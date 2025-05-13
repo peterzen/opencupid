@@ -1,3 +1,4 @@
+// apps/backend/src/plugins/prisma.ts
 import fp from 'fastify-plugin'
 import { PrismaClient } from '@prisma/client'
 

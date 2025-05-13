@@ -10,7 +10,7 @@ export default fp(async (fastify) => {
     try {
       await request.jwtVerify()
     } catch (err) {
-      reply.send(err)
+      reply.status(401).send({ error: 'Unauthorized' })
     }
   })
 })
