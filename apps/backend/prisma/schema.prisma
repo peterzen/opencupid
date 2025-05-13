@@ -20,12 +20,14 @@ model User {
   resetTokenExp  DateTime?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  lastLoginAt    DateTime?
   profile        Profile?
 }
 
 model Profile {
-  id               String   @id @default(cuid())
-  userId           String   @unique
+  id               String               @id @default(cuid())
+  userId           String               @unique
+  isActive         Boolean
   publicName       String
   intro            String?
   country          String?
@@ -34,10 +36,49 @@ model Profile {
   gender           Gender
   relationship     RelationshipStatus
   hasKids          Boolean
-  interestTags     String[]
-  searchPreference SearchPreference?
-  user             User     @relation(fields: [userId], references: [id])
+
+  // current location
+  latitude         Float?
+  longitude        Float?
+
+  // — one-to-one (opt) search prefs
+  searchPreference SearchPreference?    @relation(fields: [searchPreferenceId], references: [id])
+  searchPreferenceId String?
+
+  // — relations
+  user             User                 @relation(fields: [userId], references: [id])
+  images           ProfileImage[]
+  tags             ProfileTag[]
+
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
 }
+
+model ProfileImage {
+  id         String   @id @default(cuid())
+  profile    Profile  @relation(fields: [profileId], references: [id])
+  profileId  String
+  isPrimary  Boolean  @default(false)
+
+  createdAt  DateTime @default(now())
+}
+
+model Tag {
+  id            String         @id @default(cuid())
+  name          String         @unique
+  profileLinks  ProfileTag[]
+}
+
+model ProfileTag {
+  id         String   @id @default(cuid())
+  profile    Profile  @relation(fields: [profileId], references: [id])
+  profileId  String
+  tag        Tag      @relation(fields: [tagId], references: [id])
+  tagId      String
+
+  @@unique([profileId, tagId])  // prevents duplicates
+}
+
 
 model SearchPreference {
   id       String   @id @default(cuid())
