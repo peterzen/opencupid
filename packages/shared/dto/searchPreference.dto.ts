@@ -3,4 +3,5 @@ export interface SearchPreferenceDTO {
   ageMax: number
   gender: 'male' | 'female' | 'non_binary' | 'other'
   goal: 'friends' | 'relationship'
+  profileId: string
 }

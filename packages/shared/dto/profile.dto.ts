@@ -1,3 +1,5 @@
+import { SearchPreferenceDTO } from './searchPreference.dto'
+
 export interface ProfileDTO {
   id: string
   userId: string
@@ -10,5 +12,5 @@ export interface ProfileDTO {
   relationship: 'single' | 'in_relationship' | 'married' | 'other'
   hasKids: boolean
   interestTags: string[]
-  searchPreference: SearchPreferenceDTO
+  searchPreference?: SearchPreferenceDTO
 }

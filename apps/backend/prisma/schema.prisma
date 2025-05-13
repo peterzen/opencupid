@@ -1,3 +1,8 @@
+generator zod {
+  provider = "prisma-zod-generator"
+  output   = "../shared/zod/generated"
+}
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -31,7 +36,7 @@ model Profile {
   relationship     RelationshipStatus
   hasKids          Boolean
   interestTags     String[]
-  searchPreference SearchPreference
+  searchPreference SearchPreference?
   user             User     @relation(fields: [userId], references: [id])
 }
 
