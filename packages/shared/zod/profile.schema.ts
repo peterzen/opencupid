@@ -1,0 +1,16 @@
+import { z } from 'zod'
+import { SearchPreferenceSchema } from './searchPreference.schema'
+
+export const ProfileSchema = z.object({
+  userId: z.string(),
+  publicName: z.string().min(2),
+  intro: z.string().optional(),
+  country: z.string().optional(),
+  city: z.string().optional(),
+  birthday: z.coerce.date().optional(),
+  gender: z.enum(['male', 'female', 'non_binary', 'other']),
+  relationship: z.enum(['single', 'in_relationship', 'married', 'other']),
+  hasKids: z.boolean(),
+  interestTags: z.array(z.string()),
+  searchPreference: SearchPreferenceSchema
+})

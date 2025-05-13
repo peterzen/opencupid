@@ -1,12 +1,14 @@
 export interface ProfileDTO {
   id: string
+  userId: string
   publicName: string
   intro?: string
+  country?: string
+  city?: string
   birthday?: string
-  gender?: string
-  location?: string
-  hasKids?: boolean
-  tags?: string[]
-  status?: string
-  goal?: string
+  gender: 'male' | 'female' | 'non_binary' | 'other'
+  relationship: 'single' | 'in_relationship' | 'married' | 'other'
+  hasKids: boolean
+  interestTags: string[]
+  searchPreference: SearchPreferenceDTO
 }

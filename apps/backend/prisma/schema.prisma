@@ -8,39 +8,58 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  profile   Profile?
+  id             String   @id @default(cuid())
+  email          String   @unique
+  username       String   @unique
+  password       String
+  resetToken     String?  @unique
+  resetTokenExp  DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  profile        Profile?
 }
 
 model Profile {
-  id         String   @id @default(cuid())
-  userId     String   @unique
-  publicName String
-  intro      String?
-  birthday   DateTime?
-  gender     String?
-  location   String?
-  hasKids    Boolean?
-  tags       String[]
-  status     String?
-  goal       String?
-  user       User     @relation(fields: [userId], references: [id])
-
-  sentMessages     Message[] @relation("SentMessages")
-  receivedMessages Message[] @relation("ReceivedMessages")
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  publicName       String
+  intro            String?
+  country          String?
+  city             String?
+  birthday         DateTime?
+  gender           Gender
+  relationship     RelationshipStatus
+  hasKids          Boolean
+  interestTags     String[]
+  searchPreference SearchPreference
+  user             User     @relation(fields: [userId], references: [id])
 }
 
-model Message {
-  id           String   @id @default(cuid())
-  senderId     String
-  recipientId  String
-  content      String
-  createdAt    DateTime @default(now())
+model SearchPreference {
+  id       String   @id @default(cuid())
+  profile  Profile  @relation(fields: [profileId], references: [id])
+  profileId String  @unique
+  ageMin   Int
+  ageMax   Int
+  gender   Gender
+  goal     Goal
+}
 
-  sender       Profile  @relation("SentMessages", fields: [senderId], references: [id])
-  recipient    Profile  @relation("ReceivedMessages", fields: [recipientId], references: [id])
+enum Gender {
+  male
+  female
+  non_binary
+  other
+}
+
+enum RelationshipStatus {
+  single
+  in_relationship
+  married
+  other
+}
+
+enum Goal {
+  friends
+  relationship
 }

@@ -14,5 +14,8 @@
     "lint": "turbo run lint",
     "generate": "turbo run generate",
     "migrate": "turbo run migrate"
+  },
+  "dependencies": {
+    "zod": "^3.24.4"
   }
 }
