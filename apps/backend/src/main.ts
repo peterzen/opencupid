@@ -1,7 +1,13 @@
 import Fastify from 'fastify'
+import cors from '@fastify/cors' // Import the CORS plugin
 import env from './env'
 
 const app = Fastify({ logger: true })
+
+// Register CORS plugin
+app.register(cors, {
+  origin: '*',
+})
 
 app.register(import('./plugins/prisma'))
 app.register(import('./plugins/auth'))

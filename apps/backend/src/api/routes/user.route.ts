@@ -15,7 +15,6 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
     const user = await fastify.prisma.user.create({
       data: {
         email: data.email,
-        username: data.username,
         password: hashed
       }
     })
