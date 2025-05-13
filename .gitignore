@@ -1,0 +1,30 @@
+# Node modules
+node_modules/
+.pnpm/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Env
+.env
+
+# Build output
+dist/
+build/
+
+# Prisma
+prisma/dev.db
+.prisma/
+
+# VSCode
+.vscode/
+
+# Mac/Linux
+.DS_Store
+Thumbs.db
+
+# Turbo
+turbo/
+.turbo/

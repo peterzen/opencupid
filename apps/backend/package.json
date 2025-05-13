@@ -1,0 +1,26 @@
+{
+  "name": "backend",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "ts-node-dev src/main.ts",
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "generate": "prisma generate",
+    "migrate": "prisma migrate dev --name init"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.0.0",
+    "fastify": "^4.0.0",
+    "fastify-plugin": "^4.0.0",
+    "bcrypt": "^5.0.1",
+    "dotenv": "^16.0.0",
+    "@fastify/jwt": "^7.0.0",
+    "zod": "^3.22.2"
+  },
+  "devDependencies": {
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.0.0",
+    "@types/node": "^18.0.0",
+    "prisma": "^5.0.0"
+  }
+}
