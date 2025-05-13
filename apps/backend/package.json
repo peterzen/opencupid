@@ -2,12 +2,12 @@
   "name": "backend",
   "main": "dist/main.js",
   "scripts": {
-    "dev": "ts-node-dev src/main.ts",
+    "dev": "tsc-watch --onSuccess \"node dist/main.js\"",
     "build": "tsc",
     "start": "node dist/main.js",
     "generate": "prisma generate",
     "migrate": "prisma migrate dev --name init",
-    "watch": "tsc --watch"
+    "watch": "tsc-watch"
   },
   "dependencies": {
     "@fastify/jwt": "^7.0.0",
@@ -23,6 +23,7 @@
     "@types/node": "^18.0.0",
     "prisma": "^5.0.0",
     "ts-node-dev": "^2.0.0",
+    "tsc-watch": "^6.2.1",
     "typescript": "^5.0.0"
   }
 }
