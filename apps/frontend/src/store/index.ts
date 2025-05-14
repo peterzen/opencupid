@@ -33,14 +33,7 @@ export const useAuthStore = defineStore('auth', {
         throw 'An unexpected error occurred. Please try again.';
       }
     },
-    // async login(email: string, password: string) {
-    //   const res = await axios.post('/users/login', { email, password })
-    //   this.token = res.data.token
-    //   setJwt(this.token)
-    //   // localStorage.setItem('token', this.token)
-    //   // axios.defaults.headers.common['Authorization'] = `Bearer {this.token}`
-    //   this.user = res.data.user
-    // },
+
 
     async register(email: string, password: string) {
       try {
@@ -55,7 +48,17 @@ export const useAuthStore = defineStore('auth', {
     async confirmEmail(emailToken: string) {
       try {
         const res = await axios.get('/users/confirm-email', { params: { emailToken } })
-        return { success: true, message: res.data.message }
+
+        if (res.data.status === 'success') {
+          this.token = res.data.token;
+          setJwt(this.token);
+          this.user = res.data.user;
+          return { success: true, status: 'success' };
+        }
+
+        // Return the status flag for the frontend to handle
+        return { success: false, status: res.data.status };
+        // return { success: true, message: res.data.message }
       } catch (error: any) {
         console.error('Email confirmation failed:', error)
         throw error.response?.data?.message || 'Failed to confirm email.'

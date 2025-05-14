@@ -64,7 +64,7 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
 
     const user = await fastify.prisma.user.findUnique({ where: { resetToken: emailToken } })
     if (!user) {
-      return reply.status(400).send({ error: 'Invalid or expired email token' })
+      return reply.status(200).send({ status: 'invalid_token' }); // Return status flag
     }
 
     // Update the user's email confirmation status
@@ -77,10 +77,9 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
       },
     })
 
-    // Generate a JWT token
-    const jwtToken = fastify.jwt.sign({ userId: user.id, email: user.email })
+    const token = fastify.jwt.sign({ userId: user.id, email: user.email });
+    reply.send({ status: 'success', token, user });
 
-    reply.send({ token: jwtToken, message: 'Email confirmed successfully' })
   })
 }
 

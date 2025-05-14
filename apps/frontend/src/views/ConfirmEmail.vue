@@ -10,7 +10,6 @@
 import { defineComponent } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from '@/store';
-import { toast } from 'vue3-toastify';
 
 export default defineComponent({
   name: 'ConfirmEmail',
@@ -34,9 +33,19 @@ export default defineComponent({
 
     try {
       // Call the confirmEmail method in the auth store
-      await authStore.confirmEmail(token);
-      this.$router.push({ name: 'UserHome' });
-      toast.success('Your email address has been confirmed! Welcome.');
+      const res = await authStore.confirmEmail(token);
+
+       if (res.success) {
+          this.$router.push({ name: 'UserHome', 
+            query: { message: 'Your email has been successfully confirmed!' },
+
+          });
+        } else {
+          // Handle different status flags
+          if (res.status === 'invalid_token') {
+            this.error = 'Cannot confirm your email address, please send us a message.';
+          }
+        }
 
     } catch (err: any) {
       console.error(err);

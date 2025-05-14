@@ -3,13 +3,6 @@
     <h1>Create Account</h1>
     <form @submit.prevent="handleRegister"
           class="register-form">
-      <div class="form-group">
-        <label for="name">Name</label>
-        <input type="text"
-               id="name"
-               v-model="name"
-               required />
-      </div>
 
       <div class="form-group">
         <label for="email">Email</label>
