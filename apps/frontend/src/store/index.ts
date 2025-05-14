@@ -34,7 +34,6 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-
     async register(email: string, password: string) {
       try {
         const res = await axios.post('/users/register', { email, password })
@@ -58,12 +57,41 @@ export const useAuthStore = defineStore('auth', {
 
         // Return the status flag for the frontend to handle
         return { success: false, status: res.data.status };
-        // return { success: true, message: res.data.message }
       } catch (error: any) {
         console.error('Email confirmation failed:', error)
         throw error.response?.data?.message || 'Failed to confirm email.'
       }
     },
+    async sendPasswordRecoveryEmail(email: string) {
+      try {
+        const res = await axios.post('/users/send-password-recovery-email', { email })
+        // Return the status flag for the frontend to handle
+        return { success: true, status: res.data.status };
+      } catch (error: any) {
+        console.error('Email confirmation failed:', error)
+        throw error.response?.data?.message || 'Failed to confirm email.'
+      }
+    },
+
+    async resetPassword(token: string, password: string) {
+      try {
+        const res = await axios.post('/users/password-reset', { token, password })
+
+        if (res.data.status === 'success') {
+          this.token = res.data.token;
+          setJwt(this.token);
+          this.user = res.data.user;
+          return { success: true, status: 'success' };
+        }
+
+        return { success: false, status: res.data.status };
+
+      } catch (error: any) {
+        console.error('Reset password failed:', error)
+        throw error.response?.data?.message || 'Failed to reset password.'
+      }
+    },
+
     logout() {
       this.token = ''
       localStorage.removeItem('token')

@@ -17,8 +17,8 @@ const connection = new IORedis(redisUrl, {
 
 // configure your SMTP or API transport
 const transporter = nodemailer.createTransport({
-  host:   process.env.SMTP_HOST,
-  port:   Number(process.env.SMTP_PORT),
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT),
   secure: false,
   auth: {
     user: process.env.SMTP_USER,
@@ -35,19 +35,18 @@ new Worker('emails', async job => {
 
     if (!user) throw new Error('User not found')
 
-      const emailToken = user.resetToken
-      const email = user.email
+    const emailToken = user.resetToken
+    const email = user.email
 
-    // actually send the email
-    // TODO refactor this into a separate function
     await transporter.sendMail({
       from: process.env.EMAIL_FROM,
-      to:   email,
+      to: email,
       subject: 'Please confirm your email address',
       html: `<p>Hey there, welcome aboard!</p>
       <p>Please click this link to jump right in: <a href="${process.env.FRONTEND_URL}/confirm-email?token=${emailToken}">Confirm Email</a></p>`
     })
   }
+
   if (job.name === 'sendWelcomeEmail') {
     const { userId } = job.data as { userId: string }
 
@@ -55,15 +54,32 @@ new Worker('emails', async job => {
 
     if (!user) throw new Error('User not found')
 
-    // actually send the email
     await transporter.sendMail({
       from: process.env.EMAIL_FROM,
-      to:   user.email,
+      to: user.email,
       subject: 'Welcome to OpenCupid!',
       html: `<p>Hey there, welcome aboard!</p>`
     })
   }
 
+  if (job.name === 'sendPasswordRecoveryEmail') {
+    const { userId } = job.data as { userId: string }
+
+    const user = await prisma.user.findUnique({ where: { id: userId } })
+
+    if (!user) throw new Error('User not found')
+
+    const emailToken = user.resetToken
+    const email = user.email
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_FROM,
+      to: email,
+      subject: 'Reset your password',
+      html: `<p>To reset your password, click this link</p>
+      <p><a href="${process.env.FRONTEND_URL}/reset-password?token=${emailToken}">Confirm Email</a></p>`
+    })
+  }
 
 
 }, { connection })

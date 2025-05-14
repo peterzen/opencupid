@@ -1,13 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import type { RouteRecordRaw } from 'vue-router'
-import { useAuthStore } from '@/store'; // Import the auth store
-
+import { useAuthStore } from '@/store';
 
 import Login from '@/views/Login.vue';
 import UserHome from '@/views/UserHome.vue';
 import Register from '@/views/Register.vue';
 import ConfirmEmail from '@/views/ConfirmEmail.vue';
 import RegistrationComplete from '@/views/RegistrationComplete.vue';
+import RecoverPasswordIntent from '@/views/RecoverPasswordIntent.vue';
+import ResetPassword from '@/views/ResetPassword.vue';
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -32,6 +33,18 @@ const routes: Array<RouteRecordRaw> = [
     path: '/confirm-email',
     name: 'ConfirmEmail',
     component: ConfirmEmail,
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/forgot-password',
+    name: 'RecoverPasswordIntent',
+    component: RecoverPasswordIntent,
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: ResetPassword,
     meta: { requiresAuth: false }
   },
   {
