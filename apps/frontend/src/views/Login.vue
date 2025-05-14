@@ -28,6 +28,9 @@
                class="mt-3 alert alert-danger">{{ error }}</div>
         </form>
       </div>
+      <div class="col-md-6">
+        <p class="mt-3">Don't have an account? <router-link to="/register">Register</router-link></p>
+    </div>
     </div>
   </div>
 </template>
