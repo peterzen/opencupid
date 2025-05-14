@@ -10,6 +10,7 @@
 import { defineComponent } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from '@/store';
+import { toast } from 'vue3-toastify';
 
 export default defineComponent({
   name: 'ConfirmEmail',
@@ -34,9 +35,8 @@ export default defineComponent({
     try {
       // Call the confirmEmail method in the auth store
       await authStore.confirmEmail(token);
-      this.message = 'Your email address has been confirmed! Welcome.';
-
-          this.$router.push({ name: 'UserHome' });
+      this.$router.push({ name: 'UserHome' });
+      toast.success('Your email address has been confirmed! Welcome.');
 
     } catch (err: any) {
       console.error(err);
