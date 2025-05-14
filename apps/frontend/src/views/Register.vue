@@ -40,7 +40,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { useAuthStore } from '../store';
-import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'Register',
@@ -67,8 +66,7 @@ export default defineComponent({
           // On successful registration, navigate to login
           this.$router.push({
             path: '/register/confirm', query: {
-              email: this.email,
-              token: res.data.token
+              email: this.email
             }
           });
         } else {

@@ -14,14 +14,18 @@
     "@fastify/jwt": "^9.1.0",
     "@prisma/client": "^5.22.0",
     "bcrypt": "^5.1.1",
+    "bullmq": "^5.52.2",
     "dotenv": "^16.5.0",
     "fastify": "^5.3.3",
     "fastify-plugin": "^4.5.1",
+    "ioredis": "^5.6.1",
+    "nodemailer": "^7.0.3",
     "zod": "^3.24.4"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/node": "^18.19.100",
+    "@types/nodemailer": "^6.4.17",
     "prisma": "^5.22.0",
     "prisma-zod-generator": "^0.8.13",
     "ts-node-dev": "^2.0.0",

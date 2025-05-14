@@ -2,6 +2,8 @@ import Fastify from 'fastify'
 import cors from '@fastify/cors' // Import the CORS plugin
 import env from './env'
 
+import './workers/emailWorker'   // ← side‐effect: starts the worker
+
 const app = Fastify({ logger: true })
 
 // Register CORS plugin

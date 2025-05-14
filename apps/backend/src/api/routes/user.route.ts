@@ -3,6 +3,7 @@ import { RegisterSchema } from '@opencupid/shared/zod/user.schema'
 import { hashPassword, comparePassword } from '../../utils/hash'
 import { validateBody } from '../../utils/zodValidate'
 import { randomBytes } from 'crypto' // Import crypto for generating resetToken
+import { emailQueue } from '../../queues/emailQueue'
 
 function generateResetToken() {
   return randomBytes(32).toString('hex')
@@ -18,7 +19,6 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
 
     const hashed = await hashPassword(data.password)
     const emailConfirmationToken = generateResetToken() // Generate email confirmation token
-    console.log('Generated email confirmation token:', emailConfirmationToken)
 
     const user = await fastify.prisma.user.create({
       data: {
@@ -29,6 +29,12 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
       }
     })
 
+    // 2) enqueue the welcome/verification email
+    await emailQueue.add(
+      'sendConfirmationEmail',
+      { userId: user.id },
+      { attempts: 3, backoff: { type: 'exponential', delay: 5000 } }
+    )
     reply.send({ ok: true, id: user.id, email: user.email, token: user.resetToken })
   })
 
@@ -76,7 +82,12 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
         resetTokenExp: null, // Clear the expiration
       },
     })
-
+    // 2) enqueue the welcome/verification email
+    await emailQueue.add(
+      'sendWelcomeEmail',
+      { userId: user.id },
+      { attempts: 3, backoff: { type: 'exponential', delay: 5000 } }
+    )
     const token = fastify.jwt.sign({ userId: user.id, email: user.email });
     reply.send({ status: 'success', token, user });
 
