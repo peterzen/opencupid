@@ -30,7 +30,8 @@
       </div>
       <div class="col-md-6">
         <p class="mt-3">Don't have an account? <router-link to="/register">Register</router-link></p>
-    </div>
+        <p class="mt-3"><router-link to="/forgot-password">Forgot your password?</router-link></p>
+      </div>
     </div>
   </div>
 </template>
@@ -49,6 +50,7 @@ export default defineComponent({
       error: '' as string,
       token: '' as string,
       user: null as any,
+      isLoading: false,
     }
   },
   setup() {
@@ -57,18 +59,34 @@ export default defineComponent({
   },
   methods: {
     async handleLogin() {
-      const auth = useAuthStore()
-      this.error = ''
-      this.token = ''
+
       try {
-        await auth.login(this.email, this.password)
-        this.router.push({ name: 'UserHome' })
+        this.isLoading = true;
+        this.error = '';
+
+        const auth = useAuthStore();
+        const res = await auth.login(this.email, this.password);
+
+        if (res.success) {
+          this.$router.push({ name: 'UserHome' });
+        } else {
+          // Handle different status flags
+          if (res.status === 'invalid_credentials') {
+            this.error = 'Invalid email or password.';
+          } else if (res.status === 'email_not_confirmed') {
+            this.error = 'Please confirm your email before logging in.';
+          } else {
+            this.error = 'An unknown error occurred.';
+          }
+        }
       } catch (err: any) {
-        console.error(err)
-        this.error = err.response?.data?.message || 'Invalid credentials'
+        this.error = err || 'An unexpected error occurred.';
+        console.error('Login error:', err);
+      } finally {
+        this.isLoading = false;
       }
+
     },
   },
 })
 </script>
-

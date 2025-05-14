@@ -6,6 +6,8 @@ import { useAuthStore } from '@/store'; // Import the auth store
 import Login from '@/views/Login.vue';
 import UserHome from '@/views/UserHome.vue';
 import Register from '@/views/Register.vue';
+import ConfirmEmail from '@/views/ConfirmEmail.vue';
+import RegistrationComplete from '@/views/RegistrationComplete.vue';
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -18,6 +20,18 @@ const routes: Array<RouteRecordRaw> = [
     path: '/register',
     name: 'Register',
     component: Register,
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/register/confirm',
+    name: 'RegistrationComplete',
+    component: RegistrationComplete,
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/confirm-email',
+    name: 'ConfirmEmail',
+    component: ConfirmEmail,
     meta: { requiresAuth: false }
   },
   {

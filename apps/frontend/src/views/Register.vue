@@ -1,42 +1,39 @@
 <template>
   <div class="register-container">
     <h1>Create Account</h1>
-    <form @submit.prevent="handleRegister" class="register-form">
+    <form @submit.prevent="handleRegister"
+          class="register-form">
       <div class="form-group">
         <label for="name">Name</label>
-        <input
-          type="text"
-          id="name"
-          v-model="name"
-          required
-        />
+        <input type="text"
+               id="name"
+               v-model="name"
+               required />
       </div>
 
       <div class="form-group">
         <label for="email">Email</label>
-        <input
-          type="email"
-          id="email"
-          v-model="email"
-          required
-        />
+        <input type="email"
+               id="email"
+               v-model="email"
+               required />
       </div>
 
       <div class="form-group">
         <label for="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          v-model="password"
-          required
-        />
+        <input type="password"
+               id="password"
+               v-model="password"
+               required />
       </div>
 
-      <div v-if="error" class="error-message">
+      <div v-if="error"
+           class="error-message">
         {{ error }}
       </div>
 
-      <button type="submit" :disabled="isLoading">
+      <button type="submit"
+              :disabled="isLoading">
         {{ isLoading ? 'Creating account...' : 'Register' }}
       </button>
 
@@ -69,11 +66,24 @@ export default defineComponent({
         this.isLoading = true;
         this.error = '';
 
-        const auth = useAuthStore();
-        await auth.register( this.email, this.password);
+        const auth = useAuthStore()
+        const res = await auth.register(this.email, this.password)
+        console.log('Registration successful:', res)
 
-        // On successful registration, navigate to login
-        this.$router.push('/login');
+        if (res.success === true) {
+          // On successful registration, navigate to login
+          this.$router.push({
+            path: '/register/confirm', query: {
+              email: this.email,
+              token: res.data.token
+            }
+          });
+        } else {
+          // this.error = (res.error as { message?: string })?.message || 'Registration failed. Please try again.';
+          this.error = 'Already registered';
+        }
+        console.log('Registration successful:', res)
+
       } catch (err: any) {
         this.error = err.message || 'Registration failed. Please try again.';
         console.error('Registration error:', err);

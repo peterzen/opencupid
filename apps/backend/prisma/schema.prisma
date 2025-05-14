@@ -13,81 +13,81 @@ datasource db {
 }
 
 model User {
-  id             String   @id @default(cuid())
-  email          String   @unique
-  password       String
-  resetToken     String?  @unique
-  resetTokenExp  DateTime?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  lastLoginAt    DateTime?
-  profile        Profile?
+  id                String    @id @default(cuid())
+  email             String    @unique
+  password          String
+  resetToken        String?   @unique
+  resetTokenExp     DateTime?
+  isEmailConfirmed  Boolean   @default(false)
+  isAccountDisabled Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  lastLoginAt       DateTime?
+  profile           Profile?
 }
 
 model Profile {
-  id               String               @id @default(cuid())
-  userId           String               @unique
-  isActive         Boolean
-  publicName       String
-  intro            String?
-  country          String?
-  city             String?
-  birthday         DateTime?
-  gender           Gender
-  relationship     RelationshipStatus
-  hasKids          Boolean
+  id           String             @id @default(cuid())
+  userId       String             @unique
+  isActive     Boolean
+  publicName   String
+  intro        String?
+  country      String?
+  city         String?
+  birthday     DateTime?
+  gender       Gender
+  relationship RelationshipStatus
+  hasKids      Boolean
 
   // current location
-  latitude         Float?
-  longitude        Float?
+  latitude  Float?
+  longitude Float?
 
   // — one-to-one (opt) search prefs
-  searchPreference SearchPreference?    @relation(fields: [searchPreferenceId], references: [id])
-  searchPreferenceId String?
+  searchPreference SearchPreference? @relation(fields: [id], references: [profileId], onDelete: Cascade)
 
   // — relations
-  user             User                 @relation(fields: [userId], references: [id])
-  images           ProfileImage[]
-  tags             ProfileTag[]
+  user   User           @relation(fields: [userId], references: [id])
+  images ProfileImage[]
+  tags   ProfileTag[]
 
-  createdAt        DateTime             @default(now())
-  updatedAt        DateTime             @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ProfileImage {
-  id         String   @id @default(cuid())
-  profile    Profile  @relation(fields: [profileId], references: [id])
-  profileId  String
-  isPrimary  Boolean  @default(false)
+  id        String  @id @default(cuid())
+  profile   Profile @relation(fields: [profileId], references: [id])
+  profileId String
+  isPrimary Boolean @default(false)
 
-  createdAt  DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model Tag {
-  id            String         @id @default(cuid())
-  name          String         @unique
-  profileLinks  ProfileTag[]
+  id           String       @id @default(cuid())
+  name         String       @unique
+  profileLinks ProfileTag[]
 }
 
 model ProfileTag {
-  id         String   @id @default(cuid())
-  profile    Profile  @relation(fields: [profileId], references: [id])
-  profileId  String
-  tag        Tag      @relation(fields: [tagId], references: [id])
-  tagId      String
+  id        String  @id @default(cuid())
+  profile   Profile @relation(fields: [profileId], references: [id])
+  profileId String
+  tag       Tag     @relation(fields: [tagId], references: [id])
+  tagId     String
 
-  @@unique([profileId, tagId])  // prevents duplicates
+  @@unique([profileId, tagId]) // prevents duplicates
 }
 
-
 model SearchPreference {
-  id       String   @id @default(cuid())
-  profile  Profile  @relation(fields: [profileId], references: [id])
-  profileId String  @unique
-  ageMin   Int
-  ageMax   Int
-  gender   Gender
-  goal     Goal
+  id        String    @id @default(cuid())
+  profileId String    @unique
+  ageMin    Int
+  ageMax    Int
+  gender    Gender
+  goal      Goal
+  Profile   Profile[]
 }
 
 enum Gender {
