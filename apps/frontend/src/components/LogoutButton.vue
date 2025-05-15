@@ -1,5 +1,5 @@
 <template>
-  <button @click="logout" class="btn">Logout</button>
+  <a @click="logout" href="#" class="dropdown-item">Logout</a>
 </template>
 
 

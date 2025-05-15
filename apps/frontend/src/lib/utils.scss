@@ -1,0 +1,24 @@
+.tab-content-fixedheight > .tab-pane {
+  display: block; /* undo "display: none;" */
+  visibility: hidden;
+}
+
+.tab-content-fixedheight {
+  display: flex;
+}
+
+.tab-content-fixedheight > .tab-pane {
+  display: flex; /* undo "display: none;" */
+  visibility: hidden;
+  margin-right: -100%;
+  width: 100%;
+}
+
+.tab-content-fixedheight > .active {
+  visibility: visible;
+}
+
+.loading {
+  pointer-events: none;
+  opacity: 0.5;
+}

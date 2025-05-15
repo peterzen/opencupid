@@ -1,4 +1,9 @@
-import './assets/main.css'
+// import './assets/main.css'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import '@/lib/utils.scss'
+
+import { Settings } from 'luxon'
+Settings.defaultZone = 'Europe/Berlin'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
@@ -6,25 +11,30 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
-import Vue3Toastify, { type ToastContainerOptions } from 'vue3-toastify';
-import { toast } from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css';
-
 const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
 
+// FontAwesome icons
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import { far } from '@fortawesome/free-regular-svg-icons'
+library.add(fas, far)
+app.component('FontAwesomeIcon', FontAwesomeIcon)
 
-app.use(Vue3Toastify, {
-  autoClose: 3000,
-  position: toast.POSITION.TOP_RIGHT,
-  hideProgressBar: true,
-  closeOnClick: true,
-  pauseOnHover: true,
-  progress: undefined,
-  theme: "dark",
-} as ToastContainerOptions);
+// toastify
+import Vue3Toastify from 'vue3-toastify';
+import { defaultOptions } from './lib/toastify'
+app.use(Vue3Toastify, defaultOptions)
 
+// FormKit
+import { plugin as formKitPlugin, defaultConfig } from '@formkit/vue'
+import bootstrapConfig from '@/lib/formkit/formkit.config'
+import '@/lib/formkit/formkit-custom.scss'
+app.use(formKitPlugin, defaultConfig({
+  config: bootstrapConfig.config
+}))
 
 app.mount('#app')
