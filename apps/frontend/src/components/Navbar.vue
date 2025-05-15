@@ -14,7 +14,7 @@ export default defineComponent({
   components: {
     LogoutButton,
   },
-  
+
    data() {
     return {
       authStore: useAuthStore(),
@@ -64,6 +64,14 @@ export default defineComponent({
           <li class="nav-item me-auto">
             <RouterLink to="/me"
                         class="nav-link ">Home</RouterLink>
+          </li>
+          <li class="nav-item me-auto">
+            <RouterLink to="/profile"
+                        class="nav-link ">Profile</RouterLink>
+          </li>
+          <li class="nav-item me-auto">
+            <RouterLink to="/browse"
+                        class="nav-link ">Browse</RouterLink>
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle"
