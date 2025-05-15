@@ -10,3 +10,15 @@ export function applyTheme(theme: string) {
 }
 
 
+export function applySystemTheme() {
+  // Check if user prefers dark mode
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+  
+  // Apply theme based on system preference
+  applyTheme(prefersDark ? 'dark' : 'light')
+
+  // Listen for changes in system color scheme
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    applyTheme(e.matches ? 'dark' : 'light')
+  })
+}

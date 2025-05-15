@@ -5,7 +5,6 @@ import { RouterLink } from 'vue-router'
 <script lang="ts">
 import { Dropdown } from 'bootstrap'
 import { defineComponent } from 'vue'
-import LightSwitch from './LightSwitch.vue'
 import LogoutButton from './LogoutButton.vue';
 import { useAuthStore } from '@/store/authStore';
 
@@ -13,25 +12,28 @@ import { useAuthStore } from '@/store/authStore';
 export default defineComponent({
   name: 'Navbar',
   components: {
-    LightSwitch,
     LogoutButton,
   },
+  
    data() {
     return {
       authStore: useAuthStore(),
     }
   },
+
   computed: {
     isLoggedIn(): boolean {
-      return this.authStore.user !== null
+      return this.authStore.isLoggedIn()
     }
   },
-   mounted() {
+
+  mounted() {
     const dropdownRef = this.$refs.navbarDropdown as HTMLElement
      if (dropdownRef) {
       new Dropdown(dropdownRef)
     }
   },
+
   methods: {
     switchTheme() {
       console.log('switch theme')
@@ -60,7 +62,7 @@ export default defineComponent({
            id="navbar">
         <ul class="navbar-nav mb-2 mb-lg-0 d-flex">
           <li class="nav-item me-auto">
-            <RouterLink to="/"
+            <RouterLink to="/me"
                         class="nav-link ">Home</RouterLink>
           </li>
           <li class="nav-item dropdown">
@@ -76,14 +78,8 @@ export default defineComponent({
             <ul class="dropdown-menu dropdown-dark dropdown-menu-end"
                 aria-labelledby="navbarDropdown">
               <li>
-                <span class="dropdown-item lightswitch">
-                  <LightSwitch />
-                </span>
-              </li>
-              <li>
                 <LogoutButton />
               </li>
-
             </ul>
           </li>
         </ul>
