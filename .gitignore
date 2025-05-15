@@ -29,5 +29,3 @@ Thumbs.db
 turbo/
 .turbo/
 
-# zod generated schemas
-apps/backend/shared/zod/generated/

@@ -51,6 +51,9 @@ importers:
       zod:
         specifier: ^3.24.4
         version: 3.24.4
+      zod-prisma-types:
+        specifier: ^3.2.4
+        version: 3.2.4(@prisma/client@5.22.0(prisma@5.22.0))(prisma@5.22.0)
     devDependencies:
       '@types/bcrypt':
         specifier: ^5.0.2
@@ -831,6 +834,12 @@ packages:
   '@prisma/debug@5.22.0':
     resolution: {integrity: sha512-AUt44v3YJeggO2ZU5BkXI7M4hu9BF2zzH2iF2V5pyXT/lRTyWiElZ7It+bRH1EshoMRxHgpYg4VB6rCM+mG5jQ==}
 
+  '@prisma/debug@6.8.1':
+    resolution: {integrity: sha512-3HrYLFje+ngEUBKH9x6LWBiqpX8pQEB791RWFS+anWoklM9b6MFdWGzK0bika3rGIs0KOb0ZTKVXo6OmWvjryg==}
+
+  '@prisma/dmmf@6.8.1':
+    resolution: {integrity: sha512-1hiYYp/JvCIUWHXOqnUV1Wvr3wAMi8EsbdXta+DVfyUKmL+vGPSkG8DqZdiq8pmgKpkzofFhlITTEzvBKo3ZFw==}
+
   '@prisma/engines-version@4.16.1-1.4bc8b6e1b66cb932731fb1bdbbc550d1e010de81':
     resolution: {integrity: sha512-q617EUWfRIDTriWADZ4YiWRZXCa/WuhNgLTVd+HqWLffjMSPzyM5uOWoauX91wvQClSKZU4pzI4JJLQ9Kl62Qg==}
 
@@ -851,6 +860,12 @@ packages:
 
   '@prisma/generator-helper@4.16.2':
     resolution: {integrity: sha512-bMOH7y73Ui7gpQrioFeavMQA+Tf8ksaVf8Nhs9rQNzuSg8SSV6E9baczob0L5KGZTSgYoqnrRxuo03kVJYrnIg==}
+
+  '@prisma/generator-helper@6.8.1':
+    resolution: {integrity: sha512-YBM3pZC0sIa6PJWWCWza62b3/tl6yUYZH64DSOyguDRmOQwBGCCba1aO2yLXWr5HcjhD7bahet00JNwlY6mHag==}
+
+  '@prisma/generator@6.8.1':
+    resolution: {integrity: sha512-Pv2HE7nsFCkGwGpt9NtZgOyT8sIx0pFFfkrjRz/ebeZ2mAnFrUfA2+B+KdnhcXcaJjIcvYpL/tNT/D0XAn1sug==}
 
   '@prisma/get-platform@4.16.2':
     resolution: {integrity: sha512-fnDey1/iSefHJRMB+w243BhWENf+paRouPMdCqIVqu8dYkR1NqhldblsSUC4Zr2sKS7Ta2sK4OLdt9IH+PZTfw==}
@@ -1566,6 +1581,9 @@ packages:
   cluster-key-slot@1.1.2:
     resolution: {integrity: sha512-RMr0FhtfXemyinomL4hrWcYJxmX6deFdCxpJzhDttxgO1+bcCnkk+9drydLVDmAMG7NE6aN/fl4F7ucU/90gAA==}
     engines: {node: '>=0.10.0'}
+
+  code-block-writer@12.0.0:
+    resolution: {integrity: sha512-q4dMFMlXtKR3XNBHyMHt/3pwYNA69EDk00lloMOaaUMKPUXBw6lpXtbu3MMVG6/uOihGnRDOlkyqsONEUj60+w==}
 
   color-convert@2.0.1:
     resolution: {integrity: sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==}
@@ -4249,6 +4267,13 @@ packages:
     resolution: {integrity: sha512-9qv4rlDiopXg4E69k+vMHjNN63YFMe9sZMrdlvKnCjlCRWeCBswPPMPUfx+ipsAWq1LXHe70RcbaHdJJpS6hyQ==}
     engines: {node: '>= 10'}
 
+  zod-prisma-types@3.2.4:
+    resolution: {integrity: sha512-S4spVBMJAmecLv+aLyRhXK26qW9nWwcsOf1H1fRcEmiI8DPbftZ99u0fhqHlymuTpmMcUpuKxcNNOIqNY0ScSQ==}
+    hasBin: true
+    peerDependencies:
+      '@prisma/client': ^4.x.x || ^5.x.x || ^6.x.x
+      prisma: ^4.x.x || ^5.x.x || ^6.x.x
+
   zod-to-json-schema@3.24.5:
     resolution: {integrity: sha512-/AuWwMP+YqiPbsJx5D6TfgRTc4kTLjsh5SOcd4bLsfUg2RcEXrFMJl1DGgdHy2aCfsIA/cr/1JM0xcB2GZji8g==}
     peerDependencies:
@@ -4870,6 +4895,10 @@ snapshots:
 
   '@prisma/debug@5.22.0': {}
 
+  '@prisma/debug@6.8.1': {}
+
+  '@prisma/dmmf@6.8.1': {}
+
   '@prisma/engines-version@4.16.1-1.4bc8b6e1b66cb932731fb1bdbbc550d1e010de81': {}
 
   '@prisma/engines-version@5.22.0-44.605197351a3c8bdd595af2d2a9bc3025bca48ea2': {}
@@ -4920,6 +4949,14 @@ snapshots:
       kleur: 4.1.5
     transitivePeerDependencies:
       - supports-color
+
+  '@prisma/generator-helper@6.8.1':
+    dependencies:
+      '@prisma/debug': 6.8.1
+      '@prisma/dmmf': 6.8.1
+      '@prisma/generator': 6.8.1
+
+  '@prisma/generator@6.8.1': {}
 
   '@prisma/get-platform@4.16.2':
     dependencies:
@@ -5788,6 +5825,8 @@ snapshots:
       string-width: 4.2.3
 
   cluster-key-slot@1.1.2: {}
+
+  code-block-writer@12.0.0: {}
 
   color-convert@2.0.1:
     dependencies:
@@ -8410,6 +8449,15 @@ snapshots:
       archiver-utils: 3.0.4
       compress-commons: 4.1.2
       readable-stream: 3.6.2
+
+  zod-prisma-types@3.2.4(@prisma/client@5.22.0(prisma@5.22.0))(prisma@5.22.0):
+    dependencies:
+      '@prisma/client': 5.22.0(prisma@5.22.0)
+      '@prisma/generator-helper': 6.8.1
+      code-block-writer: 12.0.0
+      lodash: 4.17.21
+      prisma: 5.22.0
+      zod: 3.24.4
 
   zod-to-json-schema@3.24.5(zod@3.24.4):
     dependencies:

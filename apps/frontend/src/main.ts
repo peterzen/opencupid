@@ -33,8 +33,19 @@ app.use(Vue3Toastify, defaultOptions)
 import { plugin as formKitPlugin, defaultConfig } from '@formkit/vue'
 import bootstrapConfig from '@/lib/formkit/formkit.config'
 import '@/lib/formkit/formkit-custom.scss'
+import { useAuthStore } from './store/authStore'
 app.use(formKitPlugin, defaultConfig({
   config: bootstrapConfig.config
 }))
+
+
+const authStore = useAuthStore()
+
+// // Verify token on app startup
+// authStore.verifyToken().then((isValid) => {
+//   if (!isValid) {
+//     router.push({ name: 'Login' }) // Redirect to login if token is invalid
+//   }
+// })
 
 app.mount('#app')

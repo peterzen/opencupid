@@ -103,7 +103,21 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
     return reply.status(200).send({ success: true, status: 'login' });
   })
 
+  fastify.get('/verify-token', async (req, reply) => {
+    try {
+      const user = await fastify.prisma.user.findUnique({
+        where: { id: req.user.userId },
+      })
 
+      if (!user) {
+        return reply.status(401).send({ error: 'Invalid token' })
+      }
+
+      return { user }
+    } catch (err) {
+      return reply.status(500).send({ error: 'Failed to verify token' })
+    }
+  })
 
 }
 

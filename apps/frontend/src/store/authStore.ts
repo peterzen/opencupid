@@ -56,7 +56,24 @@ export const useAuthStore = defineStore('auth', {
       this.user = null
     },
 
-    isLoggedIn(){
+    async verifyToken() {
+      if (!this.token) {
+        this.logout()
+        return false
+      }
+
+      try {
+        const res = await axios.get('/users/verify-token')
+        this.user = res.data.user
+        return true
+      } catch (error: any) {
+        console.error('Token verification failed:', error)
+        this.logout()
+        return false
+      }
+    },
+
+    isLoggedIn() {
       return this.token !== ''
     }
   },
