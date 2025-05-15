@@ -5,6 +5,9 @@ import { useAuthStore } from '@/store/authStore';
 import Login from '@/views/Login.vue';
 import UserHome from '@/views/UserHome.vue';
 import LoginReturn from '@/views/LoginReturn.vue';
+import UserProfile from '@/views/UserProfile.vue';
+import { useLocalStore } from '@/store/localStore';
+import { showToast } from '@/lib/toastify';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -25,6 +28,13 @@ const routes: Array<RouteRecordRaw> = [
     component: UserHome,
     meta: { requiresAuth: true }
   },
+  {
+    path: '/profile',
+    name: 'UserProfile',
+    component: UserProfile,
+    meta: { requiresAuth: true }
+  },
+
 
 
   // Redirect root to login page
@@ -43,7 +53,8 @@ const router = createRouter({
 
 // Register the navigation guard
 router.beforeEach((to, from, next) => {
-  const auth = useAuthStore(); // Access the auth store
+  const auth = useAuthStore();
+
   if (to.meta.requiresAuth && !auth.token) {
     // If the route requires authentication and the user is not logged in, redirect to login
     next({ name: 'Login' });
@@ -51,6 +62,20 @@ router.beforeEach((to, from, next) => {
     // Otherwise, allow access
     next();
   }
+});
+
+router.afterEach((to, from) => {
+  const localStore = useLocalStore()
+  const flashMessage = localStore.getFlashMessage()
+
+  if (flashMessage) {
+    showToast(flashMessage)
+  }
+  
+  // Set the page title based on the route name
+  // const title = to.name ? `${to.name} - My App` : 'My App';
+  // document.title = title;
+
 });
 
 export default router;

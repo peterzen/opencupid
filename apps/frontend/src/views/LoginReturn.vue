@@ -1,12 +1,13 @@
 <template>
   <div class="container mt-5">
     <h2 v-if="message">{{ message }}</h2>
-    <h3 v-if="error" class="text-danger">{{ error }}</h3>
+    <h3 v-if="error"
+        class="text-danger">{{ error }}</h3>
 
     <p class="mt-3">
       <RouterLink to="/login">
         Back to login
-        </RouterLink>
+      </RouterLink>
     </p>
   </div>
 </template>
@@ -15,6 +16,7 @@
 import { defineComponent } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from '@/store/authStore';
+import { useLocalStore } from '@/store/localStore';
 
 export default defineComponent({
   name: 'LoginReturn',
@@ -27,6 +29,7 @@ export default defineComponent({
   async mounted() {
     const route = useRoute();
     const authStore = useAuthStore();
+    const localStore = useLocalStore()
 
     // Get the token from the query parameters
     const token = route.query.token as string;
@@ -38,21 +41,19 @@ export default defineComponent({
 
     try {
       const res = await authStore.login(token);
-console.log('res', res)
-       if (res.success === true) {
-          this.$router.push({ name: 'UserHome', 
-            query: { message: 'Your email has been successfully confirmed!' },
-
-          });
-        } else {
-          // Handle different status flags
-          if (res.status === 'missing_token') {
-            this.error = 'Something went wrong, please doublecheck the link in the email.';
-          }
-          if (res.status === 'invalid_token') {
-            this.error = 'Something went wrong, please doublecheck the link in the email.';
-          }
+      console.log('res', res)
+      if (res.success === true) {
+        localStore.setFlashMessage('Your email has been successfully confirmed!', 'success')
+        this.$router.push({ name: 'UserHome' })
+      } else {
+        // Handle different status flags
+        if (res.status === 'missing_token') {
+          this.error = 'Something went wrong, please doublecheck the link in the email.';
         }
+        if (res.status === 'invalid_token') {
+          this.error = 'Something went wrong, please doublecheck the link in the email.';
+        }
+      }
 
     } catch (err: any) {
       console.error(err);
@@ -61,4 +62,3 @@ console.log('res', res)
   },
 });
 </script>
-
