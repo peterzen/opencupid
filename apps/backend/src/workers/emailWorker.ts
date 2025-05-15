@@ -44,7 +44,7 @@ new Worker('emails', async job => {
       subject: 'Your login link',
       html: `<p>Hey there, welcome aboard!</p>
       <p>Please click this link to jump right in:       
-      <a href="${process.env.FRONTEND_URL}/login/return?token=${emailToken}">Confirm Email</a></p>`
+      <a href="${process.env.FRONTEND_URL}/login?token=${emailToken}">Confirm Email</a></p>`
     })
   }
 
@@ -59,7 +59,9 @@ new Worker('emails', async job => {
       from: process.env.EMAIL_FROM,
       to: user.email,
       subject: 'Welcome to OpenCupid!',
-      html: `<p>Hey there, welcome aboard!</p>`
+      html: `<p>Hey there, welcome aboard!</p>
+      <a href="${process.env.FRONTEND_URL}/me">Go connect with people</a></p>
+      `
     })
   }
 

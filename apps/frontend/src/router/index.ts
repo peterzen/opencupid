@@ -4,7 +4,6 @@ import { useAuthStore } from '@/store/authStore';
 
 import Login from '@/views/Login.vue';
 import UserHome from '@/views/UserHome.vue';
-import LoginReturn from '@/views/LoginReturn.vue';
 import UserProfile from '@/views/UserProfile.vue';
 import { useLocalStore } from '@/store/localStore';
 import { showToast } from '@/lib/toastify';
@@ -14,12 +13,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '/login',
     name: 'Login',
     component: Login,
-    meta: { requiresAuth: false }
-  },
-  {
-    path: '/login/return',
-    name: 'LoginReturn',
-    component: LoginReturn,
     meta: { requiresAuth: false }
   },
   {
@@ -34,9 +27,6 @@ const routes: Array<RouteRecordRaw> = [
     component: UserProfile,
     meta: { requiresAuth: true }
   },
-
-
-
   // Redirect root to login page
   {
     path: '/',
@@ -55,7 +45,11 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const auth = useAuthStore();
 
-  if (to.meta.requiresAuth && !auth.token) {
+  if(to.meta.requiresAuth === false && auth.isLoggedIn()) {
+    next({ name: 'UserHome' });
+  }
+
+  if (to.meta.requiresAuth && !auth.isLoggedIn()) {
     // If the route requires authentication and the user is not logged in, redirect to login
     next({ name: 'Login' });
   } else {
