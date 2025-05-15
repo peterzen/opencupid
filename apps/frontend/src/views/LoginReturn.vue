@@ -1,18 +1,23 @@
 <template>
-  aaa
   <div class="container mt-5">
-    <h1 v-if="message">{{ message }}</h1>
-    <h1 v-if="error" class="text-danger">{{ error }}</h1>
+    <h2 v-if="message">{{ message }}</h2>
+    <h3 v-if="error" class="text-danger">{{ error }}</h3>
+
+    <p class="mt-3">
+      <RouterLink to="/login">
+        Back to login
+        </RouterLink>
+    </p>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { useRoute } from 'vue-router';
-import { useAuthStore } from '@/store';
+import { useAuthStore } from '@/store/authStore';
 
 export default defineComponent({
-  name: 'ConfirmEmail',
+  name: 'LoginReturn',
   data() {
     return {
       message: '',
@@ -32,18 +37,20 @@ export default defineComponent({
     }
 
     try {
-      // Call the confirmEmail method in the auth store
-      const res = await authStore.confirmEmail(token);
-
-       if (res.success) {
+      const res = await authStore.login(token);
+console.log('res', res)
+       if (res.success === true) {
           this.$router.push({ name: 'UserHome', 
             query: { message: 'Your email has been successfully confirmed!' },
 
           });
         } else {
           // Handle different status flags
+          if (res.status === 'missing_token') {
+            this.error = 'Something went wrong, please doublecheck the link in the email.';
+          }
           if (res.status === 'invalid_token') {
-            this.error = 'Cannot confirm your email address, please send us a message.';
+            this.error = 'Something went wrong, please doublecheck the link in the email.';
           }
         }
 

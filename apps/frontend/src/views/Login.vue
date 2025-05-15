@@ -1,36 +1,32 @@
 <template>
   <div class="container mt-5">
     <div class="row justify-content-center">
-      <div class="col-md-6">
-        <h2>Login</h2>
-        <form @submit.prevent="handleLogin">
+      <div v-if="isLinkSent"
+           class="col-md-6">
+        <h2>Check your email</h2>
+        <p>We have sent you a login link. Please check your inbox.</p>
+        <p>If you don't see it, please check your spam folder.</p>
+      </div>
+
+      <div v-else
+           class="col-md-6">
+        <h2>Welcome!</h2>
+        <form @submit.prevent="handleSendLoginLink">
           <div class="mb-3">
             <label for="email"
-                   class="form-label">email</label>
+                   class="form-label">Please enter your email address to continue</label>
             <input v-model="email"
                    id="email"
                    type="text"
-                   class="form-control"
+                   class="form-control form-control-lg"
                    required />
           </div>
-          <div class="mb-3">
-            <label for="password"
-                   class="form-label">Password</label>
-            <input v-model="password"
-                   id="password"
-                   type="password"
-                   class="form-control"
-                   required />
-          </div>
+
           <button type="submit"
-                  class="btn btn-primary w-100">Login</button>
+                  class="btn btn-primary w-100 btn-lg">Continue</button>
           <div v-if="error"
                class="mt-3 alert alert-danger">{{ error }}</div>
         </form>
-      </div>
-      <div class="col-md-6">
-        <p class="mt-3">Don't have an account? <router-link to="/register">Register</router-link></p>
-        <p class="mt-3"><router-link to="/forgot-password">Forgot your password?</router-link></p>
       </div>
     </div>
   </div>
@@ -38,7 +34,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { useAuthStore } from '@/store'
+import { useAuthStore } from '@/store/authStore'
 import { useRouter } from 'vue-router'
 
 export default defineComponent({
@@ -46,11 +42,11 @@ export default defineComponent({
   data() {
     return {
       email: '',
-      password: '',
       error: '' as string,
       token: '' as string,
       user: null as any,
       isLoading: false,
+      isLinkSent: false,
     }
   },
   setup() {
@@ -58,26 +54,19 @@ export default defineComponent({
     return { router }
   },
   methods: {
-    async handleLogin() {
+    async handleSendLoginLink() {
 
       try {
         this.isLoading = true;
         this.error = '';
 
         const auth = useAuthStore();
-        const res = await auth.login(this.email, this.password);
+        const res = await auth.sendLoginLink(this.email);
 
         if (res.success) {
-          this.$router.push({ name: 'UserHome' });
+          this.isLinkSent = true;
         } else {
-          // Handle different status flags
-          if (res.status === 'invalid_credentials') {
-            this.error = 'Invalid email or password.';
-          } else if (res.status === 'email_not_confirmed') {
-            this.error = 'Please confirm your email before logging in.';
-          } else {
-            this.error = 'An unknown error occurred.';
-          }
+          this.error = 'An unknown error occurred.';
         }
       } catch (err: any) {
         this.error = err || 'An unexpected error occurred.';

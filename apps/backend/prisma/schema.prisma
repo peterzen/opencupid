@@ -13,17 +13,16 @@ datasource db {
 }
 
 model User {
-  id                String    @id @default(cuid())
-  email             String    @unique
-  password          String
-  resetToken        String?   @unique
-  resetTokenExp     DateTime?
-  isEmailConfirmed  Boolean   @default(false)
-  isAccountDisabled Boolean   @default(false)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  lastLoginAt       DateTime?
-  profile           Profile?
+  id                      String    @id @default(cuid())
+  email                   String    @unique
+  loginToken              String?   @unique
+  loginTokenExp           DateTime?
+  isRegistrationConfirmed Boolean   @default(false)
+  isAccountDisabled       Boolean   @default(false)
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  lastLoginAt             DateTime?
+  profile                 Profile?
 }
 
 model Profile {

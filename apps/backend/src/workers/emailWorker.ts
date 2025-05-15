@@ -28,22 +28,23 @@ const transporter = nodemailer.createTransport({
 
 
 new Worker('emails', async job => {
-  if (job.name === 'sendConfirmationEmail') {
+  if (job.name === 'sendLoginLinkEmail') {
     const { userId } = job.data as { userId: string }
 
     const user = await prisma.user.findUnique({ where: { id: userId } })
 
     if (!user) throw new Error('User not found')
 
-    const emailToken = user.resetToken
+    const emailToken = user.loginToken
     const email = user.email
 
     await transporter.sendMail({
       from: process.env.EMAIL_FROM,
       to: email,
-      subject: 'Please confirm your email address',
+      subject: 'Your login link',
       html: `<p>Hey there, welcome aboard!</p>
-      <p>Please click this link to jump right in: <a href="${process.env.FRONTEND_URL}/confirm-email?token=${emailToken}">Confirm Email</a></p>`
+      <p>Please click this link to jump right in:       
+      <a href="${process.env.FRONTEND_URL}/login/return?token=${emailToken}">Confirm Email</a></p>`
     })
   }
 
@@ -62,24 +63,6 @@ new Worker('emails', async job => {
     })
   }
 
-  if (job.name === 'sendPasswordRecoveryEmail') {
-    const { userId } = job.data as { userId: string }
-
-    const user = await prisma.user.findUnique({ where: { id: userId } })
-
-    if (!user) throw new Error('User not found')
-
-    const emailToken = user.resetToken
-    const email = user.email
-
-    await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
-      to: email,
-      subject: 'Reset your password',
-      html: `<p>To reset your password, click this link</p>
-      <p><a href="${process.env.FRONTEND_URL}/reset-password?token=${emailToken}">Confirm Email</a></p>`
-    })
-  }
 
 
 }, { connection })

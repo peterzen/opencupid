@@ -7,16 +7,30 @@ import { Dropdown } from 'bootstrap'
 import { defineComponent } from 'vue'
 import LightSwitch from './LightSwitch.vue'
 import LogoutButton from './LogoutButton.vue';
+import { useAuthStore } from '@/store/authStore';
 
 
 export default defineComponent({
   name: 'Navbar',
   components: {
-    LightSwitch
+    LightSwitch,
+    LogoutButton,
   },
-  mounted() {
+   data() {
+    return {
+      authStore: useAuthStore(),
+    }
+  },
+  computed: {
+    isLoggedIn(): boolean {
+      return this.authStore.user !== null
+    }
+  },
+   mounted() {
     const dropdownRef = this.$refs.navbarDropdown as HTMLElement
-    new Dropdown(dropdownRef)
+     if (dropdownRef) {
+      new Dropdown(dropdownRef)
+    }
   },
   methods: {
     switchTheme() {
@@ -28,7 +42,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <nav class="navbar sticky-top navbar-expand-md  mb-lg-4"
+  <nav v-if="isLoggedIn" class="navbar sticky-top navbar-expand-md  mb-lg-4"
        id="navbar">
     <div class="container-fluid">
       <a class="navbar-brand"

@@ -5,7 +5,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { useAuthStore } from '@/store';
+import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
