@@ -12,7 +12,7 @@ import type { Prisma } from '@prisma/client';
 
 export const TransactionIsolationLevelSchema = z.enum(['ReadUncommitted','ReadCommitted','RepeatableRead','Serializable']);
 
-export const UserScalarFieldEnumSchema = z.enum(['id','email','tokenVersion','loginToken','loginTokenExp','isRegistrationConfirmed','isAccountDisabled','createdAt','updatedAt','lastLoginAt']);
+export const UserScalarFieldEnumSchema = z.enum(['id','email','tokenVersion','loginToken','loginTokenExp','isRegistrationConfirmed','isAccountDisabled','createdAt','updatedAt','lastLoginAt','searchPreferenceId']);
 
 export const ProfileScalarFieldEnumSchema = z.enum(['id','publicName','intro','country','city','birthday','gender','relationship','hasKids','latitude','longitude','isActive','isReported','userId','createdAt','updatedAt']);
 
@@ -22,7 +22,7 @@ export const TagScalarFieldEnumSchema = z.enum(['id','name']);
 
 export const ProfileTagScalarFieldEnumSchema = z.enum(['id','profileId','tagId']);
 
-export const SearchPreferenceScalarFieldEnumSchema = z.enum(['id','profileId','ageMin','ageMax','gender','goal']);
+export const SearchPreferenceScalarFieldEnumSchema = z.enum(['id','profileId','ageMin','ageMax','gender','goal','userId']);
 
 export const SortOrderSchema = z.enum(['asc','desc']);
 
@@ -61,6 +61,7 @@ export const UserSchema = z.object({
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   lastLoginAt: z.coerce.date().nullable(),
+  searchPreferenceId: z.string().nullable(),
 })
 
 export type User = z.infer<typeof UserSchema>
@@ -137,6 +138,7 @@ export const SearchPreferenceSchema = z.object({
   profileId: z.string(),
   ageMin: z.number().int(),
   ageMax: z.number().int(),
+  userId: z.string(),
 })
 
 export type SearchPreference = z.infer<typeof SearchPreferenceSchema>
@@ -150,6 +152,7 @@ export type SearchPreference = z.infer<typeof SearchPreferenceSchema>
 
 export const UserIncludeSchema: z.ZodType<Prisma.UserInclude> = z.object({
   profile: z.union([z.boolean(),z.lazy(() => ProfileArgsSchema)]).optional(),
+  searchPreference: z.union([z.boolean(),z.lazy(() => SearchPreferenceArgsSchema)]).optional(),
 }).strict()
 
 export const UserArgsSchema: z.ZodType<Prisma.UserDefaultArgs> = z.object({
@@ -168,14 +171,15 @@ export const UserSelectSchema: z.ZodType<Prisma.UserSelect> = z.object({
   createdAt: z.boolean().optional(),
   updatedAt: z.boolean().optional(),
   lastLoginAt: z.boolean().optional(),
+  searchPreferenceId: z.boolean().optional(),
   profile: z.union([z.boolean(),z.lazy(() => ProfileArgsSchema)]).optional(),
+  searchPreference: z.union([z.boolean(),z.lazy(() => SearchPreferenceArgsSchema)]).optional(),
 }).strict()
 
 // PROFILE
 //------------------------------------------------------
 
 export const ProfileIncludeSchema: z.ZodType<Prisma.ProfileInclude> = z.object({
-  searchPreference: z.union([z.boolean(),z.lazy(() => SearchPreferenceArgsSchema)]).optional(),
   user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
   images: z.union([z.boolean(),z.lazy(() => ProfileImageFindManyArgsSchema)]).optional(),
   tags: z.union([z.boolean(),z.lazy(() => ProfileTagFindManyArgsSchema)]).optional(),
@@ -213,7 +217,6 @@ export const ProfileSelectSchema: z.ZodType<Prisma.ProfileSelect> = z.object({
   userId: z.boolean().optional(),
   createdAt: z.boolean().optional(),
   updatedAt: z.boolean().optional(),
-  searchPreference: z.union([z.boolean(),z.lazy(() => SearchPreferenceArgsSchema)]).optional(),
   user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
   images: z.union([z.boolean(),z.lazy(() => ProfileImageFindManyArgsSchema)]).optional(),
   tags: z.union([z.boolean(),z.lazy(() => ProfileTagFindManyArgsSchema)]).optional(),
@@ -293,21 +296,12 @@ export const ProfileTagSelectSchema: z.ZodType<Prisma.ProfileTagSelect> = z.obje
 //------------------------------------------------------
 
 export const SearchPreferenceIncludeSchema: z.ZodType<Prisma.SearchPreferenceInclude> = z.object({
-  Profile: z.union([z.boolean(),z.lazy(() => ProfileFindManyArgsSchema)]).optional(),
-  _count: z.union([z.boolean(),z.lazy(() => SearchPreferenceCountOutputTypeArgsSchema)]).optional(),
+  user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
 }).strict()
 
 export const SearchPreferenceArgsSchema: z.ZodType<Prisma.SearchPreferenceDefaultArgs> = z.object({
   select: z.lazy(() => SearchPreferenceSelectSchema).optional(),
   include: z.lazy(() => SearchPreferenceIncludeSchema).optional(),
-}).strict();
-
-export const SearchPreferenceCountOutputTypeArgsSchema: z.ZodType<Prisma.SearchPreferenceCountOutputTypeDefaultArgs> = z.object({
-  select: z.lazy(() => SearchPreferenceCountOutputTypeSelectSchema).nullish(),
-}).strict();
-
-export const SearchPreferenceCountOutputTypeSelectSchema: z.ZodType<Prisma.SearchPreferenceCountOutputTypeSelect> = z.object({
-  Profile: z.boolean().optional(),
 }).strict();
 
 export const SearchPreferenceSelectSchema: z.ZodType<Prisma.SearchPreferenceSelect> = z.object({
@@ -317,8 +311,8 @@ export const SearchPreferenceSelectSchema: z.ZodType<Prisma.SearchPreferenceSele
   ageMax: z.boolean().optional(),
   gender: z.boolean().optional(),
   goal: z.boolean().optional(),
-  Profile: z.union([z.boolean(),z.lazy(() => ProfileFindManyArgsSchema)]).optional(),
-  _count: z.union([z.boolean(),z.lazy(() => SearchPreferenceCountOutputTypeArgsSchema)]).optional(),
+  userId: z.boolean().optional(),
+  user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
 }).strict()
 
 
@@ -340,7 +334,9 @@ export const UserWhereInputSchema: z.ZodType<Prisma.UserWhereInput> = z.object({
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   lastLoginAt: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
+  searchPreferenceId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   profile: z.union([ z.lazy(() => ProfileNullableRelationFilterSchema),z.lazy(() => ProfileWhereInputSchema) ]).optional().nullable(),
+  searchPreference: z.union([ z.lazy(() => SearchPreferenceNullableRelationFilterSchema),z.lazy(() => SearchPreferenceWhereInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const UserOrderByWithRelationInputSchema: z.ZodType<Prisma.UserOrderByWithRelationInput> = z.object({
@@ -354,7 +350,9 @@ export const UserOrderByWithRelationInputSchema: z.ZodType<Prisma.UserOrderByWit
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   lastLoginAt: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-  profile: z.lazy(() => ProfileOrderByWithRelationInputSchema).optional()
+  searchPreferenceId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  profile: z.lazy(() => ProfileOrderByWithRelationInputSchema).optional(),
+  searchPreference: z.lazy(() => SearchPreferenceOrderByWithRelationInputSchema).optional()
 }).strict();
 
 export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> = z.union([
@@ -399,7 +397,9 @@ export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> 
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   lastLoginAt: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
+  searchPreferenceId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   profile: z.union([ z.lazy(() => ProfileNullableRelationFilterSchema),z.lazy(() => ProfileWhereInputSchema) ]).optional().nullable(),
+  searchPreference: z.union([ z.lazy(() => SearchPreferenceNullableRelationFilterSchema),z.lazy(() => SearchPreferenceWhereInputSchema) ]).optional().nullable(),
 }).strict());
 
 export const UserOrderByWithAggregationInputSchema: z.ZodType<Prisma.UserOrderByWithAggregationInput> = z.object({
@@ -413,6 +413,7 @@ export const UserOrderByWithAggregationInputSchema: z.ZodType<Prisma.UserOrderBy
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   lastLoginAt: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  searchPreferenceId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   _count: z.lazy(() => UserCountOrderByAggregateInputSchema).optional(),
   _avg: z.lazy(() => UserAvgOrderByAggregateInputSchema).optional(),
   _max: z.lazy(() => UserMaxOrderByAggregateInputSchema).optional(),
@@ -434,6 +435,7 @@ export const UserScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.UserScal
   createdAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
   lastLoginAt: z.union([ z.lazy(() => DateTimeNullableWithAggregatesFilterSchema),z.coerce.date() ]).optional().nullable(),
+  searchPreferenceId: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
 }).strict();
 
 export const ProfileWhereInputSchema: z.ZodType<Prisma.ProfileWhereInput> = z.object({
@@ -456,7 +458,6 @@ export const ProfileWhereInputSchema: z.ZodType<Prisma.ProfileWhereInput> = z.ob
   userId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
-  searchPreference: z.union([ z.lazy(() => SearchPreferenceNullableRelationFilterSchema),z.lazy(() => SearchPreferenceWhereInputSchema) ]).optional().nullable(),
   user: z.union([ z.lazy(() => UserRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional(),
   images: z.lazy(() => ProfileImageListRelationFilterSchema).optional(),
   tags: z.lazy(() => ProfileTagListRelationFilterSchema).optional()
@@ -479,7 +480,6 @@ export const ProfileOrderByWithRelationInputSchema: z.ZodType<Prisma.ProfileOrde
   userId: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
-  searchPreference: z.lazy(() => SearchPreferenceOrderByWithRelationInputSchema).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
   images: z.lazy(() => ProfileImageOrderByRelationAggregateInputSchema).optional(),
   tags: z.lazy(() => ProfileTagOrderByRelationAggregateInputSchema).optional()
@@ -517,7 +517,6 @@ export const ProfileWhereUniqueInputSchema: z.ZodType<Prisma.ProfileWhereUniqueI
   isReported: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
-  searchPreference: z.union([ z.lazy(() => SearchPreferenceNullableRelationFilterSchema),z.lazy(() => SearchPreferenceWhereInputSchema) ]).optional().nullable(),
   user: z.union([ z.lazy(() => UserRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional(),
   images: z.lazy(() => ProfileImageListRelationFilterSchema).optional(),
   tags: z.lazy(() => ProfileTagListRelationFilterSchema).optional()
@@ -745,7 +744,8 @@ export const SearchPreferenceWhereInputSchema: z.ZodType<Prisma.SearchPreference
   ageMax: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
   gender: z.union([ z.lazy(() => EnumGenderFilterSchema),z.lazy(() => GenderSchema) ]).optional(),
   goal: z.union([ z.lazy(() => EnumGoalFilterSchema),z.lazy(() => GoalSchema) ]).optional(),
-  Profile: z.lazy(() => ProfileListRelationFilterSchema).optional()
+  userId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  user: z.union([ z.lazy(() => UserRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional(),
 }).strict();
 
 export const SearchPreferenceOrderByWithRelationInputSchema: z.ZodType<Prisma.SearchPreferenceOrderByWithRelationInput> = z.object({
@@ -755,24 +755,42 @@ export const SearchPreferenceOrderByWithRelationInputSchema: z.ZodType<Prisma.Se
   ageMax: z.lazy(() => SortOrderSchema).optional(),
   gender: z.lazy(() => SortOrderSchema).optional(),
   goal: z.lazy(() => SortOrderSchema).optional(),
-  Profile: z.lazy(() => ProfileOrderByRelationAggregateInputSchema).optional()
+  userId: z.lazy(() => SortOrderSchema).optional(),
+  user: z.lazy(() => UserOrderByWithRelationInputSchema).optional()
 }).strict();
 
 export const SearchPreferenceWhereUniqueInputSchema: z.ZodType<Prisma.SearchPreferenceWhereUniqueInput> = z.union([
   z.object({
     id: z.string().cuid(),
-    profileId: z.string()
+    profileId: z.string(),
+    userId: z.string()
+  }),
+  z.object({
+    id: z.string().cuid(),
+    profileId: z.string(),
+  }),
+  z.object({
+    id: z.string().cuid(),
+    userId: z.string(),
   }),
   z.object({
     id: z.string().cuid(),
   }),
   z.object({
     profileId: z.string(),
+    userId: z.string(),
+  }),
+  z.object({
+    profileId: z.string(),
+  }),
+  z.object({
+    userId: z.string(),
   }),
 ])
 .and(z.object({
   id: z.string().cuid().optional(),
   profileId: z.string().optional(),
+  userId: z.string().optional(),
   AND: z.union([ z.lazy(() => SearchPreferenceWhereInputSchema),z.lazy(() => SearchPreferenceWhereInputSchema).array() ]).optional(),
   OR: z.lazy(() => SearchPreferenceWhereInputSchema).array().optional(),
   NOT: z.union([ z.lazy(() => SearchPreferenceWhereInputSchema),z.lazy(() => SearchPreferenceWhereInputSchema).array() ]).optional(),
@@ -780,7 +798,7 @@ export const SearchPreferenceWhereUniqueInputSchema: z.ZodType<Prisma.SearchPref
   ageMax: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
   gender: z.union([ z.lazy(() => EnumGenderFilterSchema),z.lazy(() => GenderSchema) ]).optional(),
   goal: z.union([ z.lazy(() => EnumGoalFilterSchema),z.lazy(() => GoalSchema) ]).optional(),
-  Profile: z.lazy(() => ProfileListRelationFilterSchema).optional()
+  user: z.union([ z.lazy(() => UserRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional(),
 }).strict());
 
 export const SearchPreferenceOrderByWithAggregationInputSchema: z.ZodType<Prisma.SearchPreferenceOrderByWithAggregationInput> = z.object({
@@ -790,6 +808,7 @@ export const SearchPreferenceOrderByWithAggregationInputSchema: z.ZodType<Prisma
   ageMax: z.lazy(() => SortOrderSchema).optional(),
   gender: z.lazy(() => SortOrderSchema).optional(),
   goal: z.lazy(() => SortOrderSchema).optional(),
+  userId: z.lazy(() => SortOrderSchema).optional(),
   _count: z.lazy(() => SearchPreferenceCountOrderByAggregateInputSchema).optional(),
   _avg: z.lazy(() => SearchPreferenceAvgOrderByAggregateInputSchema).optional(),
   _max: z.lazy(() => SearchPreferenceMaxOrderByAggregateInputSchema).optional(),
@@ -807,6 +826,7 @@ export const SearchPreferenceScalarWhereWithAggregatesInputSchema: z.ZodType<Pri
   ageMax: z.union([ z.lazy(() => IntWithAggregatesFilterSchema),z.number() ]).optional(),
   gender: z.union([ z.lazy(() => EnumGenderWithAggregatesFilterSchema),z.lazy(() => GenderSchema) ]).optional(),
   goal: z.union([ z.lazy(() => EnumGoalWithAggregatesFilterSchema),z.lazy(() => GoalSchema) ]).optional(),
+  userId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
 }).strict();
 
 export const UserCreateInputSchema: z.ZodType<Prisma.UserCreateInput> = z.object({
@@ -820,7 +840,9 @@ export const UserCreateInputSchema: z.ZodType<Prisma.UserCreateInput> = z.object
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   lastLoginAt: z.coerce.date().optional().nullable(),
-  profile: z.lazy(() => ProfileCreateNestedOneWithoutUserInputSchema).optional()
+  searchPreferenceId: z.string().optional().nullable(),
+  profile: z.lazy(() => ProfileCreateNestedOneWithoutUserInputSchema).optional(),
+  searchPreference: z.lazy(() => SearchPreferenceCreateNestedOneWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateInputSchema: z.ZodType<Prisma.UserUncheckedCreateInput> = z.object({
@@ -834,7 +856,9 @@ export const UserUncheckedCreateInputSchema: z.ZodType<Prisma.UserUncheckedCreat
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   lastLoginAt: z.coerce.date().optional().nullable(),
-  profile: z.lazy(() => ProfileUncheckedCreateNestedOneWithoutUserInputSchema).optional()
+  searchPreferenceId: z.string().optional().nullable(),
+  profile: z.lazy(() => ProfileUncheckedCreateNestedOneWithoutUserInputSchema).optional(),
+  searchPreference: z.lazy(() => SearchPreferenceUncheckedCreateNestedOneWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUpdateInputSchema: z.ZodType<Prisma.UserUpdateInput> = z.object({
@@ -848,7 +872,9 @@ export const UserUpdateInputSchema: z.ZodType<Prisma.UserUpdateInput> = z.object
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   lastLoginAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  profile: z.lazy(() => ProfileUpdateOneWithoutUserNestedInputSchema).optional()
+  searchPreferenceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  profile: z.lazy(() => ProfileUpdateOneWithoutUserNestedInputSchema).optional(),
+  searchPreference: z.lazy(() => SearchPreferenceUpdateOneWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateInputSchema: z.ZodType<Prisma.UserUncheckedUpdateInput> = z.object({
@@ -862,7 +888,9 @@ export const UserUncheckedUpdateInputSchema: z.ZodType<Prisma.UserUncheckedUpdat
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   lastLoginAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  profile: z.lazy(() => ProfileUncheckedUpdateOneWithoutUserNestedInputSchema).optional()
+  searchPreferenceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  profile: z.lazy(() => ProfileUncheckedUpdateOneWithoutUserNestedInputSchema).optional(),
+  searchPreference: z.lazy(() => SearchPreferenceUncheckedUpdateOneWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserCreateManyInputSchema: z.ZodType<Prisma.UserCreateManyInput> = z.object({
@@ -875,7 +903,8 @@ export const UserCreateManyInputSchema: z.ZodType<Prisma.UserCreateManyInput> = 
   isAccountDisabled: z.boolean().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
-  lastLoginAt: z.coerce.date().optional().nullable()
+  lastLoginAt: z.coerce.date().optional().nullable(),
+  searchPreferenceId: z.string().optional().nullable()
 }).strict();
 
 export const UserUpdateManyMutationInputSchema: z.ZodType<Prisma.UserUpdateManyMutationInput> = z.object({
@@ -889,6 +918,7 @@ export const UserUpdateManyMutationInputSchema: z.ZodType<Prisma.UserUpdateManyM
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   lastLoginAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  searchPreferenceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const UserUncheckedUpdateManyInputSchema: z.ZodType<Prisma.UserUncheckedUpdateManyInput> = z.object({
@@ -902,9 +932,11 @@ export const UserUncheckedUpdateManyInputSchema: z.ZodType<Prisma.UserUncheckedU
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   lastLoginAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  searchPreferenceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const ProfileCreateInputSchema: z.ZodType<Prisma.ProfileCreateInput> = z.object({
+  id: z.string().cuid().optional(),
   publicName: z.string(),
   intro: z.string().optional().nullable(),
   country: z.string().optional().nullable(),
@@ -919,7 +951,6 @@ export const ProfileCreateInputSchema: z.ZodType<Prisma.ProfileCreateInput> = z.
   isReported: z.boolean().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
-  searchPreference: z.lazy(() => SearchPreferenceCreateNestedOneWithoutProfileInputSchema).optional(),
   user: z.lazy(() => UserCreateNestedOneWithoutProfileInputSchema),
   images: z.lazy(() => ProfileImageCreateNestedManyWithoutProfileInputSchema).optional(),
   tags: z.lazy(() => ProfileTagCreateNestedManyWithoutProfileInputSchema).optional()
@@ -947,6 +978,7 @@ export const ProfileUncheckedCreateInputSchema: z.ZodType<Prisma.ProfileUnchecke
 }).strict();
 
 export const ProfileUpdateInputSchema: z.ZodType<Prisma.ProfileUpdateInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   publicName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   intro: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   country: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -961,7 +993,6 @@ export const ProfileUpdateInputSchema: z.ZodType<Prisma.ProfileUpdateInput> = z.
   isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  searchPreference: z.lazy(() => SearchPreferenceUpdateOneWithoutProfileNestedInputSchema).optional(),
   user: z.lazy(() => UserUpdateOneRequiredWithoutProfileNestedInputSchema).optional(),
   images: z.lazy(() => ProfileImageUpdateManyWithoutProfileNestedInputSchema).optional(),
   tags: z.lazy(() => ProfileTagUpdateManyWithoutProfileNestedInputSchema).optional()
@@ -1008,6 +1039,7 @@ export const ProfileCreateManyInputSchema: z.ZodType<Prisma.ProfileCreateManyInp
 }).strict();
 
 export const ProfileUpdateManyMutationInputSchema: z.ZodType<Prisma.ProfileUpdateManyMutationInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   publicName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   intro: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   country: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -1177,7 +1209,7 @@ export const SearchPreferenceCreateInputSchema: z.ZodType<Prisma.SearchPreferenc
   ageMax: z.number().int(),
   gender: z.lazy(() => GenderSchema),
   goal: z.lazy(() => GoalSchema),
-  Profile: z.lazy(() => ProfileCreateNestedManyWithoutSearchPreferenceInputSchema).optional()
+  user: z.lazy(() => UserCreateNestedOneWithoutSearchPreferenceInputSchema)
 }).strict();
 
 export const SearchPreferenceUncheckedCreateInputSchema: z.ZodType<Prisma.SearchPreferenceUncheckedCreateInput> = z.object({
@@ -1187,7 +1219,7 @@ export const SearchPreferenceUncheckedCreateInputSchema: z.ZodType<Prisma.Search
   ageMax: z.number().int(),
   gender: z.lazy(() => GenderSchema),
   goal: z.lazy(() => GoalSchema),
-  Profile: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutSearchPreferenceInputSchema).optional()
+  userId: z.string()
 }).strict();
 
 export const SearchPreferenceUpdateInputSchema: z.ZodType<Prisma.SearchPreferenceUpdateInput> = z.object({
@@ -1197,7 +1229,7 @@ export const SearchPreferenceUpdateInputSchema: z.ZodType<Prisma.SearchPreferenc
   ageMax: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => EnumGenderFieldUpdateOperationsInputSchema) ]).optional(),
   goal: z.union([ z.lazy(() => GoalSchema),z.lazy(() => EnumGoalFieldUpdateOperationsInputSchema) ]).optional(),
-  Profile: z.lazy(() => ProfileUpdateManyWithoutSearchPreferenceNestedInputSchema).optional()
+  user: z.lazy(() => UserUpdateOneRequiredWithoutSearchPreferenceNestedInputSchema).optional()
 }).strict();
 
 export const SearchPreferenceUncheckedUpdateInputSchema: z.ZodType<Prisma.SearchPreferenceUncheckedUpdateInput> = z.object({
@@ -1207,7 +1239,7 @@ export const SearchPreferenceUncheckedUpdateInputSchema: z.ZodType<Prisma.Search
   ageMax: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => EnumGenderFieldUpdateOperationsInputSchema) ]).optional(),
   goal: z.union([ z.lazy(() => GoalSchema),z.lazy(() => EnumGoalFieldUpdateOperationsInputSchema) ]).optional(),
-  Profile: z.lazy(() => ProfileUncheckedUpdateManyWithoutSearchPreferenceNestedInputSchema).optional()
+  userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const SearchPreferenceCreateManyInputSchema: z.ZodType<Prisma.SearchPreferenceCreateManyInput> = z.object({
@@ -1216,7 +1248,8 @@ export const SearchPreferenceCreateManyInputSchema: z.ZodType<Prisma.SearchPrefe
   ageMin: z.number().int(),
   ageMax: z.number().int(),
   gender: z.lazy(() => GenderSchema),
-  goal: z.lazy(() => GoalSchema)
+  goal: z.lazy(() => GoalSchema),
+  userId: z.string()
 }).strict();
 
 export const SearchPreferenceUpdateManyMutationInputSchema: z.ZodType<Prisma.SearchPreferenceUpdateManyMutationInput> = z.object({
@@ -1235,6 +1268,7 @@ export const SearchPreferenceUncheckedUpdateManyInputSchema: z.ZodType<Prisma.Se
   ageMax: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => EnumGenderFieldUpdateOperationsInputSchema) ]).optional(),
   goal: z.union([ z.lazy(() => GoalSchema),z.lazy(() => EnumGoalFieldUpdateOperationsInputSchema) ]).optional(),
+  userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const StringFilterSchema: z.ZodType<Prisma.StringFilter> = z.object({
@@ -1310,6 +1344,11 @@ export const ProfileNullableRelationFilterSchema: z.ZodType<Prisma.ProfileNullab
   isNot: z.lazy(() => ProfileWhereInputSchema).optional().nullable()
 }).strict();
 
+export const SearchPreferenceNullableRelationFilterSchema: z.ZodType<Prisma.SearchPreferenceNullableRelationFilter> = z.object({
+  is: z.lazy(() => SearchPreferenceWhereInputSchema).optional().nullable(),
+  isNot: z.lazy(() => SearchPreferenceWhereInputSchema).optional().nullable()
+}).strict();
+
 export const SortOrderInputSchema: z.ZodType<Prisma.SortOrderInput> = z.object({
   sort: z.lazy(() => SortOrderSchema),
   nulls: z.lazy(() => NullsOrderSchema).optional()
@@ -1325,7 +1364,8 @@ export const UserCountOrderByAggregateInputSchema: z.ZodType<Prisma.UserCountOrd
   isAccountDisabled: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
-  lastLoginAt: z.lazy(() => SortOrderSchema).optional()
+  lastLoginAt: z.lazy(() => SortOrderSchema).optional(),
+  searchPreferenceId: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const UserAvgOrderByAggregateInputSchema: z.ZodType<Prisma.UserAvgOrderByAggregateInput> = z.object({
@@ -1342,7 +1382,8 @@ export const UserMaxOrderByAggregateInputSchema: z.ZodType<Prisma.UserMaxOrderBy
   isAccountDisabled: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
-  lastLoginAt: z.lazy(() => SortOrderSchema).optional()
+  lastLoginAt: z.lazy(() => SortOrderSchema).optional(),
+  searchPreferenceId: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const UserMinOrderByAggregateInputSchema: z.ZodType<Prisma.UserMinOrderByAggregateInput> = z.object({
@@ -1355,7 +1396,8 @@ export const UserMinOrderByAggregateInputSchema: z.ZodType<Prisma.UserMinOrderBy
   isAccountDisabled: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
-  lastLoginAt: z.lazy(() => SortOrderSchema).optional()
+  lastLoginAt: z.lazy(() => SortOrderSchema).optional(),
+  searchPreferenceId: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const UserSumOrderByAggregateInputSchema: z.ZodType<Prisma.UserSumOrderByAggregateInput> = z.object({
@@ -1478,11 +1520,6 @@ export const FloatNullableFilterSchema: z.ZodType<Prisma.FloatNullableFilter> = 
   gt: z.number().optional(),
   gte: z.number().optional(),
   not: z.union([ z.number(),z.lazy(() => NestedFloatNullableFilterSchema) ]).optional().nullable(),
-}).strict();
-
-export const SearchPreferenceNullableRelationFilterSchema: z.ZodType<Prisma.SearchPreferenceNullableRelationFilter> = z.object({
-  is: z.lazy(() => SearchPreferenceWhereInputSchema).optional().nullable(),
-  isNot: z.lazy(() => SearchPreferenceWhereInputSchema).optional().nullable()
 }).strict();
 
 export const UserRelationFilterSchema: z.ZodType<Prisma.UserRelationFilter> = z.object({
@@ -1704,23 +1741,14 @@ export const EnumGoalFilterSchema: z.ZodType<Prisma.EnumGoalFilter> = z.object({
   not: z.union([ z.lazy(() => GoalSchema),z.lazy(() => NestedEnumGoalFilterSchema) ]).optional(),
 }).strict();
 
-export const ProfileListRelationFilterSchema: z.ZodType<Prisma.ProfileListRelationFilter> = z.object({
-  every: z.lazy(() => ProfileWhereInputSchema).optional(),
-  some: z.lazy(() => ProfileWhereInputSchema).optional(),
-  none: z.lazy(() => ProfileWhereInputSchema).optional()
-}).strict();
-
-export const ProfileOrderByRelationAggregateInputSchema: z.ZodType<Prisma.ProfileOrderByRelationAggregateInput> = z.object({
-  _count: z.lazy(() => SortOrderSchema).optional()
-}).strict();
-
 export const SearchPreferenceCountOrderByAggregateInputSchema: z.ZodType<Prisma.SearchPreferenceCountOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   profileId: z.lazy(() => SortOrderSchema).optional(),
   ageMin: z.lazy(() => SortOrderSchema).optional(),
   ageMax: z.lazy(() => SortOrderSchema).optional(),
   gender: z.lazy(() => SortOrderSchema).optional(),
-  goal: z.lazy(() => SortOrderSchema).optional()
+  goal: z.lazy(() => SortOrderSchema).optional(),
+  userId: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const SearchPreferenceAvgOrderByAggregateInputSchema: z.ZodType<Prisma.SearchPreferenceAvgOrderByAggregateInput> = z.object({
@@ -1734,7 +1762,8 @@ export const SearchPreferenceMaxOrderByAggregateInputSchema: z.ZodType<Prisma.Se
   ageMin: z.lazy(() => SortOrderSchema).optional(),
   ageMax: z.lazy(() => SortOrderSchema).optional(),
   gender: z.lazy(() => SortOrderSchema).optional(),
-  goal: z.lazy(() => SortOrderSchema).optional()
+  goal: z.lazy(() => SortOrderSchema).optional(),
+  userId: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const SearchPreferenceMinOrderByAggregateInputSchema: z.ZodType<Prisma.SearchPreferenceMinOrderByAggregateInput> = z.object({
@@ -1743,7 +1772,8 @@ export const SearchPreferenceMinOrderByAggregateInputSchema: z.ZodType<Prisma.Se
   ageMin: z.lazy(() => SortOrderSchema).optional(),
   ageMax: z.lazy(() => SortOrderSchema).optional(),
   gender: z.lazy(() => SortOrderSchema).optional(),
-  goal: z.lazy(() => SortOrderSchema).optional()
+  goal: z.lazy(() => SortOrderSchema).optional(),
+  userId: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const SearchPreferenceSumOrderByAggregateInputSchema: z.ZodType<Prisma.SearchPreferenceSumOrderByAggregateInput> = z.object({
@@ -1777,10 +1807,22 @@ export const ProfileCreateNestedOneWithoutUserInputSchema: z.ZodType<Prisma.Prof
   connect: z.lazy(() => ProfileWhereUniqueInputSchema).optional()
 }).strict();
 
+export const SearchPreferenceCreateNestedOneWithoutUserInputSchema: z.ZodType<Prisma.SearchPreferenceCreateNestedOneWithoutUserInput> = z.object({
+  create: z.union([ z.lazy(() => SearchPreferenceCreateWithoutUserInputSchema),z.lazy(() => SearchPreferenceUncheckedCreateWithoutUserInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => SearchPreferenceCreateOrConnectWithoutUserInputSchema).optional(),
+  connect: z.lazy(() => SearchPreferenceWhereUniqueInputSchema).optional()
+}).strict();
+
 export const ProfileUncheckedCreateNestedOneWithoutUserInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateNestedOneWithoutUserInput> = z.object({
   create: z.union([ z.lazy(() => ProfileCreateWithoutUserInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutUserInputSchema) ]).optional(),
   connectOrCreate: z.lazy(() => ProfileCreateOrConnectWithoutUserInputSchema).optional(),
   connect: z.lazy(() => ProfileWhereUniqueInputSchema).optional()
+}).strict();
+
+export const SearchPreferenceUncheckedCreateNestedOneWithoutUserInputSchema: z.ZodType<Prisma.SearchPreferenceUncheckedCreateNestedOneWithoutUserInput> = z.object({
+  create: z.union([ z.lazy(() => SearchPreferenceCreateWithoutUserInputSchema),z.lazy(() => SearchPreferenceUncheckedCreateWithoutUserInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => SearchPreferenceCreateOrConnectWithoutUserInputSchema).optional(),
+  connect: z.lazy(() => SearchPreferenceWhereUniqueInputSchema).optional()
 }).strict();
 
 export const StringFieldUpdateOperationsInputSchema: z.ZodType<Prisma.StringFieldUpdateOperationsInput> = z.object({
@@ -1821,6 +1863,16 @@ export const ProfileUpdateOneWithoutUserNestedInputSchema: z.ZodType<Prisma.Prof
   update: z.union([ z.lazy(() => ProfileUpdateToOneWithWhereWithoutUserInputSchema),z.lazy(() => ProfileUpdateWithoutUserInputSchema),z.lazy(() => ProfileUncheckedUpdateWithoutUserInputSchema) ]).optional(),
 }).strict();
 
+export const SearchPreferenceUpdateOneWithoutUserNestedInputSchema: z.ZodType<Prisma.SearchPreferenceUpdateOneWithoutUserNestedInput> = z.object({
+  create: z.union([ z.lazy(() => SearchPreferenceCreateWithoutUserInputSchema),z.lazy(() => SearchPreferenceUncheckedCreateWithoutUserInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => SearchPreferenceCreateOrConnectWithoutUserInputSchema).optional(),
+  upsert: z.lazy(() => SearchPreferenceUpsertWithoutUserInputSchema).optional(),
+  disconnect: z.union([ z.boolean(),z.lazy(() => SearchPreferenceWhereInputSchema) ]).optional(),
+  delete: z.union([ z.boolean(),z.lazy(() => SearchPreferenceWhereInputSchema) ]).optional(),
+  connect: z.lazy(() => SearchPreferenceWhereUniqueInputSchema).optional(),
+  update: z.union([ z.lazy(() => SearchPreferenceUpdateToOneWithWhereWithoutUserInputSchema),z.lazy(() => SearchPreferenceUpdateWithoutUserInputSchema),z.lazy(() => SearchPreferenceUncheckedUpdateWithoutUserInputSchema) ]).optional(),
+}).strict();
+
 export const ProfileUncheckedUpdateOneWithoutUserNestedInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateOneWithoutUserNestedInput> = z.object({
   create: z.union([ z.lazy(() => ProfileCreateWithoutUserInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutUserInputSchema) ]).optional(),
   connectOrCreate: z.lazy(() => ProfileCreateOrConnectWithoutUserInputSchema).optional(),
@@ -1831,10 +1883,14 @@ export const ProfileUncheckedUpdateOneWithoutUserNestedInputSchema: z.ZodType<Pr
   update: z.union([ z.lazy(() => ProfileUpdateToOneWithWhereWithoutUserInputSchema),z.lazy(() => ProfileUpdateWithoutUserInputSchema),z.lazy(() => ProfileUncheckedUpdateWithoutUserInputSchema) ]).optional(),
 }).strict();
 
-export const SearchPreferenceCreateNestedOneWithoutProfileInputSchema: z.ZodType<Prisma.SearchPreferenceCreateNestedOneWithoutProfileInput> = z.object({
-  create: z.union([ z.lazy(() => SearchPreferenceCreateWithoutProfileInputSchema),z.lazy(() => SearchPreferenceUncheckedCreateWithoutProfileInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => SearchPreferenceCreateOrConnectWithoutProfileInputSchema).optional(),
-  connect: z.lazy(() => SearchPreferenceWhereUniqueInputSchema).optional()
+export const SearchPreferenceUncheckedUpdateOneWithoutUserNestedInputSchema: z.ZodType<Prisma.SearchPreferenceUncheckedUpdateOneWithoutUserNestedInput> = z.object({
+  create: z.union([ z.lazy(() => SearchPreferenceCreateWithoutUserInputSchema),z.lazy(() => SearchPreferenceUncheckedCreateWithoutUserInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => SearchPreferenceCreateOrConnectWithoutUserInputSchema).optional(),
+  upsert: z.lazy(() => SearchPreferenceUpsertWithoutUserInputSchema).optional(),
+  disconnect: z.union([ z.boolean(),z.lazy(() => SearchPreferenceWhereInputSchema) ]).optional(),
+  delete: z.union([ z.boolean(),z.lazy(() => SearchPreferenceWhereInputSchema) ]).optional(),
+  connect: z.lazy(() => SearchPreferenceWhereUniqueInputSchema).optional(),
+  update: z.union([ z.lazy(() => SearchPreferenceUpdateToOneWithWhereWithoutUserInputSchema),z.lazy(() => SearchPreferenceUpdateWithoutUserInputSchema),z.lazy(() => SearchPreferenceUncheckedUpdateWithoutUserInputSchema) ]).optional(),
 }).strict();
 
 export const UserCreateNestedOneWithoutProfileInputSchema: z.ZodType<Prisma.UserCreateNestedOneWithoutProfileInput> = z.object({
@@ -1889,16 +1945,6 @@ export const NullableFloatFieldUpdateOperationsInputSchema: z.ZodType<Prisma.Nul
   decrement: z.number().optional(),
   multiply: z.number().optional(),
   divide: z.number().optional()
-}).strict();
-
-export const SearchPreferenceUpdateOneWithoutProfileNestedInputSchema: z.ZodType<Prisma.SearchPreferenceUpdateOneWithoutProfileNestedInput> = z.object({
-  create: z.union([ z.lazy(() => SearchPreferenceCreateWithoutProfileInputSchema),z.lazy(() => SearchPreferenceUncheckedCreateWithoutProfileInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => SearchPreferenceCreateOrConnectWithoutProfileInputSchema).optional(),
-  upsert: z.lazy(() => SearchPreferenceUpsertWithoutProfileInputSchema).optional(),
-  disconnect: z.union([ z.boolean(),z.lazy(() => SearchPreferenceWhereInputSchema) ]).optional(),
-  delete: z.union([ z.boolean(),z.lazy(() => SearchPreferenceWhereInputSchema) ]).optional(),
-  connect: z.lazy(() => SearchPreferenceWhereUniqueInputSchema).optional(),
-  update: z.union([ z.lazy(() => SearchPreferenceUpdateToOneWithWhereWithoutProfileInputSchema),z.lazy(() => SearchPreferenceUpdateWithoutProfileInputSchema),z.lazy(() => SearchPreferenceUncheckedUpdateWithoutProfileInputSchema) ]).optional(),
 }).strict();
 
 export const UserUpdateOneRequiredWithoutProfileNestedInputSchema: z.ZodType<Prisma.UserUpdateOneRequiredWithoutProfileNestedInput> = z.object({
@@ -2049,18 +2095,10 @@ export const TagUpdateOneRequiredWithoutProfileLinksNestedInputSchema: z.ZodType
   update: z.union([ z.lazy(() => TagUpdateToOneWithWhereWithoutProfileLinksInputSchema),z.lazy(() => TagUpdateWithoutProfileLinksInputSchema),z.lazy(() => TagUncheckedUpdateWithoutProfileLinksInputSchema) ]).optional(),
 }).strict();
 
-export const ProfileCreateNestedManyWithoutSearchPreferenceInputSchema: z.ZodType<Prisma.ProfileCreateNestedManyWithoutSearchPreferenceInput> = z.object({
-  create: z.union([ z.lazy(() => ProfileCreateWithoutSearchPreferenceInputSchema),z.lazy(() => ProfileCreateWithoutSearchPreferenceInputSchema).array(),z.lazy(() => ProfileUncheckedCreateWithoutSearchPreferenceInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutSearchPreferenceInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => ProfileCreateOrConnectWithoutSearchPreferenceInputSchema),z.lazy(() => ProfileCreateOrConnectWithoutSearchPreferenceInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => ProfileCreateManySearchPreferenceInputEnvelopeSchema).optional(),
-  connect: z.union([ z.lazy(() => ProfileWhereUniqueInputSchema),z.lazy(() => ProfileWhereUniqueInputSchema).array() ]).optional(),
-}).strict();
-
-export const ProfileUncheckedCreateNestedManyWithoutSearchPreferenceInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateNestedManyWithoutSearchPreferenceInput> = z.object({
-  create: z.union([ z.lazy(() => ProfileCreateWithoutSearchPreferenceInputSchema),z.lazy(() => ProfileCreateWithoutSearchPreferenceInputSchema).array(),z.lazy(() => ProfileUncheckedCreateWithoutSearchPreferenceInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutSearchPreferenceInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => ProfileCreateOrConnectWithoutSearchPreferenceInputSchema),z.lazy(() => ProfileCreateOrConnectWithoutSearchPreferenceInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => ProfileCreateManySearchPreferenceInputEnvelopeSchema).optional(),
-  connect: z.union([ z.lazy(() => ProfileWhereUniqueInputSchema),z.lazy(() => ProfileWhereUniqueInputSchema).array() ]).optional(),
+export const UserCreateNestedOneWithoutSearchPreferenceInputSchema: z.ZodType<Prisma.UserCreateNestedOneWithoutSearchPreferenceInput> = z.object({
+  create: z.union([ z.lazy(() => UserCreateWithoutSearchPreferenceInputSchema),z.lazy(() => UserUncheckedCreateWithoutSearchPreferenceInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => UserCreateOrConnectWithoutSearchPreferenceInputSchema).optional(),
+  connect: z.lazy(() => UserWhereUniqueInputSchema).optional()
 }).strict();
 
 export const EnumGenderFieldUpdateOperationsInputSchema: z.ZodType<Prisma.EnumGenderFieldUpdateOperationsInput> = z.object({
@@ -2071,32 +2109,12 @@ export const EnumGoalFieldUpdateOperationsInputSchema: z.ZodType<Prisma.EnumGoal
   set: z.lazy(() => GoalSchema).optional()
 }).strict();
 
-export const ProfileUpdateManyWithoutSearchPreferenceNestedInputSchema: z.ZodType<Prisma.ProfileUpdateManyWithoutSearchPreferenceNestedInput> = z.object({
-  create: z.union([ z.lazy(() => ProfileCreateWithoutSearchPreferenceInputSchema),z.lazy(() => ProfileCreateWithoutSearchPreferenceInputSchema).array(),z.lazy(() => ProfileUncheckedCreateWithoutSearchPreferenceInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutSearchPreferenceInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => ProfileCreateOrConnectWithoutSearchPreferenceInputSchema),z.lazy(() => ProfileCreateOrConnectWithoutSearchPreferenceInputSchema).array() ]).optional(),
-  upsert: z.union([ z.lazy(() => ProfileUpsertWithWhereUniqueWithoutSearchPreferenceInputSchema),z.lazy(() => ProfileUpsertWithWhereUniqueWithoutSearchPreferenceInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => ProfileCreateManySearchPreferenceInputEnvelopeSchema).optional(),
-  set: z.union([ z.lazy(() => ProfileWhereUniqueInputSchema),z.lazy(() => ProfileWhereUniqueInputSchema).array() ]).optional(),
-  disconnect: z.union([ z.lazy(() => ProfileWhereUniqueInputSchema),z.lazy(() => ProfileWhereUniqueInputSchema).array() ]).optional(),
-  delete: z.union([ z.lazy(() => ProfileWhereUniqueInputSchema),z.lazy(() => ProfileWhereUniqueInputSchema).array() ]).optional(),
-  connect: z.union([ z.lazy(() => ProfileWhereUniqueInputSchema),z.lazy(() => ProfileWhereUniqueInputSchema).array() ]).optional(),
-  update: z.union([ z.lazy(() => ProfileUpdateWithWhereUniqueWithoutSearchPreferenceInputSchema),z.lazy(() => ProfileUpdateWithWhereUniqueWithoutSearchPreferenceInputSchema).array() ]).optional(),
-  updateMany: z.union([ z.lazy(() => ProfileUpdateManyWithWhereWithoutSearchPreferenceInputSchema),z.lazy(() => ProfileUpdateManyWithWhereWithoutSearchPreferenceInputSchema).array() ]).optional(),
-  deleteMany: z.union([ z.lazy(() => ProfileScalarWhereInputSchema),z.lazy(() => ProfileScalarWhereInputSchema).array() ]).optional(),
-}).strict();
-
-export const ProfileUncheckedUpdateManyWithoutSearchPreferenceNestedInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateManyWithoutSearchPreferenceNestedInput> = z.object({
-  create: z.union([ z.lazy(() => ProfileCreateWithoutSearchPreferenceInputSchema),z.lazy(() => ProfileCreateWithoutSearchPreferenceInputSchema).array(),z.lazy(() => ProfileUncheckedCreateWithoutSearchPreferenceInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutSearchPreferenceInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => ProfileCreateOrConnectWithoutSearchPreferenceInputSchema),z.lazy(() => ProfileCreateOrConnectWithoutSearchPreferenceInputSchema).array() ]).optional(),
-  upsert: z.union([ z.lazy(() => ProfileUpsertWithWhereUniqueWithoutSearchPreferenceInputSchema),z.lazy(() => ProfileUpsertWithWhereUniqueWithoutSearchPreferenceInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => ProfileCreateManySearchPreferenceInputEnvelopeSchema).optional(),
-  set: z.union([ z.lazy(() => ProfileWhereUniqueInputSchema),z.lazy(() => ProfileWhereUniqueInputSchema).array() ]).optional(),
-  disconnect: z.union([ z.lazy(() => ProfileWhereUniqueInputSchema),z.lazy(() => ProfileWhereUniqueInputSchema).array() ]).optional(),
-  delete: z.union([ z.lazy(() => ProfileWhereUniqueInputSchema),z.lazy(() => ProfileWhereUniqueInputSchema).array() ]).optional(),
-  connect: z.union([ z.lazy(() => ProfileWhereUniqueInputSchema),z.lazy(() => ProfileWhereUniqueInputSchema).array() ]).optional(),
-  update: z.union([ z.lazy(() => ProfileUpdateWithWhereUniqueWithoutSearchPreferenceInputSchema),z.lazy(() => ProfileUpdateWithWhereUniqueWithoutSearchPreferenceInputSchema).array() ]).optional(),
-  updateMany: z.union([ z.lazy(() => ProfileUpdateManyWithWhereWithoutSearchPreferenceInputSchema),z.lazy(() => ProfileUpdateManyWithWhereWithoutSearchPreferenceInputSchema).array() ]).optional(),
-  deleteMany: z.union([ z.lazy(() => ProfileScalarWhereInputSchema),z.lazy(() => ProfileScalarWhereInputSchema).array() ]).optional(),
+export const UserUpdateOneRequiredWithoutSearchPreferenceNestedInputSchema: z.ZodType<Prisma.UserUpdateOneRequiredWithoutSearchPreferenceNestedInput> = z.object({
+  create: z.union([ z.lazy(() => UserCreateWithoutSearchPreferenceInputSchema),z.lazy(() => UserUncheckedCreateWithoutSearchPreferenceInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => UserCreateOrConnectWithoutSearchPreferenceInputSchema).optional(),
+  upsert: z.lazy(() => UserUpsertWithoutSearchPreferenceInputSchema).optional(),
+  connect: z.lazy(() => UserWhereUniqueInputSchema).optional(),
+  update: z.union([ z.lazy(() => UserUpdateToOneWithWhereWithoutSearchPreferenceInputSchema),z.lazy(() => UserUpdateWithoutSearchPreferenceInputSchema),z.lazy(() => UserUncheckedUpdateWithoutSearchPreferenceInputSchema) ]).optional(),
 }).strict();
 
 export const NestedStringFilterSchema: z.ZodType<Prisma.NestedStringFilter> = z.object({
@@ -2382,6 +2400,7 @@ export const NestedEnumGoalWithAggregatesFilterSchema: z.ZodType<Prisma.NestedEn
 }).strict();
 
 export const ProfileCreateWithoutUserInputSchema: z.ZodType<Prisma.ProfileCreateWithoutUserInput> = z.object({
+  id: z.string().cuid().optional(),
   publicName: z.string(),
   intro: z.string().optional().nullable(),
   country: z.string().optional().nullable(),
@@ -2396,7 +2415,6 @@ export const ProfileCreateWithoutUserInputSchema: z.ZodType<Prisma.ProfileCreate
   isReported: z.boolean().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
-  searchPreference: z.lazy(() => SearchPreferenceCreateNestedOneWithoutProfileInputSchema).optional(),
   images: z.lazy(() => ProfileImageCreateNestedManyWithoutProfileInputSchema).optional(),
   tags: z.lazy(() => ProfileTagCreateNestedManyWithoutProfileInputSchema).optional()
 }).strict();
@@ -2426,6 +2444,29 @@ export const ProfileCreateOrConnectWithoutUserInputSchema: z.ZodType<Prisma.Prof
   create: z.union([ z.lazy(() => ProfileCreateWithoutUserInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutUserInputSchema) ]),
 }).strict();
 
+export const SearchPreferenceCreateWithoutUserInputSchema: z.ZodType<Prisma.SearchPreferenceCreateWithoutUserInput> = z.object({
+  id: z.string().cuid().optional(),
+  profileId: z.string(),
+  ageMin: z.number().int(),
+  ageMax: z.number().int(),
+  gender: z.lazy(() => GenderSchema),
+  goal: z.lazy(() => GoalSchema)
+}).strict();
+
+export const SearchPreferenceUncheckedCreateWithoutUserInputSchema: z.ZodType<Prisma.SearchPreferenceUncheckedCreateWithoutUserInput> = z.object({
+  id: z.string().cuid().optional(),
+  profileId: z.string(),
+  ageMin: z.number().int(),
+  ageMax: z.number().int(),
+  gender: z.lazy(() => GenderSchema),
+  goal: z.lazy(() => GoalSchema)
+}).strict();
+
+export const SearchPreferenceCreateOrConnectWithoutUserInputSchema: z.ZodType<Prisma.SearchPreferenceCreateOrConnectWithoutUserInput> = z.object({
+  where: z.lazy(() => SearchPreferenceWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => SearchPreferenceCreateWithoutUserInputSchema),z.lazy(() => SearchPreferenceUncheckedCreateWithoutUserInputSchema) ]),
+}).strict();
+
 export const ProfileUpsertWithoutUserInputSchema: z.ZodType<Prisma.ProfileUpsertWithoutUserInput> = z.object({
   update: z.union([ z.lazy(() => ProfileUpdateWithoutUserInputSchema),z.lazy(() => ProfileUncheckedUpdateWithoutUserInputSchema) ]),
   create: z.union([ z.lazy(() => ProfileCreateWithoutUserInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutUserInputSchema) ]),
@@ -2438,6 +2479,7 @@ export const ProfileUpdateToOneWithWhereWithoutUserInputSchema: z.ZodType<Prisma
 }).strict();
 
 export const ProfileUpdateWithoutUserInputSchema: z.ZodType<Prisma.ProfileUpdateWithoutUserInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   publicName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   intro: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   country: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -2452,7 +2494,6 @@ export const ProfileUpdateWithoutUserInputSchema: z.ZodType<Prisma.ProfileUpdate
   isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  searchPreference: z.lazy(() => SearchPreferenceUpdateOneWithoutProfileNestedInputSchema).optional(),
   images: z.lazy(() => ProfileImageUpdateManyWithoutProfileNestedInputSchema).optional(),
   tags: z.lazy(() => ProfileTagUpdateManyWithoutProfileNestedInputSchema).optional()
 }).strict();
@@ -2477,27 +2518,33 @@ export const ProfileUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prisma.Prof
   tags: z.lazy(() => ProfileTagUncheckedUpdateManyWithoutProfileNestedInputSchema).optional()
 }).strict();
 
-export const SearchPreferenceCreateWithoutProfileInputSchema: z.ZodType<Prisma.SearchPreferenceCreateWithoutProfileInput> = z.object({
-  id: z.string().cuid().optional(),
-  profileId: z.string(),
-  ageMin: z.number().int(),
-  ageMax: z.number().int(),
-  gender: z.lazy(() => GenderSchema),
-  goal: z.lazy(() => GoalSchema)
+export const SearchPreferenceUpsertWithoutUserInputSchema: z.ZodType<Prisma.SearchPreferenceUpsertWithoutUserInput> = z.object({
+  update: z.union([ z.lazy(() => SearchPreferenceUpdateWithoutUserInputSchema),z.lazy(() => SearchPreferenceUncheckedUpdateWithoutUserInputSchema) ]),
+  create: z.union([ z.lazy(() => SearchPreferenceCreateWithoutUserInputSchema),z.lazy(() => SearchPreferenceUncheckedCreateWithoutUserInputSchema) ]),
+  where: z.lazy(() => SearchPreferenceWhereInputSchema).optional()
 }).strict();
 
-export const SearchPreferenceUncheckedCreateWithoutProfileInputSchema: z.ZodType<Prisma.SearchPreferenceUncheckedCreateWithoutProfileInput> = z.object({
-  id: z.string().cuid().optional(),
-  profileId: z.string(),
-  ageMin: z.number().int(),
-  ageMax: z.number().int(),
-  gender: z.lazy(() => GenderSchema),
-  goal: z.lazy(() => GoalSchema)
+export const SearchPreferenceUpdateToOneWithWhereWithoutUserInputSchema: z.ZodType<Prisma.SearchPreferenceUpdateToOneWithWhereWithoutUserInput> = z.object({
+  where: z.lazy(() => SearchPreferenceWhereInputSchema).optional(),
+  data: z.union([ z.lazy(() => SearchPreferenceUpdateWithoutUserInputSchema),z.lazy(() => SearchPreferenceUncheckedUpdateWithoutUserInputSchema) ]),
 }).strict();
 
-export const SearchPreferenceCreateOrConnectWithoutProfileInputSchema: z.ZodType<Prisma.SearchPreferenceCreateOrConnectWithoutProfileInput> = z.object({
-  where: z.lazy(() => SearchPreferenceWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => SearchPreferenceCreateWithoutProfileInputSchema),z.lazy(() => SearchPreferenceUncheckedCreateWithoutProfileInputSchema) ]),
+export const SearchPreferenceUpdateWithoutUserInputSchema: z.ZodType<Prisma.SearchPreferenceUpdateWithoutUserInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  profileId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  ageMin: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  ageMax: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => EnumGenderFieldUpdateOperationsInputSchema) ]).optional(),
+  goal: z.union([ z.lazy(() => GoalSchema),z.lazy(() => EnumGoalFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const SearchPreferenceUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prisma.SearchPreferenceUncheckedUpdateWithoutUserInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  profileId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  ageMin: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  ageMax: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => EnumGenderFieldUpdateOperationsInputSchema) ]).optional(),
+  goal: z.union([ z.lazy(() => GoalSchema),z.lazy(() => EnumGoalFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const UserCreateWithoutProfileInputSchema: z.ZodType<Prisma.UserCreateWithoutProfileInput> = z.object({
@@ -2510,7 +2557,9 @@ export const UserCreateWithoutProfileInputSchema: z.ZodType<Prisma.UserCreateWit
   isAccountDisabled: z.boolean().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
-  lastLoginAt: z.coerce.date().optional().nullable()
+  lastLoginAt: z.coerce.date().optional().nullable(),
+  searchPreferenceId: z.string().optional().nullable(),
+  searchPreference: z.lazy(() => SearchPreferenceCreateNestedOneWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserUncheckedCreateWithoutProfileInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutProfileInput> = z.object({
@@ -2523,7 +2572,9 @@ export const UserUncheckedCreateWithoutProfileInputSchema: z.ZodType<Prisma.User
   isAccountDisabled: z.boolean().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
-  lastLoginAt: z.coerce.date().optional().nullable()
+  lastLoginAt: z.coerce.date().optional().nullable(),
+  searchPreferenceId: z.string().optional().nullable(),
+  searchPreference: z.lazy(() => SearchPreferenceUncheckedCreateNestedOneWithoutUserInputSchema).optional()
 }).strict();
 
 export const UserCreateOrConnectWithoutProfileInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutProfileInput> = z.object({
@@ -2573,35 +2624,6 @@ export const ProfileTagCreateManyProfileInputEnvelopeSchema: z.ZodType<Prisma.Pr
   skipDuplicates: z.boolean().optional()
 }).strict();
 
-export const SearchPreferenceUpsertWithoutProfileInputSchema: z.ZodType<Prisma.SearchPreferenceUpsertWithoutProfileInput> = z.object({
-  update: z.union([ z.lazy(() => SearchPreferenceUpdateWithoutProfileInputSchema),z.lazy(() => SearchPreferenceUncheckedUpdateWithoutProfileInputSchema) ]),
-  create: z.union([ z.lazy(() => SearchPreferenceCreateWithoutProfileInputSchema),z.lazy(() => SearchPreferenceUncheckedCreateWithoutProfileInputSchema) ]),
-  where: z.lazy(() => SearchPreferenceWhereInputSchema).optional()
-}).strict();
-
-export const SearchPreferenceUpdateToOneWithWhereWithoutProfileInputSchema: z.ZodType<Prisma.SearchPreferenceUpdateToOneWithWhereWithoutProfileInput> = z.object({
-  where: z.lazy(() => SearchPreferenceWhereInputSchema).optional(),
-  data: z.union([ z.lazy(() => SearchPreferenceUpdateWithoutProfileInputSchema),z.lazy(() => SearchPreferenceUncheckedUpdateWithoutProfileInputSchema) ]),
-}).strict();
-
-export const SearchPreferenceUpdateWithoutProfileInputSchema: z.ZodType<Prisma.SearchPreferenceUpdateWithoutProfileInput> = z.object({
-  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  profileId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  ageMin: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  ageMax: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => EnumGenderFieldUpdateOperationsInputSchema) ]).optional(),
-  goal: z.union([ z.lazy(() => GoalSchema),z.lazy(() => EnumGoalFieldUpdateOperationsInputSchema) ]).optional(),
-}).strict();
-
-export const SearchPreferenceUncheckedUpdateWithoutProfileInputSchema: z.ZodType<Prisma.SearchPreferenceUncheckedUpdateWithoutProfileInput> = z.object({
-  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  profileId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  ageMin: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  ageMax: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
-  gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => EnumGenderFieldUpdateOperationsInputSchema) ]).optional(),
-  goal: z.union([ z.lazy(() => GoalSchema),z.lazy(() => EnumGoalFieldUpdateOperationsInputSchema) ]).optional(),
-}).strict();
-
 export const UserUpsertWithoutProfileInputSchema: z.ZodType<Prisma.UserUpsertWithoutProfileInput> = z.object({
   update: z.union([ z.lazy(() => UserUpdateWithoutProfileInputSchema),z.lazy(() => UserUncheckedUpdateWithoutProfileInputSchema) ]),
   create: z.union([ z.lazy(() => UserCreateWithoutProfileInputSchema),z.lazy(() => UserUncheckedCreateWithoutProfileInputSchema) ]),
@@ -2624,6 +2646,8 @@ export const UserUpdateWithoutProfileInputSchema: z.ZodType<Prisma.UserUpdateWit
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   lastLoginAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  searchPreferenceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  searchPreference: z.lazy(() => SearchPreferenceUpdateOneWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const UserUncheckedUpdateWithoutProfileInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutProfileInput> = z.object({
@@ -2637,6 +2661,8 @@ export const UserUncheckedUpdateWithoutProfileInputSchema: z.ZodType<Prisma.User
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   lastLoginAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  searchPreferenceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  searchPreference: z.lazy(() => SearchPreferenceUncheckedUpdateOneWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const ProfileImageUpsertWithWhereUniqueWithoutProfileInputSchema: z.ZodType<Prisma.ProfileImageUpsertWithWhereUniqueWithoutProfileInput> = z.object({
@@ -2691,6 +2717,7 @@ export const ProfileTagScalarWhereInputSchema: z.ZodType<Prisma.ProfileTagScalar
 }).strict();
 
 export const ProfileCreateWithoutImagesInputSchema: z.ZodType<Prisma.ProfileCreateWithoutImagesInput> = z.object({
+  id: z.string().cuid().optional(),
   publicName: z.string(),
   intro: z.string().optional().nullable(),
   country: z.string().optional().nullable(),
@@ -2705,7 +2732,6 @@ export const ProfileCreateWithoutImagesInputSchema: z.ZodType<Prisma.ProfileCrea
   isReported: z.boolean().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
-  searchPreference: z.lazy(() => SearchPreferenceCreateNestedOneWithoutProfileInputSchema).optional(),
   user: z.lazy(() => UserCreateNestedOneWithoutProfileInputSchema),
   tags: z.lazy(() => ProfileTagCreateNestedManyWithoutProfileInputSchema).optional()
 }).strict();
@@ -2747,6 +2773,7 @@ export const ProfileUpdateToOneWithWhereWithoutImagesInputSchema: z.ZodType<Pris
 }).strict();
 
 export const ProfileUpdateWithoutImagesInputSchema: z.ZodType<Prisma.ProfileUpdateWithoutImagesInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   publicName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   intro: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   country: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -2761,7 +2788,6 @@ export const ProfileUpdateWithoutImagesInputSchema: z.ZodType<Prisma.ProfileUpda
   isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  searchPreference: z.lazy(() => SearchPreferenceUpdateOneWithoutProfileNestedInputSchema).optional(),
   user: z.lazy(() => UserUpdateOneRequiredWithoutProfileNestedInputSchema).optional(),
   tags: z.lazy(() => ProfileTagUpdateManyWithoutProfileNestedInputSchema).optional()
 }).strict();
@@ -2823,6 +2849,7 @@ export const ProfileTagUpdateManyWithWhereWithoutTagInputSchema: z.ZodType<Prism
 }).strict();
 
 export const ProfileCreateWithoutTagsInputSchema: z.ZodType<Prisma.ProfileCreateWithoutTagsInput> = z.object({
+  id: z.string().cuid().optional(),
   publicName: z.string(),
   intro: z.string().optional().nullable(),
   country: z.string().optional().nullable(),
@@ -2837,7 +2864,6 @@ export const ProfileCreateWithoutTagsInputSchema: z.ZodType<Prisma.ProfileCreate
   isReported: z.boolean().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
-  searchPreference: z.lazy(() => SearchPreferenceCreateNestedOneWithoutProfileInputSchema).optional(),
   user: z.lazy(() => UserCreateNestedOneWithoutProfileInputSchema),
   images: z.lazy(() => ProfileImageCreateNestedManyWithoutProfileInputSchema).optional()
 }).strict();
@@ -2894,6 +2920,7 @@ export const ProfileUpdateToOneWithWhereWithoutTagsInputSchema: z.ZodType<Prisma
 }).strict();
 
 export const ProfileUpdateWithoutTagsInputSchema: z.ZodType<Prisma.ProfileUpdateWithoutTagsInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   publicName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   intro: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   country: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -2908,7 +2935,6 @@ export const ProfileUpdateWithoutTagsInputSchema: z.ZodType<Prisma.ProfileUpdate
   isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  searchPreference: z.lazy(() => SearchPreferenceUpdateOneWithoutProfileNestedInputSchema).optional(),
   user: z.lazy(() => UserUpdateOneRequiredWithoutProfileNestedInputSchema).optional(),
   images: z.lazy(() => ProfileImageUpdateManyWithoutProfileNestedInputSchema).optional()
 }).strict();
@@ -2954,92 +2980,80 @@ export const TagUncheckedUpdateWithoutProfileLinksInputSchema: z.ZodType<Prisma.
   name: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
-export const ProfileCreateWithoutSearchPreferenceInputSchema: z.ZodType<Prisma.ProfileCreateWithoutSearchPreferenceInput> = z.object({
-  publicName: z.string(),
-  intro: z.string().optional().nullable(),
-  country: z.string().optional().nullable(),
-  city: z.string().optional().nullable(),
-  birthday: z.coerce.date().optional().nullable(),
-  gender: z.lazy(() => GenderSchema).optional().nullable(),
-  relationship: z.lazy(() => RelationshipStatusSchema).optional().nullable(),
-  hasKids: z.boolean().optional().nullable(),
-  latitude: z.number().optional().nullable(),
-  longitude: z.number().optional().nullable(),
-  isActive: z.boolean().optional(),
-  isReported: z.boolean().optional(),
+export const UserCreateWithoutSearchPreferenceInputSchema: z.ZodType<Prisma.UserCreateWithoutSearchPreferenceInput> = z.object({
+  id: z.string().cuid().optional(),
+  email: z.string(),
+  tokenVersion: z.number().int().optional(),
+  loginToken: z.string().optional().nullable(),
+  loginTokenExp: z.coerce.date().optional().nullable(),
+  isRegistrationConfirmed: z.boolean().optional(),
+  isAccountDisabled: z.boolean().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
-  user: z.lazy(() => UserCreateNestedOneWithoutProfileInputSchema),
-  images: z.lazy(() => ProfileImageCreateNestedManyWithoutProfileInputSchema).optional(),
-  tags: z.lazy(() => ProfileTagCreateNestedManyWithoutProfileInputSchema).optional()
+  lastLoginAt: z.coerce.date().optional().nullable(),
+  searchPreferenceId: z.string().optional().nullable(),
+  profile: z.lazy(() => ProfileCreateNestedOneWithoutUserInputSchema).optional()
 }).strict();
 
-export const ProfileUncheckedCreateWithoutSearchPreferenceInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateWithoutSearchPreferenceInput> = z.object({
-  publicName: z.string(),
-  intro: z.string().optional().nullable(),
-  country: z.string().optional().nullable(),
-  city: z.string().optional().nullable(),
-  birthday: z.coerce.date().optional().nullable(),
-  gender: z.lazy(() => GenderSchema).optional().nullable(),
-  relationship: z.lazy(() => RelationshipStatusSchema).optional().nullable(),
-  hasKids: z.boolean().optional().nullable(),
-  latitude: z.number().optional().nullable(),
-  longitude: z.number().optional().nullable(),
-  isActive: z.boolean().optional(),
-  isReported: z.boolean().optional(),
-  userId: z.string(),
+export const UserUncheckedCreateWithoutSearchPreferenceInputSchema: z.ZodType<Prisma.UserUncheckedCreateWithoutSearchPreferenceInput> = z.object({
+  id: z.string().cuid().optional(),
+  email: z.string(),
+  tokenVersion: z.number().int().optional(),
+  loginToken: z.string().optional().nullable(),
+  loginTokenExp: z.coerce.date().optional().nullable(),
+  isRegistrationConfirmed: z.boolean().optional(),
+  isAccountDisabled: z.boolean().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
-  images: z.lazy(() => ProfileImageUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
-  tags: z.lazy(() => ProfileTagUncheckedCreateNestedManyWithoutProfileInputSchema).optional()
+  lastLoginAt: z.coerce.date().optional().nullable(),
+  searchPreferenceId: z.string().optional().nullable(),
+  profile: z.lazy(() => ProfileUncheckedCreateNestedOneWithoutUserInputSchema).optional()
 }).strict();
 
-export const ProfileCreateOrConnectWithoutSearchPreferenceInputSchema: z.ZodType<Prisma.ProfileCreateOrConnectWithoutSearchPreferenceInput> = z.object({
-  where: z.lazy(() => ProfileWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => ProfileCreateWithoutSearchPreferenceInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutSearchPreferenceInputSchema) ]),
+export const UserCreateOrConnectWithoutSearchPreferenceInputSchema: z.ZodType<Prisma.UserCreateOrConnectWithoutSearchPreferenceInput> = z.object({
+  where: z.lazy(() => UserWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => UserCreateWithoutSearchPreferenceInputSchema),z.lazy(() => UserUncheckedCreateWithoutSearchPreferenceInputSchema) ]),
 }).strict();
 
-export const ProfileCreateManySearchPreferenceInputEnvelopeSchema: z.ZodType<Prisma.ProfileCreateManySearchPreferenceInputEnvelope> = z.object({
-  data: z.union([ z.lazy(() => ProfileCreateManySearchPreferenceInputSchema),z.lazy(() => ProfileCreateManySearchPreferenceInputSchema).array() ]),
-  skipDuplicates: z.boolean().optional()
+export const UserUpsertWithoutSearchPreferenceInputSchema: z.ZodType<Prisma.UserUpsertWithoutSearchPreferenceInput> = z.object({
+  update: z.union([ z.lazy(() => UserUpdateWithoutSearchPreferenceInputSchema),z.lazy(() => UserUncheckedUpdateWithoutSearchPreferenceInputSchema) ]),
+  create: z.union([ z.lazy(() => UserCreateWithoutSearchPreferenceInputSchema),z.lazy(() => UserUncheckedCreateWithoutSearchPreferenceInputSchema) ]),
+  where: z.lazy(() => UserWhereInputSchema).optional()
 }).strict();
 
-export const ProfileUpsertWithWhereUniqueWithoutSearchPreferenceInputSchema: z.ZodType<Prisma.ProfileUpsertWithWhereUniqueWithoutSearchPreferenceInput> = z.object({
-  where: z.lazy(() => ProfileWhereUniqueInputSchema),
-  update: z.union([ z.lazy(() => ProfileUpdateWithoutSearchPreferenceInputSchema),z.lazy(() => ProfileUncheckedUpdateWithoutSearchPreferenceInputSchema) ]),
-  create: z.union([ z.lazy(() => ProfileCreateWithoutSearchPreferenceInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutSearchPreferenceInputSchema) ]),
+export const UserUpdateToOneWithWhereWithoutSearchPreferenceInputSchema: z.ZodType<Prisma.UserUpdateToOneWithWhereWithoutSearchPreferenceInput> = z.object({
+  where: z.lazy(() => UserWhereInputSchema).optional(),
+  data: z.union([ z.lazy(() => UserUpdateWithoutSearchPreferenceInputSchema),z.lazy(() => UserUncheckedUpdateWithoutSearchPreferenceInputSchema) ]),
 }).strict();
 
-export const ProfileUpdateWithWhereUniqueWithoutSearchPreferenceInputSchema: z.ZodType<Prisma.ProfileUpdateWithWhereUniqueWithoutSearchPreferenceInput> = z.object({
-  where: z.lazy(() => ProfileWhereUniqueInputSchema),
-  data: z.union([ z.lazy(() => ProfileUpdateWithoutSearchPreferenceInputSchema),z.lazy(() => ProfileUncheckedUpdateWithoutSearchPreferenceInputSchema) ]),
+export const UserUpdateWithoutSearchPreferenceInputSchema: z.ZodType<Prisma.UserUpdateWithoutSearchPreferenceInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  tokenVersion: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  loginToken: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  loginTokenExp: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  isRegistrationConfirmed: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  isAccountDisabled: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  lastLoginAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  searchPreferenceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  profile: z.lazy(() => ProfileUpdateOneWithoutUserNestedInputSchema).optional()
 }).strict();
 
-export const ProfileUpdateManyWithWhereWithoutSearchPreferenceInputSchema: z.ZodType<Prisma.ProfileUpdateManyWithWhereWithoutSearchPreferenceInput> = z.object({
-  where: z.lazy(() => ProfileScalarWhereInputSchema),
-  data: z.union([ z.lazy(() => ProfileUpdateManyMutationInputSchema),z.lazy(() => ProfileUncheckedUpdateManyWithoutSearchPreferenceInputSchema) ]),
-}).strict();
-
-export const ProfileScalarWhereInputSchema: z.ZodType<Prisma.ProfileScalarWhereInput> = z.object({
-  AND: z.union([ z.lazy(() => ProfileScalarWhereInputSchema),z.lazy(() => ProfileScalarWhereInputSchema).array() ]).optional(),
-  OR: z.lazy(() => ProfileScalarWhereInputSchema).array().optional(),
-  NOT: z.union([ z.lazy(() => ProfileScalarWhereInputSchema),z.lazy(() => ProfileScalarWhereInputSchema).array() ]).optional(),
-  id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
-  publicName: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
-  intro: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
-  country: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
-  city: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
-  birthday: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
-  gender: z.union([ z.lazy(() => EnumGenderNullableFilterSchema),z.lazy(() => GenderSchema) ]).optional().nullable(),
-  relationship: z.union([ z.lazy(() => EnumRelationshipStatusNullableFilterSchema),z.lazy(() => RelationshipStatusSchema) ]).optional().nullable(),
-  hasKids: z.union([ z.lazy(() => BoolNullableFilterSchema),z.boolean() ]).optional().nullable(),
-  latitude: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
-  longitude: z.union([ z.lazy(() => FloatNullableFilterSchema),z.number() ]).optional().nullable(),
-  isActive: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
-  isReported: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
-  userId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
-  createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
-  updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+export const UserUncheckedUpdateWithoutSearchPreferenceInputSchema: z.ZodType<Prisma.UserUncheckedUpdateWithoutSearchPreferenceInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  email: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  tokenVersion: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
+  loginToken: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  loginTokenExp: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  isRegistrationConfirmed: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  isAccountDisabled: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  lastLoginAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  searchPreferenceId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  profile: z.lazy(() => ProfileUncheckedUpdateOneWithoutUserNestedInputSchema).optional()
 }).strict();
 
 export const ProfileImageCreateManyProfileInputSchema: z.ZodType<Prisma.ProfileImageCreateManyProfileInput> = z.object({
@@ -3104,82 +3118,6 @@ export const ProfileTagUncheckedUpdateWithoutTagInputSchema: z.ZodType<Prisma.Pr
 export const ProfileTagUncheckedUpdateManyWithoutTagInputSchema: z.ZodType<Prisma.ProfileTagUncheckedUpdateManyWithoutTagInput> = z.object({
   id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   profileId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-}).strict();
-
-export const ProfileCreateManySearchPreferenceInputSchema: z.ZodType<Prisma.ProfileCreateManySearchPreferenceInput> = z.object({
-  publicName: z.string(),
-  intro: z.string().optional().nullable(),
-  country: z.string().optional().nullable(),
-  city: z.string().optional().nullable(),
-  birthday: z.coerce.date().optional().nullable(),
-  gender: z.lazy(() => GenderSchema).optional().nullable(),
-  relationship: z.lazy(() => RelationshipStatusSchema).optional().nullable(),
-  hasKids: z.boolean().optional().nullable(),
-  latitude: z.number().optional().nullable(),
-  longitude: z.number().optional().nullable(),
-  isActive: z.boolean().optional(),
-  isReported: z.boolean().optional(),
-  userId: z.string(),
-  createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional()
-}).strict();
-
-export const ProfileUpdateWithoutSearchPreferenceInputSchema: z.ZodType<Prisma.ProfileUpdateWithoutSearchPreferenceInput> = z.object({
-  publicName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  intro: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  country: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  city: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => NullableEnumGenderFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => NullableEnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  hasKids: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  latitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  user: z.lazy(() => UserUpdateOneRequiredWithoutProfileNestedInputSchema).optional(),
-  images: z.lazy(() => ProfileImageUpdateManyWithoutProfileNestedInputSchema).optional(),
-  tags: z.lazy(() => ProfileTagUpdateManyWithoutProfileNestedInputSchema).optional()
-}).strict();
-
-export const ProfileUncheckedUpdateWithoutSearchPreferenceInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateWithoutSearchPreferenceInput> = z.object({
-  publicName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  intro: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  country: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  city: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => NullableEnumGenderFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => NullableEnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  hasKids: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  latitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  images: z.lazy(() => ProfileImageUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
-  tags: z.lazy(() => ProfileTagUncheckedUpdateManyWithoutProfileNestedInputSchema).optional()
-}).strict();
-
-export const ProfileUncheckedUpdateManyWithoutSearchPreferenceInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateManyWithoutSearchPreferenceInput> = z.object({
-  publicName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  intro: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  country: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  city: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => NullableEnumGenderFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => NullableEnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  hasKids: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  latitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  longitude: z.union([ z.number(),z.lazy(() => NullableFloatFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 /////////////////////////////////////////

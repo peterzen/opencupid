@@ -4,8 +4,37 @@ import { ProfileSchema } from '@opencupid/shared/zod/generated'
 import { CreateProfileSchema, UpdateProfileSchema } from '@opencupid/shared/zod/profile.schema'
 
 const profileRoutes: FastifyPluginAsync = async (fastify) => {
+  // Get current user's profile
+  fastify.get('/me', {
+    onRequest: [fastify.authenticate]
+  }, async (req, reply) => {
+
+    const profile = await fastify.prisma.profile.findUnique({
+      where: { userId: req.user.userId },
+    })
+    console.debug('Fetched profile for user:', req.user.userId, profile)
+    if (!profile) {
+      // Create empty profile record with required fields
+      const profile = await fastify.prisma.profile.create({
+        data: {
+          userId: req.user.userId,
+          publicName: '',
+          gender: null,
+          relationship: null,
+          hasKids: null,
+          isActive: false,
+        }
+      })
+    }
+    return reply.status(200).send({ success: true, profile: profile })
+
+  })
+
   // Get all profiles
-  fastify.get('/', async (req, reply) => {
+
+  fastify.get('/', {
+    onRequest: [fastify.authenticate]
+  }, async (req, reply) => {
     const profiles = await fastify.prisma.profile.findMany({
       include: {
         user: true, // Include related user data if needed
@@ -15,7 +44,9 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
   })
 
   // Get a single profile by ID
-  fastify.get('/:id', async (req, reply) => {
+  fastify.get('/:id', {
+    onRequest: [fastify.authenticate]
+  }, async (req, reply) => {
     const { id } = req.params as { id: string }
 
     const profile = await fastify.prisma.profile.findUnique({
@@ -32,23 +63,12 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     return { profile }
   })
 
-  // Create a new profile
-  fastify.post('/', async (req, reply) => {
-    const data = validateBody(CreateProfileSchema, req, reply)
-    if (!data) return
 
-    const profile = await fastify.prisma.profile.create({
-      data: {
-        ...data,
-        userId: req.user.userId, // Assuming userId is available from JWT
-      },
-    })
-
-    return { profile }
-  })
 
   // Update an existing profile
-  fastify.patch('/:id', async (req, reply) => {
+  fastify.patch('/:id', {
+    onRequest: [fastify.authenticate]
+  }, async (req, reply) => {
     const { id } = req.params as { id: string }
     const data = validateBody(UpdateProfileSchema, req, reply)
     if (!data) return

@@ -33,9 +33,14 @@ app.use(Vue3Toastify, defaultOptions)
 import { plugin as formKitPlugin, defaultConfig } from '@formkit/vue'
 import bootstrapConfig from '@/lib/formkit/formkit.config'
 import '@/lib/formkit/formkit-custom.scss'
+import { useAuthStore } from './store/authStore'
 
 app.use(formKitPlugin, defaultConfig({
   config: bootstrapConfig.config
 }))
+
+// Initialize auth state from localStorage
+// const authStore = useAuthStore()
+// authStore.initializeFromStorage()
 
 app.mount('#app')

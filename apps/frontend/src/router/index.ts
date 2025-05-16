@@ -42,14 +42,20 @@ const router = createRouter({
 });
 
 // Register the navigation guard
-router.beforeEach((to, from, next) => {
-  const auth = useAuthStore();
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore()
 
-  if(to.meta.requiresAuth === false && auth.isLoggedIn) {
-    next({ name: 'UserHome' });
+  // Initialize auth state if not already done
+  if (!authStore.isInitialized) {
+    await authStore.initializeFromStorage()
   }
 
-  if (to.meta.requiresAuth && !auth.isLoggedIn) {
+  if (to.meta.requiresAuth === false && authStore.isLoggedIn) {
+    next({ name: 'UserHome' });
+    return
+  }
+
+  if (to.meta.requiresAuth && !authStore.isLoggedIn) {
     // If the route requires authentication and the user is not logged in, redirect to login
     next({ name: 'Login' });
   } else {
@@ -65,7 +71,7 @@ router.afterEach((to, from) => {
   if (flashMessage) {
     showToast(flashMessage)
   }
-  
+
   // Set the page title based on the route name
   // const title = to.name ? `${to.name} - My App` : 'My App';
   // document.title = title;

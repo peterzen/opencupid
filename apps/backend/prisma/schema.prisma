@@ -21,10 +21,12 @@ model User {
   isRegistrationConfirmed Boolean   @default(false)
   isAccountDisabled       Boolean   @default(false)
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  lastLoginAt DateTime?
-  profile     Profile?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  lastLoginAt        DateTime?
+  profile            Profile?          @relation
+  searchPreference   SearchPreference?
+  searchPreferenceId String?
 }
 
 model Profile {
@@ -45,12 +47,10 @@ model Profile {
   isActive   Boolean @default(false)
   isReported Boolean @default(false)
 
-  // — one-to-one (opt) search prefs
-  searchPreference SearchPreference? @relation(fields: [id], references: [profileId], onDelete: Cascade)
-
   // — relations
-  userId String         @unique
-  user   User           @relation(fields: [userId], references: [id])
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id]) // Ensure proper relation
+
   images ProfileImage[]
   tags   ProfileTag[]
 
@@ -84,13 +84,15 @@ model ProfileTag {
 }
 
 model SearchPreference {
-  id        String    @id @default(cuid())
-  profileId String    @unique
+  id        String @id @default(cuid())
+  profileId String @unique
   ageMin    Int
   ageMax    Int
   gender    Gender
   goal      Goal
-  Profile   Profile[]
+  
+  userId    String @unique
+  user      User   @relation(fields: [userId], references: [id]) // Ensure proper relation
 }
 
 enum Gender {

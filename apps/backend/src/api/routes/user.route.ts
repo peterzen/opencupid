@@ -15,7 +15,7 @@ function getTokenExpiration() {
 
 const userRoutes: FastifyPluginAsync = async (fastify) => {
 
-  fastify.get('/login-return', async (req, reply) => {
+  fastify.get('/otp-login', async (req, reply) => {
     const { token } = req.query as { token: string }
 
     if (!token) {
@@ -53,7 +53,7 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
 
     const payload = { userId: user.id, email: user.email, tokenVersion: user.tokenVersion ?? 0 }
     const jwt = fastify.jwt.sign(payload)
-    reply.send({ status: 'success', token: jwt, user: { id: user.id, email: user.email } })
+    reply.send({ success: true, token: jwt })
   })
 
 
@@ -125,7 +125,7 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(401).send({ error: 'Unauthorized' })
     }
 
-    return reply.status(200).send({ success: true, data: user  })
+    return reply.status(200).send({ success: true, data: user })
   })
 }
 

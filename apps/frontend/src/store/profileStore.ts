@@ -16,6 +16,7 @@ export const useProfileStore = defineStore('profile', {
       try {
         const res = await axios.get('/profiles/me') 
         this.profile = res.data.profile
+        console.log('Fetched user profile:', this.profile)
         return this.profile
       } catch (error: any) {
         console.error('Failed to fetch user profile:', error)

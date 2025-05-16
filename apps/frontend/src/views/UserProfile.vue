@@ -1,155 +1,159 @@
 <template>
   <div class="container mt-5">
     <h2>Profile</h2>
-    <FormKit
-      type="form"
-      @submit="submitProfile"
-    >
-      <!-- Public Name -->
-      <FormKit
-        name="publicName"
-        label="Public Name"
-        type="text"
-        placeholder="Enter your public name"
-        :value="profile.publicName"
-      />
-      <FormKit
-        name="intro"
-        label="Introduction"
-        type="textarea"
-        placeholder="Write a short introduction"
-        :value="profile.intro"
-      />
 
-      <!-- City -->
-      <FormKit
-        name="city"
-        label="City"
-        type="text"
-        placeholder="Enter your city"
-        :value="profile.city"
-      />
-
-      <!-- Full Birthday -->
-      <div class="row">
-        <div class="col">
-          <FormKit
-        name="birthYear"
-        label="Year"
-        type="number"
-        placeholder="YYYY"
-        :value="profile.birthYear"
-        :validation="`required|integer|min:1900|max:${maxBirthYear}`"
-          />
-        </div>
-        <div class="col">
-          <FormKit
-        name="birthMonth"
-        label="Month"
-        type="number"
-        placeholder="MM"
-        :value="profile.birthMonth"
-        validation="required|integer|min:1|max:12"
-          />
-        </div>
-        <div class="col">
-          <FormKit
-        name="birthDay"
-        label="Day"
-        type="number"
-        placeholder="DD"
-        :value="profile.birthDay"
-        validation="required|integer|min:1|max:31"
-          />
-        </div>
+    <!-- Loading state -->
+    <div v-if="isLoading"
+         class="text-center">
+      <div class="spinner-border"
+           role="status">
+        <span class="visually-hidden">Loading...</span>
       </div>
-      <FormKit
-        name="gender"
-        label="Gender"
-        type="select"
-        :options="genderOptions"
-        :value="profile.gender"
-        validation="required"
-      />
-      <FormKit
-        name="relationship"
-        label="Relationship Status"
-        type="select"
-        :options="relationshipOptions"
-        :value="profile.relationship"
-        validation="required"
-      />
-      <FormKit
-        name="hasKids"
-        label="Do you have kids?"
-        type="radio"
-        :options="[
-          { value: true, label: 'Yes' },
-          { value: false, label: 'No' },
-        ]"
-        :value="profile.hasKids"
-        validation="required"
-      />
-   
+    </div>
 
-      <!-- Submit Button -->
-      <FormKit type="submit" label="Save Profile" />
-    </FormKit>
+    <div class="row"
+         v-else>
+      <div class="col-md-6 offset-md-3">
+        <form @submit.prevent="submitProfile(profile)">
+          <div class="mb-3">
+            <label for="publicName"
+                   class="form-label">Public Name</label>
+            <input type="text"
+                   v-model="profile.publicName"
+                   class="form-control"
+                   id="publicName"
+                   required />
+          </div>
+
+          <div class="mb-3">
+            <label for="intro"
+                   class="form-label">Introduction</label>
+            <textarea v-model="profile.intro"
+                      class="form-control"
+                      id="intro"></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="city"
+                   class="form-label">City</label>
+            <input type="text"
+                   v-model="profile.city"
+                   class="form-control"
+                   id="city" />
+          </div>
+
+                    <div class="mb-3">
+            <label for="city"
+                   class="form-label">Country</label>
+            <input type="text"
+                   v-model="profile.country"
+                   class="form-control"
+                   id="city" />
+          </div>
+
+
+          <div class="mb-3">
+            <label for="birthDate"
+                   class="form-label">Birth Date</label>
+            <input type="date"
+                   v-model="profile.birthDate"
+                   class="form-control"
+                   id="birthDate"
+                   :max="'{{ maxBirthYear }}'" />
+          </div>
+
+          <button type="submit"
+                  class="btn btn-primary">Save</button>
+
+
+        </form>
+
+      </div>
+
+    </div>
   </div>
 </template>
 
+
+
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue'
+import { defineComponent } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
+import { toast } from 'vue3-toastify'
 
 export default defineComponent({
   name: 'UserProfile',
-  setup() {
-    const profileStore = useProfileStore()
 
-    // Fetch the user's profile on component mount
-    const profile = ref(profileStore.profile || {})
-    if (!profile.value.id) {
-      profileStore.getUserProfile().then((data) => {
-        profile.value = data || {}
-      })
+  data() {
+    return {
+      profile: {
+        id: null,
+        publicName: '',
+        intro: '',
+        city: '',
+        birthYear: null,
+        birthMonth: null,
+        birthDay: null,
+        gender: '',
+        relationship: '',
+        hasKids: null,
+      },
+      isLoading: false,
+      error: '',
+      genderOptions: [
+        { value: 'male', label: 'Male' },
+        { value: 'female', label: 'Female' },
+        { value: 'non_binary', label: 'Non-Binary' },
+        { value: 'other', label: 'Other' },
+      ],
+      relationshipOptions: [
+        { value: 'single', label: 'Single' },
+        { value: 'in_relationship', label: 'In a Relationship' },
+        { value: 'married', label: 'Married' },
+        { value: 'other', label: 'Other' },
+      ],
     }
+  },
 
-    // Options for gender and relationship status
-    const genderOptions = [
-      { value: 'male', label: 'Male' },
-      { value: 'female', label: 'Female' },
-      { value: 'non_binary', label: 'Non-Binary' },
-      { value: 'other', label: 'Other' },
-    ]
+  computed: {
+    maxBirthYear(): number {
+      return new Date().getFullYear() - 18
+    },
 
-    const relationshipOptions = [
-      { value: 'single', label: 'Single' },
-      { value: 'in_relationship', label: 'In a Relationship' },
-      { value: 'married', label: 'Married' },
-      { value: 'other', label: 'Other' },
-    ]
+    profileStore() {
+      return useProfileStore()
+    }
+  },
 
-    // Maximum birth year (must be 18+)
-    const maxBirthYear = computed(() => new Date().getFullYear() - 18)
-
-    // Submit handler
-    const submitProfile = async (formData: Record<string, any>) => {
+  methods: {
+    async loadProfile() {
       try {
-        await profileStore.updateProfile(formData)
-        alert('Profile updated successfully!')
+        this.isLoading = true
+        const data = await this.profileStore.getUserProfile()
+        console.log('Profile data:', data)
+        this.profile = data || {}
+      } catch (error) {
+        console.error('Failed to load profile:', error)
+        this.error = 'Failed to load profile. Please try again.'
+      } finally {
+        this.isLoading = false
+      }
+    },
+
+    async submitProfile(formData: Record<string, any>) {
+      try {
+        await this.profileStore.updateProfile(formData)
+        toast.success('Profile updated successfully!')
       } catch (error) {
         console.error('Failed to update profile:', error)
-        alert('Failed to update profile. Please try again.')
+        this.error = 'Failed to update profile. Please try again.'
       }
     }
+  },
 
-    return {
-      profile,
-      genderOptions,
-      relationshipOptions,
-      maxBirthYear,
-      submitProfile,
+  async created() {
+    if (!this.profile.id) {
+      await this.loadProfile()
     }
   },
 })
