@@ -58,13 +58,13 @@ export const useAuthStore = defineStore('auth', {
 
         if (res.data.success === true) {
           this.setAuthState(res.data.token)
-          return { success: true, status: '' };
         }
 
       } catch (error: any) {
         console.error('Login failed:', error)
         return { success: false, status: error.message }
       }
+      return { success: true, status: '' };
     },
 
     async sendLoginLink(email: string) {
