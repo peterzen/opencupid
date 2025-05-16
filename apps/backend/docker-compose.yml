@@ -13,6 +13,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   maildev:
+    restart: unless-stopped
     image: maildev/maildev
     ports:
       - "1080:1080"
