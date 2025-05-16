@@ -9,6 +9,9 @@ const app = Fastify({ logger: true })
 // Register CORS plugin
 app.register(cors, {
   origin: '*',
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  methods: ['GET', 'PUT', 'POST', 'DELETE', 'PATCH']
 })
 
 app.register(import('./plugins/prisma'))

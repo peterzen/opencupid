@@ -45,11 +45,11 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const auth = useAuthStore();
 
-  if(to.meta.requiresAuth === false && auth.isLoggedIn()) {
+  if(to.meta.requiresAuth === false && auth.isLoggedIn) {
     next({ name: 'UserHome' });
   }
 
-  if (to.meta.requiresAuth && !auth.isLoggedIn()) {
+  if (to.meta.requiresAuth && !auth.isLoggedIn) {
     // If the route requires authentication and the user is not logged in, redirect to login
     next({ name: 'Login' });
   } else {

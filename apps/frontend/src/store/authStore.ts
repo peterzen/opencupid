@@ -5,25 +5,54 @@ import axios from 'axios'
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '/api'
 
 function setJwt(token: string) {
-  localStorage.setItem('token', token)
   axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
 }
 
 export const useAuthStore = defineStore('auth', {
-  state: () => ({
-    user: null as null | Record<string, any>,
-    token: localStorage.getItem('token') || '',
-  }),
+  state: () => {
+    const jwt = localStorage.getItem('token') || ''
+    let userId = null
+    let email = null
+    if (jwt) {
+      setJwt(jwt)
+      console.log("jwt: ", jwt)
+      // extract user info from token
+      try {
+        const payload = JSON.parse(atob(jwt.split('.')[1]))
+        // Optionally, you can assign user info here if you want it available on reload
+        userId = payload.userId || null
+        email = payload.email || null
+      } catch (e) {
+        console.warn('Failed to parse JWT payload:', e)
+      }
+    }
+    console.log("userId: ", userId)
+    console.log("email: ", email)
+    return {
+      user: null as null | Record<string, any>,
+      userId,
+      jwt,
+      email
+    }
+  },
+
+  getters: {
+    isLoggedIn: (state) => state.jwt !== '',
+    getUserId: (state) => state.userId,
+    getEmail: (state) => state.email,
+  },
   actions: {
-    async login(token: string) {
+    async otpLogin(otp: string) {
       try {
         const res = await axios.get('/users/login-return', {
-          params: { token }
+          params: { token: otp }
         })
 
         if (res.data.status === 'success') {
-          this.token = res.data.token;
-          setJwt(this.token);
+          this.jwt = res.data.token;
+          localStorage.setItem('token', this.jwt)
+          setJwt(this.jwt);
+
           this.user = res.data.user;
           console.log("user: ", this.user)
           return { success: true, status: '' };
@@ -50,35 +79,11 @@ export const useAuthStore = defineStore('auth', {
     },
 
     logout() {
-      this.token = ''
+      this.user = null
+      this.jwt = ''
       localStorage.removeItem('token')
       delete axios.defaults.headers.common['Authorization']
-      this.user = null
     },
 
-    async verifyToken() {
-      if (!this.token) {
-        this.logout()
-        return false
-      }
-
-      try {
-        const res = await axios.get('/users/verify-token')
-        this.user = res.data.user
-        return true
-      } catch (error: any) {
-        console.error('Token verification failed:', error)
-        this.logout()
-        return false
-      }
-    },
-
-    isLoggedIn() {
-      return this.token !== ''
-    },
-
-    getCurrentUser() {
-      return this.user
-    }
   },
 })

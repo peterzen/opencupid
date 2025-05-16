@@ -12,8 +12,9 @@ export const useProfileStore = defineStore('profile', {
   actions: {
     // Fetch the current user's profile
     async getUserProfile() {
+
       try {
-        const res = await axios.get('/profiles/me') // Assuming `/profiles/me` returns the current user's profile
+        const res = await axios.get('/profiles/me') 
         this.profile = res.data.profile
         return this.profile
       } catch (error: any) {

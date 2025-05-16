@@ -62,7 +62,7 @@ export default defineComponent({
 
     if (token !== '') {
       try {
-        const res = await authStore.login(token);
+        const res = await authStore.otpLogin(token);
 
         if (res.success === true) {
           this.$router.push({ name: 'UserHome' })

@@ -15,12 +15,6 @@ function getTokenExpiration() {
 
 const userRoutes: FastifyPluginAsync = async (fastify) => {
 
-  type JwtPayload = {
-    userId: string
-    email: string
-    tokenVersion: number
-  }
-
   fastify.get('/login-return', async (req, reply) => {
     const { token } = req.query as { token: string }
 
@@ -57,7 +51,7 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
       )
     }
 
-    const payload: JwtPayload = { userId: user.id, email: user.email, tokenVersion: user.tokenVersion ?? 0 }
+    const payload = { userId: user.id, email: user.email, tokenVersion: user.tokenVersion ?? 0 }
     const jwt = fastify.jwt.sign(payload)
     reply.send({ status: 'success', token: jwt, user: { id: user.id, email: user.email } })
   })
@@ -109,25 +103,30 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
     return reply.status(200).send({ success: true, status: 'login' });
   })
 
-  fastify.get('/verify-token', async (req, reply) => {
-    try {
-      const user = await fastify.prisma.user.findUnique({
-        where: { id: req.user.userId },
-      })
-
-      if (!user) {
-        return reply.status(401).send({ success: false, error: 'Invalid token' })
-      }
-      reply.send({
-        success: true,
-        user: { id: user.id, email: user.email }
-      });
-
-    } catch (err) {
-      return reply.status(500).send({ error: 'Failed to verify token' })
+  fastify.get('/me', async (req, reply) => {
+    if (req.user === null) {
+      return reply.status(401).send({ error: 'Unauthorized' })
     }
-  })
 
+    const user = await fastify.prisma.user.findUnique({
+      where: { id: req.user.userId },
+      select: {
+        id: true,
+        email: true,
+        isRegistrationConfirmed: true,
+        createdAt: true,
+        updatedAt: true,
+        lastLoginAt: true,
+        tokenVersion: true,
+      }
+    })
+
+    if (!user) {
+      return reply.status(401).send({ error: 'Unauthorized' })
+    }
+
+    return reply.status(200).send({ success: true, data: user  })
+  })
 }
 
 export default userRoutes

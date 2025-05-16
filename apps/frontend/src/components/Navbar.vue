@@ -15,7 +15,7 @@ export default defineComponent({
     LogoutButton,
   },
 
-   data() {
+  data() {
     return {
       authStore: useAuthStore(),
     }
@@ -23,28 +23,27 @@ export default defineComponent({
 
   computed: {
     isLoggedIn(): boolean {
-      return this.authStore.isLoggedIn()
+      return this.authStore.isLoggedIn
+    },
+    email(): string {
+      return this.authStore.getEmail ?? ''
     }
   },
 
   mounted() {
     const dropdownRef = this.$refs.navbarDropdown as HTMLElement
-     if (dropdownRef) {
+    if (dropdownRef) {
       new Dropdown(dropdownRef)
     }
   },
 
-  methods: {
-    switchTheme() {
-      console.log('switch theme')
-    }
-  }
 })
 
 </script>
 
 <template>
-  <nav v-if="isLoggedIn" class="navbar sticky-top navbar-expand-md  mb-lg-4"
+  <nav v-if="isLoggedIn"
+       class="navbar sticky-top navbar-expand-md  mb-lg-4"
        id="navbar">
     <div class="container-fluid">
       <a class="navbar-brand"
@@ -85,6 +84,7 @@ export default defineComponent({
             </a>
             <ul class="dropdown-menu dropdown-dark dropdown-menu-end"
                 aria-labelledby="navbarDropdown">
+              <li><span class="dropdown-item">{{ email }}</span></li>
               <li>
                 <LogoutButton />
               </li>
