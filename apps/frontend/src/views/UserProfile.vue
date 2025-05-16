@@ -1,76 +1,67 @@
 <template>
-  <div class="container mt-5">
-    <h2>Profile</h2>
+  <h2>Profile</h2>
 
-    <!-- Loading state -->
-    <div v-if="isLoading"
-         class="text-center">
-      <div class="spinner-border"
-           role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-    </div>
+  <LoadingComponent v-if="isLoading" />
 
-    <div class="row"
-         v-else>
-      <div class="col-md-6 offset-md-3">
-        <form @submit.prevent="submitProfile(profile)">
-          <div class="mb-3">
-            <label for="publicName"
-                   class="form-label">Public Name</label>
-            <input type="text"
-                   v-model="profile.publicName"
-                   class="form-control"
-                   id="publicName"
-                   required />
-          </div>
+  <div class="row"
+       v-else>
+    <div class="col-md-6 offset-md-3">
+      <form @submit.prevent="submitProfile(profile)">
+        <div class="mb-3">
+          <label for="publicName"
+                 class="form-label">Public Name</label>
+          <input type="text"
+                 v-model="profile.publicName"
+                 class="form-control"
+                 id="publicName"
+                 required />
+        </div>
 
-          <div class="mb-3">
-            <label for="intro"
-                   class="form-label">Introduction</label>
-            <textarea v-model="profile.intro"
-                      class="form-control"
-                      id="intro"></textarea>
-          </div>
+        <div class="mb-3">
+          <label for="intro"
+                 class="form-label">Introduction</label>
+          <textarea v-model="profile.intro"
+                    class="form-control"
+                    id="intro"></textarea>
+        </div>
 
-          <div class="mb-3">
-            <label for="city"
-                   class="form-label">City</label>
-            <input type="text"
-                   v-model="profile.city"
-                   class="form-control"
-                   id="city" />
-          </div>
+        <div class="mb-3">
+          <label for="city"
+                 class="form-label">City</label>
+          <input type="text"
+                 v-model="profile.city"
+                 class="form-control"
+                 id="city" />
+        </div>
 
-                    <div class="mb-3">
-            <label for="city"
-                   class="form-label">Country</label>
-            <input type="text"
-                   v-model="profile.country"
-                   class="form-control"
-                   id="city" />
-          </div>
+        <div class="mb-3">
+          <label for="city"
+                 class="form-label">Country</label>
+          <input type="text"
+                 v-model="profile.country"
+                 class="form-control"
+                 id="city" />
+        </div>
 
 
-          <div class="mb-3">
-            <label for="birthDate"
-                   class="form-label">Birth Date</label>
-            <input type="date"
-                   v-model="profile.birthDate"
-                   class="form-control"
-                   id="birthDate"
-                   :max="'{{ maxBirthYear }}'" />
-          </div>
+        <div class="mb-3">
+          <label for="birthDate"
+                 class="form-label">Birth Date</label>
+          <input type="date"
+                 v-model="profile.birthDate"
+                 class="form-control"
+                 id="birthDate"
+                 :max="'{{ maxBirthYear }}'" />
+        </div>
 
-          <button type="submit"
-                  class="btn btn-primary">Save</button>
+        <button type="submit"
+                class="btn btn-primary">Save</button>
 
 
-        </form>
-
-      </div>
+      </form>
 
     </div>
+
   </div>
 </template>
 
@@ -80,9 +71,13 @@
 import { defineComponent } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
 import { toast } from 'vue3-toastify'
+import LoadingComponent from '@/components/LoadingComponent.vue'
 
 export default defineComponent({
   name: 'UserProfile',
+  components: {
+    LoadingComponent,
+  },
 
   data() {
     return {
