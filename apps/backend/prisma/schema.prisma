@@ -15,37 +15,41 @@ datasource db {
 model User {
   id                      String    @id @default(cuid())
   email                   String    @unique
+  tokenVersion            Int       @default(0) // bump to invalidate old tokens
   loginToken              String?   @unique
   loginTokenExp           DateTime?
   isRegistrationConfirmed Boolean   @default(false)
   isAccountDisabled       Boolean   @default(false)
-  createdAt               DateTime  @default(now())
-  updatedAt               DateTime  @updatedAt
-  lastLoginAt             DateTime?
-  profile                 Profile?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  lastLoginAt DateTime?
+  profile     Profile?
 }
 
 model Profile {
-  id           String             @id @default(cuid())
-  userId       String             @unique
-  isActive     Boolean
+  id           String              @id @default(cuid())
   publicName   String
   intro        String?
   country      String?
   city         String?
   birthday     DateTime?
-  gender       Gender
-  relationship RelationshipStatus
-  hasKids      Boolean
+  gender       Gender?
+  relationship RelationshipStatus?
+  hasKids      Boolean?
 
   // current location
   latitude  Float?
   longitude Float?
 
+  isActive   Boolean @default(false)
+  isReported Boolean @default(false)
+
   // — one-to-one (opt) search prefs
   searchPreference SearchPreference? @relation(fields: [id], references: [profileId], onDelete: Cascade)
 
   // — relations
+  userId String         @unique
   user   User           @relation(fields: [userId], references: [id])
   images ProfileImage[]
   tags   ProfileTag[]

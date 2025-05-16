@@ -15,9 +15,14 @@ function getTokenExpiration() {
 
 const userRoutes: FastifyPluginAsync = async (fastify) => {
 
-  // Confirm email endpoint
+  type JwtPayload = {
+    userId: string
+    email: string
+    tokenVersion: number
+  }
+
   fastify.get('/login-return', async (req, reply) => {
-    const { token } = req.query as { token: string } 
+    const { token } = req.query as { token: string }
 
     if (!token) {
       return reply.status(200).send({ success: false, status: 'missing_token' })
@@ -52,8 +57,9 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
       )
     }
 
-    const jwt = fastify.jwt.sign({ userId: user.id, email: user.email });
-    reply.send({ status: 'success', token: jwt, user });
+    const payload: JwtPayload = { userId: user.id, email: user.email, tokenVersion: user.tokenVersion ?? 0 }
+    const jwt = fastify.jwt.sign(payload)
+    reply.send({ status: 'success', token: jwt, user: { id: user.id, email: user.email } })
   })
 
 
@@ -110,10 +116,13 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
       })
 
       if (!user) {
-        return reply.status(401).send({ error: 'Invalid token' })
+        return reply.status(401).send({ success: false, error: 'Invalid token' })
       }
+      reply.send({
+        success: true,
+        user: { id: user.id, email: user.email }
+      });
 
-      return { user }
     } catch (err) {
       return reply.status(500).send({ error: 'Failed to verify token' })
     }

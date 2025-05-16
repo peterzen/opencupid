@@ -17,8 +17,8 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     async login(token: string) {
       try {
-        const res = await axios.get('/users/login-return', { 
-          params: { token } 
+        const res = await axios.get('/users/login-return', {
+          params: { token }
         })
 
         if (res.data.status === 'success') {
@@ -75,6 +75,10 @@ export const useAuthStore = defineStore('auth', {
 
     isLoggedIn() {
       return this.token !== ''
+    },
+
+    getCurrentUser() {
+      return this.user
     }
   },
 })
