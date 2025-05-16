@@ -1,12 +1,16 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import type { RouteRecordRaw } from 'vue-router'
+
 import { useAuthStore } from '@/store/authStore';
+import { useLocalStore } from '@/store/localStore';
+import { showToast } from '@/lib/toastify';
 
 import Login from '@/views/Login.vue';
 import UserHome from '@/views/UserHome.vue';
+import Messaging from '@/views/Messaging.vue';
 import UserProfile from '@/views/UserProfile.vue';
-import { useLocalStore } from '@/store/localStore';
-import { showToast } from '@/lib/toastify';
+import Onboarding from '@/views/Onboarding.vue';
+import BrowseProfiles from '@/views/BrowseProfiles.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -25,6 +29,24 @@ const routes: Array<RouteRecordRaw> = [
     path: '/profile',
     name: 'UserProfile',
     component: UserProfile,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/onboarding',
+    name: 'Onboarding',
+    component: Onboarding,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/browse',
+    name: 'BrowseProfiles',
+    component: BrowseProfiles,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/inbox',
+    name: 'Messaging',
+    component: Messaging,
     meta: { requiresAuth: true }
   },
   // Redirect root to login page
