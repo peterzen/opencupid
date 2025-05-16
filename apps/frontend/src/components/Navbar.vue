@@ -1,46 +1,3 @@
-<script setup lang="ts">
-import { RouterLink } from 'vue-router'
-</script>
-
-<script lang="ts">
-import { Dropdown } from 'bootstrap'
-import { defineComponent } from 'vue'
-import LogoutButton from './LogoutButton.vue';
-import { useAuthStore } from '@/store/authStore';
-
-
-export default defineComponent({
-  name: 'Navbar',
-  components: {
-    LogoutButton,
-  },
-
-  data() {
-    return {
-      authStore: useAuthStore(),
-    }
-  },
-
-  computed: {
-    isLoggedIn(): boolean {
-      return this.authStore.isLoggedIn
-    },
-    email(): string {
-      return this.authStore.getEmail ?? ''
-    }
-  },
-
-  mounted() {
-    const dropdownRef = this.$refs.navbarDropdown as HTMLElement
-    if (dropdownRef) {
-      new Dropdown(dropdownRef)
-    }
-  },
-
-})
-
-</script>
-
 <template>
   <nav v-if="isLoggedIn"
        class="navbar sticky-top navbar-expand-md  mb-lg-4"
@@ -62,22 +19,27 @@ export default defineComponent({
         <ul class="navbar-nav mb-2 mb-lg-0 d-flex">
           <li class="nav-item me-auto">
             <RouterLink to="/me"
+                        :class="{ 'active': currentRoute === '/me' }"
                         class="nav-link ">Home</RouterLink>
           </li>
           <li class="nav-item me-auto">
             <RouterLink to="/onboarding"
+                        :class="{ 'active': currentRoute === '/onboarding' }"
                         class="nav-link ">Onboarding</RouterLink>
           </li>
           <li class="nav-item me-auto">
             <RouterLink to="/profile"
+                        :class="{ 'active': currentRoute === '/profile' }"
                         class="nav-link ">Profile</RouterLink>
           </li>
           <li class="nav-item me-auto">
             <RouterLink to="/browse"
+                        :class="{ 'active': currentRoute === '/browse' }"
                         class="nav-link ">Browse</RouterLink>
           </li>
           <li class="nav-item me-auto">
             <RouterLink to="/inbox"
+                        :class="{ 'active': currentRoute === '/inbox' }"
                         class="nav-link ">Inbox</RouterLink>
           </li>
           <li class="nav-item dropdown">
@@ -125,4 +87,51 @@ export default defineComponent({
   position: relative;
 }
 </style>
-```
+
+
+<script setup lang="ts">
+import { RouterLink, useRouter } from 'vue-router'
+const router = useRouter()
+
+</script>
+
+<script lang="ts">
+import { Dropdown } from 'bootstrap'
+import { defineComponent } from 'vue'
+import LogoutButton from './LogoutButton.vue';
+import { useAuthStore } from '@/store/authStore';
+
+
+export default defineComponent({
+  name: 'Navbar',
+  components: {
+    LogoutButton,
+  },
+  data() {
+    return {
+      authStore: useAuthStore(),
+    }
+  },
+
+  computed: {
+    isLoggedIn(): boolean {
+      return this.authStore.isLoggedIn
+    },
+    email(): string {
+      return this.authStore.getEmail ?? ''
+    },
+    currentRoute(): string {
+      return this.$route.path
+    },
+  },
+
+  mounted() {
+    const dropdownRef = this.$refs.navbarDropdown as HTMLElement
+    if (dropdownRef) {
+      new Dropdown(dropdownRef)
+    }
+  },
+
+})
+
+</script>
