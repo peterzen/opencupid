@@ -72,12 +72,15 @@ import { defineComponent } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
 import { toast } from 'vue3-toastify'
 import LoadingComponent from '@/components/LoadingComponent.vue'
+import {userProfileMixin} from './mixins/userProfileMixins'
 
 export default defineComponent({
   name: 'UserProfile',
   components: {
     LoadingComponent,
   },
+
+  mixins: [userProfileMixin],
 
   data() {
     return {
@@ -121,20 +124,7 @@ export default defineComponent({
   },
 
   methods: {
-    async loadProfile() {
-      try {
-        this.isLoading = true
-        const data = await this.profileStore.getUserProfile()
-        console.log('Profile data:', data)
-        this.profile = data || {}
-      } catch (error) {
-        console.error('Failed to load profile:', error)
-        this.error = 'Failed to load profile. Please try again.'
-      } finally {
-        this.isLoading = false
-      }
-    },
-
+ 
     async submitProfile(formData: Record<string, any>) {
       try {
         await this.profileStore.updateProfile(formData)
@@ -146,10 +136,6 @@ export default defineComponent({
     }
   },
 
-  async created() {
-    if (!this.profile.id) {
-      await this.loadProfile()
-    }
-  },
+
 })
 </script>

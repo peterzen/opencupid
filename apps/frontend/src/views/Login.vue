@@ -10,10 +10,10 @@
 
       <div v-if="showForm"
            class="col-md-6">
-          <div v-if="error"
-               class="mt-3 alert alert-danger">{{ error }}</div>
+        <div v-if="error"
+             class="mt-3 alert alert-danger">{{ error }}</div>
 
-           <form @submit.prevent="handleSendLoginLink">
+        <form @submit.prevent="handleSendLoginLink">
           <div class="mb-3">
             <label for="email"
                    class="form-label">Please enter your email address to continue</label>

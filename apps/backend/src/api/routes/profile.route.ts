@@ -18,18 +18,40 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       const profile = await fastify.prisma.profile.create({
         data: {
           userId: req.user.userId,
-          publicName: '',
-          gender: null,
-          relationship: null,
-          hasKids: null,
           isActive: false,
+          publicName: '',
+          // Add other required fields with default values as needed
         }
       })
     }
     return reply.status(200).send({ success: true, profile: profile })
-
   })
 
+  // // Create a new profile
+  // fastify.post('/', {
+  //   onRequest: [fastify.authenticate]
+  // }, async (req, reply) => {
+  //   const data = validateBody(CreateProfileSchema, req, reply)
+  //   if (!data) return
+
+  //   const existingProfile = await fastify.prisma.profile.findUnique({
+  //     where: { userId: req.user.userId },
+  //   })
+
+  //   if (existingProfile) {
+  //     return reply.status(400).send({ error: 'Profile already exists' })
+  //   }
+
+  //   const profile = await fastify.prisma.profile.create({
+  //     data: {
+  //       ...data,
+  //       userId: req.user.userId,
+  //       isActive: false,
+  //     }
+  //   })
+
+  //   return reply.status(201).send({ success: true, profile })
+  // })
   // Get all profiles
 
   fastify.get('/', {

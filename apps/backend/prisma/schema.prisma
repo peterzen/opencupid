@@ -31,14 +31,16 @@ model User {
 
 model Profile {
   id           String              @id @default(cuid())
-  publicName   String
+  publicName   String?
   intro        String?
-  country      String?
-  city         String?
+  country      String? @default("")
+  city         String? @default("")
   birthday     DateTime?
-  gender       Gender?
-  relationship RelationshipStatus?
-  hasKids      Boolean?
+  gender       Gender? @default(unspecified)
+  relationship RelationshipStatus? @default(unspecified)
+  hasKids      Boolean? @default(false)
+
+  lookingFor ConnectionType[]
 
   // current location
   latitude  Float?
@@ -51,20 +53,32 @@ model Profile {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id]) // Ensure proper relation
 
-  images ProfileImage[]
+  images ProfileImage[] @relation("ProfileImages")
   tags   ProfileTag[]
+
+  // Add direct relation to primary image
+  primaryImageId String?       @unique
+  primaryImage   ProfileImage? @relation("PrimaryImage", fields: [primaryImageId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model ProfileImage {
-  id        String  @id @default(cuid())
-  profile   Profile @relation(fields: [profileId], references: [id])
-  profileId String
-  isPrimary Boolean @default(false)
+  id       String @id @default(cuid())
+  url      String // Add URL field
+  mimeType String // Add mime type for content validation
+  size     Int // Add file size in bytes
+
+  // Relation to profile (non-primary)
+  profile   Profile? @relation("ProfileImages", fields: [profileId], references: [id])
+  profileId String?
+
+  // Relation for primary image
+  primaryFor Profile? @relation("PrimaryImage")
 
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Tag {
@@ -89,10 +103,9 @@ model SearchPreference {
   ageMin    Int
   ageMax    Int
   gender    Gender
-  goal      Goal
-  
-  userId    String @unique
-  user      User   @relation(fields: [userId], references: [id]) // Ensure proper relation
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id]) // Ensure proper relation
 }
 
 enum Gender {
@@ -100,6 +113,7 @@ enum Gender {
   female
   non_binary
   other
+  unspecified
 }
 
 enum RelationshipStatus {
@@ -107,9 +121,10 @@ enum RelationshipStatus {
   in_relationship
   married
   other
+  unspecified
 }
 
-enum Goal {
+enum ConnectionType {
   friends
   relationship
 }
