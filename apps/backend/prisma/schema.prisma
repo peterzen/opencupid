@@ -27,18 +27,19 @@ model User {
   profile            Profile?          @relation
   searchPreference   SearchPreference?
   searchPreferenceId String?
+  ProfileImage       ProfileImage[]
 }
 
 model Profile {
-  id           String              @id @default(cuid())
+  id           String             @id @default(cuid())
   publicName   String
   intro        String
-  country      String @default("")
-  city         String @default("")
+  country      String             @default("")
+  city         String             @default("")
   birthday     DateTime?
-  gender       Gender @default(unspecified)
+  gender       Gender             @default(unspecified)
   relationship RelationshipStatus @default(unspecified)
-  hasKids      Boolean? @default(false)
+  hasKids      Boolean?           @default(false)
 
   lookingFor ConnectionType[]
 
@@ -66,9 +67,12 @@ model Profile {
 
 model ProfileImage {
   id       String @id @default(cuid())
-  url      String // Add URL field
-  mimeType String // Add mime type for content validation
-  size     Int // Add file size in bytes
+  mimeType String
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade) // Ensure proper relation with cascade delete
+
+  altText     String?
+  storagePath String
 
   // Relation to profile (non-primary)
   profile   Profile? @relation("ProfileImages", fields: [profileId], references: [id])

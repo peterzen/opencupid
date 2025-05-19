@@ -8,20 +8,21 @@
       <FormKit type="text"
                id="publicName"
                name="publicName"
-               label="Public Name"
+               label="My name is..."
                help="This name will be visible to other users."
                v-model="profile.publicName"
                validation="required" />
 
       <FormKit type="select"
                name="country"
-               label="I'm from..."
+               label="I am from..."
                id="country"
                v-model="profile.country"
                :options="countrySelectOptions"
                validation="required" />
 
       <ImageUpload v-model="profileImage"
+                   :profile="profile"
                    :maxWidth="800"
                    :maxHeight="800"
                    :quality="80" />

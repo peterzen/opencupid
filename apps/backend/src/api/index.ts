@@ -8,7 +8,7 @@ const api: FastifyPluginAsync = async (fastify) => {
   fastify.register(userRoutes, { prefix: '/users' })
   fastify.register(profileRoutes, { prefix: '/profiles' })
   fastify.register(messageRoutes, { prefix: '/messages' })
-  fastify.register(uploadRoutes, { prefix: '/upload' })
+  fastify.register(uploadRoutes, { prefix: '/media' })
 }
 
 export default api

@@ -7,53 +7,41 @@
     <FormKit type="form"
              @submit="submitProfile"
              :actions="false">
-      <div class="mb-3">
 
-        <FormKit type="text"
-                 name="publicName"
-                 label="Public Name"
-                 id="publicName"
-                 v-model="profile.publicName"
-                 validation="required" />
-      </div>
+      <FormKit type="text"
+               name="publicName"
+               label="Public Name"
+               id="publicName"
+               v-model="profile.publicName"
+               validation="required" />
 
-      <div class="mb-3">
-        <FormKit type="textarea"
-                 name="intro"
-                 label="Introduction"
-                 id="intro"
-                 v-model="profile.intro" />
-      </div>
+      <FormKit type="textarea"
+               name="intro"
+               label="Introduction"
+               id="intro"
+               v-model="profile.intro" />
 
-      <div class="mb-3">
-        <FormKit type="select"
-                 name="country"
-                 label="Country"
-                 id="country"
-                 v-model="profile.country"
-                 :options="countrySelectOptions"
-                 validation="required" />
-      </div>
+      <FormKit type="select"
+               name="country"
+               label="Country"
+               id="country"
+               v-model="profile.country"
+               :options="countrySelectOptions"
+               validation="required" />
 
-      <div class="mb-3">
-        <FormKit type="text"
-                 name="city"
-                 label="City"
-                 id="city"
-                 v-model="profile.city" />
-      </div>
+      <FormKit type="text"
+               name="city"
+               label="City"
+               id="city"
+               v-model="profile.city" />
 
-
-
-      <div class="mb-3">
-        <FormKit type="date"
-                 name="birthday"
-                 label="Birth Date"
-                 id="birthDate"
-                 v-model="birthdayFormatted"
-                 :max="maxDate"
-                 validation="required" />
-      </div>
+      <FormKit type="date"
+               name="birthday"
+               label="Birth Date"
+               id="birthDate"
+               v-model="birthdayFormatted"
+               :max="maxDate"
+               validation="required" />
 
       <button type="submit"
               class="btn btn-primary">Save</button>
