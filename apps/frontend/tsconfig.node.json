@@ -22,7 +22,12 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "src/*"
+      ],
+      "@zod/*": [
+        "../../packages/shared/zod/*"
+      ],
     }
   },
 }

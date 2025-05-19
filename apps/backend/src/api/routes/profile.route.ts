@@ -1,7 +1,7 @@
 import { FastifyPluginAsync } from 'fastify'
-import { validateBody } from '../../utils/zodValidate'
-import { ProfileSchema } from '@opencupid/shared/zod/generated'
-import { CreateProfileSchema, UpdateProfileSchema } from '@opencupid/shared/zod/profile.schema'
+import { validateBody } from '@utils/zodValidate'
+import { ProfileSchema } from '@zod/generated'
+import { CreateProfileSchema, UpdateProfileSchema } from '@zod/profile.schema'
 
 const profileRoutes: FastifyPluginAsync = async (fastify) => {
   // Get current user's profile
@@ -27,31 +27,6 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     return reply.status(200).send({ success: true, profile: profile })
   })
 
-  // // Create a new profile
-  // fastify.post('/', {
-  //   onRequest: [fastify.authenticate]
-  // }, async (req, reply) => {
-  //   const data = validateBody(CreateProfileSchema, req, reply)
-  //   if (!data) return
-
-  //   const existingProfile = await fastify.prisma.profile.findUnique({
-  //     where: { userId: req.user.userId },
-  //   })
-
-  //   if (existingProfile) {
-  //     return reply.status(400).send({ error: 'Profile already exists' })
-  //   }
-
-  //   const profile = await fastify.prisma.profile.create({
-  //     data: {
-  //       ...data,
-  //       userId: req.user.userId,
-  //       isActive: false,
-  //     }
-  //   })
-
-  //   return reply.status(201).send({ success: true, profile })
-  // })
   // Get all profiles
 
   fastify.get('/', {

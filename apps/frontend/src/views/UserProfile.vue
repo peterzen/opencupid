@@ -48,7 +48,7 @@
           <label for="birthDate"
                  class="form-label">Birth Date</label>
           <input type="date"
-                 v-model="profile.birthDate"
+                 v-model="profile.birthday"
                  class="form-control"
                  id="birthDate"
                  :max="'{{ maxBirthYear }}'" />
@@ -72,7 +72,22 @@ import { defineComponent } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
 import { toast } from 'vue3-toastify'
 import LoadingComponent from '@/components/LoadingComponent.vue'
-import {userProfileMixin} from './mixins/userProfileMixins'
+import { ProfileSchema } from '@zod/generated'
+import type { Profile } from '@zod/generated'
+
+const genderOptions = [
+  { value: 'male', label: 'Male' },
+  { value: 'female', label: 'Female' },
+  { value: 'non_binary', label: 'Non-Binary' },
+  { value: 'other', label: 'Other' },
+]
+
+const relationshipOptions = [
+  { value: 'single', label: 'Single' },
+  { value: 'in_relationship', label: 'In a Relationship' },
+  { value: 'married', label: 'Married' },
+  { value: 'other', label: 'Other' },
+]
 
 export default defineComponent({
   name: 'UserProfile',
@@ -80,36 +95,12 @@ export default defineComponent({
     LoadingComponent,
   },
 
-  mixins: [userProfileMixin],
-
   data() {
     return {
-      profile: {
-        id: null,
-        publicName: '',
-        intro: '',
-        city: '',
-        birthYear: null,
-        birthMonth: null,
-        birthDay: null,
-        gender: '',
-        relationship: '',
-        hasKids: null,
-      },
+      profile: {} as Profile,
       isLoading: false,
       error: '',
-      genderOptions: [
-        { value: 'male', label: 'Male' },
-        { value: 'female', label: 'Female' },
-        { value: 'non_binary', label: 'Non-Binary' },
-        { value: 'other', label: 'Other' },
-      ],
-      relationshipOptions: [
-        { value: 'single', label: 'Single' },
-        { value: 'in_relationship', label: 'In a Relationship' },
-        { value: 'married', label: 'Married' },
-        { value: 'other', label: 'Other' },
-      ],
+
     }
   },
 
@@ -124,7 +115,7 @@ export default defineComponent({
   },
 
   methods: {
- 
+
     async submitProfile(formData: Record<string, any>) {
       try {
         await this.profileStore.updateProfile(formData)
@@ -135,6 +126,13 @@ export default defineComponent({
       }
     }
   },
+
+  async mounted() {
+    const userProfile = await this.profileStore.getUserProfile()
+    if (userProfile !== null) {
+      this.profile = userProfile || {} as Profile
+    }
+  }
 
 
 })

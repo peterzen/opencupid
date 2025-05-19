@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify'
-import { LoginSchema } from '@opencupid/shared/zod/user.schema'
+import { LoginSchema } from '@zod/user.schema'
 import { validateBody } from '../../utils/zodValidate'
 import { randomBytes } from 'crypto' // Import crypto for generating resetToken
 import { emailQueue } from '../../queues/emailQueue'

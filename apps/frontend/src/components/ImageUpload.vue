@@ -22,8 +22,10 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   name: 'ImageUpload',
   emits: ['update:modelValue'],
   
@@ -51,10 +53,10 @@ export default {
 
   methods: {
     triggerFileInput() {
-      this.$refs.fileInput.click()
+      // this.$refs.fileInput.click()
     },
 
-    async handleFileChange(event) {
+    async handleFileChange(event:any) {
       const file = event.target.files[0]
       if (!file) return
 
@@ -62,8 +64,10 @@ export default {
       try {
         // Create preview
         const reader = new FileReader()
-        reader.onload = (e) => {
-          this.preview = e.target.result
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+          if (e.target) {
+            // this.preview = e.target.result
+          }
         }
         reader.readAsDataURL(file)
 
@@ -87,11 +91,12 @@ export default {
 
     removeImage() {
       this.preview = null
-      this.$refs.fileInput.value = ''
+      // this.$refs.fileInput.value = ''
       this.$emit('update:modelValue', null)
     }
   }
-}
+})
+
 </script>
 
 <style scoped>

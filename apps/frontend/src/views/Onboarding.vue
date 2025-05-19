@@ -13,7 +13,7 @@
                required />
         <div class="form-group">
 
-          <ImageUpload v-model="profile.primaryImage"
+          <ImageUpload v-model="profileImage"
                        :maxWidth="800"
                        :maxHeight="800"
                        :quality="80" />
@@ -30,25 +30,33 @@
 
 <script lang="ts">
 import ImageUpload from '@/components/ImageUpload.vue';
-import { userProfileMixin } from './mixins/userProfileMixins';
 import { defineComponent } from 'vue';
 
+import type { Profile, ProfileImage } from '@zod/generated'
+import { useProfileStore } from '@/store/profileStore';
 
 export default defineComponent({
   name: 'Onboarding',
-  mixins: [userProfileMixin],
   components: {
     ImageUpload,
   },
 
   data() {
     return {
-      // Add your form fields here
-      publicName: '',
-      email: '',
+      profile: {} as Profile,
+      profileImage: {} as ProfileImage,
       error: '',
       isLoading: false,
     };
+  },
+  computed: {
+    maxBirthYear(): number {
+      return new Date().getFullYear() - 18
+    },
+
+    profileStore() {
+      return useProfileStore()
+    }
   },
   methods: {
     async submitForm() {
@@ -56,10 +64,7 @@ export default defineComponent({
       this.error = '';
 
       try {
-        await this.profileStore.updateProfile({
-          publicName: this.publicName,
-          primaryImage: this.profile.primaryImage,
-        });
+        await this.profileStore.updateProfile(this.profile)
         // Handle success, e.g., navigate to another page or show a success message
         // this.$router.push('/dashboard');
       } catch (err: any) {
@@ -70,5 +75,12 @@ export default defineComponent({
       }
     }
   },
+
+  async mounted() {
+    const userProfile = await this.profileStore.getUserProfile()
+    if (userProfile !== null) {
+      this.profile = userProfile || {} as Profile
+    }
+  }
 })
 </script>

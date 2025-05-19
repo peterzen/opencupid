@@ -6,9 +6,12 @@
     "strict": true,
     "strictNullChecks": true,
     "paths": {
-      "@opencupid/shared/*": [
-        "../../packages/shared/*"
-      ]
+      "@utils/*": [
+        "src/utils/*"
+      ],
+      "@zod/*": [
+        "../../packages/shared/zod/*"
+      ],
     }
   },
   "include": [

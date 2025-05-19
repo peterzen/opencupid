@@ -9,10 +9,10 @@
   </div>
 </template>
 
-<style scoped></style>
+<script lang="ts">
+import { defineComponent } from 'vue';
 
-<script>
-export default {
+export default defineComponent({
   name: 'LoadingComponent',
-};
+})
 </script>

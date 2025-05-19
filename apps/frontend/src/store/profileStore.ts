@@ -1,11 +1,13 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
+// import { ProfileSchema } from '@zod/generated'
+import type { Profile } from '@zod/generated'
 
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '/api'
 
 export const useProfileStore = defineStore('profile', {
   state: () => ({
-    profile: null as null | Record<string, any>, // Current user's profile
+    profile: {} as null | Profile, // Current user's profile
     selectedProfile: null as null | Record<string, any>, // Profile fetched by ID
   }),
 
@@ -14,8 +16,8 @@ export const useProfileStore = defineStore('profile', {
     async getUserProfile() {
 
       try {
-        const res = await axios.get('/profiles/me') 
-        this.profile = res.data.profile
+        const res = await axios.get('/profiles/me')
+        this.profile = res.data.profile as Profile
         console.log('Fetched user profile:', this.profile)
         return this.profile
       } catch (error: any) {
