@@ -1,17 +1,16 @@
 <template>
   <div class="image-upload">
-    <div class="upload-container">
-      <input
+      
+      <FormKit
         type="file"
-        ref="fileInput"
+        label="Add profile photo"
+        accept=".jpg,.jpeg,.png,.gif"
         @change="handleFileChange"
-        accept="image/*"
-        class="file-input"
-      />
-      <button @click="triggerFileInput" class="upload-button">
-        Select Image
-      </button>
-    </div>
+        help="Select a photo."
+        capture="user"
+        file-remove-icon="trash"
+        multiple="false" />
+
 
     <div v-if="preview" class="preview-container">
       <img :src="preview" alt="Preview" class="preview-image" />
@@ -98,51 +97,3 @@ export default defineComponent({
 })
 
 </script>
-
-<style scoped>
-.image-upload {
-  padding: 1rem;
-}
-
-.upload-container {
-  margin-bottom: 1rem;
-}
-
-.file-input {
-  display: none;
-}
-
-.upload-button {
-  padding: 0.5rem 1rem;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.preview-container {
-  margin-top: 1rem;
-}
-
-.preview-image {
-  max-width: 100%;
-  max-height: 300px;
-  object-fit: contain;
-}
-
-.remove-button {
-  margin-top: 0.5rem;
-  padding: 0.5rem 1rem;
-  background-color: #f44336;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.loading {
-  margin-top: 1rem;
-  color: #666;
-}
-</style>

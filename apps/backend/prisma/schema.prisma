@@ -31,13 +31,13 @@ model User {
 
 model Profile {
   id           String              @id @default(cuid())
-  publicName   String?
-  intro        String?
-  country      String? @default("")
-  city         String? @default("")
+  publicName   String
+  intro        String
+  country      String @default("")
+  city         String @default("")
   birthday     DateTime?
-  gender       Gender? @default(unspecified)
-  relationship RelationshipStatus? @default(unspecified)
+  gender       Gender @default(unspecified)
+  relationship RelationshipStatus @default(unspecified)
   hasKids      Boolean? @default(false)
 
   lookingFor ConnectionType[]

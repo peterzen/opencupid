@@ -3,64 +3,63 @@
 
   <LoadingComponent v-if="isLoading" />
 
-  <div class="row"
-       v-else>
-    <div class="col-md-6 offset-md-3">
-      <form @submit.prevent="submitProfile(profile)">
-        <div class="mb-3">
-          <label for="publicName"
-                 class="form-label">Public Name</label>
-          <input type="text"
-                 v-model="profile.publicName"
-                 class="form-control"
+  <div class="col-md-6 offset-md-3">
+    <FormKit type="form"
+             @submit="submitProfile"
+             :actions="false">
+      <div class="mb-3">
+
+        <FormKit type="text"
+                 name="publicName"
+                 label="Public Name"
                  id="publicName"
-                 required />
-        </div>
+                 v-model="profile.publicName"
+                 validation="required" />
+      </div>
 
-        <div class="mb-3">
-          <label for="intro"
-                 class="form-label">Introduction</label>
-          <textarea v-model="profile.intro"
-                    class="form-control"
-                    id="intro"></textarea>
-        </div>
+      <div class="mb-3">
+        <FormKit type="textarea"
+                 name="intro"
+                 label="Introduction"
+                 id="intro"
+                 v-model="profile.intro" />
+      </div>
 
-        <div class="mb-3">
-          <label for="city"
-                 class="form-label">City</label>
-          <input type="text"
-                 v-model="profile.city"
-                 class="form-control"
-                 id="city" />
-        </div>
-
-        <div class="mb-3">
-          <label for="city"
-                 class="form-label">Country</label>
-          <input type="text"
+      <div class="mb-3">
+        <FormKit type="select"
+                 name="country"
+                 label="Country"
+                 id="country"
                  v-model="profile.country"
-                 class="form-control"
-                 id="city" />
-        </div>
+                 :options="countrySelectOptions"
+                 validation="required" />
+      </div>
+
+      <div class="mb-3">
+        <FormKit type="text"
+                 name="city"
+                 label="City"
+                 id="city"
+                 v-model="profile.city" />
+      </div>
 
 
-        <div class="mb-3">
-          <label for="birthDate"
-                 class="form-label">Birth Date</label>
-          <input type="date"
-                 v-model="profile.birthday"
-                 class="form-control"
+
+      <div class="mb-3">
+        <FormKit type="date"
+                 name="birthday"
+                 label="Birth Date"
                  id="birthDate"
-                 :max="'{{ maxBirthYear }}'" />
-        </div>
+                 v-model="birthdayFormatted"
+                 :max="maxDate"
+                 validation="required" />
+      </div>
 
-        <button type="submit"
-                class="btn btn-primary">Save</button>
+      <button type="submit"
+              class="btn btn-primary">Save</button>
 
 
-      </form>
-
-    </div>
+    </FormKit>
 
   </div>
 </template>
@@ -71,36 +70,23 @@
 import { defineComponent } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
 import { toast } from 'vue3-toastify'
+import type { Profile, ProfileImage } from '@zod/generated'
+
 import LoadingComponent from '@/components/LoadingComponent.vue'
-import { ProfileSchema } from '@zod/generated'
-import type { Profile } from '@zod/generated'
+import { getCountryOptions } from '@/lib/countries'
 
-const genderOptions = [
-  { value: 'male', label: 'Male' },
-  { value: 'female', label: 'Female' },
-  { value: 'non_binary', label: 'Non-Binary' },
-  { value: 'other', label: 'Other' },
-]
-
-const relationshipOptions = [
-  { value: 'single', label: 'Single' },
-  { value: 'in_relationship', label: 'In a Relationship' },
-  { value: 'married', label: 'Married' },
-  { value: 'other', label: 'Other' },
-]
 
 export default defineComponent({
   name: 'UserProfile',
   components: {
     LoadingComponent,
   },
-
   data() {
     return {
       profile: {} as Profile,
+      profileImage: {} as ProfileImage,
       isLoading: false,
       error: '',
-
     }
   },
 
@@ -111,14 +97,41 @@ export default defineComponent({
 
     profileStore() {
       return useProfileStore()
-    }
+    },
+
+    countrySelectOptions() {
+      return getCountryOptions()
+    },
+
+    // for the <FormKit type="date"> value (YYYY-MM-DD)
+    birthdayFormatted: {
+      get(): string {
+        const b = this.profile.birthday
+        // if it's already a Date, use toISOString; if it's a string, assume it's ISO
+        if (!b) return ''
+        const iso = b instanceof Date
+          ? b.toISOString()
+          : (typeof b === 'string' ? b : '').toString()
+        return iso.split('T')[0]
+      },
+      set(value: string) {
+        this.profile.birthday = value ? new Date(value) : null
+      }
+    },
+
+    // max selectable = today minus 18 years
+    maxDate(): string {
+      const d = new Date()
+      d.setFullYear(d.getFullYear() - 18)
+      return d.toISOString().split('T')[0]
+    },
   },
 
   methods: {
-
     async submitProfile(formData: Record<string, any>) {
+      console.log('submitProfile', this.profile)
       try {
-        await this.profileStore.updateProfile(formData)
+        await this.profileStore.updateProfile(this.profile)
         toast.success('Profile updated successfully!')
       } catch (error) {
         console.error('Failed to update profile:', error)

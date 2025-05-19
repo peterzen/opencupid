@@ -7,14 +7,23 @@ Settings.defaultZone = 'Europe/Berlin'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { createI18n } from 'vue-i18n'
 
 import App from './App.vue'
 import router from './router'
+
+const i18n = createI18n({
+  legacy: true,
+  locale: 'en',
+  fallbackLocale: 'en',
+})
 
 const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
+app.use(i18n)
+app.provide('$i18n', i18n)
 
 // FontAwesome icons
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -33,7 +42,6 @@ app.use(Vue3Toastify, defaultOptions)
 import { plugin as formKitPlugin, defaultConfig } from '@formkit/vue'
 import bootstrapConfig from '@/lib/formkit/formkit.config'
 import '@/lib/formkit/formkit-custom.scss'
-import { useAuthStore } from './store/authStore'
 
 app.use(formKitPlugin, defaultConfig({
   config: bootstrapConfig.config

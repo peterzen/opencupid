@@ -20,7 +20,7 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
           userId: req.user.userId,
           isActive: false,
           publicName: '',
-          // Add other required fields with default values as needed
+          intro: '',  // Adding required intro field with empty string as default
         }
       })
     }

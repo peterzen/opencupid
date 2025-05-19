@@ -1,30 +1,37 @@
 <template>
   <div class="row justify-content-center">
     <h2>Onboarding</h2>
+    <FormKit type="form"
+             :actions="false"
+             @submit="submitForm">
 
-    <form @submit.prevent="submitForm"
-          class="col-12 col-md-6">
-      <div class="form-group">
-        <label for="publicName">Public Name</label>
-        <input type="text"
+      <FormKit type="text"
                id="publicName"
+               name="publicName"
+               label="Public Name"
+               help="This name will be visible to other users."
                v-model="profile.publicName"
-               class="form-control"
-               required />
-        <div class="form-group">
+               validation="required" />
 
-          <ImageUpload v-model="profileImage"
-                       :maxWidth="800"
-                       :maxHeight="800"
-                       :quality="80" />
-        </div>
-      </div>
+      <FormKit type="select"
+               name="country"
+               label="I'm from..."
+               id="country"
+               v-model="profile.country"
+               :options="countrySelectOptions"
+               validation="required" />
+
+      <ImageUpload v-model="profileImage"
+                   :maxWidth="800"
+                   :maxHeight="800"
+                   :quality="80" />
+
       <button type="submit"
               class="btn btn-primary"
               :disabled="isLoading">
         <span v-if="isLoading">Loading...</span>
         <span v-else>Submit</span></button>
-    </form>
+    </FormKit>
   </div>
 </template>
 
@@ -34,6 +41,7 @@ import { defineComponent } from 'vue';
 
 import type { Profile, ProfileImage } from '@zod/generated'
 import { useProfileStore } from '@/store/profileStore';
+import { getCountryOptions } from '@/lib/countries';
 
 export default defineComponent({
   name: 'Onboarding',
@@ -49,15 +57,17 @@ export default defineComponent({
       isLoading: false,
     };
   },
+
   computed: {
-    maxBirthYear(): number {
-      return new Date().getFullYear() - 18
+    countrySelectOptions() {
+      return getCountryOptions()
     },
 
     profileStore() {
       return useProfileStore()
     }
   },
+
   methods: {
     async submitForm() {
       this.isLoading = true;
@@ -65,7 +75,6 @@ export default defineComponent({
 
       try {
         await this.profileStore.updateProfile(this.profile)
-        // Handle success, e.g., navigate to another page or show a success message
         // this.$router.push('/dashboard');
       } catch (err: any) {
         // Handle error
