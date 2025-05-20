@@ -1,5 +1,6 @@
 // import './assets/main.css'
-import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/scss/bootstrap.scss'
+import '@/lib/bootstrap-customizations.scss'
 import '@/lib/utils.scss'
 
 import { Settings } from 'luxon'
