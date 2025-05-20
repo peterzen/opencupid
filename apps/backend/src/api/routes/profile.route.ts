@@ -50,7 +50,7 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       where: { id },
       include: {
         user: false,
-        primaryImage: true,
+        profileImage: true,
       },
     })
 

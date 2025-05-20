@@ -7,14 +7,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-generator erd {
-  provider = "prisma-erd-generator"
-  output   = "ERD.svg"
-  // theme    = "forest"
-  // erdDebug = false
-  // disabled = true
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -57,31 +49,36 @@ enum RelationshipStatus {
   unspecified
 }
 
-/// Tag.scope  (friend vs. dating)
-enum TagScope {
-  friend
-  dating
-}
-
 model Tag {
-  id   Int      @id @default(autoincrement())
-  name String   @unique
-  type TagScope
+  id        Int            @id @default(autoincrement())
+  name      String         @unique
+  scope     ConnectionType
+  createdAt DateTime       @default(now())
 
-  friendProfileTags ProfileTag[]
+  profileTags      ProfileTag[]
+  datingProfileTag DatingProfileTag[]
 }
 
 model ProfileTag {
   id    String @id @default(cuid())
+  tag   Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId Int
+
+  profile   Profile @relation(fields: [profileId], references: [id])
+  profileId String
+
+  @@unique([profileId, tagId])
+}
+
+model DatingProfileTag {
+  id    String @id @default(cuid())
   tag   Tag    @relation(fields: [tagId], references: [id])
   tagId Int
 
-  profile         Profile        @relation(fields: [profileId], references: [id])
-  profileId       String
-  datingProfile   DatingProfile? @relation(fields: [datingProfileId], references: [id])
-  datingProfileId String?
+  datingProfile   DatingProfile @relation(fields: [datingProfileId], references: [id])
+  datingProfileId String
 
-  @@unique([profileId, tagId])
+  @@unique([datingProfileId, tagId])
 }
 
 model DatingPreference {
@@ -99,11 +96,11 @@ model ConnectionRequest {
   fromUserId String
   toUser     User             @relation("RequestsReceived", fields: [toUserId], references: [id], onDelete: Cascade)
   toUserId   String
-  type       ConnectionType
+  scope      ConnectionType
   status     ConnectionStatus
   createdAt  DateTime         @default(now())
 
-  @@unique([fromUserId, toUserId, type])
+  @@unique([fromUserId, toUserId, scope])
 }
 
 model User {
@@ -112,15 +109,22 @@ model User {
   tokenVersion            Int       @default(0)
   loginToken              String?   @unique
   loginTokenExp           DateTime?
+  isActive                Boolean   @default(true)
+  isBlocked               Boolean   @default(false)
   isRegistrationConfirmed Boolean   @default(false)
-  isAccountDisabled       Boolean   @default(false)
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  lastLoginAt             DateTime?
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  lastLoginAt DateTime?
+  language   String?          @default("en")
+  lookingFor ConnectionType[]
+  latitude   Float?
+  longitude  Float?
 
+  // relations
   profile       Profile?       @relation
-  datingProfile DatingProfile?
+  datingProfile DatingProfile? @relation
+  ProfileImage  ProfileImage[]
 
   // Sent/received connection requests
   requestsSent     ConnectionRequest[] @relation("RequestsSent")
@@ -134,13 +138,9 @@ model Profile {
   country    String @default("")
   city       String @default("")
 
-  lookingFor ConnectionType[]
-
-  latitude  Float?
-  longitude Float?
-
-  isActive   Boolean @default(false)
+  isActive   Boolean @default(true)
   isReported Boolean @default(false)
+  isBlocked  Boolean @default(false)
 
   // relations
   userId String @unique
@@ -148,22 +148,12 @@ model Profile {
 
   tags ProfileTag[]
 
+  profileImageId String?        @unique
+  profileImage   ProfileImage?  @relation(name: "ProfilePrimaryImage", fields: [profileImageId], references: [id])
+  otherImages    ProfileImage[] @relation(name: "ProfileOtherImages")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
-
-model ProfileImage {
-  id       String @id @default(cuid())
-  mimeType String
-  userId   String
-
-  altText        String?
-  storagePath    String
-
-
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-
 }
 
 model DatingProfile {
@@ -177,21 +167,38 @@ model DatingProfile {
   relationship RelationshipStatus @default(unspecified)
   hasKids      Boolean?           @default(false)
 
-  lookingFor ConnectionType[]
-
-  latitude  Float?
-  longitude Float?
-
-  isActive   Boolean @default(false)
+  isActive   Boolean @default(true)
   isReported Boolean @default(false)
+  isBlocked  Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // relations
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
 
-  preference DatingPreference?
+  datingPreference DatingPreference?
+  tags             DatingProfileTag[]
 
-  tags ProfileTag[]
+  profileImageId String?        @unique
+  profileImage   ProfileImage?  @relation(name: "DatingProfilePrimaryImage", fields: [profileImageId], references: [id])
+  otherImages    ProfileImage[] @relation(name: "DatingProfileOtherImages")
+}
+
+model ProfileImage {
+  id       String @id @default(cuid())
+  mimeType String
+  userId   String
+  user     User   @relation(fields: [userId], references: [id])
+
+  altText     String?
+  storagePath String
+
+  primaryForProfile       Profile?        @relation("ProfilePrimaryImage")
+  otherForProfiles        Profile[]       @relation("ProfileOtherImages")
+  primaryForDatingProfile DatingProfile?  @relation("DatingProfilePrimaryImage")
+  otherForDatingProfiles  DatingProfile[] @relation("DatingProfileOtherImages")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
