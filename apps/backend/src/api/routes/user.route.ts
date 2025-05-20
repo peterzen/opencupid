@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify'
-import { LoginSchema } from '@zod/user.schema'
+import { LoginSchema, UpdateUserSchema } from '@zod/user.schema'
 import { validateBody } from '../../utils/zodValidate'
 import { randomBytes } from 'crypto' // Import crypto for generating resetToken
 import { emailQueue } from '../../queues/emailQueue'
@@ -103,7 +103,9 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
     return reply.status(200).send({ success: true, status: 'login' });
   })
 
-  fastify.get('/me', async (req, reply) => {
+  fastify.get('/me', {
+    onRequest: [fastify.authenticate]
+  }, async (req, reply) => {
     if (req.user === null) {
       return reply.status(401).send({ error: 'Unauthorized' })
     }
@@ -111,13 +113,11 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
     const user = await fastify.prisma.user.findUnique({
       where: { id: req.user.userId },
       select: {
-        id: true,
         email: true,
-        isRegistrationConfirmed: true,
-        createdAt: true,
-        updatedAt: true,
-        lastLoginAt: true,
-        tokenVersion: true,
+        lookingFor: true,
+        language: true,
+        latitude: true,
+        longitude: true,
       }
     })
 
@@ -127,6 +127,28 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
 
     return reply.status(200).send({ success: true, data: user })
   })
+
+
+  // fastify.patch('/me', {
+  //   onRequest: [fastify.authenticate]
+  // }, async (req, reply) => {
+  //   if (req.user === null) {
+  //     return reply.status(401).send({ error: 'Unauthorized' })
+  //   }
+  //   const data = validateBody(UpdateUserSchema, req, reply)
+  //   if (!data) return
+
+  //   const user = await fastify.prisma.user.update({
+  //     where: { id: req.user.userId },
+  //     data,
+  //   })
+
+  //   if (!user) {
+  //     return reply.status(401).send({ error: 'Unauthorized' })
+  //   }
+
+  //   return reply.status(200).send({ success: true  })
+  // })
 }
 
 export default userRoutes

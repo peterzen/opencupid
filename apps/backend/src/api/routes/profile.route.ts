@@ -3,7 +3,12 @@ import { validateBody } from '@utils/zodValidate'
 import { ProfileSchema } from '@zod/generated'
 import { CreateProfileSchema, UpdateProfileSchema } from '@zod/profile.schema'
 
+import { UserService } from '../../services/user.service'
+
 const profileRoutes: FastifyPluginAsync = async (fastify) => {
+
+  const userService = UserService.getInstance()
+
   // Get current user's profile
   fastify.get('/me', {
     onRequest: [fastify.authenticate]
@@ -61,8 +66,6 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     return { profile }
   })
 
-
-
   // Update an existing profile
   fastify.patch('/:id', {
     onRequest: [fastify.authenticate]
@@ -71,7 +74,7 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     const data = validateBody(UpdateProfileSchema, req, reply)
     if (!data) return
 
-    // Verify ownership
+    // TODO Verify ownership correctly - userId isn't checked ATM
     const existingProfile = await fastify.prisma.profile.findUnique({
       where: { id },
       select: { userId: true },
@@ -91,6 +94,19 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     })
 
     return { profile }
+  })
+
+
+  fastify.post('/initialize', {
+    onRequest: [fastify.authenticate]
+  }, async (req, reply) => {
+    if (req.user === null) {
+      return reply.status(401).send({ error: 'Unauthorized' })
+    }
+    const data = validateBody(CreateProfileSchema, req, reply)
+    console.log('Creating profiles with data:', data)
+    const { profile, datingProfile } = await userService.initializeProfiles(req.user.userId, data.lookingFor)
+    return reply.status(200).send({ success: true, profile, datingProfile })
   })
 }
 

@@ -1,13 +1,15 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 // import { ProfileSchema } from '@zod/generated'
-import type { Profile } from '@zod/generated'
+import type { ConnectionTypeType, DatingProfile, Profile } from '@zod/generated'
+import { ConnectionOptions } from 'tls'
 
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '/api'
 
 export const useProfileStore = defineStore('profile', {
   state: () => ({
     profile: {} as null | Profile, // Current user's profile
+    datingProfile: {} as null | DatingProfile, // Current user's dating profile
     selectedProfile: null as null | Record<string, any>, // Profile fetched by ID
   }),
 
@@ -49,5 +51,16 @@ export const useProfileStore = defineStore('profile', {
         throw error.response?.data?.message || 'Failed to update profile'
       }
     },
+
+    async createProfiles(lookingFor: ConnectionTypeType[]) {
+      try {
+        const res = await axios.post('/profiles/initialize', { lookingFor })
+        this.profile = res.data.profile
+        return this.profile
+      } catch (error: any) {
+        console.error('Failed to create profile:', error)
+        throw error.response?.data?.message || 'Failed to create profile'
+      }
+    }
   },
 })

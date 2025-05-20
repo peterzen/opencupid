@@ -115,6 +115,9 @@ importers:
       vue-i18n:
         specifier: ^11.1.3
         version: 11.1.3(vue@3.5.13(typescript@5.8.3))
+      vue-multiselect:
+        specifier: github:peterzen/vue-multiselect
+        version: https://codeload.github.com/peterzen/vue-multiselect/tar.gz/c6ff2be467e95bca24c4fdc6bead400f8e28c215
       vue-router:
         specifier: ^4.5.0
         version: 4.5.1(vue@3.5.13(typescript@5.8.3))
@@ -4245,6 +4248,11 @@ packages:
     engines: {node: '>= 16'}
     peerDependencies:
       vue: ^3.0.0
+
+  vue-multiselect@https://codeload.github.com/peterzen/vue-multiselect/tar.gz/c6ff2be467e95bca24c4fdc6bead400f8e28c215:
+    resolution: {tarball: https://codeload.github.com/peterzen/vue-multiselect/tar.gz/c6ff2be467e95bca24c4fdc6bead400f8e28c215}
+    version: 3.2.0
+    engines: {node: '>= 14.18.1', npm: '>= 6.14.15'}
 
   vue-router@4.5.1:
     resolution: {integrity: sha512-ogAF3P97NPm8fJsE4by9dwSYtDwXIY1nFY9T6DyQnGHd1E2Da94w9JIolpe42LJGIl0DwOHBi8TcRPlPGwbTtw==}
@@ -8556,6 +8564,8 @@ snapshots:
       '@intlify/shared': 11.1.3
       '@vue/devtools-api': 6.6.4
       vue: 3.5.13(typescript@5.8.3)
+
+  vue-multiselect@https://codeload.github.com/peterzen/vue-multiselect/tar.gz/c6ff2be467e95bca24c4fdc6bead400f8e28c215: {}
 
   vue-router@4.5.1(vue@3.5.13(typescript@5.8.3)):
     dependencies:

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { ProfileSchema } from '@zod/generated'
+import { ConnectionTypeSchema, ProfileSchema } from '@zod/generated'
 
 import { SearchPreferenceSchema } from './searchPreference.schema'
 
@@ -23,12 +23,8 @@ export const UpdateProfileSchema = ProfileSchema.partial() // Allow partial upda
 
 // CreateProfileSchema using Zod with minimal duplication
 export const CreateProfileSchema = z.object({
-  body: z.object({
-    userId: z.string(),
-    isActive: z.boolean(),
-    // publicName: z.string().min(1, 'Public name is required'),
-    // lookingFor: z.array(ConnectionTypeSchema).nonempty({ message: 'Select at least one connection type' }),
-  }),
+  // publicName: z.string().min(1, 'Public name is required'),
+  lookingFor: z.array(ConnectionTypeSchema).nonempty({ message: 'Select at least one connection type' }),
 });
 
 export type CreateProfileInput = z.infer<typeof CreateProfileSchema>;

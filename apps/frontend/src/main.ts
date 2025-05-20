@@ -13,6 +13,9 @@ import { createI18n } from 'vue-i18n'
 import App from './App.vue'
 import router from './router'
 
+// const i18n = window.__APP_I18N__ || createI18n({legacy: true })
+// window.__APP_I18N__ = i18n // persists across HMR
+
 const i18n = createI18n({
   legacy: true,
   locale: 'en',
@@ -23,7 +26,7 @@ const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
-app.use(i18n)
+// app.use(i18n)
 app.provide('$i18n', i18n)
 
 // FontAwesome icons
@@ -48,6 +51,7 @@ app.use(formKitPlugin, defaultConfig({
   config: bootstrapConfig.config
 }))
 
+import "@/lib/vue-multiselect.scss"
 // Initialize auth state from localStorage
 // const authStore = useAuthStore()
 // authStore.initializeFromStorage()

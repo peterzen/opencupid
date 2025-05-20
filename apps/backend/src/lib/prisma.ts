@@ -1,19 +1,37 @@
-// src/lib/prisma.ts
 import { PrismaClient } from '@prisma/client'
+import type { LogLevel } from 'fastify'
 
+// Define process-wide log level
+const logLevels = process.env.NODE_ENV === 'production' 
+  ? ['error'] // In production, log only errors
+  : ['query', 'error', 'warn']
+
+// In development, use global to prevent multiple instances during hot reloading
 declare global {
-  // allow global ‘prisma’ for hot-reload/dev so we don't create many instances
   // eslint-disable-next-line no-var
   var prisma: PrismaClient | undefined
 }
 
-export const prisma: PrismaClient =
-  global.prisma ||
-  new PrismaClient({
-    // optional logging
-    // log: ['query', 'warn', 'error'],
+// Create the PrismaClient instance
+const prismaClientSingleton = () => {
+  return new PrismaClient({
+    log: logLevels as LogLevel[],
+    // You can configure connection pooling settings here
+    // datasources: {
+    //   db: {
+    //     url: process.env.DATABASE_URL,
+    //     // These settings can improve performance under high load
+    //     poolTimeout: 20, // 20 seconds
+    //     connectionLimit: 10 // default is 10
+    //   }
+    // }
   })
+}
 
+// Create the singleton
+export const prisma = global.prisma ?? prismaClientSingleton()
+
+// Cache in development only
 if (process.env.NODE_ENV !== 'production') {
   global.prisma = prisma
 }

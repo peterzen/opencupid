@@ -78,6 +78,29 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    async fetchUser() {
+      try {
+        const res = await axios.get('/users/me')
+        // Return the status flag for the frontend to handle
+        return { success: true, user: res.data.user, error: null };
+      } catch (error: any) {
+        console.error('Could not fetch user:', error)
+        return { success: false, user: null, error: error.message }
+      }
+    },
+
+    // Update the current user's profile
+    // async updateUser(userData: Record<string, any>) {
+    //   try {
+    //     const res = await axios.patch("/users/me", userData)
+    //     return { success: true, user: res.data.user, error: null }
+    //   } catch (error: any) {
+    //     console.error('Failed to update profile:', error)
+    //     const msg = error.response?.data?.message || 'Failed to update profile'
+    //     return { success: false, user: null, error: msg }
+    //   }
+    // },
+
     logout() {
       this.userId = null
       this.email = null
