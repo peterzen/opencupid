@@ -28,7 +28,7 @@ export function getUploadBaseDir(): string {
   return env.MEDIA_UPLOAD_DIR
 }
 
-export function checkUploadBaseDir(): void {
+export function checkUploadBaseDir(): boolean {
   // Check if the upload directory exists, and create it if it doesn't
   const uploadDir = getUploadBaseDir()
   if (!fs.existsSync(uploadDir)) {
@@ -37,8 +37,9 @@ export function checkUploadBaseDir(): void {
   // Check if the directory is writable
   try {
     fs.accessSync(uploadDir, fs.constants.W_OK)
+    return true
   } catch (error) {
-    throw new Error(`Upload directory ${uploadDir} is not writable`)
+    return false
   }
 }
 

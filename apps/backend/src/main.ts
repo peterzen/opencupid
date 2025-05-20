@@ -1,6 +1,6 @@
 import Fastify from 'fastify'
 import cors from '@fastify/cors' // Import the CORS plugin
-import staticSrv from '@fastify/static'
+// import staticSrv from '@fastify/static'
 import env from './env'
 
 import './workers/emailWorker'   // ← side‐effect: starts the worker
@@ -20,11 +20,15 @@ app.register(import('./plugins/prisma'))
 app.register(import('./plugins/auth'))
 app.register(import('./api'))
 
-checkUploadBaseDir()
-app.register(staticSrv, {
-  root: env.MEDIA_UPLOAD_DIR,
-  prefix: env.MEDIA_UPLOAD_URL
-})
+// app.register(staticSrv, {
+//   root: env.MEDIA_UPLOAD_DIR,
+// })
+
+const ok = checkUploadBaseDir()
+if (!ok) {
+  app.log.error("Media upload directory cannot be created or is not writable")
+  process.exit(1)
+}
 
 app.listen({ port: env.PORT }, (err) => {
   if (err) {

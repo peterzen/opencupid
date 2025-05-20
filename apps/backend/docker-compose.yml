@@ -24,6 +24,16 @@ services:
     restart: unless-stopped
     ports:
       - "6379:6379"
-            
+  nginx:
+    image: imagesrv
+    restart: unless-stopped
+    env_file:
+    - ../backend/.env
+    ports:
+      - "3001:3001"
+    volumes:
+      - ${MEDIA_UPLOAD_DIR}:/srv/nginx
+
+
 volumes:
   postgres_data:
