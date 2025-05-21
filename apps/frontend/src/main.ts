@@ -2,6 +2,7 @@
 import 'bootstrap/scss/bootstrap.scss'
 import '@/lib/bootstrap-customizations.scss'
 import '@/lib/utils.scss'
+import 'bootstrap-vue-next/dist/bootstrap-vue-next.css'
 
 import { Settings } from 'luxon'
 Settings.defaultZone = 'Europe/Berlin'
@@ -9,6 +10,7 @@ Settings.defaultZone = 'Europe/Berlin'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
+import { createBootstrap } from 'bootstrap-vue-next'
 
 import App from './App.vue'
 import router from './router'
@@ -27,6 +29,7 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 // app.use(i18n)
+app.use(createBootstrap()) // bootstrap-vue-next
 app.provide('$i18n', i18n)
 
 // FontAwesome icons
@@ -42,18 +45,9 @@ import Vue3Toastify from 'vue3-toastify';
 import { defaultOptions } from './lib/toastify'
 app.use(Vue3Toastify, defaultOptions)
 
-// FormKit
-import { plugin as formKitPlugin, defaultConfig } from '@formkit/vue'
-import bootstrapConfig from '@/lib/formkit/formkit.config'
-import '@/lib/formkit/formkit-custom.scss'
-
-app.use(formKitPlugin, defaultConfig({
-  config: bootstrapConfig.config
-}))
+import { useFormKit } from '@/lib/formkit'
+useFormKit(app)
 
 import "@/lib/vue-multiselect.scss"
-// Initialize auth state from localStorage
-// const authStore = useAuthStore()
-// authStore.initializeFromStorage()
 
 app.mount('#app')

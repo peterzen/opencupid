@@ -1,7 +1,20 @@
+// FormKit
+import { plugin as formKitPlugin, defaultConfig } from '@formkit/vue'
+import '@/lib/formkit/formkit-custom.scss'
+
 import { generateClasses } from '@formkit/themes'
 import { getAvailableLocales } from '../i18n'
+import { createAutoHeightTextareaPlugin, createFloatingLabelsPlugin } from '@formkit/addons'
+import '@formkit/addons/css/floatingLabels'
 
-const config = {
+const config = defaultConfig({
+  // theme: 'genesis',
+  plugins: [
+    createAutoHeightTextareaPlugin(),
+    createFloatingLabelsPlugin({
+      useAsDefault: true,
+    }),
+  ],
   config: {
     locales: getAvailableLocales(),
     classes: generateClasses({
@@ -29,6 +42,11 @@ const config = {
       }
     })
   }
+})
+
+
+
+export const useFormKit = (app: any) => {
+  app.use(formKitPlugin, config)
 }
 
-export default config
