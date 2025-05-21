@@ -13,9 +13,10 @@ export default defineConfig({
     vueDevTools(),
   ],
   resolve: {
-    
+
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@zod/generated': path.resolve(__dirname, '../../packages/shared/zod/generated')
     },
   },
 })
