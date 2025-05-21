@@ -1,35 +1,31 @@
 import { FastifyPluginAsync } from 'fastify'
 import { validateBody } from '@utils/zodValidate'
-import { ProfileSchema } from '@zod/generated'
-import { CreateProfileSchema, UpdateProfileSchema } from '@zod/profile.schema'
+import { ownerDatingProfileSchema, ownerProfileSchema, publicProfileSchema, UpdateProfileSchema } from '@zod/profile.schema'
 
-import { UserService } from '../../services/user.service'
+import { ProfileService } from 'src/services/profile.service'
 
 const profileRoutes: FastifyPluginAsync = async (fastify) => {
 
-  const userService = UserService.getInstance()
+  const profileService = ProfileService.getInstance()
 
   // Get current user's profile
   fastify.get('/me', {
     onRequest: [fastify.authenticate]
   }, async (req, reply) => {
 
-    const profile = await fastify.prisma.profile.findUnique({
-      where: { userId: req.user.userId },
-    })
-    console.debug('Fetched profile for user:', req.user.userId, profile)
+    const { profile, datingProfile } = await profileService.getAllProfilesByUserId(req.user.userId)
+    console.debug('Fetched profiles for user:', req.user.userId, profile, datingProfile)
+
     if (!profile) {
-      // Create empty profile record with required fields
-      const profile = await fastify.prisma.profile.create({
-        data: {
-          userId: req.user.userId,
-          isActive: false,
-          publicName: '',
-          intro: '',  // Adding required intro field with empty string as default
-        }
-      })
+      return reply.status(404).send({ error: 'Profile not found' })
     }
-    return reply.status(200).send({ success: true, profile: profile })
+    const safeProfile = ownerProfileSchema.parse(profile)
+    const safeDatingProfile = ownerDatingProfileSchema.parse(datingProfile)
+    return reply.status(200).send({
+      success: true,
+      profile: safeProfile,
+      datingProfile: safeDatingProfile
+    })
   })
 
   // Get all profiles
@@ -51,13 +47,7 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
   }, async (req, reply) => {
     const { id } = req.params as { id: string }
 
-    const profile = await fastify.prisma.profile.findUnique({
-      where: { id },
-      include: {
-        user: false,
-        profileImage: true,
-      },
-    })
+    const profile = await profileService.getProfileById(id)
 
     if (!profile) {
       return reply.status(404).send({ error: 'Profile not found' })
@@ -88,26 +78,11 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(403).send({ error: 'Not authorized to update this profile' })
     }
 
-    const profile = await fastify.prisma.profile.update({
-      where: { id },
-      data,
-    })
-
-    return { profile }
+    const profile = await profileService.updateProfile(id, data)
+    return reply.status(200).send({ success: true, profile })
   })
 
 
-  fastify.post('/initialize', {
-    onRequest: [fastify.authenticate]
-  }, async (req, reply) => {
-    if (req.user === null) {
-      return reply.status(401).send({ error: 'Unauthorized' })
-    }
-    const data = validateBody(CreateProfileSchema, req, reply)
-    console.log('Creating profiles with data:', data)
-    const { profile, datingProfile } = await userService.initializeProfiles(req.user.userId, data.lookingFor)
-    return reply.status(200).send({ success: true, profile, datingProfile })
-  })
 }
 
 export default profileRoutes

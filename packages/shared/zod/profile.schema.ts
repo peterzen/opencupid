@@ -1,25 +1,10 @@
 import { z } from 'zod'
-import { ConnectionTypeSchema, ProfileSchema } from '@zod/generated'
+import { ConnectionTypeSchema, DatingPreferenceSchema, DatingProfileSchema, ProfileImageSchema, ProfileSchema } from '@zod/generated'
 
 import { SearchPreferenceSchema } from './searchPreference.schema'
-
-// export const ProfileSchema = z.object({
-//   userId: z.string(),
-//   publicName: z.string().min(2),
-//   intro: z.string().optional(),
-//   country: z.string().optional(),
-//   city: z.string().optional(),
-//   birthday: z.coerce.date().optional(),
-//   gender: z.enum(['male', 'female', 'non_binary', 'other']),
-//   relationship: z.enum(['single', 'in_relationship', 'married', 'other']),
-//   hasKids: z.boolean(),
-//   interestTags: z.array(z.string()),
-//   searchPreference: SearchPreferenceSchema
-// })
-
+import { publicTagSchema } from './tags.schema';
 
 export const UpdateProfileSchema = ProfileSchema.partial() // Allow partial updates
-
 
 // CreateProfileSchema using Zod with minimal duplication
 export const CreateProfileSchema = z.object({
@@ -29,4 +14,66 @@ export const CreateProfileSchema = z.object({
 
 export type CreateProfileInput = z.infer<typeof CreateProfileSchema>;
 
+const publicProfileFields = {
+  id: true,
+  publicName: true,
+  intro: true,
+  profileImageId: true,
+  city: true,
+  country: true,
+} as const;
 
+export const publicProfileSchema = ProfileSchema
+  .pick(publicProfileFields)
+  .extend({
+    // profileImage: ProfileImageSchema.optional(),
+    otherImages: z.array(ProfileImageSchema).optional(),
+    tags: z.array(publicTagSchema)
+  });
+
+
+export const ownerProfileSchema = ProfileSchema
+  .pick({
+    ...publicProfileFields,
+    id: true,
+    isActive: true,
+  }).extend({
+    tags: z.array(publicTagSchema).optional(),
+    // profileImage: ProfileImageSchema.optional(),
+    otherImages: z.array(ProfileImageSchema).optional(),
+  });
+
+
+const publicDatingProfileFields = {
+  id: true,
+  publicName: true,
+  intro: true,
+  profileImageId: true,
+  city: true,
+  country: true,
+  hasKids: true,
+  relationship: true,
+  gender: true,
+  birthday: true,
+} as const;
+
+
+export const publicDatingProfileSchema = DatingProfileSchema
+  .pick({
+    ...publicDatingProfileFields
+  }).extend({
+    // profileImage: ProfileImageSchema.optional(),
+    tags: z.array(publicTagSchema).optional(),
+  });
+
+export const ownerDatingProfileSchema = DatingProfileSchema
+  .pick({
+    ...publicDatingProfileFields,
+    id: true,
+    isActive: true,
+  }).extend({
+    // profileImage: ProfileImageSchema.optional(),
+    otherImages: z.array(ProfileImageSchema).optional(),
+    tags: z.array(publicTagSchema).optional(),
+    datingPreference: DatingPreferenceSchema.optional(),
+  })

@@ -52,15 +52,5 @@ export const useProfileStore = defineStore('profile', {
       }
     },
 
-    async createProfiles(lookingFor: ConnectionTypeType[]) {
-      try {
-        const res = await axios.post('/profiles/initialize', { lookingFor })
-        this.profile = res.data.profile
-        return this.profile
-      } catch (error: any) {
-        console.error('Failed to create profile:', error)
-        throw error.response?.data?.message || 'Failed to create profile'
-      }
-    }
   },
 })

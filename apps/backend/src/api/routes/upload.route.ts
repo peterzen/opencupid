@@ -46,7 +46,7 @@ const uploadRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
       data: {
         id: imageId,
         userId: req.user.userId,
-        profileId: profileId,
+        primaryForProfile: { connect: { id: profileId } },
         mimeType: fileUpload.mimetype,
         storagePath: storageRelPath,
       }

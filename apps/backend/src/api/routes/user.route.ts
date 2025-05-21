@@ -3,11 +3,13 @@ import { LoginSchema } from '@zod/user.schema'
 import { validateBody } from '../../utils/zodValidate'
 import { emailQueue } from '../../queues/emailQueue'
 import { UserService } from 'src/services/user.service'
+import { ProfileService } from 'src/services/profile.service'
 
 
 const userRoutes: FastifyPluginAsync = async (fastify) => {
 
   const userService = UserService.getInstance()
+  const profileService = ProfileService.getInstance()
 
   fastify.get('/otp-login', async (req, reply) => {
     const { token } = req.query as { token: string }
@@ -28,6 +30,8 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
         { userId: user.id },
         { attempts: 3, backoff: { type: 'exponential', delay: 5000 } }
       )
+      // If the user is new, initialize their profiles
+      profileService.initializeProfiles(user.id, ['friend', 'dating'])
     }
 
     const payload = { userId: user.id, email: user.email, tokenVersion: user.tokenVersion ?? 0 }

@@ -54,11 +54,6 @@ export class UserService {
       },
     })
 
-    // If the user is new, initialize their profiles
-    if (isNewUser) {
-      await this.initializeProfiles(user.id, ['friend', 'dating'])
-    }
-
     return { user: userUpdated, isNewUser }
   }
 
@@ -123,43 +118,5 @@ export class UserService {
   //   })
   // }
 
-  async initializeProfiles(userId: string, lookingFor: ConnectionTypeType[]): Promise<{
-    profile: Profile,
-    datingProfile: DatingProfile
-  }> {
-    let profile = await prisma.profile.findUnique({
-      where: { userId }
-    })
-
-    if (!profile) {
-      profile = await prisma.profile.create({
-        data: {
-          userId,
-          isActive: lookingFor.includes('friend'),
-          publicName: '',
-          intro: ''
-        }
-      })
-    }
-
-    let datingProfile = await prisma.datingProfile.findUnique({
-      where: { userId }
-    })
-
-    if (!datingProfile) {
-      datingProfile = await prisma.datingProfile.create({
-        data: {
-          userId,
-          isActive: lookingFor.includes('dating'),
-          publicName: '',
-          intro: ''
-        }
-      })
-    }
-    return {
-      profile,
-      datingProfile
-    }
-  }
 
 }

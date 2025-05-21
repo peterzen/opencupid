@@ -81,31 +81,23 @@ export default defineComponent({
       //   this.isLoading = false;
       // }
 
-      try {
-        await this.profileStore.initializeProfiles(this.lookingFor)
-        // this.$router.push('/dashboard');
-      } catch (err: any) {
-        // Handle error
-        this.error = err.message || 'An error occurred while updating the profile.';
-      } finally {
-        this.isLoading = false;
-      }
+      // try {
+      //   await this.profileStore.initializeProfiles(this.lookingFor)
+      //   // this.$router.push('/dashboard');
+      // } catch (err: any) {
+      //   // Handle error
+      //   this.error = err.message || 'An error occurred while updating the profile.';
+      // } finally {
+      //   this.isLoading = false;
+      // }
     }
   },
 
   async mounted() {
-    // const userProfile = await this.profileStore.getUserProfile()
-    // if (userProfile !== null) {
-    //   this.profile = userProfile || {} as Profile
-    // }
-
-    // const { success, user, error } = await this.authStore.fetchUser()
-    // if (success) {
-    //   this.user = user || {} as User
-    // } else {
-    //   this.error = error || 'An error occurred while fetching the user.';
-    // }
-
+    const userProfile = await this.profileStore.getUserProfile()
+    if (userProfile !== null) {
+      this.profile = userProfile 
+    }
   }
 })
 </script>
