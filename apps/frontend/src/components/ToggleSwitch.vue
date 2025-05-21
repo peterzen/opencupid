@@ -1,0 +1,131 @@
+<template>
+  <label class="container" :class="{disabled }">
+    <input
+      class="input"
+      type="checkbox"
+      :checked="modelValue"
+      :disabled="disabled"
+      @change="toggleHandler"
+    />
+    <span class="switch"></span>
+    <span class="label">{{ label }}</span>
+  </label>
+</template>
+
+<script lang="ts">
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+  name: "ToggleSwitch",
+  props: {
+    label: {
+      type: String,
+      required: true,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    modelValue: {
+      type: Boolean,
+      required: true,
+    },
+  },
+  emits: ['update:modelValue'],
+  methods:{
+    toggleHandler(event: Event) {
+      const target = event.target as HTMLInputElement;
+      this.$emit('update:modelValue', target.checked);
+    },
+  }
+})
+</script>
+
+<style scoped>
+.container {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+.label {
+  margin-left: 12px;
+  color: var(--bs-secondary-color); 
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+label {
+  cursor: pointer;
+  user-select: none;
+}
+/* Visually hide the checkbox input */
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+.switch {
+  --switch-container-width: 50px;
+  --switch-size: calc(var(--switch-container-width) / 2);
+  /* Bootstrap color variables */
+  --switch-bg: var(--bs-gray-200);
+  --switch-bg-checked: var(--bs-success);
+  --switch-bg-disabled: var(--bs-gray-300);
+  --switch-border-default: var(--bs-gray-400);
+  --switch-border-focus: var(--bs-primary);
+  --switch-border-focus-checked: var(--bs-success);
+  --switch-border-disabled: var(--bs-gray-500);
+
+  display: flex;
+  align-items: center;
+  position: relative;
+  height: var(--switch-size);
+  flex-basis: var(--switch-container-width);
+  border-radius: var(--switch-size);
+  background-color: var(--switch-bg);
+  flex-shrink: 0;
+  transition: background-color 0.25s ease-in-out;
+}
+.switch::before {
+  content: "";
+  position: absolute;
+  left: 1px;
+  height: calc(var(--switch-size) - 4px);
+  width: calc(var(--switch-size) - 4px);
+  border-radius: 9999px;
+  background-color: #fff;
+  border: 2px solid var(--switch-border-default);
+  transition: transform 0.375s ease-in-out, border-color 0.25s;
+}
+.input:checked + .switch {
+  background-color: var(--switch-bg-checked);
+}
+.input:checked + .switch::before {
+  border-color: var(--switch-border-focus-checked);
+  transform: translateX(
+    calc(var(--switch-container-width) - var(--switch-size))
+  );
+}
+.input:focus + .switch::before {
+  border-color: var(--switch-border-focus);
+}
+.input:focus:checked + .switch::before {
+  border-color: var(--switch-border-focus-checked);
+}
+.input:disabled + .switch {
+  background-color: var(--switch-bg-disabled);
+}
+.input:disabled + .switch::before {
+  background-color: var(--bs-gray-500);
+  border-color: var(--switch-border-disabled);
+}
+.disabled .label {
+  color: var(--bs-gray-500);
+}
+</style>
