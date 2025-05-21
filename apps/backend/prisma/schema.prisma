@@ -83,9 +83,12 @@ model DatingProfileTag {
 
 model DatingPreference {
   userId     String           @id
-  prefGender PreferenceGender @default(any)
   prefAgeMin Int?
   prefAgeMax Int?
+
+  latitude   Float?
+  longitude  Float?
+  prefGender PreferenceGender @default(any)
 
   profile DatingProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
 }
@@ -117,9 +120,6 @@ model User {
   lastLoginAt             DateTime?
 
   language   String?          @default("en")
-  lookingFor ConnectionType[]
-  latitude   Float?
-  longitude  Float?
 
   // relations
   profile       Profile?       @relation
