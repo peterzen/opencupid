@@ -1,1 +1,1 @@
-// Optional DB seed script
+import './seed/ProfileTags'

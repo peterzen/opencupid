@@ -12,13 +12,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/// connection_request.type
 enum ConnectionType {
   friend
   dating
 }
 
-/// connection_request.status
 enum ConnectionStatus {
   pending
   accepted
@@ -50,13 +48,28 @@ enum RelationshipStatus {
 }
 
 model Tag {
-  id        Int            @id @default(autoincrement())
-  name      String         @unique
-  scope     ConnectionType
-  createdAt DateTime       @default(now())
-
+  id               Int              @id @default(autoincrement())
+  slug             String           @unique
+  name             String           @unique
+  translations     TagTranslation[]
   profileTags      ProfileTag[]
-  datingProfileTag DatingProfileTag[]
+  isApproved       Boolean          @default(false)
+  isDeleted        Boolean          @default(false)
+  isHidden         Boolean          @default(false)
+  isCreatedByAdmin Boolean          @default(false)
+  createdBy        String? 
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+model TagTranslation {
+  id     Int    @id @default(autoincrement())
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId  Int
+  locale String // e.g. "en", "de", "fr"
+  name   String // e.g. "Farm stay", "Ferien auf dem Bauernhof"
+
+  @@unique([tagId, locale])
 }
 
 model ProfileTag {
@@ -64,25 +77,18 @@ model ProfileTag {
   tag   Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
   tagId Int
 
-  profile   Profile @relation(fields: [profileId], references: [id])
-  profileId String
+  profileId String?
+  profile   Profile? @relation(fields: [profileId], references: [id])
+
+  datingProfileId String?
+  datingProfile   DatingProfile? @relation(fields: [datingProfileId], references: [id])
 
   @@unique([profileId, tagId])
-}
-
-model DatingProfileTag {
-  id    String @id @default(cuid())
-  tag   Tag    @relation(fields: [tagId], references: [id])
-  tagId Int
-
-  datingProfile   DatingProfile @relation(fields: [datingProfileId], references: [id])
-  datingProfileId String
-
   @@unique([datingProfileId, tagId])
 }
 
 model DatingPreference {
-  userId     String           @id
+  userId     String @id
   prefAgeMin Int?
   prefAgeMax Int?
 
@@ -118,15 +124,13 @@ model User {
   createdAt               DateTime  @default(now())
   updatedAt               DateTime  @updatedAt
   lastLoginAt             DateTime?
-
-  language   String?          @default("en")
+  language                String?   @default("en")
 
   // relations
   profile       Profile?       @relation
   datingProfile DatingProfile? @relation
   ProfileImage  ProfileImage[]
 
-  // Sent/received connection requests
   requestsSent     ConnectionRequest[] @relation("RequestsSent")
   requestsReceived ConnectionRequest[] @relation("RequestsReceived")
 }
@@ -142,7 +146,6 @@ model Profile {
   isReported Boolean @default(false)
   isBlocked  Boolean @default(false)
 
-  // relations
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
 
@@ -174,12 +177,11 @@ model DatingProfile {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // relations
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
 
   datingPreference DatingPreference?
-  tags             DatingProfileTag[]
+  tags             ProfileTag[]
 
   profileImageId String?        @unique
   profileImage   ProfileImage?  @relation(name: "DatingProfilePrimaryImage", fields: [profileImageId], references: [id])
