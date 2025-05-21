@@ -2,8 +2,10 @@
 <h2>Find people</h2>
   </template>
 
-  <script>
-  export default {
+  <script lang="ts">
+import { defineComponent } from 'vue';
+
+  export default defineComponent({
     name: 'BrowseProfiles',
     data() {
       return {
@@ -16,9 +18,6 @@
     mounted() {
       // Lifecycle hook
     }
-  };
+  })
   </script>
 
-  <style scoped>
-  /* Add your component styles here */
-  </style>

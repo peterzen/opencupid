@@ -1,24 +1,26 @@
 <template>
   <h2>Messaging</h2>
-  </template>
+</template>
 
-  <script>
-  export default {
-    name: 'Messaging',
-    data() {
-      return {
-        // Add your component data here
-      };
-    },
-    methods: {
-      // Add your component methods here
-    },
-    mounted() {
-      // Lifecycle hook
-    }
-  };
-  </script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 
-  <style scoped>
-  /* Add your component styles here */
-  </style>
+export default defineComponent({
+  name: 'Messaging',
+  data() {
+    return {
+      // Add your component data here
+    };
+  },
+  methods: {
+    // Add your component methods here
+  },
+  mounted() {
+    // Lifecycle hook
+  }
+})
+</script>
+
+<style scoped>
+/* Add your component styles here */
+</style>
