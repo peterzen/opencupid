@@ -1,48 +1,27 @@
 import { FastifyPluginAsync } from 'fastify'
-import { LoginSchema, UpdateUserSchema } from '@zod/user.schema'
+import { LoginSchema } from '@zod/user.schema'
 import { validateBody } from '../../utils/zodValidate'
-import { randomBytes } from 'crypto' // Import crypto for generating resetToken
 import { emailQueue } from '../../queues/emailQueue'
-
-function makeLoginToken() {
-  return randomBytes(32).toString('hex')
-}
-
-function getTokenExpiration() {
-  return new Date(Date.now() + 1000 * 60 * 60 * 240)
-}
+import { UserService } from 'src/services/user.service'
 
 
 const userRoutes: FastifyPluginAsync = async (fastify) => {
 
+  const userService = UserService.getInstance()
+
   fastify.get('/otp-login', async (req, reply) => {
     const { token } = req.query as { token: string }
-
     if (!token) {
       return reply.status(200).send({ success: false, status: 'missing_token' })
     }
 
-    const user = await fastify.prisma.user.findUnique({ where: { loginToken: token } })
+    const { user, isNewUser } = await userService.otpLogin(token)
     if (!user) {
       return reply.status(200).send({ success: false, status: 'invalid_token' })
     }
 
-    const isNewUser = user.isRegistrationConfirmed === false
-
-    // Update the user's email confirmation status
-    await fastify.prisma.user.update({
-      where: { id: user.id },
-      data: {
-        isRegistrationConfirmed: true,
-        loginToken: null, // Clear the reset token
-        loginTokenExp: null, // Clear the expiration
-        lastLoginAt: new Date(), // Update the last login date
-      },
-    })
-
     // new user
     if (isNewUser) {
-
       // 2) enqueue the welcome email
       await emailQueue.add(
         'sendWelcomeEmail',
@@ -56,26 +35,15 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
     reply.send({ success: true, token: jwt })
   })
 
-
   fastify.post('/send-login-link', async (req, reply) => {
     const data = validateBody(LoginSchema, req, reply)
     // TODO return 400 with status
     if (!data) return
 
-    const user = await fastify.prisma.user.findUnique({ where: { email: data.email } })
-    const emailConfirmationToken = makeLoginToken() // enerate email confirmation token
-    const tokenExpiration = getTokenExpiration() // Set token expiration to 24 hours from now
+    const { user, isNewUser } = await userService.createUserOTP(data.email, data.locale)
 
-    if (!user) {
-      // register email address
-
-      const user = await fastify.prisma.user.create({
-        data: {
-          email: data.email,
-          loginToken: emailConfirmationToken,
-          loginTokenExp: tokenExpiration,
-        }
-      })
+    // new user
+    if (isNewUser) {
       await emailQueue.add(
         'sendLoginLinkEmail',
         { userId: user.id },
@@ -85,39 +53,27 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(200).send({ success: true, status: 'register' });
     }
 
-    // existing user
-    await fastify.prisma.user.update({
-      where: { id: user.id },
-      data: {
-        loginToken: emailConfirmationToken, // Clear the reset token
-        loginTokenExp: tokenExpiration, // Clear the expiration
-      },
-    })
-
+    //  existing user
     await emailQueue.add(
       'sendLoginLinkEmail',
       { userId: user.id },
       { attempts: 3, backoff: { type: 'exponential', delay: 5000 } }
     )
-
     return reply.status(200).send({ success: true, status: 'login' });
   })
 
   fastify.get('/me', {
     onRequest: [fastify.authenticate]
   }, async (req, reply) => {
+
     if (req.user === null) {
       return reply.status(401).send({ error: 'Unauthorized' })
     }
 
-    const user = await fastify.prisma.user.findUnique({
-      where: { id: req.user.userId },
+    const user = userService.getUserById(req.user.userId, {
       select: {
         email: true,
-        lookingFor: true,
         language: true,
-        latitude: true,
-        longitude: true,
       }
     })
 
