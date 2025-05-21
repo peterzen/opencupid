@@ -12,20 +12,18 @@
     <div class="tab-content p-3 border border-top-0">
       <div v-if="activeTab === 'friend'"
            class="tab-pane active">
-        <div class="d-flex align-items-center mb-3">
-          <span class="me-2">Profile Active</span>
-        </div>
         <fieldset :disabled="!profile.isActive">
-          <!-- Profile form fields here -->
+          <div class="mt-4">
+            <ProfileForm v-model="profile" />
+          </div>
         </fieldset>
       </div>
       <div v-if="activeTab === 'dating'"
            class="tab-pane active">
-        <div class="d-flex align-items-center mb-3">
-          <span class="me-2">Dating Profile Active</span>
-        </div>
         <fieldset :disabled="!datingProfile.isActive">
-          <!-- Dating profile form fields here -->
+          <div class="mt-4">
+            <DatingProfileForm v-model="datingProfile" />
+          </div>
         </fieldset>
       </div>
     </div>
@@ -54,11 +52,15 @@ import type { Profile, DatingProfile } from '@zod/generated'
 import { useProfileStore } from '@/store/profileStore';
 
 import ConnectionTypeSelector from '@/components/ConnectionTypeSelector.vue';
+import ProfileForm from '@/components/profiles/ProfileForm.vue';
+import DatingProfileForm from '@/components/profiles/DatingProfileForm.vue';
 
 export default defineComponent({
   name: 'Onboarding',
   components: {
     ConnectionTypeSelector,
+    ProfileForm,
+    DatingProfileForm,
   },
 
   data() {

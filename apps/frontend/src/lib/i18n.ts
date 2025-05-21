@@ -18,3 +18,22 @@ export function setLocale(locale: string) {
   // formKitConfig.config.locales = getAvailableLocales()
   changeLocale(locale)
 }
+
+
+import { GenderSchema, RelationshipStatusSchema } from '@zod/generated'
+
+export function enumOptions<T extends Record<string, string | number>>(enumObj: T, prefix: string) {
+  // Filters out reverse-mapping keys if enum is numeric, but yours is string
+  return Object.values(enumObj).map((value) => ({
+    value,
+    label: `${prefix}.${value}`, // e.g., "gender.male"
+  }));
+}
+
+export function getGenderOptions() {
+  return enumOptions(GenderSchema.enum, 'gender')
+}
+
+export function getRelationshipStatusOptions() {
+  return enumOptions(RelationshipStatusSchema.enum, 'relationship')
+}

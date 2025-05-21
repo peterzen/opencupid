@@ -49,21 +49,6 @@ export default defineComponent({
   <ul class="nav nav-tabs nav-fill">
     <li class="nav-item">
       <span class="nav-link text-start"
-            :class="{ active: activeTab === 'friend' }">
-
-        <ToggleSwitch value="friend"
-                      :disabled="friendsToggleDisabled"
-                      label=""
-                      @update:modelValue="val => $emit('update:profileActive', val)"
-                      :modelValue="profileActive" />
-        <a class="tab-switch"
-           @click="$emit('update:selectTab', 'friend')">
-          Socializing
-        </a>
-      </span>
-    </li>
-    <li class="nav-item">
-      <span class="nav-link text-start"
             :class="{ active: activeTab === 'dating' }">
         <ToggleSwitch value="dating"
                       :disabled="datingToggleDisabled"
@@ -76,6 +61,21 @@ export default defineComponent({
         </a>
       </span>
 
+    </li>
+    <li class="nav-item">
+      <span class="nav-link text-start"
+            :class="{ active: activeTab === 'friend' }">
+
+        <ToggleSwitch value="friend"
+                      :disabled="friendsToggleDisabled"
+                      label=""
+                      @update:modelValue="val => $emit('update:profileActive', val)"
+                      :modelValue="profileActive" />
+        <a class="tab-switch"
+           @click="$emit('update:selectTab', 'friend')">
+          Socializing
+        </a>
+      </span>
     </li>
   </ul>
 
