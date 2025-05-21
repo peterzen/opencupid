@@ -1,7 +1,34 @@
 <template>
   <div class="row justify-content-center">
 
-    <ConnectionTypeSelector v-model="lookingFor" />
+    <ConnectionTypeSelector :profileActive="profile.isActive"
+                            :datingActive="datingProfile.isActive"
+                            :activeTab="activeTab"
+                            @update:selectTab="activeTab = $event"
+                            @update:profileActive="val => profile.isActive = val"
+                            @update:datingActive="val => datingProfile.isActive = val" />
+
+
+    <div class="tab-content p-3 border border-top-0">
+      <div v-if="activeTab === 'friend'"
+           class="tab-pane active">
+        <div class="d-flex align-items-center mb-3">
+          <span class="me-2">Profile Active</span>
+        </div>
+        <fieldset :disabled="!profile.isActive">
+          <!-- Profile form fields here -->
+        </fieldset>
+      </div>
+      <div v-if="activeTab === 'dating'"
+           class="tab-pane active">
+        <div class="d-flex align-items-center mb-3">
+          <span class="me-2">Dating Profile Active</span>
+        </div>
+        <fieldset :disabled="!datingProfile.isActive">
+          <!-- Dating profile form fields here -->
+        </fieldset>
+      </div>
+    </div>
 
     <form @submit.prevent="submitForm">
       <div v-if="error"
@@ -13,8 +40,8 @@
         <button type="submit"
                 class="btn btn-primary"
                 :disabled="isLoading">
-          <span v-if="isLoading">Loading...</span>
-          <span v-else>Continue</span></button>
+          <span v-if="isLoading">Working...</span>
+          <span v-else>Save</span></button>
       </div>
     </form>
   </div>
@@ -23,9 +50,8 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
-import type { Profile, User, ProfileImage, ConnectionTypeType } from '@zod/generated'
+import type { Profile, DatingProfile } from '@zod/generated'
 import { useProfileStore } from '@/store/profileStore';
-import { useAuthStore } from '@/store/authStore';
 
 import ConnectionTypeSelector from '@/components/ConnectionTypeSelector.vue';
 
@@ -37,36 +63,21 @@ export default defineComponent({
 
   data() {
     return {
-      user: {} as User,
       profile: {} as Profile,
-      profileImage: {} as ProfileImage,
-      lookingFor: ['friend'] as ConnectionTypeType[],
+      datingProfile: {} as DatingProfile,
+      activeTab: 'friend',
       error: '',
       isLoading: false,
     };
-  },
-
-  watch: {
-    lookingFor: {
-      handler(newVal) {
-        console.log('lookingFor changed:', newVal);
-      },
-      deep: true,
-    },
   },
 
   computed: {
     profileStore() {
       return useProfileStore()
     },
-    authStore() {
-      return useAuthStore()
-    }
   },
 
   methods: {
-
-
     async submitForm() {
       this.isLoading = true;
       this.error = '';
@@ -94,10 +105,10 @@ export default defineComponent({
   },
 
   async mounted() {
-    const userProfile = await this.profileStore.getUserProfile()
-    if (userProfile !== null) {
-      this.profile = userProfile 
-    }
+    const { profile, datingProfile } = await this.profileStore.getUserProfiles()
+    this.profile = profile;
+    this.datingProfile = datingProfile;
+    console.log("mounted", this.profile, this.datingProfile)
   }
 })
 </script>

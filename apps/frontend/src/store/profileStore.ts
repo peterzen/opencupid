@@ -15,13 +15,18 @@ export const useProfileStore = defineStore('profile', {
 
   actions: {
     // Fetch the current user's profile
-    async getUserProfile() {
+    async getUserProfiles() {
 
       try {
         const res = await axios.get('/profiles/me')
         this.profile = res.data.profile as Profile
+        this.datingProfile = res.data.datingProfile as DatingProfile
         console.log('Fetched user profile:', this.profile)
-        return this.profile
+        console.log('Fetched user dating profile:', this.datingProfile)
+        return {
+          profile: this.profile,
+          datingProfile: this.datingProfile,
+        }
       } catch (error: any) {
         console.error('Failed to fetch user profile:', error)
         throw error.response?.data?.message || 'Failed to fetch user profile'
