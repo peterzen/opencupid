@@ -15,9 +15,6 @@
       "@prisma/client": [
         "apps/backend/node_modules/@prisma/client"
       ],
-      "@generated/*": [
-        "packages/shared/zod/generated/*"
-      ],
       "@zod/*": [
         "packages/shared/zod/*"
       ],
