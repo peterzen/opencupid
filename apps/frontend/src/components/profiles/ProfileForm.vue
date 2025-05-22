@@ -26,6 +26,7 @@
                      :close-on-select="true"
                      :clear-on-select="false"
                      open-direction="bottom"
+                     :required="true"
                      placeholder="I'm from..."
                      label="label"
                      track-by="label" />
@@ -35,7 +36,13 @@
         <FormKit type="text"
                  name="city"
                  label="My city..."
-                 id="city"
+                 id="city" 
+                 :validation-messages="{
+                  required: 'Please enter your name',
+                  min: 'Name must be at least 2 characters long',
+                  max: 'Name must be less than 50 characters long'
+                }"
+                 validation="required" 
                  v-model="profile.city" />
       </div>
 
@@ -48,7 +55,21 @@
                  max-auto-height="20"
                  rows="3"
                  :floating-label="true"
+                 :validation-messages="{
+                  required: 'Please enter your name',
+                  min: 'Name must be at least 2 characters long',
+                  max: 'Name must be less than 50 characters long'
+                }"
+                 validation="required" 
                  v-model="profile.intro" />
+      </div>
+
+        <div class="d-grid gap-2 mb-3">
+        <button type="submit"
+                class="btn btn-primary"
+                :disabled="isLoading">
+          <span v-if="isLoading">Working...</span>
+          <span v-else>Save</span></button>
       </div>
 
     </FormKit>

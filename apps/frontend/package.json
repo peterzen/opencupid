@@ -12,7 +12,8 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "vue-i18n-extract": "vue-i18n-extract report --vueFiles './src/**/*.?(ts|vue)' --languageFiles '../../packages/shared/i18n/*.?(json|yml|yaml|js)'"
   },
   "dependencies": {
     "@formkit/addons": "^1.6.9",
@@ -64,6 +65,7 @@
     "vite": "^6.2.4",
     "vite-plugin-vue-devtools": "^7.7.2",
     "vitest": "^3.1.1",
+    "vue-i18n-extract": "^2.0.7",
     "vue-tsc": "^2.2.8",
     "vue3-toastify": "^0.2.8"
   }
