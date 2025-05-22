@@ -111,9 +111,15 @@ export class ProfileService {
   }
 
 
-  async updateProfile(profileId: string, data: Prisma.ProfileUpdateInput): Promise<Profile> {
+  async updateProfile(userId: string, data: Prisma.ProfileUpdateInput): Promise<Profile> {
     return prisma.profile.update({
-      where: { id: profileId },
+      where: {  userId: userId },
+      data
+    })
+  }
+  async updateDatingProfile(userId: string, data: Prisma.DatingProfileUpdateInput): Promise<DatingProfile> {
+    return prisma.datingProfile.update({
+      where: { userId: userId },
       data
     })
   }

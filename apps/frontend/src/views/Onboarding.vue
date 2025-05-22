@@ -22,7 +22,10 @@
            class="tab-pane active">
         <fieldset :disabled="!datingProfile.isActive">
           <div class="mt-4">
-            <DatingProfileForm v-model="datingProfile" />
+            <DatingProfileForm 
+            :isLoading="isLoading"
+            :modelValue="datingProfile"
+            @submit="saveDatingProfile" />
           </div>
         </fieldset>
       </div>
@@ -80,6 +83,20 @@ export default defineComponent({
   },
 
   methods: {
+    async saveDatingProfile(formData: DatingProfile) {
+      this.isLoading = true;
+      this.error = '';
+      console.log("saveDatingProfile", formData)
+      try {
+        await this.profileStore.updateDatingProfile(formData)
+        // this.$router.push('/dashboard');
+      } catch (err: any) {
+        // Handle error
+        this.error = err.message || 'An error occurred while updating the profile.';
+      } finally {
+        this.isLoading = false;
+      }
+    },
     async submitForm() {
       this.isLoading = true;
       this.error = '';

@@ -34,7 +34,7 @@ export function setLocale(locale: string) {
 }
 
 
-import { GenderSchema, RelationshipStatusSchema } from '@zod/generated'
+import { GenderSchema, HasKidsSchema, RelationshipStatusSchema } from '@zod/generated'
 
 export function enumOptions<T extends Record<string, string | number>>(enumObj: T, prefix: string) {
   return Object.values(enumObj).map((value) => ({
@@ -51,10 +51,14 @@ export function getRelationshipStatusOptions() {
   return enumOptions(RelationshipStatusSchema.enum, 'relationship')
 }
 
+export function getHasKidsOptionsOptions() {
+  return enumOptions(HasKidsSchema.enum, 'haskids')
+}
+
 
 export function appUseI18n(app: any) {
-  const i18n =window.__APP_I18N__ || createI18n({
-    // legacy: true,
+  const i18n = window.__APP_I18N__ || createI18n({
+    legacy: false,
     locale: getLocale(),
     fallbackLocale: 'en',
     messages: { en, hu, de, fr },

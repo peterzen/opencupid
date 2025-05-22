@@ -17,8 +17,8 @@ const config = defaultConfig({
     }),
   ],
   config: {
-    locales: {en},
-    locale : 'en',
+    locales: { en },
+    locale: 'en',
     classes: generateClasses({
       global: {
         outer: '$reset',
@@ -34,6 +34,11 @@ const config = defaultConfig({
         input: '$reset form-range',
       },
       checkbox: {
+        input: '$reset form-check-input',
+        outer: '$reset ps-0 form-check',
+        label: '$reset form-check-label'
+      },
+      radio: {
         input: '$reset form-check-input',
         outer: '$reset ps-0 form-check',
         label: '$reset form-check-label'

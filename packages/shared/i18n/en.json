@@ -13,6 +13,11 @@
     "other": "Other",
     "unspecified": "I'd rather not say"
   },
+  "haskids": {
+    "yes": "Yes",
+    "no": "No",
+    "unspecified": "I'd rather not say"
+  },
   "nav": {
     "home": "Home",
     "onboarding": "Onboarding",

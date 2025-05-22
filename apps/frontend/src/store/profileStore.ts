@@ -46,16 +46,29 @@ export const useProfileStore = defineStore('profile', {
     },
 
     // Update the current user's profile
-    async updateProfile(profileData: Record<string, any>) {
+    async updateProfile(profileData:Partial<Profile>) {
       try {
-        const res = await axios.patch(`/profiles/${this.profile?.id}`, profileData)
+        const res = await axios.patch('/profiles/profile', profileData)
         this.profile = res.data.profile
-        return this.profile
+        return this.profile as Profile
       } catch (error: any) {
         console.error('Failed to update profile:', error)
         throw error.response?.data?.message || 'Failed to update profile'
       }
     },
+
+
+    async updateDatingProfile(profileData: Partial<DatingProfile>) {
+      try {
+        const res = await axios.patch(`/profiles/dating`, profileData)
+        this.datingProfile = res.data.profile
+        return this.profile as DatingProfile
+      } catch (error: any) {
+        console.error('Failed to update profile:', error)
+        throw error.response?.data?.message || 'Failed to update profile'
+      }
+    },
+
 
   },
 })

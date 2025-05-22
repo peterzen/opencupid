@@ -1,6 +1,6 @@
 import { FastifyPluginAsync } from 'fastify'
 import { validateBody } from '@utils/zodValidate'
-import { ownerDatingProfileSchema, ownerProfileSchema, publicProfileSchema, UpdateProfileSchema } from '@zod/profile.schema'
+import { ownerDatingProfileSchema, ownerProfileSchema, publicProfileSchema, UpdateDatingProfileSchema, UpdateProfileSchema } from '@zod/profile.schema'
 
 import { ProfileService } from 'src/services/profile.service'
 
@@ -57,30 +57,39 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
   })
 
   // Update an existing profile
-  fastify.patch('/:id', {
+  fastify.patch('/profile', {
     onRequest: [fastify.authenticate]
   }, async (req, reply) => {
-    const { id } = req.params as { id: string }
+
+    if (!req.user.userId) {
+      return reply.status(401).send({ error: 'Unauthorized' })
+    }
+
     const data = validateBody(UpdateProfileSchema, req, reply)
     if (!data) return
 
-    // TODO Verify ownership correctly - userId isn't checked ATM
-    const existingProfile = await fastify.prisma.profile.findUnique({
-      where: { id },
-      select: { userId: true },
-    })
+    const profile = profileService.updateProfile(req.user.userId, data)
 
-    if (!existingProfile) {
-      return reply.status(404).send({ error: 'Profile not found' })
-    }
-
-    if (existingProfile.userId !== req.user.userId) {
-      return reply.status(403).send({ error: 'Not authorized to update this profile' })
-    }
-
-    const profile = await profileService.updateProfile(id, data)
     return reply.status(200).send({ success: true, profile })
   })
+
+  // Update an existing profile
+  fastify.patch('/dating', {
+    onRequest: [fastify.authenticate]
+  }, async (req, reply) => {
+
+    if (!req.user.userId) {
+      return reply.status(401).send({ error: 'Unauthorized' })
+    }
+
+    const data = validateBody(UpdateDatingProfileSchema, req, reply)
+    if (!data) return
+
+    const profile = profileService.updateDatingProfile(req.user.userId, data)
+
+    return reply.status(200).send({ success: true, profile })
+  })
+
 
 
 }

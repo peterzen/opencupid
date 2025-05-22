@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import { ConnectionTypeSchema, DatingPreferenceSchema, DatingProfileSchema, ProfileImageSchema, ProfileSchema } from '@zod/generated'
 
-import { SearchPreferenceSchema } from './searchPreference.schema'
 import { publicTagSchema } from './tags.schema';
 
 export const UpdateProfileSchema = ProfileSchema.partial() // Allow partial updates
@@ -77,3 +76,6 @@ export const ownerDatingProfileSchema = DatingProfileSchema
     tags: z.array(publicTagSchema).optional(),
     datingPreference: DatingPreferenceSchema.optional(),
   })
+
+
+export const UpdateDatingProfileSchema = DatingProfileSchema.partial() // Allow partial updates

@@ -48,6 +48,10 @@ export const GenderSchema = z.enum(['male','female','non_binary','other','unspec
 
 export type GenderType = `${z.infer<typeof GenderSchema>}`
 
+export const HasKidsSchema = z.enum(['yes','no','unspecified']);
+
+export type HasKidsType = `${z.infer<typeof HasKidsSchema>}`
+
 export const PreferenceGenderSchema = z.enum(['male','female','non_binary','any']);
 
 export type PreferenceGenderType = `${z.infer<typeof PreferenceGenderSchema>}`
@@ -184,13 +188,13 @@ export type Profile = z.infer<typeof ProfileSchema>
 export const DatingProfileSchema = z.object({
   gender: GenderSchema,
   relationship: RelationshipStatusSchema,
+  hasKids: HasKidsSchema,
   id: z.string().cuid(),
   publicName: z.string(),
   intro: z.string(),
   country: z.string(),
   city: z.string(),
   birthday: z.coerce.date().nullable(),
-  hasKids: z.boolean().nullable(),
   isActive: z.boolean(),
   isReported: z.boolean(),
   isBlocked: z.boolean(),
@@ -1220,7 +1224,7 @@ export const DatingProfileWhereInputSchema: z.ZodType<Prisma.DatingProfileWhereI
   birthday: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
   gender: z.union([ z.lazy(() => EnumGenderFilterSchema),z.lazy(() => GenderSchema) ]).optional(),
   relationship: z.union([ z.lazy(() => EnumRelationshipStatusFilterSchema),z.lazy(() => RelationshipStatusSchema) ]).optional(),
-  hasKids: z.union([ z.lazy(() => BoolNullableFilterSchema),z.boolean() ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => EnumHasKidsFilterSchema),z.lazy(() => HasKidsSchema) ]).optional(),
   isActive: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   isReported: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   isBlocked: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
@@ -1244,7 +1248,7 @@ export const DatingProfileOrderByWithRelationInputSchema: z.ZodType<Prisma.Datin
   birthday: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   gender: z.lazy(() => SortOrderSchema).optional(),
   relationship: z.lazy(() => SortOrderSchema).optional(),
-  hasKids: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  hasKids: z.lazy(() => SortOrderSchema).optional(),
   isActive: z.lazy(() => SortOrderSchema).optional(),
   isReported: z.lazy(() => SortOrderSchema).optional(),
   isBlocked: z.lazy(() => SortOrderSchema).optional(),
@@ -1301,7 +1305,7 @@ export const DatingProfileWhereUniqueInputSchema: z.ZodType<Prisma.DatingProfile
   birthday: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
   gender: z.union([ z.lazy(() => EnumGenderFilterSchema),z.lazy(() => GenderSchema) ]).optional(),
   relationship: z.union([ z.lazy(() => EnumRelationshipStatusFilterSchema),z.lazy(() => RelationshipStatusSchema) ]).optional(),
-  hasKids: z.union([ z.lazy(() => BoolNullableFilterSchema),z.boolean() ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => EnumHasKidsFilterSchema),z.lazy(() => HasKidsSchema) ]).optional(),
   isActive: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   isReported: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   isBlocked: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
@@ -1323,7 +1327,7 @@ export const DatingProfileOrderByWithAggregationInputSchema: z.ZodType<Prisma.Da
   birthday: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   gender: z.lazy(() => SortOrderSchema).optional(),
   relationship: z.lazy(() => SortOrderSchema).optional(),
-  hasKids: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  hasKids: z.lazy(() => SortOrderSchema).optional(),
   isActive: z.lazy(() => SortOrderSchema).optional(),
   isReported: z.lazy(() => SortOrderSchema).optional(),
   isBlocked: z.lazy(() => SortOrderSchema).optional(),
@@ -1348,7 +1352,7 @@ export const DatingProfileScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma
   birthday: z.union([ z.lazy(() => DateTimeNullableWithAggregatesFilterSchema),z.coerce.date() ]).optional().nullable(),
   gender: z.union([ z.lazy(() => EnumGenderWithAggregatesFilterSchema),z.lazy(() => GenderSchema) ]).optional(),
   relationship: z.union([ z.lazy(() => EnumRelationshipStatusWithAggregatesFilterSchema),z.lazy(() => RelationshipStatusSchema) ]).optional(),
-  hasKids: z.union([ z.lazy(() => BoolNullableWithAggregatesFilterSchema),z.boolean() ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => EnumHasKidsWithAggregatesFilterSchema),z.lazy(() => HasKidsSchema) ]).optional(),
   isActive: z.union([ z.lazy(() => BoolWithAggregatesFilterSchema),z.boolean() ]).optional(),
   isReported: z.union([ z.lazy(() => BoolWithAggregatesFilterSchema),z.boolean() ]).optional(),
   isBlocked: z.union([ z.lazy(() => BoolWithAggregatesFilterSchema),z.boolean() ]).optional(),
@@ -1993,7 +1997,7 @@ export const DatingProfileCreateInputSchema: z.ZodType<Prisma.DatingProfileCreat
   birthday: z.coerce.date().optional().nullable(),
   gender: z.lazy(() => GenderSchema).optional(),
   relationship: z.lazy(() => RelationshipStatusSchema).optional(),
-  hasKids: z.boolean().optional().nullable(),
+  hasKids: z.lazy(() => HasKidsSchema).optional(),
   isActive: z.boolean().optional(),
   isReported: z.boolean().optional(),
   isBlocked: z.boolean().optional(),
@@ -2015,7 +2019,7 @@ export const DatingProfileUncheckedCreateInputSchema: z.ZodType<Prisma.DatingPro
   birthday: z.coerce.date().optional().nullable(),
   gender: z.lazy(() => GenderSchema).optional(),
   relationship: z.lazy(() => RelationshipStatusSchema).optional(),
-  hasKids: z.boolean().optional().nullable(),
+  hasKids: z.lazy(() => HasKidsSchema).optional(),
   isActive: z.boolean().optional(),
   isReported: z.boolean().optional(),
   isBlocked: z.boolean().optional(),
@@ -2037,7 +2041,7 @@ export const DatingProfileUpdateInputSchema: z.ZodType<Prisma.DatingProfileUpdat
   birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => EnumGenderFieldUpdateOperationsInputSchema) ]).optional(),
   relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => EnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional(),
-  hasKids: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => EnumHasKidsFieldUpdateOperationsInputSchema) ]).optional(),
   isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isBlocked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
@@ -2059,7 +2063,7 @@ export const DatingProfileUncheckedUpdateInputSchema: z.ZodType<Prisma.DatingPro
   birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => EnumGenderFieldUpdateOperationsInputSchema) ]).optional(),
   relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => EnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional(),
-  hasKids: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => EnumHasKidsFieldUpdateOperationsInputSchema) ]).optional(),
   isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isBlocked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
@@ -2081,7 +2085,7 @@ export const DatingProfileCreateManyInputSchema: z.ZodType<Prisma.DatingProfileC
   birthday: z.coerce.date().optional().nullable(),
   gender: z.lazy(() => GenderSchema).optional(),
   relationship: z.lazy(() => RelationshipStatusSchema).optional(),
-  hasKids: z.boolean().optional().nullable(),
+  hasKids: z.lazy(() => HasKidsSchema).optional(),
   isActive: z.boolean().optional(),
   isReported: z.boolean().optional(),
   isBlocked: z.boolean().optional(),
@@ -2100,7 +2104,7 @@ export const DatingProfileUpdateManyMutationInputSchema: z.ZodType<Prisma.Dating
   birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => EnumGenderFieldUpdateOperationsInputSchema) ]).optional(),
   relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => EnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional(),
-  hasKids: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => EnumHasKidsFieldUpdateOperationsInputSchema) ]).optional(),
   isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isBlocked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
@@ -2117,7 +2121,7 @@ export const DatingProfileUncheckedUpdateManyInputSchema: z.ZodType<Prisma.Datin
   birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => EnumGenderFieldUpdateOperationsInputSchema) ]).optional(),
   relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => EnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional(),
-  hasKids: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => EnumHasKidsFieldUpdateOperationsInputSchema) ]).optional(),
   isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isBlocked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
@@ -2856,9 +2860,11 @@ export const EnumRelationshipStatusFilterSchema: z.ZodType<Prisma.EnumRelationsh
   not: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => NestedEnumRelationshipStatusFilterSchema) ]).optional(),
 }).strict();
 
-export const BoolNullableFilterSchema: z.ZodType<Prisma.BoolNullableFilter> = z.object({
-  equals: z.boolean().optional().nullable(),
-  not: z.union([ z.boolean(),z.lazy(() => NestedBoolNullableFilterSchema) ]).optional().nullable(),
+export const EnumHasKidsFilterSchema: z.ZodType<Prisma.EnumHasKidsFilter> = z.object({
+  equals: z.lazy(() => HasKidsSchema).optional(),
+  in: z.lazy(() => HasKidsSchema).array().optional(),
+  notIn: z.lazy(() => HasKidsSchema).array().optional(),
+  not: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => NestedEnumHasKidsFilterSchema) ]).optional(),
 }).strict();
 
 export const DatingPreferenceNullableScalarRelationFilterSchema: z.ZodType<Prisma.DatingPreferenceNullableScalarRelationFilter> = z.object({
@@ -2943,12 +2949,14 @@ export const EnumRelationshipStatusWithAggregatesFilterSchema: z.ZodType<Prisma.
   _max: z.lazy(() => NestedEnumRelationshipStatusFilterSchema).optional()
 }).strict();
 
-export const BoolNullableWithAggregatesFilterSchema: z.ZodType<Prisma.BoolNullableWithAggregatesFilter> = z.object({
-  equals: z.boolean().optional().nullable(),
-  not: z.union([ z.boolean(),z.lazy(() => NestedBoolNullableWithAggregatesFilterSchema) ]).optional().nullable(),
-  _count: z.lazy(() => NestedIntNullableFilterSchema).optional(),
-  _min: z.lazy(() => NestedBoolNullableFilterSchema).optional(),
-  _max: z.lazy(() => NestedBoolNullableFilterSchema).optional()
+export const EnumHasKidsWithAggregatesFilterSchema: z.ZodType<Prisma.EnumHasKidsWithAggregatesFilter> = z.object({
+  equals: z.lazy(() => HasKidsSchema).optional(),
+  in: z.lazy(() => HasKidsSchema).array().optional(),
+  notIn: z.lazy(() => HasKidsSchema).array().optional(),
+  not: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => NestedEnumHasKidsWithAggregatesFilterSchema) ]).optional(),
+  _count: z.lazy(() => NestedIntFilterSchema).optional(),
+  _min: z.lazy(() => NestedEnumHasKidsFilterSchema).optional(),
+  _max: z.lazy(() => NestedEnumHasKidsFilterSchema).optional()
 }).strict();
 
 export const ProfileListRelationFilterSchema: z.ZodType<Prisma.ProfileListRelationFilter> = z.object({
@@ -3601,8 +3609,8 @@ export const EnumRelationshipStatusFieldUpdateOperationsInputSchema: z.ZodType<P
   set: z.lazy(() => RelationshipStatusSchema).optional()
 }).strict();
 
-export const NullableBoolFieldUpdateOperationsInputSchema: z.ZodType<Prisma.NullableBoolFieldUpdateOperationsInput> = z.object({
-  set: z.boolean().optional().nullable()
+export const EnumHasKidsFieldUpdateOperationsInputSchema: z.ZodType<Prisma.EnumHasKidsFieldUpdateOperationsInput> = z.object({
+  set: z.lazy(() => HasKidsSchema).optional()
 }).strict();
 
 export const UserUpdateOneRequiredWithoutDatingProfileNestedInputSchema: z.ZodType<Prisma.UserUpdateOneRequiredWithoutDatingProfileNestedInput> = z.object({
@@ -4133,9 +4141,11 @@ export const NestedEnumRelationshipStatusFilterSchema: z.ZodType<Prisma.NestedEn
   not: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => NestedEnumRelationshipStatusFilterSchema) ]).optional(),
 }).strict();
 
-export const NestedBoolNullableFilterSchema: z.ZodType<Prisma.NestedBoolNullableFilter> = z.object({
-  equals: z.boolean().optional().nullable(),
-  not: z.union([ z.boolean(),z.lazy(() => NestedBoolNullableFilterSchema) ]).optional().nullable(),
+export const NestedEnumHasKidsFilterSchema: z.ZodType<Prisma.NestedEnumHasKidsFilter> = z.object({
+  equals: z.lazy(() => HasKidsSchema).optional(),
+  in: z.lazy(() => HasKidsSchema).array().optional(),
+  notIn: z.lazy(() => HasKidsSchema).array().optional(),
+  not: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => NestedEnumHasKidsFilterSchema) ]).optional(),
 }).strict();
 
 export const NestedEnumGenderWithAggregatesFilterSchema: z.ZodType<Prisma.NestedEnumGenderWithAggregatesFilter> = z.object({
@@ -4158,12 +4168,14 @@ export const NestedEnumRelationshipStatusWithAggregatesFilterSchema: z.ZodType<P
   _max: z.lazy(() => NestedEnumRelationshipStatusFilterSchema).optional()
 }).strict();
 
-export const NestedBoolNullableWithAggregatesFilterSchema: z.ZodType<Prisma.NestedBoolNullableWithAggregatesFilter> = z.object({
-  equals: z.boolean().optional().nullable(),
-  not: z.union([ z.boolean(),z.lazy(() => NestedBoolNullableWithAggregatesFilterSchema) ]).optional().nullable(),
-  _count: z.lazy(() => NestedIntNullableFilterSchema).optional(),
-  _min: z.lazy(() => NestedBoolNullableFilterSchema).optional(),
-  _max: z.lazy(() => NestedBoolNullableFilterSchema).optional()
+export const NestedEnumHasKidsWithAggregatesFilterSchema: z.ZodType<Prisma.NestedEnumHasKidsWithAggregatesFilter> = z.object({
+  equals: z.lazy(() => HasKidsSchema).optional(),
+  in: z.lazy(() => HasKidsSchema).array().optional(),
+  notIn: z.lazy(() => HasKidsSchema).array().optional(),
+  not: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => NestedEnumHasKidsWithAggregatesFilterSchema) ]).optional(),
+  _count: z.lazy(() => NestedIntFilterSchema).optional(),
+  _min: z.lazy(() => NestedEnumHasKidsFilterSchema).optional(),
+  _max: z.lazy(() => NestedEnumHasKidsFilterSchema).optional()
 }).strict();
 
 export const TagTranslationCreateWithoutTagInputSchema: z.ZodType<Prisma.TagTranslationCreateWithoutTagInput> = z.object({
@@ -4409,7 +4421,7 @@ export const DatingProfileCreateWithoutTagsInputSchema: z.ZodType<Prisma.DatingP
   birthday: z.coerce.date().optional().nullable(),
   gender: z.lazy(() => GenderSchema).optional(),
   relationship: z.lazy(() => RelationshipStatusSchema).optional(),
-  hasKids: z.boolean().optional().nullable(),
+  hasKids: z.lazy(() => HasKidsSchema).optional(),
   isActive: z.boolean().optional(),
   isReported: z.boolean().optional(),
   isBlocked: z.boolean().optional(),
@@ -4430,7 +4442,7 @@ export const DatingProfileUncheckedCreateWithoutTagsInputSchema: z.ZodType<Prism
   birthday: z.coerce.date().optional().nullable(),
   gender: z.lazy(() => GenderSchema).optional(),
   relationship: z.lazy(() => RelationshipStatusSchema).optional(),
-  hasKids: z.boolean().optional().nullable(),
+  hasKids: z.lazy(() => HasKidsSchema).optional(),
   isActive: z.boolean().optional(),
   isReported: z.boolean().optional(),
   isBlocked: z.boolean().optional(),
@@ -4548,7 +4560,7 @@ export const DatingProfileUpdateWithoutTagsInputSchema: z.ZodType<Prisma.DatingP
   birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => EnumGenderFieldUpdateOperationsInputSchema) ]).optional(),
   relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => EnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional(),
-  hasKids: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => EnumHasKidsFieldUpdateOperationsInputSchema) ]).optional(),
   isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isBlocked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4569,7 +4581,7 @@ export const DatingProfileUncheckedUpdateWithoutTagsInputSchema: z.ZodType<Prism
   birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => EnumGenderFieldUpdateOperationsInputSchema) ]).optional(),
   relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => EnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional(),
-  hasKids: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => EnumHasKidsFieldUpdateOperationsInputSchema) ]).optional(),
   isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isBlocked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4590,7 +4602,7 @@ export const DatingProfileCreateWithoutDatingPreferenceInputSchema: z.ZodType<Pr
   birthday: z.coerce.date().optional().nullable(),
   gender: z.lazy(() => GenderSchema).optional(),
   relationship: z.lazy(() => RelationshipStatusSchema).optional(),
-  hasKids: z.boolean().optional().nullable(),
+  hasKids: z.lazy(() => HasKidsSchema).optional(),
   isActive: z.boolean().optional(),
   isReported: z.boolean().optional(),
   isBlocked: z.boolean().optional(),
@@ -4611,7 +4623,7 @@ export const DatingProfileUncheckedCreateWithoutDatingPreferenceInputSchema: z.Z
   birthday: z.coerce.date().optional().nullable(),
   gender: z.lazy(() => GenderSchema).optional(),
   relationship: z.lazy(() => RelationshipStatusSchema).optional(),
-  hasKids: z.boolean().optional().nullable(),
+  hasKids: z.lazy(() => HasKidsSchema).optional(),
   isActive: z.boolean().optional(),
   isReported: z.boolean().optional(),
   isBlocked: z.boolean().optional(),
@@ -4648,7 +4660,7 @@ export const DatingProfileUpdateWithoutDatingPreferenceInputSchema: z.ZodType<Pr
   birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => EnumGenderFieldUpdateOperationsInputSchema) ]).optional(),
   relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => EnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional(),
-  hasKids: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => EnumHasKidsFieldUpdateOperationsInputSchema) ]).optional(),
   isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isBlocked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4669,7 +4681,7 @@ export const DatingProfileUncheckedUpdateWithoutDatingPreferenceInputSchema: z.Z
   birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => EnumGenderFieldUpdateOperationsInputSchema) ]).optional(),
   relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => EnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional(),
-  hasKids: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => EnumHasKidsFieldUpdateOperationsInputSchema) ]).optional(),
   isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isBlocked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4911,7 +4923,7 @@ export const DatingProfileCreateWithoutUserInputSchema: z.ZodType<Prisma.DatingP
   birthday: z.coerce.date().optional().nullable(),
   gender: z.lazy(() => GenderSchema).optional(),
   relationship: z.lazy(() => RelationshipStatusSchema).optional(),
-  hasKids: z.boolean().optional().nullable(),
+  hasKids: z.lazy(() => HasKidsSchema).optional(),
   isActive: z.boolean().optional(),
   isReported: z.boolean().optional(),
   isBlocked: z.boolean().optional(),
@@ -4932,7 +4944,7 @@ export const DatingProfileUncheckedCreateWithoutUserInputSchema: z.ZodType<Prism
   birthday: z.coerce.date().optional().nullable(),
   gender: z.lazy(() => GenderSchema).optional(),
   relationship: z.lazy(() => RelationshipStatusSchema).optional(),
-  hasKids: z.boolean().optional().nullable(),
+  hasKids: z.lazy(() => HasKidsSchema).optional(),
   isActive: z.boolean().optional(),
   isReported: z.boolean().optional(),
   isBlocked: z.boolean().optional(),
@@ -5100,7 +5112,7 @@ export const DatingProfileUpdateWithoutUserInputSchema: z.ZodType<Prisma.DatingP
   birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => EnumGenderFieldUpdateOperationsInputSchema) ]).optional(),
   relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => EnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional(),
-  hasKids: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => EnumHasKidsFieldUpdateOperationsInputSchema) ]).optional(),
   isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isBlocked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
@@ -5121,7 +5133,7 @@ export const DatingProfileUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prism
   birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => EnumGenderFieldUpdateOperationsInputSchema) ]).optional(),
   relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => EnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional(),
-  hasKids: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => EnumHasKidsFieldUpdateOperationsInputSchema) ]).optional(),
   isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isBlocked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
@@ -5870,7 +5882,7 @@ export const DatingProfileCreateWithoutProfileImageInputSchema: z.ZodType<Prisma
   birthday: z.coerce.date().optional().nullable(),
   gender: z.lazy(() => GenderSchema).optional(),
   relationship: z.lazy(() => RelationshipStatusSchema).optional(),
-  hasKids: z.boolean().optional().nullable(),
+  hasKids: z.lazy(() => HasKidsSchema).optional(),
   isActive: z.boolean().optional(),
   isReported: z.boolean().optional(),
   isBlocked: z.boolean().optional(),
@@ -5891,7 +5903,7 @@ export const DatingProfileUncheckedCreateWithoutProfileImageInputSchema: z.ZodTy
   birthday: z.coerce.date().optional().nullable(),
   gender: z.lazy(() => GenderSchema).optional(),
   relationship: z.lazy(() => RelationshipStatusSchema).optional(),
-  hasKids: z.boolean().optional().nullable(),
+  hasKids: z.lazy(() => HasKidsSchema).optional(),
   isActive: z.boolean().optional(),
   isReported: z.boolean().optional(),
   isBlocked: z.boolean().optional(),
@@ -5917,7 +5929,7 @@ export const DatingProfileCreateWithoutOtherImagesInputSchema: z.ZodType<Prisma.
   birthday: z.coerce.date().optional().nullable(),
   gender: z.lazy(() => GenderSchema).optional(),
   relationship: z.lazy(() => RelationshipStatusSchema).optional(),
-  hasKids: z.boolean().optional().nullable(),
+  hasKids: z.lazy(() => HasKidsSchema).optional(),
   isActive: z.boolean().optional(),
   isReported: z.boolean().optional(),
   isBlocked: z.boolean().optional(),
@@ -5938,7 +5950,7 @@ export const DatingProfileUncheckedCreateWithoutOtherImagesInputSchema: z.ZodTyp
   birthday: z.coerce.date().optional().nullable(),
   gender: z.lazy(() => GenderSchema).optional(),
   relationship: z.lazy(() => RelationshipStatusSchema).optional(),
-  hasKids: z.boolean().optional().nullable(),
+  hasKids: z.lazy(() => HasKidsSchema).optional(),
   isActive: z.boolean().optional(),
   isReported: z.boolean().optional(),
   isBlocked: z.boolean().optional(),
@@ -6101,7 +6113,7 @@ export const DatingProfileUpdateWithoutProfileImageInputSchema: z.ZodType<Prisma
   birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => EnumGenderFieldUpdateOperationsInputSchema) ]).optional(),
   relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => EnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional(),
-  hasKids: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => EnumHasKidsFieldUpdateOperationsInputSchema) ]).optional(),
   isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isBlocked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
@@ -6122,7 +6134,7 @@ export const DatingProfileUncheckedUpdateWithoutProfileImageInputSchema: z.ZodTy
   birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => EnumGenderFieldUpdateOperationsInputSchema) ]).optional(),
   relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => EnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional(),
-  hasKids: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => EnumHasKidsFieldUpdateOperationsInputSchema) ]).optional(),
   isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isBlocked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
@@ -6162,7 +6174,7 @@ export const DatingProfileScalarWhereInputSchema: z.ZodType<Prisma.DatingProfile
   birthday: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
   gender: z.union([ z.lazy(() => EnumGenderFilterSchema),z.lazy(() => GenderSchema) ]).optional(),
   relationship: z.union([ z.lazy(() => EnumRelationshipStatusFilterSchema),z.lazy(() => RelationshipStatusSchema) ]).optional(),
-  hasKids: z.union([ z.lazy(() => BoolNullableFilterSchema),z.boolean() ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => EnumHasKidsFilterSchema),z.lazy(() => HasKidsSchema) ]).optional(),
   isActive: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   isReported: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   isBlocked: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
@@ -6503,7 +6515,7 @@ export const DatingProfileUpdateWithoutOtherImagesInputSchema: z.ZodType<Prisma.
   birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => EnumGenderFieldUpdateOperationsInputSchema) ]).optional(),
   relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => EnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional(),
-  hasKids: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => EnumHasKidsFieldUpdateOperationsInputSchema) ]).optional(),
   isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isBlocked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
@@ -6524,7 +6536,7 @@ export const DatingProfileUncheckedUpdateWithoutOtherImagesInputSchema: z.ZodTyp
   birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => EnumGenderFieldUpdateOperationsInputSchema) ]).optional(),
   relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => EnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional(),
-  hasKids: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => EnumHasKidsFieldUpdateOperationsInputSchema) ]).optional(),
   isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isBlocked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
@@ -6545,7 +6557,7 @@ export const DatingProfileUncheckedUpdateManyWithoutOtherImagesInputSchema: z.Zo
   birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => EnumGenderFieldUpdateOperationsInputSchema) ]).optional(),
   relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => EnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional(),
-  hasKids: z.union([ z.boolean(),z.lazy(() => NullableBoolFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => EnumHasKidsFieldUpdateOperationsInputSchema) ]).optional(),
   isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isBlocked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),

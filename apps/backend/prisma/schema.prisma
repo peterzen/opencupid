@@ -32,6 +32,12 @@ enum Gender {
   unspecified
 }
 
+enum HasKids {
+  yes
+  no
+  unspecified
+}
+
 enum PreferenceGender {
   male
   female
@@ -57,7 +63,7 @@ model Tag {
   isDeleted        Boolean          @default(false)
   isHidden         Boolean          @default(false)
   isCreatedByAdmin Boolean          @default(false)
-  createdBy        String? 
+  createdBy        String?
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 }
@@ -168,7 +174,7 @@ model DatingProfile {
   birthday     DateTime?
   gender       Gender             @default(unspecified)
   relationship RelationshipStatus @default(unspecified)
-  hasKids      Boolean?           @default(false)
+  hasKids      HasKids            @default(unspecified)
 
   isActive   Boolean @default(true)
   isReported Boolean @default(false)
