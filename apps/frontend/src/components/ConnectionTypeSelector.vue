@@ -27,16 +27,6 @@ const datingToggleDisabled = computed(() =>
   props.datingActive && !props.profileActive
 )
 
-// Methods
-function setProfileActive(val: boolean) {
-  emit('update:profileActive', val)
-  emit('update:selectTab', 'profile')
-}
-
-function setDatingActive(val: boolean) {
-  emit('update:datingActive', val)
-  emit('update:selectTab', 'dating')
-}
 </script>
 
 
@@ -46,7 +36,7 @@ function setDatingActive(val: boolean) {
       <span class="nav-link text-start"
             :class="{ active: activeTab === 'dating' }">
         <ToggleSwitch value="dating"
-                      :disabled="datingToggleDisabled"
+                      :disabled="false"
                       label=""
                       @update:modelValue="val => $emit('update:datingActive', val)"
                       :modelValue="datingActive" />
@@ -62,7 +52,7 @@ function setDatingActive(val: boolean) {
             :class="{ active: activeTab === 'friend' }">
 
         <ToggleSwitch value="friend"
-                      :disabled="friendsToggleDisabled"
+                      :disabled="false"
                       label=""
                       @update:modelValue="val => $emit('update:profileActive', val)"
                       :modelValue="profileActive" />

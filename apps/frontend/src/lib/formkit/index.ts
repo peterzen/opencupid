@@ -4,8 +4,7 @@ import { en } from '@formkit/i18n'
 import '@/lib/formkit/formkit-custom.scss'
 
 import { generateClasses } from '@formkit/themes'
-import { getAvailableLocales } from '../i18n'
-import { createAutoHeightTextareaPlugin, createFloatingLabelsPlugin } from '@formkit/addons'
+import { createAutoAnimatePlugin, createAutoHeightTextareaPlugin, createFloatingLabelsPlugin } from '@formkit/addons'
 import '@formkit/addons/css/floatingLabels'
 
 const config = defaultConfig({
@@ -15,6 +14,21 @@ const config = defaultConfig({
     createFloatingLabelsPlugin({
       useAsDefault: true,
     }),
+    createAutoAnimatePlugin(
+      {
+        /* optional AutoAnimate config */
+        // default:
+        duration: 150,
+        easing: 'ease-in-out',
+      },
+      {
+        /* optional animation targets object */
+        // default:
+        global: ['outer', 'inner'],
+        form: ['form'],
+        repeater: ['items'],
+      }
+    )
   ],
   config: {
     locales: { en },
@@ -44,8 +58,9 @@ const config = defaultConfig({
         label: '$reset form-check-label'
       },
       submit: {
-        outer: '$reset mt-3',
-        input: '$reset btn btn-primary'
+        outer: '$reset',
+        wrapper: '$reset',
+        input: '$reset btn'
       }
     })
   }

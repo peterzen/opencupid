@@ -16,7 +16,7 @@
     "single": "Single",
     "in_relationship": "In a relationship",
     "married": "Married",
-    "other": "Other",
+    "other": "Other (it's complicated)",
     "unspecified": "I'd rather not say"
   },
   "haskids": {
@@ -30,6 +30,10 @@
     "profile": "Profile",
     "browse": "Browse",
     "inbox": "Inbox"
+  },
+  "authentication": {
+    "login": "Login",
+    "logout": "Logout"
   },
   "uicomponents": {
     "submitbutton": {

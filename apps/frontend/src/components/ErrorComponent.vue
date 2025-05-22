@@ -1,6 +1,6 @@
 <template>
   <div v-if="error"
-       class="alert alert-danger mb-3">
+       class="alert alert-danger mb-4">
     <h4>{{ t('uicomponents.error.title') }}</h4>
     {{ error }}
   </div>

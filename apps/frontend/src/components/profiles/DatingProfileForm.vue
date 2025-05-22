@@ -2,22 +2,46 @@
   <div class="col-md-8 offset-md-2">
     <FormKit type="form"
              :actions="false"
+             :disabled="isLoading"
+             #default="{ state: { valid } }"
              @submit="submitForm">
 
-      <div class="mb-3">
-        <FormKit type="text"
-                 v-model="formData.publicName"
-                 label="My name is..."
-                 validation="required"
-                 :validation-messages="{
-                  required: 'Please enter your name',
-                  min: 'Name must be at least 2 characters long',
-                  max: 'Name must be less than 50 characters long'
-                }" />
-      </div>
+      <fieldset :disabled="!modelValue.isActive || isLoading">
 
-      <div class="mb-3">
-        <Multiselect v-model="birthYear"
+        <div class="mb-4">
+          <FormKit type="text"
+                   v-model="formData.publicName"
+                   label="My name is..."
+                   input-class="form-control-lg"
+                   :validation="[['required'], ['matches', /^[\p{L}]+(?:['-][\p{L}]+)*(?:\s+[\p{L}]+(?:['-][\p{L}]+)*)*$/u]]"
+                   validation-visibility="blur"
+                   :validation-messages="{
+                    matches: 'No real names policy here but please only put your name here.',
+                    required: 'Please enter your name',
+                    min: 'Name must be at least 2 characters long',
+                    max: 'Name must be less than 50 characters long'
+                  }" />
+        </div>
+
+        <div class="mb-4">
+          <FormKit type="number"
+                   label="I was born in..."
+                   input-class="form-control-lg"
+                   name="temperature"
+                   number="integer"
+                   v-model="birthYear"
+                   step="1"
+                   min="1920"
+                   :max="birthYearMax"
+                   validation-visibility="blur"
+                   :validation="[['required'], ['min', 1920], ['max', birthYearMax]]"
+                   :validation-messages="{
+                    required: 'Please enter your birth year',
+                    min: 'Wow, you are really old!',
+                    max: 'Wow, you are really young! You should be at least 18 to be here.'
+                  }" />
+
+          <!-- <Multiselect v-model="birthYear"
                      :options="birthYearSelectOptions"
                      :close-on-select="true"
                      :clear-on-select="false"
@@ -26,11 +50,17 @@
                      open-direction="bottom"
                      placeholder="I was born in...">
           <template v-slot:tag></template>
-        </Multiselect>
-      </div>
+</Multiselect> -->
+        </div>
 
-      <div class="mb-3">
-        <Multiselect v-model="gender"
+        <div class="mb-3">
+          <FormKit v-model="formData.gender"
+                   type="radio"
+                   label=""
+                   :options="genderOptions"
+                   help="I identify as..." />
+
+          <!-- <Multiselect v-model="gender"
                      :options="genderOptions"
                      :close-on-select="true"
                      :clear-on-select="false"
@@ -48,12 +78,17 @@
 
           <template #option="props">
             {{ t(props.option.label) }}
-          </template> -->
-        </Multiselect>
-      </div>
+          </template> 
+        </Multiselect> -->
+        </div>
 
-      <div class="mb-3">
-        <Multiselect v-model="relationship"
+        <div class="mb-3">
+          <FormKit v-model="formData.relationship"
+                   type="radio"
+                   label=""
+                   :options="relationshipStatusOptions"
+                   help="I am ..." />
+          <!-- <Multiselect v-model="relationship"
                      :options="relationshipStatusOptions"
                      :close-on-select="true"
                      :clear-on-select="false"
@@ -63,41 +98,46 @@
                      track-by="label"
                      placeholder="I am currently...">
           <template v-slot:noResult></template>
-          <!-- <template #singleLabel="props">
+          <template #singleLabel="props">
             {{ t(props.option.label) }}
           </template>
 
           <template #option="props">
             {{ t(props.option.label) }}
-          </template> -->
-        </Multiselect>
-      </div>
+          </template>
+        </Multiselect> -->
+        </div>
 
-      <div class="mb-3">
-        <!-- eslint-disable-next-line vue/no-xxx -->
-        <FormKit v-model="formData.hasKids"
-                 type="radio"
-                 label=""
-                 :options="haveKidsRadioOptions"
-                 help="Do you have kids?" />
-      </div>
+        <div class="mb-4">
+          <FormKit v-model="formData.hasKids"
+                   type="radio"
+                   label=""
+                   :options="haveKidsRadioOptions"
+                   help="Kids?" />
+        </div>
 
-      <div class="mb-3">
-        <FormKit type="textarea"
-                 v-model="formData.intro"
-                 label="A few words about me..."
-                 auto-height
-                 :validation-messages="{
-                  required: 'Please write a sentence or two about yourself',
-                  min: 'Name must be at least 2 characters long',
-                  max: 'Name must be less than 50 characters long'
-                }"
-                 validation="required" />
-      </div>
+        <div class="mb-3">
+          <FormKit type="textarea"
+                   input-class="form-control-lg"
+                   v-model="formData.intro"
+                   label="A few words about me..."
+                   auto-height
+                   :validation-messages="{
+                    required: 'Please write a sentence or two about yourself',
+                    min: 'Name must be at least 2 characters long',
+                    max: 'Name must be less than 50 characters long'
+                  }"
+                   validation="required" />
+        </div>
+      </fieldset>
 
       <ErrorComponent :error="error" />
 
-      <SubmitButtonComponent :isLoading="props.isLoading" />
+      <FormKit type="submit"
+               wrapper-class="d-grid gap-2 mb-3"
+               input-class="btn-primary btn-lg"
+               label="Save"
+               :disabled="!valid || props.isLoading" />
 
     </FormKit>
   </div>
@@ -107,7 +147,6 @@
 <script setup lang="ts">
 import { reactive, ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import Multiselect from 'vue-multiselect'
 import { DatingProfile } from '@zod/generated'
 import { getGenderOptions, getHasKidsOptionsOptions, getRelationshipStatusOptions } from '@/lib/i18n'
 import ErrorComponent from '@/components/ErrorComponent.vue'
@@ -118,6 +157,7 @@ const props = defineProps<{
   modelValue: DatingProfile
   isLoading: boolean
 }>()
+
 const emit = defineEmits<{
   (e: 'update:modelValue', value: DatingProfile): void
   (e: 'submit', value: DatingProfile): void
@@ -143,26 +183,17 @@ watch(
 // Options for selects/radios
 const genderOptions = getGenderOptions(t)
 const relationshipStatusOptions = getRelationshipStatusOptions(t)
-const birthYearSelectOptions = computed(() => {
-  const current = new Date().getFullYear() - 18
-  return Array.from({ length: 100 }, (_, i) => current - i)
-})
 const haveKidsRadioOptions = getHasKidsOptionsOptions(t)
 
 // Computed proxies for multiselect v-models
-const gender = computed({
-  get: () => genderOptions.find((o) => o.value === formData.gender),
-  set: (opt: any) => { formData.gender = opt.value },
-})
-const relationship = computed({
-  get: () => relationshipStatusOptions.find((o) => o.value === formData.relationship),
-  set: (opt: any) => { formData.relationship = opt.value },
-})
 const birthYear = computed({
   get: () => formData.birthday ? new Date(formData.birthday).getFullYear() : null,
   set: (year: number) => {
     if (year) formData.birthday = new Date(year, 0, 1)
   },
+})
+const birthYearMax = computed(() => {
+  return new Date().getFullYear() - 18
 })
 
 // Submit handler

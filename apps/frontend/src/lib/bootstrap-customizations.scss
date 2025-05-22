@@ -5,3 +5,10 @@
   }
   user-select: none;
 }
+
+fieldset:disabled{
+  opacity: 0.3;
+  .form-control {
+    background-color: inherit;
+  }
+}

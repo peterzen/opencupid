@@ -1,8 +1,8 @@
 <template>
   <div class="row justify-content-center">
 
-    <ConnectionTypeSelector :profileActive="profile.isActive"
-                            :datingActive="datingProfile.isActive"
+    <ConnectionTypeSelector :profileActive="profile.isActive === undefined ? false : profile.isActive"
+                            :datingActive="datingProfile.isActive === undefined ? false : datingProfile.isActive"
                             :activeTab="activeTab"
                             @update:selectTab="activeTab = $event"
                             @update:profileActive="val => profile.isActive = val"
@@ -10,25 +10,21 @@
 
 
     <div class="tab-content p-3 border border-top-0">
-      <div v-if="activeTab === 'friend'"
-           class="tab-pane active">
-        <fieldset :disabled="!profile.isActive">
-          <div class="mt-4">
-            <ProfileForm :isLoading="isLoading"
-                         v-model="profile"
-                         @submit="saveProfile" />
-          </div>
-        </fieldset>
-      </div>
       <div v-if="activeTab === 'dating'"
            class="tab-pane active">
-        <fieldset :disabled="!datingProfile.isActive">
-          <div class="mt-4">
-            <DatingProfileForm :isLoading="isLoading"
-                               :modelValue="datingProfile"
-                               @submit="saveDatingProfile" />
-          </div>
-        </fieldset>
+        <div class="mt-4">
+          <DatingProfileForm :isLoading="isLoading"
+                             :modelValue="datingProfile"
+                             @submit="saveDatingProfile" />
+        </div>
+      </div>
+      <div v-if="activeTab === 'friend'"
+           class="tab-pane active">
+        <div class="mt-4">
+          <ProfileForm :isLoading="isLoading"
+                       v-model="profile"
+                       @submit="saveProfile" />
+        </div>
       </div>
     </div>
   </div>
@@ -101,7 +97,9 @@ export default defineComponent({
   },
 
   async mounted() {
+    this.isLoading = true
     const { profile, datingProfile } = await this.profileStore.getUserProfiles()
+    this.isLoading = false;
     this.profile = profile;
     this.datingProfile = datingProfile;
     console.log("mounted", this.profile, this.datingProfile)
