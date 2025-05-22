@@ -166,15 +166,15 @@ model Profile {
 }
 
 model DatingProfile {
-  id           String             @id @default(cuid())
-  publicName   String
-  intro        String
-  country      String             @default("")
-  city         String             @default("")
+  id           String              @id @default(cuid())
+  publicName   String              @default("")
+  intro        String              @default("")
+  country      String              @default("")
+  city         String              @default("")
   birthday     DateTime?
-  gender       Gender             @default(unspecified)
-  relationship RelationshipStatus @default(unspecified)
-  hasKids      HasKids            @default(unspecified)
+  gender       Gender?
+  relationship RelationshipStatus?
+  hasKids      HasKids?
 
   isActive   Boolean @default(true)
   isReported Boolean @default(false)

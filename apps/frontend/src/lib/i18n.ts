@@ -36,23 +36,23 @@ export function setLocale(locale: string) {
 
 import { GenderSchema, HasKidsSchema, RelationshipStatusSchema } from '@zod/generated'
 
-export function enumOptions<T extends Record<string, string | number>>(enumObj: T, prefix: string) {
+export function enumOptions<T extends Record<string, string | number>>(enumObj: T, prefix: string, t: Function) {
   return Object.values(enumObj).map((value) => ({
     value,
-    label: `${prefix}.${value}`, // e.g., "gender.male"
+    label: t(`${prefix}.${value}`), // e.g., "gender.male"
   }));
 }
 
-export function getGenderOptions() {
-  return enumOptions(GenderSchema.enum, 'gender')
+export function getGenderOptions(t: Function) {
+  return enumOptions(GenderSchema.enum, 'gender', t)
 }
 
-export function getRelationshipStatusOptions() {
-  return enumOptions(RelationshipStatusSchema.enum, 'relationship')
+export function getRelationshipStatusOptions(t: Function) {
+  return enumOptions(RelationshipStatusSchema.enum, 'relationship', t)
 }
 
-export function getHasKidsOptionsOptions() {
-  return enumOptions(HasKidsSchema.enum, 'haskids')
+export function getHasKidsOptionsOptions(t: Function) {
+  return enumOptions(HasKidsSchema.enum, 'haskids', t)
 }
 
 

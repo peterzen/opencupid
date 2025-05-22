@@ -24,5 +24,24 @@
     "profile": "Profile",
     "browse": "Browse",
     "inbox": "Inbox"
+  },
+  "uicomponents": {
+    "submitbutton": {
+      "working": "Working...",
+      "submit": "Submit"
+    },
+    "modal": {
+      "close": "Close"
+    },
+    "toast": {
+      "success": {
+        "title": "Success",
+        "message": "Your action was successful."
+      },
+      "error": {
+        "title": "Error",
+        "message": "An error occurred. Please try again."
+      }
+    }
   }
 }
