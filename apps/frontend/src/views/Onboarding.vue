@@ -28,7 +28,7 @@
       </div>
     </div>
 
-    <form @submit.prevent="submitForm">
+    <!-- <form @submit.prevent="submitForm">
       <div v-if="error"
            class="alert alert-danger mt-3">
         {{ error }}
@@ -41,7 +41,7 @@
           <span v-if="isLoading">Working...</span>
           <span v-else>Save</span></button>
       </div>
-    </form>
+    </form> -->
   </div>
 </template>
 

@@ -1,60 +1,93 @@
 <template>
+  <div class="col-md-8 offset-md-2">
 
     <FormKit type="form"
+             actions="false"
              @submit="submitForm">
 
-      <div class="row mb-3">
-        <label for="publicName"
-               class="col-sm-2 col-form-label">My name is</label>
-        <div class="col-sm-10">
-          <FormKit type="text"
-                   name="name"
-                   label=""
-                   validation="required" />
-        </div>
-      </div>
-
-      <div class="row mb-3">
-        <label class="col-sm-2 col-form-label">I was born in...</label>
-        <div class="col-sm-10">
-          <Multiselect v-model="birthYear"
-                       :options="birthYearSelectOptions"
-                       :close-on-select="true"
-                       :clear-on-select="false"
-                       :show-labels="false"
-                       placeholder="Select one" />
-        </div>
+      <div class="mb-3">
+        <FormKit type="text"
+                 name="name"
+                 label="My name is..."
+                 v-model="modelValue.publicName"
+                 validation="required"
+                 :validation-messages="{
+                  required: 'Please enter your name',
+                  min: 'Name must be at least 2 characters long',
+                  max: 'Name must be less than 50 characters long'
+                }" />
       </div>
 
       <div class="mb-3">
-        <FormKit type="select"
-                 name="gender"
-                 label="Gender"
-                 :options="genderOptions"
-                 validation="required" />
+        <Multiselect v-model="birthYear"
+                     :options="birthYearSelectOptions"
+                     :close-on-select="true"
+                     :clear-on-select="false"
+                     id="birthyear"
+                     :show-labels="false"
+                     open-direction="bottom"
+                     placeholder="I was born in...">
+          <template v-slot:tag></template>
+        </Multiselect>
+      </div>
+
+      <div class="mb-3">
+        <Multiselect v-model="modelValue.gender"
+                     :options="genderOptions"
+                     :close-on-select="true"
+                     :clear-on-select="false"
+                     :show-labels="false"
+                     :searchable="false"
+                     open-direction="bottom"
+                     id="gender"
+                     label="label"
+                     track-by="label"
+                     placeholder="I identify as...">
+          <template v-slot:noResult></template>
+        </Multiselect>
+      </div>
+
+      <div class="mb-3">
+        <Multiselect v-model="modelValue.relationship"
+                     :options="relationshipStatusOptions"
+                     :close-on-select="true"
+                     :clear-on-select="false"
+                     open-direction="bottom"
+                     id="relationship"
+                     label="label"
+                     track-by="label"
+                     placeholder="I am currently..." />
       </div>
 
       <div class="mb-3">
         <FormKit type="textarea"
-                 name="bio"
-                 label="Bio"
-                 validation="required|max:500" />
-      </div>
-
-      <div class="mb-3">
-        <FormKit type="checkbox"
-                 name="relationship"
-                 label="Relationship status"
-                 :options="relationshipStatusOptions"
+                 name="intro"
+                 label="A few words about me..."
+                 auto-height
+                 v-model="modelValue.intro"
+                 :validation-messages="{
+                  required: 'Please enter your name',
+                  min: 'Name must be at least 2 characters long',
+                  max: 'Name must be less than 50 characters long'
+                }"
                  validation="required" />
       </div>
 
       <div v-if="error"
-           class="alert alert-danger mt-3">
+           class="alert alert-danger mb-3">
         {{ error }}
       </div>
 
+      <div class="d-grid gap-2 mb-3">
+        <button type="submit"
+                class="btn btn-primary"
+                :disabled="isLoading">
+          <span v-if="isLoading">Working...</span>
+          <span v-else>Save</span></button>
+      </div>
+
     </FormKit>
+  </div>
 </template>
 
 
@@ -64,7 +97,6 @@ import { defineComponent } from "vue";
 import Multiselect from "vue-multiselect";
 
 import { getGenderOptions, getRelationshipStatusOptions } from "@/lib/i18n";
-import { isFileLoadingAllowed } from "vite";
 
 export default defineComponent({
   name: "DatingProfileForm",

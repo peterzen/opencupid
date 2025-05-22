@@ -1,39 +1,55 @@
 <template>
+  <div class="col-md-8 offset-md-2">
 
-  <div class="col-md-6 offset-md-3">
     <FormKit type="form"
              @submit="submitProfile"
              :actions="false">
 
-      <FormKit type="text"
-               name="publicName"
-               label="My name is..."
-               id="publicName"
-               v-model="profile.publicName"
-               validation="required" />
+      <div class="mb-3">
+        <FormKit type="text"
+                 name="publicName"
+                 label="My name is..."
+                 id="publicName"
+                 v-model="profile.publicName"
+                 :floating-label="true"
+                 :validation-messages="{
+                  required: 'Please enter your name',
+                  min: 'Name must be at least 2 characters long',
+                  max: 'Name must be less than 50 characters long'
+                }"
+                 validation="required" />
+      </div>
 
-      <div class="form-group">
-        <label class="form-label">I live in...</label>
+      <div class="mb-3">
         <Multiselect v-model="profile.country"
                      :options="countrySelectOptions"
                      :close-on-select="true"
                      :clear-on-select="false"
-                     placeholder="Select country"
+                     open-direction="bottom"
+                     placeholder="I'm from..."
                      label="label"
                      track-by="label" />
+      </div>
 
+      <div class="mb-3">
         <FormKit type="text"
                  name="city"
-                 label="City"
+                 label="My city..."
                  id="city"
                  v-model="profile.city" />
       </div>
 
-      <FormKit type="textarea"
-               name="intro"
-               label="Introduction"
-               id="intro"
-               v-model="profile.intro" />
+      <div class="mb-3">
+        <FormKit type="textarea"
+                 name="intro"
+                 label="A few words about me..."
+                 id="intro"
+                 auto-height
+                 max-auto-height="20"
+                 rows="3"
+                 :floating-label="true"
+                 v-model="profile.intro" />
+      </div>
 
     </FormKit>
 

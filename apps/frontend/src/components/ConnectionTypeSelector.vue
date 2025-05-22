@@ -92,6 +92,8 @@ export default defineComponent({
   display: flex;
   flex-direction: row;
   font-weight: bold;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 
 .tab-switch {

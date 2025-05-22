@@ -19,7 +19,7 @@ const config = defaultConfig({
     locales: getAvailableLocales(),
     classes: generateClasses({
       global: {
-        outer: '$reset mb-3',
+        outer: '$reset',
         input: 'form-control',
         label: 'form-label',
         help: 'form-text text-muted'
