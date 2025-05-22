@@ -1,4 +1,10 @@
 {
+  "general": {
+    "connectiontypes": {
+      "dating": "Dating",
+      "socializing": "Socializing"
+    }
+  },
   "gender": {
     "male": "Male",
     "female": "Female",

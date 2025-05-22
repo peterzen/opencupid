@@ -1,49 +1,44 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-import ToggleSwitch from '@/components/ToggleSwitch.vue';
+<script setup lang="ts">
+import { computed } from 'vue'
+import ToggleSwitch from '@/components/ToggleSwitch.vue'
+import { useI18n } from 'vue-i18n';
 
-export default defineComponent({
-  name: 'ConnectionTypeSelector',
-  components: { ToggleSwitch },
-  props: {
-    profileActive: {
-      type: Boolean,
-      required: true,
-      default: false
-    },
-    datingActive: {
-      type: Boolean,
-      required: true,
-      default: false
-    },
-    activeTab: {
-      type: String,
-      required: true,
-    }
-  },
-  emits: [
-    'update:profileActive',
-    'update:datingActive',
-    'update:selectTab'
-  ],
-  computed: {
-    friendsToggleDisabled(): boolean {
-      return this.profileActive && !this.datingActive;
-    },
-    datingToggleDisabled(): boolean {
-      return this.datingActive && !this.profileActive;
-    }
-  },
-  methods: {
-    setProfileActive(val: boolean) {
-      this.$emit('update:profileActive', val);
-    },
-    setDatingActive(val: boolean) {
-      this.$emit('update:datingActive', val);
-    },
-  }
-})
+const { t } = useI18n()
+
+// Props
+const props = defineProps<{
+  profileActive: boolean
+  datingActive: boolean
+  activeTab: string
+}>()
+
+// Emits
+const emit = defineEmits<{
+  (e: 'update:profileActive', val: boolean): void
+  (e: 'update:datingActive', val: boolean): void
+  (e: 'update:selectTab', tab: string): void
+}>()
+
+// Computed disabling logic
+const friendsToggleDisabled = computed(() =>
+  props.profileActive && !props.datingActive
+)
+const datingToggleDisabled = computed(() =>
+  props.datingActive && !props.profileActive
+)
+
+// Methods
+function setProfileActive(val: boolean) {
+  emit('update:profileActive', val)
+  emit('update:selectTab', 'profile')
+}
+
+function setDatingActive(val: boolean) {
+  emit('update:datingActive', val)
+  emit('update:selectTab', 'dating')
+}
 </script>
+
 
 <template>
   <ul class="nav nav-tabs nav-fill">
@@ -57,7 +52,7 @@ export default defineComponent({
                       :modelValue="datingActive" />
         <a class="tab-switch"
            @click="$emit('update:selectTab', 'dating')">
-          Dating
+          {{ t('general.connectiontypes.dating') }}
         </a>
       </span>
 
@@ -73,13 +68,11 @@ export default defineComponent({
                       :modelValue="profileActive" />
         <a class="tab-switch"
            @click="$emit('update:selectTab', 'friend')">
-          Socializing
+          {{ t('general.connectiontypes.socializing') }}
         </a>
       </span>
     </li>
   </ul>
-
-
 </template>
 
 <style lang="scss" scoped>
