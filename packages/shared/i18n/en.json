@@ -1,1 +1,23 @@
-{}
+{
+  "gender": {
+    "male": "Male",
+    "female": "Female",
+    "non_binary": "Non-binary",
+    "other": "Other",
+    "unspecified": "I'd rather not say"
+  },
+  "relationship": {
+    "single": "Single",
+    "in_relationship": "In a relationship",
+    "married": "Married",
+    "other": "Other",
+    "unspecified": "I'd rather not say"
+  },
+  "nav": {
+    "home": "Home",
+    "onboarding": "Onboarding",
+    "profile": "Profile",
+    "browse": "Browse",
+    "inbox": "Inbox"
+  }
+}

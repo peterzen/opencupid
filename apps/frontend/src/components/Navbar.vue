@@ -20,27 +20,27 @@
           <li class="nav-item me-auto">
             <RouterLink to="/me"
                         :class="{ 'active': currentRoute === '/me' }"
-                        class="nav-link ">Home</RouterLink>
+                        class="nav-link ">{{ t('nav.home') }}</RouterLink>
           </li>
           <li class="nav-item me-auto">
             <RouterLink to="/onboarding"
                         :class="{ 'active': currentRoute === '/onboarding' }"
-                        class="nav-link ">Onboarding</RouterLink>
+                        class="nav-link ">{{ t('nav.onboarding') }}</RouterLink>
           </li>
           <li class="nav-item me-auto">
             <RouterLink to="/profile"
                         :class="{ 'active': currentRoute === '/profile' }"
-                        class="nav-link ">Profile</RouterLink>
+                        class="nav-link ">{{ t('nav.profile') }}</RouterLink>
           </li>
           <li class="nav-item me-auto">
             <RouterLink to="/browse"
                         :class="{ 'active': currentRoute === '/browse' }"
-                        class="nav-link ">Browse</RouterLink>
+                        class="nav-link ">{{ t('nav.browse') }}</RouterLink>
           </li>
           <li class="nav-item me-auto">
             <RouterLink to="/inbox"
                         :class="{ 'active': currentRoute === '/inbox' }"
-                        class="nav-link ">Inbox</RouterLink>
+                        class="nav-link ">{{ t('nav.inbox') }}</RouterLink>
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle"
@@ -91,8 +91,9 @@
 
 <script setup lang="ts">
 import { RouterLink, useRouter } from 'vue-router'
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 const router = useRouter()
-
 </script>
 
 <script lang="ts">

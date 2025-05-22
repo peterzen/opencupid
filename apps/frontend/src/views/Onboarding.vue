@@ -67,7 +67,7 @@ export default defineComponent({
     return {
       profile: {} as Profile,
       datingProfile: {} as DatingProfile,
-      activeTab: 'friend',
+      activeTab: 'dating',
       error: '',
       isLoading: false,
     };

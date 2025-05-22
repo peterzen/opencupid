@@ -1,0 +1,23 @@
+{
+  "gender": {
+    "male": "Männlich",
+    "female": "Weiblich",
+    "non_binary": "Nicht-binär",
+    "other": "Andere",
+    "unspecified": "Ich möchte es lieber nicht sagen"
+  },
+  "relationship": {
+    "single": "Single",
+    "in_relationship": "In einer Beziehung",
+    "married": "Verheiratet",
+    "other": "Andere",
+    "unspecified": "Ich möchte es lieber nicht sagen"
+  },
+  "nav": {
+    "home": "Startseite",
+    "onboarding": "Registrierung",
+    "profile": "Profil",
+    "browse": "Durchsuchen",
+    "inbox": "Nachrichten"
+  }
+}

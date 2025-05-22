@@ -1,1 +1,23 @@
-{}
+{
+  "gender": {
+    "male": "Férfi",
+    "female": "Nő",
+    "non_binary": "Nem-bináris",
+    "other": "Egyéb",
+    "unspecified": "Inkább nem mondom meg"
+  },
+  "relationship": {
+    "single": "Egyedülálló",
+    "in_relationship": "Kapcsolatban",
+    "married": "Házas",
+    "other": "Egyéb",
+    "unspecified": "Inkább nem mondom meg"
+  },
+  "nav": {
+    "home": "Kezdőlap",
+    "onboarding": "Belépés",
+    "profile": "Profil",
+    "browse": "Böngészés",
+    "inbox": "Üzenetek"
+  }
+}

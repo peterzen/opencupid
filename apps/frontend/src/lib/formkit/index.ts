@@ -1,5 +1,6 @@
 // FormKit
 import { plugin as formKitPlugin, defaultConfig } from '@formkit/vue'
+import { en } from '@formkit/i18n'
 import '@/lib/formkit/formkit-custom.scss'
 
 import { generateClasses } from '@formkit/themes'
@@ -16,7 +17,8 @@ const config = defaultConfig({
     }),
   ],
   config: {
-    locales: getAvailableLocales(),
+    locales: {en},
+    locale : 'en',
     classes: generateClasses({
       global: {
         outer: '$reset',

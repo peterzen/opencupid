@@ -1,53 +1,40 @@
+
 // import './assets/main.css'
 import 'bootstrap/scss/bootstrap.scss'
 import '@/lib/bootstrap-customizations.scss'
 import '@/lib/utils.scss'
 import 'bootstrap-vue-next/dist/bootstrap-vue-next.css'
+import "@/lib/vue-multiselect.scss"
 
 import { Settings } from 'luxon'
 Settings.defaultZone = 'Europe/Berlin'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import { createI18n } from 'vue-i18n'
 import { createBootstrap } from 'bootstrap-vue-next'
 
 import App from './App.vue'
 import router from './router'
 
-// const i18n = window.__APP_I18N__ || createI18n({legacy: true })
-// window.__APP_I18N__ = i18n // persists across HMR
-
-const i18n = createI18n({
-  legacy: true,
-  locale: 'en',
-  fallbackLocale: 'en',
-})
-
 const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
-// app.use(i18n)
 app.use(createBootstrap()) // bootstrap-vue-next
-app.provide('$i18n', i18n)
 
-// FontAwesome icons
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { fas } from '@fortawesome/free-solid-svg-icons'
-import { far } from '@fortawesome/free-regular-svg-icons'
-library.add(fas, far)
-app.component('FontAwesomeIcon', FontAwesomeIcon)
+// Load/initialize icon set
+import { useIcons } from './lib/icons'
+useIcons(app)
 
 // toastify
 import Vue3Toastify from 'vue3-toastify';
 import { defaultOptions } from './lib/toastify'
 app.use(Vue3Toastify, defaultOptions)
 
+import { appUseI18n } from './lib/i18n'
+appUseI18n(app)
+
 import { useFormKit } from '@/lib/formkit'
 useFormKit(app)
-
-import "@/lib/vue-multiselect.scss"
 
 app.mount('#app')

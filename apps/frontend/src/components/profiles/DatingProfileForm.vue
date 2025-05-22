@@ -2,7 +2,7 @@
   <div class="col-md-8 offset-md-2">
 
     <FormKit type="form"
-             actions="false"
+             :actions="false"
              @submit="submitForm">
 
       <div class="mb-3">
@@ -44,6 +44,15 @@
                      track-by="label"
                      placeholder="I identify as...">
           <template v-slot:noResult></template>
+          <template #singleLabel="props">
+            {{ debug(props.option) }}
+            {{ (props.option.label) }}
+          </template>
+
+          <template #option="props">
+            {{ t(props.option.label) }}
+          </template>
+
         </Multiselect>
       </div>
 
@@ -56,7 +65,11 @@
                      id="relationship"
                      label="label"
                      track-by="label"
-                     placeholder="I am currently..." />
+                     placeholder="I am currently...">
+          <template #option="props">
+            {{ t(props.option.label) }}
+          </template>
+        </Multiselect>
       </div>
 
       <div class="mb-3">
@@ -89,7 +102,16 @@
     </FormKit>
   </div>
 </template>
+<script setup lang="ts">
+import { useI18n } from "vue-i18n"
+const { t } = useI18n() // this causes the error
+const props = defineProps<{ modelValue: DatingProfile }>();
 
+function debug(opt: any) {
+  console.log("i18n", opt);
+  return "";
+}
+</script>
 
 <script lang="ts">
 import { DatingProfile } from "@zod/generated";
@@ -110,10 +132,6 @@ export default defineComponent({
       type: Object,
       required: false,
     },
-  },
-
-  setup(props: { modelValue: DatingProfile }) {
-    // Type-safe access
   },
 
   data() {

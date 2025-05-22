@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@formkit/addons": "^1.6.9",
+    "@formkit/i18n": "^1.6.9",
     "@formkit/icons": "^1.6.9",
     "bootstrap-vue-next": "^0.29.3",
     "i18n-iso-countries": "^7.14.0",

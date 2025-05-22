@@ -28,6 +28,9 @@
       "@zod/*": [
         "../../packages/shared/zod/*"
       ],
+      "@opencupid/shared/*": [
+        "packages/shared/*"
+      ],
     }
   },
 }

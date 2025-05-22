@@ -1,4 +1,3 @@
-import { fileURLToPath, URL } from 'node:url'
 import path from 'path'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
@@ -16,6 +15,7 @@ export default defineConfig({
 
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@opencupid/shared': path.resolve(__dirname, '../../packages/shared'),
       '@zod/generated': path.resolve(__dirname, '../../packages/shared/zod/generated')
     },
   },
