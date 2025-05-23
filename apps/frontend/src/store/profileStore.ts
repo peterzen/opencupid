@@ -3,8 +3,25 @@ import axios from 'axios'
 // import { ProfileSchema } from '@zod/generated'
 import type { ConnectionTypeType, DatingProfile, Profile, ProfileImage } from '@zod/generated'
 import { ConnectionOptions } from 'tls'
+import { PublicProfileImageSchema } from '@zod/media.schema'
 
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '/api'
+
+// Success / Error response shapes
+interface UploadSuccess {
+  success: true
+  profileImage: PublicProfileImageSchema
+}
+
+
+interface UploadError {
+  success: false
+  message: string
+  fieldErrors?: Record<string, string[]>
+}
+
+
+type UploadResponse = UploadSuccess | UploadError
 
 export const useProfileStore = defineStore('profile', {
   state: () => ({
@@ -68,20 +85,33 @@ export const useProfileStore = defineStore('profile', {
       }
     },
 
-    async uploadProfileImage(file: File) {
+    async uploadProfileImage(
+      file: File,
+      captionText: string
+    ): Promise<UploadResponse> {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('captionText', captionText)
+
       try {
-        const formData = new FormData()
-        formData.append('file', file)
-        const res = await axios.post('/profiles/image', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        })
-        const image = res.data.image as ProfileImage
-        return image
-      } catch (error: any) {
-        console.error('Failed to upload profile image:', error)
-        throw error.response?.data?.message || 'Failed to upload profile image'
+        const { data } = await axios.post<UploadSuccess>('/profiles/image', formData)
+        // data.success is guaranteed true here
+        return data
+      } catch (err: unknown) {
+        let out: UploadError = {
+          success: false,
+          message: 'An unexpected error occurred'
+        }
+
+        if (axios.isAxiosError(err) && err.response) {
+          const resp = err.response.data as Partial<UploadError>
+          out.message = resp.message ?? out.message
+          if (resp.fieldErrors) out.fieldErrors = resp.fieldErrors
+        } else if (err instanceof Error) {
+          out.message = err.message
+        }
+
+        return out
       }
     },
 

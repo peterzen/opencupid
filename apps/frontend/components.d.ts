@@ -25,6 +25,7 @@ declare module 'vue' {
     ModalDialogComponent: typeof import('./src/components/ModalDialogComponent.vue')['default']
     Navbar: typeof import('./src/components/Navbar.vue')['default']
     ProfileForm: typeof import('./src/components/profiles/ProfileForm.vue')['default']
+    ProfileImageComponent: typeof import('./src/components/profiles/ProfileImageComponent.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SubmitButtonComponent: typeof import('./src/components/SubmitButtonComponent.vue')['default']

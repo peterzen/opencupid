@@ -5,23 +5,28 @@
     <div v-else>
 
       <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+
         <ImageUpload @image:uploaded="fetchImages" />
 
         <div v-for="img in images"
              :key="img.id"
              class="col">
-          <div class="card h-100">
+          <div class="card h-100"
+               :class="{ 'removing': isRemoving[img.id] }">
             <div class="ratio ratio-1x1">
-              <img :src="getImageUrl(img.storagePath)"
-                   :alt="img.altText || 'Profile image'"
-                   class="card-img-top" />
+              <ProfileImageComponent :image="img" />
             </div>
-            <div class="card-body d-flex flex-column">
-              <button class="btn btn-sm btn-secondary"
+            <div class="actions">
+              <button class="btn btn-sm btn-danger"
                       @click="remove(img)"
                       :disabled="isRemoving[img.id]">
-                {{ isRemoving[img.id] ? 'Removing...' : 'Remove' }}
+                <FontAwesomeIcon icon="fa-solid fa-trash" />
               </button>
+            </div>
+            <div class="card-body d-flex flex-column">
+              <div class="text-muted ">
+                {{ img.altText }}
+              </div>
             </div>
           </div>
         </div>
@@ -31,25 +36,23 @@
     <!-- <div v-if="images.length === 0"
          class="mb-3 empty">No images uploaded yet.
     </div> -->
-
-
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import axios from 'axios'
 import { useProfileStore } from '@/store/profileStore'
 import { Profile, ProfileImage } from '@zod/generated'
 import ImageUpload from '@/components/profiles/ImageUpload.vue'
 import LoadingComponent from '@/components/LoadingComponent.vue'
+import ProfileImageComponent from '@/components/profiles/ProfileImageComponent.vue'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 const profileStore = useProfileStore()
 
 const images = ref<ProfileImage[]>([])
 const isLoading = ref(false)
 const isRemoving = reactive<Record<string, boolean>>({})
-const fileInput = ref<HTMLInputElement>()
 const myProfile = ref<Profile | null>(null)
 /**
  * Fetch all images for current user
@@ -65,34 +68,6 @@ async function fetchImages() {
   }
 }
 
-/**
- * Returns full URL for a stored image path
- */
-function getImageUrl(storagePath: string) {
-  return `http://localhost:3001/${storagePath}`
-}
-
-/**
- * Handle file selected and upload via API
- */
-async function upload(event: Event) {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
-  if (!file) return
-
-  isLoading.value = true
-  try {
-    const form = new FormData()
-    form.append('image', file)
-    const { data } = await axios.post<ProfileImage>('/api/profile-images', form)
-    images.value.unshift(data)
-  } catch (err) {
-    console.error('Upload failed', err)
-  } finally {
-    isLoading.value = false
-    if (fileInput.value) fileInput.value.value = ''
-  }
-}
 
 /**
  * Remove an image by ID
@@ -122,5 +97,16 @@ onMounted(async () => {
 <style scoped lang="scss">
 img {
   object-fit: cover;
+}
+
+.removing {
+  opacity: 0.2;
+}
+
+.actions {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 1;
 }
 </style>

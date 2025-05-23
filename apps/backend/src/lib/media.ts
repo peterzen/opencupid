@@ -5,6 +5,10 @@ import fs from 'fs'
 
 import env from '../env'
 
+export function uploadTmpDir() {
+  return path.join(env.MEDIA_UPLOAD_DIR, 'uploads')
+}
+
 export function generateStorageDirPrefix(): string {
   // 1) Generate a unique ID
   const id = randomUUID() // e.g. "9f47a2c9-9f1c-4a2d-8b1e-1234567890ab"
@@ -37,10 +41,14 @@ export function checkUploadBaseDir(): boolean {
   // Check if the directory is writable
   try {
     fs.accessSync(uploadDir, fs.constants.W_OK)
-    return true
   } catch (error) {
     return false
   }
+  const tmpDir = uploadTmpDir()
+  if (!fs.existsSync(tmpDir)) {
+    fs.mkdirSync(tmpDir, { recursive: true })
+  }
+  return true
 }
 
 export function createStorageDir(uploadDir: string) {

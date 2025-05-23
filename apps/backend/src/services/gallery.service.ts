@@ -1,13 +1,30 @@
 import cuid from 'cuid';
 import path from 'path';
+import { createHash } from 'crypto';
+import { Transform } from 'stream';
 import fs from 'fs';
-import { pipeline } from 'stream/promises';
 import { createWriteStream } from 'fs';
+import { pipeline } from 'stream/promises';
+import { MultipartFile, SavedMultipartFile } from '@fastify/multipart';
 
 import { prisma } from '../lib/prisma'
-import { MultipartFile } from '@fastify/multipart';
 import { ProfileImage } from '@prisma/client';
-import { createStorageDir, generateStorageDirPrefix, getStorageRelativePath, getUploadBaseDir } from 'src/lib/media';
+import {
+  createStorageDir,
+  generateStorageDirPrefix,
+  getStorageRelativePath,
+  getUploadBaseDir
+} from 'src/lib/media';
+
+import {
+  ownerProfileImageSchema,
+  OwnerProfileImageSchema,
+  PublicProfileImageSchema,
+  publicProfileImageSchema,
+  type CreateProfileImageSchema
+} from '@zod/media.schema';
+import env from 'src/env';
+import { generateContentHash } from '@utils/hash';
 
 
 export class ImageGalleryService {
@@ -45,11 +62,7 @@ export class ImageGalleryService {
     });
   }
 
-  async storeImage(userId: string, fileUpload: MultipartFile) {
-    // Validate file type
-    if (!fileUpload.mimetype.startsWith('image/')) {
-      throw new Error('File must be an image');
-    }
+  async storeImage(userId: string, fileUpload: SavedMultipartFile, captionText: string): Promise<ProfileImage> {
 
     // Generate a CUID for the ProfileImage
     const filename = cuid();
@@ -62,31 +75,27 @@ export class ImageGalleryService {
     const storageRelPath = getStorageRelativePath(storagePrefix, filename, fileExtension);
     const fullPath = path.join(uploadBaseDir, storageRelPath);
 
-    // Save the file
-    await pipeline(
-      fileUpload.file,
-      createWriteStream(fullPath)
-    );
+    // Move the uploaded temp file to the final location
+    await fs.promises.rename(fileUpload.filepath, fullPath);
+
+    // compute the content hash of the file
+    const contentHash = await generateContentHash(fullPath)
 
     // Create a new ProfileImage record
-    const profileImage = await this.createImage({
+    return await this.createImage({
       userId: userId,
       mimeType: fileUpload.mimetype,
+      altText: captionText,
       storagePath: storageRelPath,
+      isModerated: false,
+      contentHash: contentHash
     })
-    console.log('Created ProfileImage:', profileImage);
-    return profileImage;
   }
 
   /**
    * Create a new ProfileImage record
    */
-  async createImage(data: {
-    userId: string;
-    mimeType: string;
-    storagePath: string;
-    altText?: string;
-  }): Promise<ProfileImage> {
+  async createImage(data: CreateProfileImageSchema): Promise<ProfileImage> {
     return prisma.profileImage.create({ data });
   }
 
@@ -99,8 +108,6 @@ export class ImageGalleryService {
       where: { id: image.id },
       data: {
         altText: image.altText,
-        mimeType: image.mimeType,
-        storagePath: image.storagePath,
       }
     });
   }
@@ -135,4 +142,31 @@ export class ImageGalleryService {
     }
     return true
   }
+
+  /**
+   * Constructs the public URL for the image
+   */
+  getImageUrl(image: ProfileImage): string {
+    const urlBase = env.IMAGE_URL_BASE
+    return `${urlBase}/${image.storagePath}`;
+  }
+
+  /**
+   * Add the public URL to the image object and sanitize it
+   * by removing any non-public fields
+   */
+  toPublicProfileImage(image: ProfileImage): PublicProfileImageSchema {
+    image.url = this.getImageUrl(image);
+    return publicProfileImageSchema.parse(image)
+  }
+
+  /**
+   * Add the public URL to the image object and sanitize it
+   * by removing fields that are not accessible to the owner
+   */
+  toOwnerProfileImage(image: ProfileImage): OwnerProfileImageSchema {
+    image.url = this.getImageUrl(image);
+    return ownerProfileImageSchema.parse(image)
+  }
+
 }

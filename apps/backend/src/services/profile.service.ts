@@ -135,31 +135,6 @@ export class ProfileService {
     })
   }
 
-  async addProfileImage(profileId: string, imageData: {
-    userId: string,
-    mimeType: string,
-    storagePath: string,
-    altText?: string
-  }): Promise<ProfileImage> {
-    return prisma.profileImage.create({
-      data: {
-        id: cuid(),
-        mimeType: imageData.mimeType,
-        userId: imageData.userId,
-        storagePath: imageData.storagePath,
-        altText: imageData.altText,
-        primaryForProfile: {
-          connect: { id: profileId }
-        }
-      }
-    })
-  }
-
-  async removeProfileImage(imageId: string): Promise<void> {
-    await prisma.profileImage.delete({
-      where: { id: imageId }
-    })
-  }
 
   async addProfileTag(profileId: string, tagId: number): Promise<ProfileTag> {
     return prisma.profileTag.create({

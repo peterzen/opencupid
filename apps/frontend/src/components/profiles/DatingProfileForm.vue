@@ -3,11 +3,9 @@
 
 
     <div class="mb-4">
-
-      <ImageUpload :maxWidth="800"
-                   :maxHeight="800"
-                   :quality="80"
-                   @image:uploaded="emit('update:modelValue', formData)" />
+      <div class="col-sm-6 offset-sm-3">
+        <ImageUpload @image:uploaded="emit('update:modelValue', formData)" />
+      </div>
     </div>
 
     <FormKit type="form"

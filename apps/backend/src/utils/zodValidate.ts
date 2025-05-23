@@ -9,3 +9,19 @@ export function validateBody<T extends ZodSchema<any>>(schema: T, req: FastifyRe
   }
   return result.data
 }
+
+
+export async function asyncValidateBody<T>(
+  schema: ZodSchema<T>,
+  req: FastifyRequest,
+  reply: FastifyReply
+): Promise<T | undefined> {
+  const result = await schema.safeParseAsync(req.body)
+  if (!result.success) {
+    const { fieldErrors, formErrors } = result.error.flatten()
+    reply.status(400).send({ fieldErrors, formErrors })
+    return
+  }
+  return result.data
+}
+

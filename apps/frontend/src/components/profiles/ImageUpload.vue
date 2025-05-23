@@ -8,9 +8,8 @@
              id="image-upload-input"
              capture="user"
              floating-label="false"
-             file-remove="false"
-             file-remove-icon="trash"
-             file-remove-class="hidden"
+             :file-remove="false"
+             :file-remove-icon="false"
              label="Add profile photo"
              label-class="btn btn-primary"
              :multiple="false">
@@ -22,22 +21,40 @@
       </template>
     </FormKit>
     <div v-if="error"
-         class="text-danger mt-2">{{ error }}</div>
+         class="text-danger mt-2">
+      {{ error }}
+    </div>
   </div>
   <BModal v-model="modal"
           centered
           button-size="sm"
           cancel-title="Nevermind"
           initial-animation
-          title="Add image"
+          title="Add a photo"
           @cancel="handleRemovePreview"
           @ok="handleUpload">
     <div v-if="preview"
          class="preview-container">
-      <img :src="preview"
-           alt="Preview"
-           width="200"
-           class="preview-image" />
+      <div class="mb-3">
+        <img :src="preview"
+             alt="Preview"
+             width="200"
+             class="preview-image" />
+      </div>
+      <div class="mb-3">
+        <FormKit type="textarea"
+                 input-class="form-control-sm"
+                 placeholder="Caption this..."
+                 v-model="captionText"
+                 label=""
+                 floating-label="false"
+                 auto-height
+                 :validation-messages="{
+                  required: 'Please write a sentence or two about yourself',
+                  min: 'Name must be at least 2 characters long',
+                  max: 'Name must be less than 50 characters long'
+                }" />
+      </div>
     </div>
   </BModal>
 </template>
@@ -46,9 +63,9 @@
 import { ref } from 'vue'
 import type { ProfileImage } from '@zod/generated'
 import { useProfileStore } from '@/store/profileStore'
-import { BvTriggerableEvent } from 'bootstrap-vue-next'
 
 import AvatarUploadIcon from '@/assets/icons/files/avatar-upload.svg'
+import { PublicProfileImageSchema } from '@zod/media.schema'
 
 const profileStore = useProfileStore()
 
@@ -59,12 +76,11 @@ const isLoading = ref(false)
 const error = ref<string | null>(null)
 const fileInput = ref<HTMLInputElement>()
 const modal = ref(false)
-const dontCloseFn = (e: BvTriggerableEvent) => {
-  e.preventDefault()
-}
+const captionText = ref<string>('')
+
 // Emitters
 const emit = defineEmits<{
-  (e: 'image:uploaded', payload: ProfileImage): void
+  (e: 'image:uploaded', payload: PublicProfileImageSchema): void
   (e: 'image:deleted', payload: { id: string }): void
 }>()
 
@@ -96,19 +112,23 @@ async function handleUpload() {
   if (!selectedFile.value) return
   isLoading.value = true
   error.value = null
-  try {
-    const image = await profileStore.uploadProfileImage(selectedFile.value)
-    emit('image:uploaded', image)
-    // Clear after upload
-    preview.value = null
-    selectedFile.value = null
-    if (fileInput.value) fileInput.value.value = ''
-  } catch (err: any) {
-    console.error('Upload error:', err)
-    error.value = err.message || 'Error uploading image.'
-  } finally {
+  const res = await profileStore.uploadProfileImage(selectedFile.value, captionText.value)
+
+  if (!res.success) {
+    console.error('Upload error:', res.message)
+    error.value = res.message
     isLoading.value = false
+    return
   }
+  const image = res.profileImage
+  emit('image:uploaded', image)
+
+  // Clear after upload
+  preview.value = null
+  selectedFile.value = null
+  if (fileInput.value) fileInput.value.value = ''
+
+  isLoading.value = false
 }
 
 /**
@@ -133,8 +153,10 @@ async function handleRemovePreview() {
     display: none;
   }
 }
+
 .file-upload-label {
   width: 100%;
+
   svg {
     width: 100%;
     height: 100%;
