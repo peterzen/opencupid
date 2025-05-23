@@ -18,8 +18,14 @@ export default defineConfig({
       resolvers: [BootstrapVueNextResolver()],
     }),
   ],
+   css: {
+    preprocessorOptions: {
+      scss: {
+        quietDeps: true
+      }
+    }
+  },
   resolve: {
-
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@opencupid/shared': path.resolve(__dirname, '../../packages/shared'),
