@@ -1,5 +1,15 @@
 <template>
   <div class="col-md-8 offset-md-2">
+
+
+    <div class="mb-4">
+
+      <ImageUpload :maxWidth="800"
+                   :maxHeight="800"
+                   :quality="80"
+                   @image:uploaded="emit('update:modelValue', formData)" />
+    </div>
+
     <FormKit type="form"
              :actions="false"
              :disabled="isLoading"
@@ -7,6 +17,7 @@
              @submit="submitForm">
 
       <fieldset :disabled="!modelValue.isActive || isLoading">
+
 
         <div class="mb-4">
           <FormKit type="text"
@@ -150,7 +161,7 @@ import { useI18n } from 'vue-i18n'
 import { DatingProfile } from '@zod/generated'
 import { getGenderOptions, getHasKidsOptionsOptions, getRelationshipStatusOptions } from '@/lib/i18n'
 import ErrorComponent from '@/components/ErrorComponent.vue'
-import SubmitButtonComponent from '@/components/SubmitButtonComponent.vue'
+import ImageUpload from './ImageUpload.vue'
 
 // Props & Emits
 const props = defineProps<{

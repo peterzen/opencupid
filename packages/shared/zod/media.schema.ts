@@ -1,5 +1,7 @@
 import { profile } from 'console';
 import { z } from 'zod';
+import { DatingProfileSchema, ProfileImageSchema, ProfileSchema } from './generated';
+import { publicTagSchema } from './tags.schema';
 
 export const UploadImageSchema = z.object({
   file: z.instanceof(File).refine(
@@ -20,3 +22,26 @@ export const UploadImageSchema = z.object({
 });
 
 // export type UploadImage = z.infer<typeof UploadImageSchema>;
+
+
+
+const publicProfileImageFields = {
+  mimeType: true,
+  altText: true,
+  storagePath: true,
+} as const;
+
+export const publicProfileImageSchema = ProfileImageSchema
+  .pick(publicProfileImageFields)
+
+
+export const ownerProfileImageSchema = ProfileImageSchema
+  .pick({
+    ...publicProfileImageFields,
+    id: true,
+  }).extend({
+    primaryForProfile: ProfileSchema.optional(),
+    primaryForDatingProfile: DatingProfileSchema.optional(),
+    otherForDatingProfiles: z.array(DatingProfileSchema).optional(),
+    otherForProfiles: z.array(ProfileSchema).optional(),
+  });

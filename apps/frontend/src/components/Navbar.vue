@@ -28,9 +28,9 @@
                         class="nav-link ">{{ t('nav.onboarding') }}</RouterLink>
           </li>
           <li class="nav-item me-auto">
-            <RouterLink to="/profile"
-                        :class="{ 'active': currentRoute === '/profile' }"
-                        class="nav-link ">{{ t('nav.profile') }}</RouterLink>
+            <RouterLink to="/me/gallery"
+                        :class="{ 'active': currentRoute === '/me/gallery' }"
+                        class="nav-link ">{{ t('nav.gallery') }}</RouterLink>
           </li>
           <li class="nav-item me-auto">
             <RouterLink to="/browse"

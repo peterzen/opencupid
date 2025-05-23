@@ -200,8 +200,8 @@ model ProfileImage {
   userId   String
   user     User   @relation(fields: [userId], references: [id])
 
-  altText     String?
-  storagePath String
+  altText     String @default("")
+  storagePath String @unique
 
   primaryForProfile       Profile?        @relation("ProfilePrimaryImage")
   otherForProfiles        Profile[]       @relation("ProfileOtherImages")
@@ -210,4 +210,9 @@ model ProfileImage {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // contentHash String? @unique
+  // isModerated Boolean @default(false)
+
+  // @@index([userId])
 }

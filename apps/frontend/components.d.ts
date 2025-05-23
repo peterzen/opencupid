@@ -8,22 +8,26 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    BForm: typeof import('bootstrap-vue-next/components/BForm')['BForm']
+    BButton: typeof import('bootstrap-vue-next/components/BButton')['BButton']
+    BModal: typeof import('bootstrap-vue-next/components/BModal')['BModal']
     ConnectionTypeSelector: typeof import('./src/components/ConnectionTypeSelector.vue')['default']
     DatingProfileForm: typeof import('./src/components/profiles/DatingProfileForm.vue')['default']
+    ErrorComponent: typeof import('./src/components/ErrorComponent.vue')['default']
     IconCommunity: typeof import('./src/components/icons/IconCommunity.vue')['default']
     IconDocumentation: typeof import('./src/components/icons/IconDocumentation.vue')['default']
     IconEcosystem: typeof import('./src/components/icons/IconEcosystem.vue')['default']
     IconSupport: typeof import('./src/components/icons/IconSupport.vue')['default']
     IconTooling: typeof import('./src/components/icons/IconTooling.vue')['default']
-    ImageUpload: typeof import('./src/components/ImageUpload.vue')['default']
+    ImageUpload: typeof import('./src/components/profiles/ImageUpload.vue')['default']
     LightSwitch: typeof import('./src/components/LightSwitch.vue')['default']
     LoadingComponent: typeof import('./src/components/LoadingComponent.vue')['default']
     LogoutButton: typeof import('./src/components/LogoutButton.vue')['default']
+    ModalDialogComponent: typeof import('./src/components/ModalDialogComponent.vue')['default']
     Navbar: typeof import('./src/components/Navbar.vue')['default']
     ProfileForm: typeof import('./src/components/profiles/ProfileForm.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SubmitButtonComponent: typeof import('./src/components/SubmitButtonComponent.vue')['default']
     ToggleSwitch: typeof import('./src/components/ToggleSwitch.vue')['default']
   }
 }

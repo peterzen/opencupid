@@ -10,6 +10,7 @@ import UserHome from '@/views/UserHome.vue';
 import Messaging from '@/views/Messaging.vue';
 import Onboarding from '@/views/Onboarding.vue';
 import BrowseProfiles from '@/views/BrowseProfiles.vue';
+import ImageGallery from '@/views/ImageGallery.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -22,6 +23,12 @@ const routes: Array<RouteRecordRaw> = [
     path: '/me',
     name: 'UserHome',
     component: UserHome,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/me/gallery',
+    name: 'ImageGaller',
+    component: ImageGallery,
     meta: { requiresAuth: true }
   },
   {

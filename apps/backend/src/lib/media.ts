@@ -5,7 +5,7 @@ import fs from 'fs'
 
 import env from '../env'
 
-export function getStorageDirPrefix(): string {
+export function generateStorageDirPrefix(): string {
   // 1) Generate a unique ID
   const id = randomUUID() // e.g. "9f47a2c9-9f1c-4a2d-8b1e-1234567890ab"
 
