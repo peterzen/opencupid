@@ -62,6 +62,10 @@ export class ImageGalleryService {
     });
   }
 
+  /**
+   * Store an image uploaded by the user
+   * Returns the created ProfileImage record
+   */
   async storeImage(userId: string, fileUpload: SavedMultipartFile, captionText: string): Promise<ProfileImage> {
 
     // Generate a CUID for the ProfileImage

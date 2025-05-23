@@ -1,29 +1,22 @@
 import { FastifyPluginAsync } from 'fastify'
-import multipart, { } from '@fastify/multipart';
+import multipart from '@fastify/multipart';
 
 import { validateBody } from '@utils/zodValidate'
-import { ownerDatingProfileSchema, ownerProfileSchema, UpdateDatingProfileSchema, UpdateProfileSchema } from '@zod/profile.schema'
+import {
+  ownerDatingProfileSchema,
+  ownerProfileSchema,
+  publicProfileSchema,
+  UpdateDatingProfileSchema,
+  UpdateProfileSchema
+} from '@zod/profile.schema'
 
 import { ProfileService } from 'src/services/profile.service'
 import { ImageGalleryService } from 'src/services/gallery.service'
-import env from 'src/env';
 import { uploadTmpDir } from 'src/lib/media';
-
-const uploadTmp = env.MEDIA_UPLOAD_DIR + '/uploads'
+import { sendError } from '../helpers';
+import env from 'src/env';
 
 const profileRoutes: FastifyPluginAsync = async (fastify) => {
-
-  // --- Helper to send uniform error responses ---
-  const sendError = (
-    reply: FastifyPluginAsync['prototype']['reply'],
-    statusCode: number,
-    message: string,
-    fieldErrors?: Record<string, string[]>
-  ) => {
-    const payload: any = { success: false, message }
-    if (fieldErrors) payload.fieldErrors = fieldErrors
-    return reply.code(statusCode).send(payload)
-  }
 
   await fastify.register(multipart, {
     limits: {
@@ -37,89 +30,102 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     },
     attachFieldsToBody: false,
   });
+
+  // instantiate services
   const profileService = ProfileService.getInstance()
   const imageGalleryService = ImageGalleryService.getInstance();
 
-  // Get current user's profile
-  fastify.get('/me', {
-    onRequest: [fastify.authenticate]
-  }, async (req, reply) => {
-
-    const { profile, datingProfile } = await profileService.getAllProfilesByUserId(req.user.userId)
-    console.debug('Fetched profiles for user:', req.user.userId, profile, datingProfile)
-
-    if (!profile) {
-      return reply.status(404).send({ error: 'Profile not found' })
+  /**
+   * Get the current user's profile
+   * @description This route retrieves the current user's social and dating profiles.
+   */
+  fastify.get('/me', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    if (!req.user.userId) {
+      return sendError(reply, 401, 'Unauthorized')
     }
-    const safeProfile = ownerProfileSchema.parse(profile)
-    const safeDatingProfile = ownerDatingProfileSchema.parse(datingProfile)
-    return reply.status(200).send({
-      success: true,
-      profile: safeProfile,
-      datingProfile: safeDatingProfile
-    })
+    try {
+      const { profile, datingProfile } = await profileService.getAllProfilesByUserId(req.user.userId)
+      if (!profile) return sendError(reply, 404, 'Social profile not found')
+      if (!datingProfile) return sendError(reply, 404, 'Dating profile not found')
+
+      const safeProfile = ownerProfileSchema.parse(profile)
+      const safeDatingProfile = ownerDatingProfileSchema.parse(datingProfile)
+      return reply.code(200).send({ success: true, profile: safeProfile, datingProfile: safeDatingProfile })
+    } catch (err) {
+      fastify.log.error(err)
+      return sendError(reply, 500, 'Failed to load profiles')
+    }
   })
 
-  // Get all profiles
-
-  fastify.get('/', {
-    onRequest: [fastify.authenticate]
-  }, async (req, reply) => {
-    const profiles = await fastify.prisma.profile.findMany({
-      include: {
-        user: true, // Include related user data if needed
-      },
-    })
-    return { profiles }
+  /**
+   * Get all profiles
+   * @description This route retrieves all profiles in the system.
+   */
+  fastify.get('/', { onRequest: [fastify.authenticate] }, async (_req, reply) => {
+    try {
+      const profiles = await fastify.prisma.profile.findMany({
+        include: { profileImage: true, tags: { include: { tag: true } } }
+      })
+      return reply.code(200).send({ success: true, profiles })
+    } catch (err) {
+      fastify.log.error(err)
+      return sendError(reply, 500, 'Failed to list profiles')
+    }
   })
 
-  // Get a single profile by ID
-  fastify.get('/:id', {
-    onRequest: [fastify.authenticate]
-  }, async (req, reply) => {
+  /**
+   * Get a profile by ID
+   * @param {string} id - The ID of the profile to retrieve
+   */
+  fastify.get('/:id', { onRequest: [fastify.authenticate] }, async (req, reply) => {
     const { id } = req.params as { id: string }
-
-    const profile = await profileService.getProfileById(id)
-
-    if (!profile) {
-      return reply.status(404).send({ error: 'Profile not found' })
+    try {
+      const raw = await profileService.getProfileById(id)
+      if (!raw) return sendError(reply, 404, 'Profile not found')
+      const profile = publicProfileSchema.parse(raw)
+      return reply.code(200).send({ success: true, profile })
+    } catch (err) {
+      fastify.log.error(err)
+      return sendError(reply, 500, 'Failed to fetch profile')
     }
+  })
 
-    return { profile }
+  /**
+   * Update the current user's profile
+   */
+  fastify.patch('/profile', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    if (!req.user.userId) {
+      return sendError(reply, 401, 'Unauthorized')
+    }
+    const data = await validateBody(UpdateProfileSchema, req, reply)
+    if (!data) return
+    try {
+      const updated = await profileService.updateProfile(req.user.userId, data)
+      if (!updated) return sendError(reply, 404, 'Profile not found')
+      const profile = ownerProfileSchema.parse(updated)
+      return reply.code(200).send({ success: true, profile })
+    } catch (err) {
+      fastify.log.error(err)
+      return sendError(reply, 500, 'Failed to update profile')
+    }
   })
 
   // Update an existing profile
-  fastify.patch('/profile', {
-    onRequest: [fastify.authenticate]
-  }, async (req, reply) => {
-
+  fastify.patch('/dating', { onRequest: [fastify.authenticate] }, async (req, reply) => {
     if (!req.user.userId) {
-      return reply.status(401).send({ error: 'Unauthorized' })
+      return sendError(reply, 401, 'Unauthorized')
     }
-
-    const data = validateBody(UpdateProfileSchema, req, reply)
+    const data = await validateBody(UpdateDatingProfileSchema, req, reply)
     if (!data) return
-
-    const profile = profileService.updateProfile(req.user.userId, data)
-
-    return reply.status(200).send({ success: true, profile })
-  })
-
-  // Update an existing profile
-  fastify.patch('/dating', {
-    onRequest: [fastify.authenticate]
-  }, async (req, reply) => {
-
-    if (!req.user.userId) {
-      return reply.status(401).send({ error: 'Unauthorized' })
+    try {
+      const updated = await profileService.updateDatingProfile(req.user.userId, data)
+      if (!updated) return sendError(reply, 404, 'Dating profile not found')
+      const datingProfile = ownerDatingProfileSchema.parse(updated)
+      return reply.code(200).send({ success: true, datingProfile })
+    } catch (err) {
+      fastify.log.error(err)
+      return sendError(reply, 500, 'Failed to update dating profile')
     }
-
-    const data = validateBody(UpdateDatingProfileSchema, req, reply)
-    if (!data) return
-
-    const profile = profileService.updateDatingProfile(req.user.userId, data)
-
-    return reply.status(200).send({ success: true, profile })
   })
 
   // Single file upload route
@@ -128,7 +134,7 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
   }, async (req, reply) => {
 
     if (!req.user.userId) {
-      return reply.status(401).send({ error: 'Unauthorized' })
+      return sendError(reply, 401, 'Unauthorized')
     }
     // const { profileId } = req.params as { profileId: string }
 
@@ -145,9 +151,7 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       })
     } catch (err: any) {
       fastify.log.warn('Upload error:', err)
-      return sendError(
-        reply,
-        400,
+      return sendError(reply, 400,
         `The image is too large ${err.code === 'FST_ERR_MULTIPART_FILE_TOO_LARGE' ? ` ${env.IMAGE_MAX_SIZE}MB max` : ''}`
       )
     }
@@ -156,7 +160,6 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       return sendError(reply, 400, 'No file uploaded')
     }
 
-    // each entry is a MultipartFile with .filepath, .fieldname, .filename, .mimetype, .encoding
     const fileUpload = files[0]
     // Validate file type
     if (!fileUpload.mimetype.startsWith('image/')) {
@@ -175,34 +178,39 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     }
   })
 
-  // Delete a profile image
-  fastify.delete('/image/:profileImageId', {
-    onRequest: [fastify.authenticate]
-  }, async (req, reply) => {
-
+  /**
+   * Delete a profile image
+   */
+  fastify.delete('/image/:profileImageId', { onRequest: [fastify.authenticate] }, async (req, reply) => {
     if (!req.user.userId) {
-      return reply.status(401).send({ error: 'Unauthorized' })
+      return sendError(reply, 401, 'Unauthorized')
     }
-
     const { profileImageId } = req.params as { profileImageId: string }
-    await imageGalleryService.deleteImage(req.user.userId, profileImageId)
-    return reply.status(200).send({ success: true })
+    try {
+      await imageGalleryService.deleteImage(req.user.userId, profileImageId)
+      return reply.code(200).send({ success: true })
+    } catch (err) {
+      fastify.log.error(err)
+      return sendError(reply, 500, 'Failed to delete image')
+    }
   })
 
 
-  fastify.get('/user-images', {
-    onRequest: [fastify.authenticate]
-  }, async (req, reply) => {
-
+  /***
+   * Get all images for a user
+   */
+  fastify.get('/user-images', { onRequest: [fastify.authenticate] }, async (req, reply) => {
     if (!req.user.userId) {
-      return reply.status(401).send({ error: 'Unauthorized' })
+      return sendError(reply, 401, 'Unauthorized')
     }
-
-    const images = await imageGalleryService.listImages(req.user.userId)
-    const safeImages = images.map((image) => {
-      return imageGalleryService.toOwnerProfileImage(image)
-    })
-    return reply.status(200).send({ success: true, images: safeImages })
+    try {
+      const images = await imageGalleryService.listImages(req.user.userId)
+      const safeImages = images.map(img => imageGalleryService.toOwnerProfileImage(img))
+      return reply.code(200).send({ success: true, images: safeImages })
+    } catch (err) {
+      fastify.log.error(err)
+      return sendError(reply, 500, 'Failed to list images')
+    }
   })
 }
 

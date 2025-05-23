@@ -1,4 +1,3 @@
-// TODO: implement profile service
 import { prisma } from '../lib/prisma'
 import { Profile, ProfileImage, ProfileTag, Prisma } from '@prisma/client'
 import { Tag } from '@prisma/client'
