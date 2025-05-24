@@ -18,11 +18,18 @@ export default defineConfig({
       resolvers: [BootstrapVueNextResolver()],
     }),
   ],
-   css: {
+  css: {
     preprocessorOptions: {
       scss: {
-        quietDeps: true
-      }
+        silenceDeprecations: [
+          'import',
+          'mixed-decls',
+          'color-functions',
+          'global-builtin',
+        ],
+        includePaths: ['node_modules'],
+        quietDeps: true,
+      },
     }
   },
   resolve: {
