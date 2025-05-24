@@ -2,15 +2,16 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 // import { ProfileSchema } from '@zod/generated'
 import type { ConnectionTypeType, DatingProfile, Profile, ProfileImage } from '@zod/generated'
-import { ConnectionOptions } from 'tls'
-import { PublicProfileImageSchema } from '@zod/media.schema'
+import type {PublicProfile, OwnerProfile} from '@zod/profile.schema'
+
+import { OwnerProfileImage, PublicProfileImage } from '@zod/media.schema'
 
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '/api'
 
 // Success / Error response shapes
 interface UploadSuccess {
   success: true
-  profileImage: PublicProfileImageSchema
+  profileImage: PublicProfileImage
 }
 
 
@@ -25,9 +26,11 @@ type UploadResponse = UploadSuccess | UploadError
 
 export const useProfileStore = defineStore('profile', {
   state: () => ({
-    profile: {} as null | Profile, // Current user's profile
+    profile: {} as null | OwnerProfile, // Current user's profile
     datingProfile: {} as null | DatingProfile, // Current user's dating profile
     selectedProfile: null as null | Record<string, any>, // Profile fetched by ID
+    profileImages: [] as OwnerProfileImage[], // List of profile images
+    datingProfileImages: [] as OwnerProfileImage[], // List of dating profile images
   }),
 
   actions: {
@@ -112,6 +115,52 @@ export const useProfileStore = defineStore('profile', {
         }
 
         return out
+      }
+    },
+
+     /** 
+     * Set the “main” profile image.
+     * Calls POST /profiles/image/:imageId/main
+     */
+    async setProfileImage(imageId: string) {
+      try {
+        const { data } = await axios.post<{ success: true; profile: OwnerProfile }>(
+          `/profiles/image/${imageId}/main`
+        )
+        // update the entire profile (including new profileImage)
+        this.profile = data.profile
+        return { success: true }
+      } catch (err: unknown) {
+        let msg = 'Failed to set profile image'
+        if (axios.isAxiosError(err) && err.response?.data?.message) {
+          msg = err.response.data.message
+        } else if (err instanceof Error) {
+          msg = err.message
+        }
+        return { success: false, error: msg }
+      }
+    },
+
+    /**
+     * Add an image to the “otherImages” list.
+     * Calls POST /profiles/image/:imageId/other
+     */
+    async addImageToProfile(imageId: string) {
+      try {
+        const { data } = await axios.post<{ success: true; otherImages: OwnerProfileImage[] }>(
+          `/profiles/image/${imageId}/other`
+        )
+        // replace the otherImages array
+        this.profileImages = data.otherImages
+        return { success: true }
+      } catch (err: unknown) {
+        let msg = 'Failed to add image to profile'
+        if (axios.isAxiosError(err) && err.response?.data?.message) {
+          msg = err.response.data.message
+        } else if (err instanceof Error) {
+          msg = err.message
+        }
+        return { success: false, error: msg }
       }
     },
 

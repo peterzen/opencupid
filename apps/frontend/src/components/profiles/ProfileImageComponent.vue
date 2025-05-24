@@ -5,11 +5,11 @@
 
 <script setup lang="ts">
 import { defineProps, type PropType } from 'vue'
-import type { PublicProfileImageSchema } from '@zod/media.schema'
+import type { OwnerProfileImage, PublicProfileImage } from '@zod/media.schema'
 
 const props = defineProps({
   image: {
-    type: Object as PropType<PublicProfileImageSchema>,
+    type: Object as PropType<PublicProfileImage | OwnerProfileImage>,
     required: true,
   }
 })

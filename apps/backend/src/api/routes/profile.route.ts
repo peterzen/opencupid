@@ -1,10 +1,11 @@
 import { FastifyPluginAsync } from 'fastify'
-import multipart from '@fastify/multipart';
+import multipart, { MultipartValue } from '@fastify/multipart';
 
 import { validateBody } from '@utils/zodValidate'
 import {
   ownerDatingProfileSchema,
   ownerProfileSchema,
+  ProfileScope,
   publicProfileSchema,
   UpdateDatingProfileSchema,
   UpdateProfileSchema
@@ -15,6 +16,16 @@ import { ImageGalleryService } from 'src/services/gallery.service'
 import { uploadTmpDir } from 'src/lib/media';
 import { sendError } from '../helpers';
 import env from 'src/env';
+import { z } from 'zod';
+
+
+
+const imageScopeParamsSchema = z.object({
+  imageId: z.string().uuid(),        // or whatever format your IDs are
+  profileScope: z.nativeEnum(ProfileScope)
+})
+
+
 
 const profileRoutes: FastifyPluginAsync = async (fastify) => {
 
@@ -101,6 +112,7 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     if (!data) return
     try {
       const updated = await profileService.updateProfile(req.user.userId, data)
+      console.log('Updated profile:', updated)
       if (!updated) return sendError(reply, 404, 'Profile not found')
       const profile = ownerProfileSchema.parse(updated)
       return reply.code(200).send({ success: true, profile })
@@ -136,7 +148,6 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     if (!req.user.userId) {
       return sendError(reply, 401, 'Unauthorized')
     }
-    // const { profileId } = req.params as { profileId: string }
 
     let files
 
@@ -156,9 +167,7 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       )
     }
 
-    if (files.length === 0) {
-      return sendError(reply, 400, 'No file uploaded')
-    }
+    if (files.length === 0) return sendError(reply, 400, 'No file uploaded')
 
     const fileUpload = files[0]
     // Validate file type
@@ -166,7 +175,12 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       return sendError(reply, 400, 'Uploaded file must be an image')
     }
 
-    const captionText = fileUpload.fields.captionText?.value || ''
+    const captionText = (
+      ((Array.isArray(fileUpload.fields.captionText)
+        ? fileUpload.fields.captionText[0]
+        : fileUpload.fields.captionText) as MultipartValue
+      ).value ?? '')
+
 
     try {
       const stored = await imageGalleryService.storeImage(req.user.userId, fileUpload, captionText)
@@ -195,6 +209,66 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     }
   })
 
+  // Attach an image to the profile’s “otherImages” list
+  fastify.post(
+    '/image/:imageId/:profileScope/other',
+    { onRequest: [fastify.authenticate] },
+    async (req, reply) => {
+      if (!req.user.userId) {
+        return sendError(reply, 401, 'Unauthorized')
+      }
+      const { imageId, profileScope } = imageScopeParamsSchema.parse(req.params)
+
+      const schema = profileScope === ProfileScope.SOCIAL ? ownerProfileSchema : ownerDatingProfileSchema
+
+      try {
+        const updated = profileService.addImageToProfile(req.user.userId, profileScope, imageId)
+        if (!updated) return sendError(reply, 404, 'Profile not found')
+        const profile = schema.parse(updated)
+        // return only the newly‐attached images
+        return reply
+          .code(200)
+          .send({ success: true, profile })
+      } catch (err) {
+        fastify.log.error('Error adding image to otherImages:', err)
+        return sendError(reply, 500, 'Failed to attach image')
+      }
+    }
+  )
+
+  // Set the primary profileImage
+  fastify.post(
+    '/image/:imageId/:profileScope/primary',
+    { onRequest: [fastify.authenticate] },
+    async (req, reply) => {
+      if (!req.user.userId) {
+        return sendError(reply, 401, 'Unauthorized')
+      }
+      const { imageId, profileScope } = imageScopeParamsSchema.parse(req.params)
+
+      let schema
+      switch (profileScope) {
+        case ProfileScope.SOCIAL:
+          schema = ownerProfileSchema
+          break
+        case ProfileScope.DATING:
+          schema = ownerDatingProfileSchema
+          break
+      }
+
+      try {
+        const updated = profileService.setProfileImage(req.user.userId, profileScope, imageId)
+        // validate with your ownerProfileSchema so the shape is safe
+        const safe = schema.parse(updated)
+        return reply
+          .code(200)
+          .send({ success: true, profile: safe })
+      } catch (err) {
+        fastify.log.error('Error setting main profile image:', err)
+        return sendError(reply, 500, 'Failed to set profile image')
+      }
+    }
+  )
 
   /***
    * Get all images for a user

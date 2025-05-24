@@ -18,8 +18,8 @@ import {
 
 import {
   ownerProfileImageSchema,
-  OwnerProfileImageSchema,
-  PublicProfileImageSchema,
+  OwnerProfileImage,
+  PublicProfileImage,
   publicProfileImageSchema,
   type CreateProfileImageSchema
 } from '@zod/media.schema';
@@ -159,7 +159,7 @@ export class ImageGalleryService {
    * Add the public URL to the image object and sanitize it
    * by removing any non-public fields
    */
-  toPublicProfileImage(image: ProfileImage): PublicProfileImageSchema {
+  toPublicProfileImage(image: ProfileImage): PublicProfileImage {
     image.url = this.getImageUrl(image);
     return publicProfileImageSchema.parse(image)
   }
@@ -168,7 +168,7 @@ export class ImageGalleryService {
    * Add the public URL to the image object and sanitize it
    * by removing fields that are not accessible to the owner
    */
-  toOwnerProfileImage(image: ProfileImage): OwnerProfileImageSchema {
+  toOwnerProfileImage(image: ProfileImage): OwnerProfileImage {
     image.url = this.getImageUrl(image);
     return ownerProfileImageSchema.parse(image)
   }

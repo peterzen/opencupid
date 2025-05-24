@@ -2,6 +2,7 @@ import { prisma } from '../lib/prisma'
 import { Profile, ProfileImage, ProfileTag, Prisma } from '@prisma/client'
 import { Tag } from '@prisma/client'
 import { ConnectionTypeType, DatingProfile } from '@zod/generated'
+import { AnyProfile, ProfileScope } from '@zod/profile.schema'
 import cuid from 'cuid'
 
 // Define types for service return values
@@ -112,10 +113,11 @@ export class ProfileService {
 
   async updateProfile(userId: string, data: Prisma.ProfileUpdateInput): Promise<Profile> {
     return prisma.profile.update({
-      where: {  userId: userId },
+      where: { userId: userId },
       data
     })
   }
+
   async updateDatingProfile(userId: string, data: Prisma.DatingProfileUpdateInput): Promise<DatingProfile> {
     return prisma.datingProfile.update({
       where: { userId: userId },
@@ -123,22 +125,50 @@ export class ProfileService {
     })
   }
 
-  async setProfileImage(profileId: string, imageId: string): Promise<Profile> {
-    return prisma.profile.update({
-      where: { id: profileId },
+  async setProfileImage(userId: string, profileScope: ProfileScope, imageId: string): Promise<AnyProfile> {
+    const update = {
+      where: { userId },
       data: {
-        profileImage: {
+        otherImages: {
           connect: { id: imageId }
         }
       }
-    })
+    }
+    switch (profileScope) {
+      case ProfileScope.SOCIAL:
+        return prisma.profile.update(update)
+      case ProfileScope.DATING:
+        return prisma.datingProfile.update(update)
+      default:
+        throw new Error(`Invalid profile scope: ${profileScope}`)
+    }
   }
 
+  public async addImageToProfile(userId: string, profileScope: ProfileScope, imageId: string): Promise<AnyProfile> {
+    const update = {
+      where: { userId },
+      data: {
+        otherImages: {
+          connect: { id: imageId }
+        }
+      },
+      include: {
+        otherImages: true
+      }
+    }
+    switch (profileScope) {
+      case ProfileScope.SOCIAL:
+        return prisma.profile.update(update)
+      case ProfileScope.DATING:
+        return prisma.datingProfile.update(update)
+      default:
+        throw new Error(`Invalid profile scope: ${profileScope}`)
+    }
+  }
 
-  async addProfileTag(profileId: string, tagId: number): Promise<ProfileTag> {
+  async addProfileTag(profileId: string, profileScope: ProfileScope, tagId: number): Promise<ProfileTag> {
     return prisma.profileTag.create({
       data: {
-        id: cuid(),
         profile: {
           connect: { id: profileId }
         },

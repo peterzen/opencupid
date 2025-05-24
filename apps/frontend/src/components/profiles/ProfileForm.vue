@@ -1,5 +1,12 @@
 <template>
   <div class="col-md-8 offset-md-2">
+
+    <div class="mb-4">
+      <div class="col-sm-6">
+        <ImageUpload @image:uploaded="emit('update:modelValue', formData)" />
+      </div>
+    </div>
+
     <FormKit type="form"
              :actions="false"
              :disabled="isLoading"
@@ -95,6 +102,7 @@ import { getCountryOptions } from '@/lib/countries';
 
 import Multiselect from 'vue-multiselect'
 import ErrorComponent from '@/components/ErrorComponent.vue'
+import ImageUpload from './ImageUpload.vue'
 
 // Props & Emits
 const props = defineProps<{

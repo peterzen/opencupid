@@ -35,8 +35,7 @@ const publicProfileImageFields = {
 export const publicProfileImageSchema = ProfileImageSchema
   .pick(publicProfileImageFields)
 
-
-export type PublicProfileImageSchema = z.infer<typeof publicProfileImageSchema>;
+export type PublicProfileImage = z.infer<typeof publicProfileImageSchema>;
 
 export const ownerProfileImageSchema = ProfileImageSchema
   .pick({
@@ -49,7 +48,7 @@ export const ownerProfileImageSchema = ProfileImageSchema
     otherForProfiles: z.array(ProfileSchema).optional(),
   });
 
-export type OwnerProfileImageSchema = z.infer<typeof ownerProfileImageSchema>;
+export type OwnerProfileImage = z.infer<typeof ownerProfileImageSchema>;
 
 const createProfileImageSchema = ProfileImageSchema.pick({
   userId: true,

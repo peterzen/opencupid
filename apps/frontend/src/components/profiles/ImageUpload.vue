@@ -65,7 +65,7 @@ import type { ProfileImage } from '@zod/generated'
 import { useProfileStore } from '@/store/profileStore'
 
 import AvatarUploadIcon from '@/assets/icons/files/avatar-upload.svg'
-import { PublicProfileImageSchema } from '@zod/media.schema'
+import { PublicProfileImage } from '@zod/media.schema'
 
 const profileStore = useProfileStore()
 
@@ -80,7 +80,7 @@ const captionText = ref<string>('')
 
 // Emitters
 const emit = defineEmits<{
-  (e: 'image:uploaded', payload: PublicProfileImageSchema): void
+  (e: 'image:uploaded', payload: PublicProfileImage): void
   (e: 'image:deleted', payload: { id: string }): void
 }>()
 

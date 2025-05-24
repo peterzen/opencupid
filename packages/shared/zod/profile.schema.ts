@@ -1,17 +1,20 @@
 import { z } from 'zod'
-import { ConnectionTypeSchema, DatingPreferenceSchema, DatingProfileSchema, ProfileImageSchema, ProfileSchema } from '@zod/generated'
+import { ConnectionTypeSchema, DatingPreferenceSchema, DatingProfile, DatingProfileSchema, Profile, ProfileImageSchema, ProfileSchema } from '@zod/generated'
 
 import { publicTagSchema } from './tags.schema';
+import { ownerProfileImageSchema, publicProfileImageSchema } from './media.schema';
 
 export const UpdateProfileSchema = ProfileSchema.partial() // Allow partial updates
 
-// CreateProfileSchema using Zod with minimal duplication
-export const CreateProfileSchema = z.object({
-  // publicName: z.string().min(1, 'Public name is required'),
-  lookingFor: z.array(ConnectionTypeSchema).nonempty({ message: 'Select at least one connection type' }),
-});
 
-export type CreateProfileInput = z.infer<typeof CreateProfileSchema>;
+export enum ProfileScope {
+  DATING = 'dating',
+  SOCIAL = 'social'
+}
+
+export type AnyProfile = Profile | DatingProfile
+
+export const profileScopeSchema = z.nativeEnum(ProfileScope)
 
 const publicProfileFields = {
   id: true,
@@ -22,10 +25,11 @@ const publicProfileFields = {
   country: true,
 } as const;
 
+export type PublicProfile = z.infer<typeof publicProfileSchema>;
 export const publicProfileSchema = ProfileSchema
   .pick(publicProfileFields)
   .extend({
-    // profileImage: ProfileImageSchema.optional(),
+    profileImage: publicProfileImageSchema.nullable().optional(),
     otherImages: z.array(ProfileImageSchema).optional(),
     tags: z.array(publicTagSchema)
   });
@@ -37,10 +41,12 @@ export const ownerProfileSchema = ProfileSchema
     id: true,
     isActive: true,
   }).extend({
-    tags: z.array(publicTagSchema).optional(),
-    // profileImage: ProfileImageSchema.optional(),
+    profileImage: ownerProfileImageSchema.nullable().optional(),
     otherImages: z.array(ProfileImageSchema).optional(),
+    tags: z.array(publicTagSchema).optional(),
   });
+
+export type OwnerProfile = z.infer<typeof ownerProfileSchema>;
 
 
 const publicDatingProfileFields = {
