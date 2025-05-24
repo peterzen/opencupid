@@ -47,13 +47,15 @@ import ImageUpload from '@/components/profiles/ImageUpload.vue'
 import LoadingComponent from '@/components/LoadingComponent.vue'
 import ProfileImageComponent from '@/components/profiles/ProfileImageComponent.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { OwnerProfile } from '@zod/profile.schema'
 
 const profileStore = useProfileStore()
 
 const images = ref<ProfileImage[]>([])
 const isLoading = ref(false)
 const isRemoving = reactive<Record<string, boolean>>({})
-const myProfile = ref<Profile | null>(null)
+const profile = ref<OwnerProfile | null>(null)
+
 /**
  * Fetch all images for current user
  */
@@ -86,9 +88,9 @@ async function remove(image: ProfileImage) {
 
 onMounted(async () => {
   isLoading.value = true
-  const { profile, datingProfile } = await profileStore.getUserProfiles()
+  const fetched = await profileStore.getUserProfile()
   isLoading.value = false;
-  myProfile.value = profile;
+  profile.value = fetched;
 
   fetchImages()
 })

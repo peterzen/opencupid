@@ -38,7 +38,7 @@
                    input-class="form-control-lg"
                    name="temperature"
                    number="integer"
-                   v-model="birthYear"
+                   v-model="birthYear!"
                    step="1"
                    min="1920"
                    :max="birthYearMax"
@@ -63,7 +63,7 @@
         </div>
 
         <div class="mb-3">
-          <FormKit v-model="formData.gender"
+          <FormKit v-model="formData.gender!"
                    type="radio"
                    label=""
                    :options="genderOptions"
@@ -92,7 +92,7 @@
         </div>
 
         <div class="mb-3">
-          <FormKit v-model="formData.relationship"
+          <FormKit v-model="formData.relationship!"
                    type="radio"
                    label=""
                    :options="relationshipStatusOptions"
@@ -118,7 +118,7 @@
         </div>
 
         <div class="mb-4">
-          <FormKit v-model="formData.hasKids"
+          <FormKit v-model="formData.hasKids!"
                    type="radio"
                    label=""
                    :options="haveKidsRadioOptions"
@@ -128,7 +128,7 @@
         <div class="mb-3">
           <FormKit type="textarea"
                    input-class="form-control-lg"
-                   v-model="formData.intro"
+                   v-model="formData.introDating"
                    label="A few words about me..."
                    auto-height
                    :validation-messages="{
@@ -156,20 +156,20 @@
 <script setup lang="ts">
 import { reactive, ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { DatingProfile } from '@zod/generated'
 import { getGenderOptions, getHasKidsOptionsOptions, getRelationshipStatusOptions } from '@/lib/i18n'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import ImageUpload from './ImageUpload.vue'
+import { OwnerProfile, UpdateProfile } from '@zod/profile.schema'
 
 // Props & Emits
 const props = defineProps<{
-  modelValue: DatingProfile
+  modelValue: OwnerProfile
   isLoading: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: DatingProfile): void
-  (e: 'submit', value: DatingProfile): void
+  (e: 'update:modelValue', value: UpdateProfile): void
+  (e: 'submit', value: UpdateProfile): void
 }>()
 
 // i18n
@@ -178,7 +178,7 @@ const { t } = useI18n()
 console.log('DatingProfileForm', props.modelValue)
 
 // Local form state
-const formData = reactive<DatingProfile>({ ...props.modelValue })
+const formData = reactive<OwnerProfile>({ ...props.modelValue })
 
 const error = ref('')
 

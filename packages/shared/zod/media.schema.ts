@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DatingProfileSchema, ProfileImageSchema, ProfileSchema } from './generated';
+import { ProfileImageSchema, ProfileSchema } from './generated';
 
 // XXX this dooesn't work with the present multipart setup
 // without the `attachFieldsToBody: true` option, 
@@ -43,8 +43,6 @@ export const ownerProfileImageSchema = ProfileImageSchema
     id: true,
   }).extend({
     primaryForProfile: ProfileSchema.optional(),
-    primaryForDatingProfile: DatingProfileSchema.optional(),
-    otherForDatingProfiles: z.array(DatingProfileSchema).optional(),
     otherForProfiles: z.array(ProfileSchema).optional(),
   });
 

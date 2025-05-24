@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
-// import { ProfileSchema } from '@zod/generated'
-import type { ConnectionTypeType, DatingProfile, Profile, ProfileImage } from '@zod/generated'
-import type {PublicProfile, OwnerProfile} from '@zod/profile.schema'
+import type { Profile, ProfileImage } from '@zod/generated'
+import type { OwnerProfile, UpdateProfile } from '@zod/profile.schema'
 
 import { OwnerProfileImage, PublicProfileImage } from '@zod/media.schema'
 
@@ -27,25 +26,17 @@ type UploadResponse = UploadSuccess | UploadError
 export const useProfileStore = defineStore('profile', {
   state: () => ({
     profile: {} as null | OwnerProfile, // Current user's profile
-    datingProfile: {} as null | DatingProfile, // Current user's dating profile
-    selectedProfile: null as null | Record<string, any>, // Profile fetched by ID
     profileImages: [] as OwnerProfileImage[], // List of profile images
-    datingProfileImages: [] as OwnerProfileImage[], // List of dating profile images
   }),
 
   actions: {
     // Fetch the current user's profile
-    async getUserProfiles() {
+    async getUserProfile():Promise<OwnerProfile> {
       try {
         const res = await axios.get('/profiles/me')
-        this.profile = res.data.profile as Profile
-        this.datingProfile = res.data.datingProfile as DatingProfile
+        this.profile = res.data.profile as OwnerProfile
         console.log('Fetched user profile:', this.profile)
-        console.log('Fetched user dating profile:', this.datingProfile)
-        return {
-          profile: this.profile,
-          datingProfile: this.datingProfile,
-        }
+        return this.profile
       } catch (error: any) {
         console.error('Failed to fetch user profile:', error)
         throw error.response?.data?.message || 'Failed to fetch user profile'
@@ -56,8 +47,7 @@ export const useProfileStore = defineStore('profile', {
     async findProfile(profileId: string) {
       try {
         const res = await axios.get(`/profiles/${profileId}`)
-        this.selectedProfile = res.data.profile
-        return this.selectedProfile
+        return res.data.profile
       } catch (error: any) {
         console.error('Failed to fetch profile:', error)
         throw error.response?.data?.message || 'Failed to fetch profile'
@@ -65,28 +55,18 @@ export const useProfileStore = defineStore('profile', {
     },
 
     // Update the current user's social profile
-    async updateProfile(profileData: Partial<Profile>) {
+    async updateProfile(profileData: Partial<OwnerProfile> & UpdateProfile): Promise<OwnerProfile> {
       try {
         const res = await axios.patch('/profiles/profile', profileData)
         this.profile = res.data.profile
-        return this.profile as Profile
+        return this.profile as OwnerProfile
       } catch (error: any) {
-        console.error('Failed to update profile:', error)
+        console.error('Store: cannot to update profile:', error)
         throw error.response?.data?.message || 'Failed to update profile'
       }
     },
 
-    // Update the current user's dating profile
-    async updateDatingProfile(profileData: Partial<DatingProfile>) {
-      try {
-        const res = await axios.patch(`/profiles/dating`, profileData)
-        this.datingProfile = res.data.profile
-        return this.profile as DatingProfile
-      } catch (error: any) {
-        console.error('Failed to update profile:', error)
-        throw error.response?.data?.message || 'Failed to update profile'
-      }
-    },
+
 
     async uploadProfileImage(
       file: File,
@@ -118,10 +98,10 @@ export const useProfileStore = defineStore('profile', {
       }
     },
 
-     /** 
-     * Set the “main” profile image.
-     * Calls POST /profiles/image/:imageId/main
-     */
+    /** 
+    * Set the “main” profile image.
+    * Calls POST /profiles/image/:imageId/main
+    */
     async setProfileImage(imageId: string) {
       try {
         const { data } = await axios.post<{ success: true; profile: OwnerProfile }>(
@@ -175,7 +155,7 @@ export const useProfileStore = defineStore('profile', {
 
     async getUserImages() {
       try {
-        const res = await axios.get('/profiles/user-images')
+        const res = await axios.get('/profiles/image/list')
         return res.data.images as ProfileImage[]
       } catch (error: any) {
         console.error('Failed to fetch user profile:', error)

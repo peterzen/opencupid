@@ -3,12 +3,9 @@ import multipart, { MultipartValue } from '@fastify/multipart';
 
 import { validateBody } from '@utils/zodValidate'
 import {
-  ownerDatingProfileSchema,
   ownerProfileSchema,
-  ProfileScope,
   publicProfileSchema,
-  UpdateDatingProfileSchema,
-  UpdateProfileSchema
+  updateProfileSchema
 } from '@zod/profile.schema'
 
 import { ProfileService } from 'src/services/profile.service'
@@ -20,9 +17,8 @@ import { z } from 'zod';
 
 
 
-const imageScopeParamsSchema = z.object({
+const attachImageParamsSchema = z.object({
   imageId: z.string().uuid(),        // or whatever format your IDs are
-  profileScope: z.nativeEnum(ProfileScope)
 })
 
 
@@ -55,13 +51,11 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       return sendError(reply, 401, 'Unauthorized')
     }
     try {
-      const { profile, datingProfile } = await profileService.getAllProfilesByUserId(req.user.userId)
+      const profile = await profileService.getProfileByUserId(req.user.userId)
       if (!profile) return sendError(reply, 404, 'Social profile not found')
-      if (!datingProfile) return sendError(reply, 404, 'Dating profile not found')
 
       const safeProfile = ownerProfileSchema.parse(profile)
-      const safeDatingProfile = ownerDatingProfileSchema.parse(datingProfile)
-      return reply.code(200).send({ success: true, profile: safeProfile, datingProfile: safeDatingProfile })
+      return reply.code(200).send({ success: true, profile: safeProfile})
     } catch (err) {
       fastify.log.error(err)
       return sendError(reply, 500, 'Failed to load profiles')
@@ -108,7 +102,7 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     if (!req.user.userId) {
       return sendError(reply, 401, 'Unauthorized')
     }
-    const data = await validateBody(UpdateProfileSchema, req, reply)
+    const data = await validateBody(updateProfileSchema, req, reply)
     if (!data) return
     try {
       const updated = await profileService.updateProfile(req.user.userId, data)
@@ -122,23 +116,6 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     }
   })
 
-  // Update an existing profile
-  fastify.patch('/dating', { onRequest: [fastify.authenticate] }, async (req, reply) => {
-    if (!req.user.userId) {
-      return sendError(reply, 401, 'Unauthorized')
-    }
-    const data = await validateBody(UpdateDatingProfileSchema, req, reply)
-    if (!data) return
-    try {
-      const updated = await profileService.updateDatingProfile(req.user.userId, data)
-      if (!updated) return sendError(reply, 404, 'Dating profile not found')
-      const datingProfile = ownerDatingProfileSchema.parse(updated)
-      return reply.code(200).send({ success: true, datingProfile })
-    } catch (err) {
-      fastify.log.error(err)
-      return sendError(reply, 500, 'Failed to update dating profile')
-    }
-  })
 
   // Single file upload route
   fastify.post('/image', {
@@ -177,10 +154,9 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
 
     const captionText = (
       ((Array.isArray(fileUpload.fields.captionText)
-        ? fileUpload.fields.captionText[0]
+        ? fileUpload.fields.captionText[0] 
         : fileUpload.fields.captionText) as MultipartValue
-      ).value ?? '')
-
+      ).value ?? '') as string
 
     try {
       const stored = await imageGalleryService.storeImage(req.user.userId, fileUpload, captionText)
@@ -211,20 +187,18 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
 
   // Attach an image to the profile’s “otherImages” list
   fastify.post(
-    '/image/:imageId/:profileScope/other',
+    '/image/:imageId/other',
     { onRequest: [fastify.authenticate] },
     async (req, reply) => {
       if (!req.user.userId) {
         return sendError(reply, 401, 'Unauthorized')
       }
-      const { imageId, profileScope } = imageScopeParamsSchema.parse(req.params)
-
-      const schema = profileScope === ProfileScope.SOCIAL ? ownerProfileSchema : ownerDatingProfileSchema
+      const { imageId } = attachImageParamsSchema.parse(req.params)
 
       try {
-        const updated = profileService.addImageToProfile(req.user.userId, profileScope, imageId)
+        const updated = profileService.addImageToProfile(req.user.userId,  imageId)
         if (!updated) return sendError(reply, 404, 'Profile not found')
-        const profile = schema.parse(updated)
+        const profile = ownerProfileSchema.parse(updated)
         // return only the newly‐attached images
         return reply
           .code(200)
@@ -238,28 +212,18 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
 
   // Set the primary profileImage
   fastify.post(
-    '/image/:imageId/:profileScope/primary',
+    '/image/:imageId/primary',
     { onRequest: [fastify.authenticate] },
     async (req, reply) => {
       if (!req.user.userId) {
         return sendError(reply, 401, 'Unauthorized')
       }
-      const { imageId, profileScope } = imageScopeParamsSchema.parse(req.params)
-
-      let schema
-      switch (profileScope) {
-        case ProfileScope.SOCIAL:
-          schema = ownerProfileSchema
-          break
-        case ProfileScope.DATING:
-          schema = ownerDatingProfileSchema
-          break
-      }
+      const { imageId } = attachImageParamsSchema.parse(req.params)
 
       try {
-        const updated = profileService.setProfileImage(req.user.userId, profileScope, imageId)
+        const updated = profileService.setProfileImage(req.user.userId, imageId)
         // validate with your ownerProfileSchema so the shape is safe
-        const safe = schema.parse(updated)
+        const safe = ownerProfileSchema.parse(updated)
         return reply
           .code(200)
           .send({ success: true, profile: safe })
@@ -273,7 +237,7 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
   /***
    * Get all images for a user
    */
-  fastify.get('/user-images', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+  fastify.get('/image/list', { onRequest: [fastify.authenticate] }, async (req, reply) => {
     if (!req.user.userId) {
       return sendError(reply, 401, 'Unauthorized')
     }

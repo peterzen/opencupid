@@ -2,29 +2,30 @@
 import { computed } from 'vue'
 import ToggleSwitch from '@/components/ToggleSwitch.vue'
 import { useI18n } from 'vue-i18n';
+import { ConnectionTypeType } from '@zod/generated';
 
 const { t } = useI18n()
 
 // Props
 const props = defineProps<{
-  profileActive: boolean
-  datingActive: boolean
-  activeTab: string
+  isSocialActive: boolean
+  isDatingActive: boolean
+  activeTab: ConnectionTypeType
 }>()
 
 // Emits
 const emit = defineEmits<{
-  (e: 'update:profileActive', val: boolean): void
-  (e: 'update:datingActive', val: boolean): void
-  (e: 'update:selectTab', tab: string): void
+  (e: 'update:isSocialActive', val: boolean): void
+  (e: 'update:isDatingActive', val: boolean): void
+  (e: 'update:selectTab', tab: ConnectionTypeType): void
 }>()
 
 // Computed disabling logic
 const friendsToggleDisabled = computed(() =>
-  props.profileActive && !props.datingActive
+  props.isSocialActive && !props.isDatingActive
 )
 const datingToggleDisabled = computed(() =>
-  props.datingActive && !props.profileActive
+  props.isDatingActive && !props.isSocialActive
 )
 
 </script>
@@ -34,33 +35,33 @@ const datingToggleDisabled = computed(() =>
   <ul class="nav nav-tabs nav-fill">
     <li class="nav-item">
       <span class="nav-link text-start"
+            :class="{ active: activeTab === 'friend' }">
+
+        <ToggleSwitch value="friend"
+                      :disabled="false"
+                      label=""
+                      @update:modelValue="val => $emit('update:isSocialActive', val)"
+                      :modelValue="isSocialActive" />
+        <a class="tab-switch"
+           @click="$emit('update:selectTab', 'friend')">
+          {{ t('general.connectiontypes.socializing') }}
+        </a>
+      </span>
+    </li>
+    <li class="nav-item">
+      <span class="nav-link text-start"
             :class="{ active: activeTab === 'dating' }">
         <ToggleSwitch value="dating"
                       :disabled="false"
                       label=""
-                      @update:modelValue="val => $emit('update:datingActive', val)"
-                      :modelValue="datingActive" />
+                      @update:modelValue="val => $emit('update:isDatingActive', val)"
+                      :modelValue="isDatingActive" />
         <a class="tab-switch"
            @click="$emit('update:selectTab', 'dating')">
           {{ t('general.connectiontypes.dating') }}
         </a>
       </span>
 
-    </li>
-    <li class="nav-item">
-      <span class="nav-link text-start"
-            :class="{ active: activeTab === 'friend' }">
-
-        <ToggleSwitch value="friend"
-                      :disabled="false"
-                      label=""
-                      @update:modelValue="val => $emit('update:profileActive', val)"
-                      :modelValue="profileActive" />
-        <a class="tab-switch"
-           @click="$emit('update:selectTab', 'friend')">
-          {{ t('general.connectiontypes.socializing') }}
-        </a>
-      </span>
     </li>
   </ul>
 </template>

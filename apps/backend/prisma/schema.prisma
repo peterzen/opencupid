@@ -54,7 +54,7 @@ enum RelationshipStatus {
 }
 
 model Tag {
-  id               Int              @id @default(autoincrement())
+  id               String           @id @default(cuid())
   slug             String           @unique
   name             String           @unique
   translations     TagTranslation[]
@@ -71,7 +71,7 @@ model Tag {
 model TagTranslation {
   id     Int    @id @default(autoincrement())
   tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
-  tagId  Int
+  tagId  String
   locale String // e.g. "en", "de", "fr"
   name   String // e.g. "Farm stay", "Ferien auf dem Bauernhof"
 
@@ -81,16 +81,12 @@ model TagTranslation {
 model ProfileTag {
   id    String @id @default(cuid())
   tag   Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
-  tagId Int
+  tagId String
 
   profileId String?
   profile   Profile? @relation(fields: [profileId], references: [id])
 
-  datingProfileId String?
-  datingProfile   DatingProfile? @relation(fields: [datingProfileId], references: [id])
-
   @@unique([profileId, tagId])
-  @@unique([datingProfileId, tagId])
 }
 
 model DatingPreference {
@@ -100,9 +96,10 @@ model DatingPreference {
 
   latitude   Float?
   longitude  Float?
+  prefRadius Int?             @default(50) // in km
   prefGender PreferenceGender @default(any)
 
-  profile DatingProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  isLocationActive Boolean @default(false)
 }
 
 model ConnectionRequest {
@@ -133,20 +130,22 @@ model User {
   language                String?   @default("en")
 
   // relations
-  profile       Profile?       @relation
-  datingProfile DatingProfile? @relation
-  ProfileImage  ProfileImage[]
+  profile      Profile?       @relation
+  ProfileImage ProfileImage[]
 
   requestsSent     ConnectionRequest[] @relation("RequestsSent")
   requestsReceived ConnectionRequest[] @relation("RequestsReceived")
 }
 
 model Profile {
-  id         String @id @default(cuid())
-  publicName String
-  intro      String
-  country    String @default("")
-  city       String @default("")
+  id          String @id @default(cuid())
+  publicName  String
+  country     String @default("")
+  city        String @default("")
+  introSocial String @default("")
+
+  isSocialActive Boolean @default(false)
+  isDatingActive Boolean @default(false)
 
   isActive   Boolean @default(true)
   isReported Boolean @default(false)
@@ -154,6 +153,12 @@ model Profile {
 
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
+
+  introDating  String              @default("")
+  birthday     DateTime?
+  gender       Gender?
+  relationship RelationshipStatus?
+  hasKids      HasKids?
 
   tags ProfileTag[]
 
@@ -163,35 +168,6 @@ model Profile {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
-
-model DatingProfile {
-  id           String              @id @default(cuid())
-  publicName   String              @default("")
-  intro        String              @default("")
-  country      String              @default("")
-  city         String              @default("")
-  birthday     DateTime?
-  gender       Gender?
-  relationship RelationshipStatus?
-  hasKids      HasKids?
-
-  isActive   Boolean @default(true)
-  isReported Boolean @default(false)
-  isBlocked  Boolean @default(false)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id])
-
-  datingPreference DatingPreference?
-  tags             ProfileTag[]
-
-  profileImageId String?        @unique
-  profileImage   ProfileImage?  @relation(name: "DatingProfilePrimaryImage", fields: [profileImageId], references: [id])
-  otherImages    ProfileImage[] @relation(name: "DatingProfileOtherImages")
 }
 
 model ProfileImage {
@@ -204,10 +180,8 @@ model ProfileImage {
   storagePath String  @unique
   url         String?
 
-  primaryForProfile       Profile?        @relation("ProfilePrimaryImage")
-  otherForProfiles        Profile[]       @relation("ProfileOtherImages")
-  primaryForDatingProfile DatingProfile?  @relation("DatingProfilePrimaryImage")
-  otherForDatingProfiles  DatingProfile[] @relation("DatingProfileOtherImages")
+  primaryForProfile Profile?  @relation("ProfilePrimaryImage")
+  otherForProfiles  Profile[] @relation("ProfileOtherImages")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

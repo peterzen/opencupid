@@ -77,7 +77,7 @@
                     max: 'Name must be less than 50 characters long'
                   }"
                    validation="required"
-                   v-model="formData.intro" />
+                   v-model="formData.introSocial" />
         </div>
       </fieldset>
       <ErrorComponent :error="error" />
@@ -103,15 +103,17 @@ import { getCountryOptions } from '@/lib/countries';
 import Multiselect from 'vue-multiselect'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import ImageUpload from './ImageUpload.vue'
+import { OwnerProfile, UpdateProfile } from '@zod/profile.schema';
 
 // Props & Emits
 const props = defineProps<{
-  modelValue: Profile
+  modelValue: OwnerProfile
   isLoading: boolean
 }>()
+
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: Profile): void
-  (e: 'submit', value: Profile): void
+  (e: 'update:modelValue', value: UpdateProfile): void
+  (e: 'submit', value: UpdateProfile): void
 }>()
 
 // i18n
@@ -121,7 +123,7 @@ console.log('ProfileForm', props.modelValue)
 
 
 // Local form state
-const formData = reactive<Profile>({ ...props.modelValue })
+const formData = reactive<OwnerProfile>({ ...props.modelValue })
 
 const error = ref('')
 
