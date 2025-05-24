@@ -6,7 +6,20 @@ import env from './env'
 import './workers/emailWorker'   // ← side‐effect: starts the worker
 import { checkUploadBaseDir } from './lib/media'
 
-const app = Fastify({ logger: true })
+const app = Fastify({
+  logger: {
+    transport: process.env.NODE_ENV === 'production'
+      ? undefined
+      : {
+        target: 'pino-pretty',
+        options: {
+          colorize: true,
+          translateTime: 'HH:MM:ss Z',
+          ignore: 'pid,hostname'
+        }
+      }
+  }
+})
 
 // Register CORS plugin
 app.register(cors, {
