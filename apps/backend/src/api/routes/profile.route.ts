@@ -3,8 +3,13 @@ import multipart, { MultipartValue } from '@fastify/multipart';
 
 import { validateBody } from '@utils/zodValidate'
 import {
+  OwnerProfile,
   ownerProfileSchema,
+  ownerScalarSchema,
+  ProfileWithImages,
+  PublicProfile,
   publicProfileSchema,
+  publicScalarsSchema,
   updateProfileSchema
 } from '@zod/profile.schema'
 
@@ -14,14 +19,14 @@ import { uploadTmpDir } from 'src/lib/media';
 import { sendError } from '../helpers';
 import env from 'src/env';
 import { z } from 'zod';
+import { Profile, ProfileImage } from '@zod/generated';
+import { OwnerProfileImage, PublicProfileImage } from '@zod/media.schema';
 
 
 
 const attachImageParamsSchema = z.object({
-  imageId: z.string().uuid(),        // or whatever format your IDs are
+  imageId: z.string().cuid(),        // or whatever format your IDs are
 })
-
-
 
 const profileRoutes: FastifyPluginAsync = async (fastify) => {
 
@@ -42,6 +47,46 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
   const profileService = ProfileService.getInstance()
   const imageGalleryService = ImageGalleryService.getInstance();
 
+  function mapToOwner(profile: ProfileWithImages): OwnerProfile {
+    const safe = ownerScalarSchema.parse(profile)
+
+    // Transform each image using the service
+    const transformedProfileImage = profile.profileImage
+      ? imageGalleryService.toOwnerProfileImage(profile.profileImage)
+      : null
+
+    const transformedOtherImages = profile.otherImages.map((img: ProfileImage) =>
+      imageGalleryService.toOwnerProfileImage(img)
+    )
+
+    // Merge scalars (from safe) with your newly-shaped images
+    return {
+      ...safe,
+      profileImage: transformedProfileImage,
+      otherImages: transformedOtherImages,
+    }
+  }
+
+  function mapToPublic(profile: ProfileWithImages): PublicProfile {
+    // a) Strip private fields from the *scalars* (guaranteeing tags: string[])
+    const safe = publicScalarsSchema.parse(profile)
+
+    // b) Build the image bits
+    const transformedProfileImage = profile.profileImage
+      ? imageGalleryService.toPublicProfileImage(profile.profileImage)
+      : null
+
+    const transformedOtherImages = profile.otherImages.map((img: ProfileImage) =>
+      imageGalleryService.toPublicProfileImage(img)
+    )
+
+    return {
+      ...safe,
+      profileImage: transformedProfileImage,
+      otherImages: transformedOtherImages,
+    }
+  }
+
   /**
    * Get the current user's profile
    * @description This route retrieves the current user's social and dating profiles.
@@ -54,8 +99,9 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       const profile = await profileService.getProfileByUserId(req.user.userId)
       if (!profile) return sendError(reply, 404, 'Social profile not found')
 
-      const safeProfile = ownerProfileSchema.parse(profile)
-      return reply.code(200).send({ success: true, profile: safeProfile})
+      const safeProfile = mapToOwner(profile)
+      console.log('Returning profile:', safeProfile)
+      return reply.code(200).send({ success: true, profile: safeProfile })
     } catch (err) {
       fastify.log.error(err)
       return sendError(reply, 500, 'Failed to load profiles')
@@ -154,14 +200,14 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
 
     const captionText = (
       ((Array.isArray(fileUpload.fields.captionText)
-        ? fileUpload.fields.captionText[0] 
+        ? fileUpload.fields.captionText[0]
         : fileUpload.fields.captionText) as MultipartValue
       ).value ?? '') as string
 
     try {
       const stored = await imageGalleryService.storeImage(req.user.userId, fileUpload, captionText)
-      const publicImage = imageGalleryService.toOwnerProfileImage(stored)
-      return reply.code(200).send({ success: true, profileImage: publicImage })
+      const image = imageGalleryService.toOwnerProfileImage(stored)
+      return reply.code(200).send({ success: true, profileImage: image })
     } catch (err) {
       fastify.log.error('Error storing image:', err)
       return sendError(reply, 500, 'Failed to store image')
@@ -196,10 +242,9 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       const { imageId } = attachImageParamsSchema.parse(req.params)
 
       try {
-        const updated = profileService.addImageToProfile(req.user.userId,  imageId)
+        const updated = profileService.addImageToProfile(req.user.userId, imageId)
         if (!updated) return sendError(reply, 404, 'Profile not found')
         const profile = ownerProfileSchema.parse(updated)
-        // return only the newly‐attached images
         return reply
           .code(200)
           .send({ success: true, profile })
@@ -219,14 +264,17 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
         return sendError(reply, 401, 'Unauthorized')
       }
       const { imageId } = attachImageParamsSchema.parse(req.params)
+      console.log('Setting primary image for user:', req.user.userId, 'Image ID:', imageId)
 
       try {
-        const updated = profileService.setProfileImage(req.user.userId, imageId)
+        const updated = await profileService.setProfileImage(req.user.userId, imageId)
+        console.log('Updated profile after setting primary image:', updated)
         // validate with your ownerProfileSchema so the shape is safe
-        const safe = ownerProfileSchema.parse(updated)
+        // const safe = ownerProfileSchema.parse(updated)
+        // updated.profileImage = imageGalleryService.toOwnerProfileImage(safe.profileImage)
         return reply
           .code(200)
-          .send({ success: true, profile: safe })
+          .send({ success: true })
       } catch (err) {
         fastify.log.error('Error setting main profile image:', err)
         return sendError(reply, 500, 'Failed to set profile image')

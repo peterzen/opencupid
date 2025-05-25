@@ -1,6 +1,7 @@
 import { prisma } from '../lib/prisma'
 import { Profile, ProfileImage, ProfileTag, Prisma } from '@prisma/client'
 import { Tag } from '@prisma/client'
+import { OwnerProfile, ownerProfileSchema, PublicProfile, publicProfileSchema } from '@zod/profile.schema'
 
 // Define types for service return values
 export type ProfileWithImages = Profile & {
@@ -75,7 +76,7 @@ export class ProfileService {
     return prisma.profile.update({
       where: { userId },
       data: {
-        otherImages: {
+        profileImage: {
           connect: { id: imageId }
         }
       }
@@ -198,5 +199,13 @@ export class ProfileService {
         introSocial: ''
       }
     })
+  }
+
+  toPublicProfile(profile: Profile): PublicProfile {
+    return publicProfileSchema.parse(profile)
+  }
+
+  toOwnerProfile(profile: Profile): OwnerProfile {
+    return ownerProfileSchema.parse(profile)
   }
 }

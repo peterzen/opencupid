@@ -1,9 +1,14 @@
-import { z } from 'zod'
-import { ProfileImageSchema, ProfileSchema } from '@zod/generated'
+import type { Prisma } from "@prisma/client";
+import { z } from "zod";
+import { ProfileSchema } from "@zod/generated";
 
-import { publicTagSchema } from './tags.schema';
-import { ownerProfileImageSchema, publicProfileImageSchema } from './media.schema';
-
+import { publicTagSchema } from "./tags.schema";
+import {
+  OwnerProfileImage,
+  ownerProfileImageSchema,
+  PublicProfileImage,
+  publicProfileImageSchema,
+} from "./media.schema";
 
 const publicProfileFields = {
   id: true,
@@ -23,45 +28,54 @@ const publicDatingProfileFields = {
   isDatingActive: true,
 } as const;
 
+export const publicScalarsSchema = ProfileSchema.pick({
+  ...publicProfileFields,
+});
+
+export const publicProfileSchema = publicScalarsSchema.extend({
+  profileImage: publicProfileImageSchema.nullable().default(null),
+  otherImages: z.array(publicProfileImageSchema).default([]),
+  tags: z.array(publicTagSchema).default([]),
+});
+
 export type PublicProfile = z.infer<typeof publicProfileSchema>;
-export const publicProfileSchema = ProfileSchema
-  .pick({
-    ...publicProfileFields,
-  })
-  .extend({
-    profileImage: publicProfileImageSchema.nullable().optional(),
-    otherImages: z.array(ProfileImageSchema).optional(),
-    tags: z.array(publicTagSchema)
-  });
+
+export const publicDatingProfileSchema = ProfileSchema.pick({
+  ...publicProfileFields,
+  ...publicDatingProfileFields,
+}).extend({
+  profileImage: publicProfileImageSchema.nullable().default(null),
+  otherImages: z.array(publicProfileImageSchema).default([]),
+  tags: z.array(publicTagSchema).default([]),
+});
 
 export type PublicDatingProfile = z.infer<typeof publicDatingProfileSchema>;
-export const publicDatingProfileSchema = ProfileSchema
-  .pick({
-    ...publicProfileFields,
-    ...publicDatingProfileFields,
-  })
-  .extend({
-    profileImage: publicProfileImageSchema.nullable().optional(),
-    otherImages: z.array(ProfileImageSchema).optional(),
-    tags: z.array(publicTagSchema)
-  });
+
+export const ownerScalarSchema = ProfileSchema.pick({
+  ...publicProfileFields,
+  ...publicDatingProfileFields,
+  id: true,
+  isActive: true,
+});
+
+export const ownerProfileSchema = ownerScalarSchema.extend({
+  profileImage: ownerProfileImageSchema.nullable().default(null),
+  otherImages: z.array(ownerProfileImageSchema).default([]),
+  tags: z.array(publicTagSchema).default([]),
+});
 
 export type OwnerProfile = z.infer<typeof ownerProfileSchema>;
-export const ownerProfileSchema = ProfileSchema
-  .pick({
-    ...publicProfileFields,
-    ...publicDatingProfileFields,
-    id: true,
-    isActive: true,
-  }).extend({
-    profileImage: ownerProfileImageSchema.nullable().optional(),
-    otherImages: z.array(ProfileImageSchema).optional(),
-    tags: z.array(publicTagSchema).optional(),
-  });
-
 
 export const updateProfileSchema = ProfileSchema.pick({
   ...publicProfileFields,
   ...publicDatingProfileFields,
-}).partial() // Allow partial updates
+}).partial();
+
 export type UpdateProfile = z.infer<typeof updateProfileSchema>;
+
+export type ProfileWithImages = Prisma.ProfileGetPayload<{
+  include: {
+    profileImage: true;
+    otherImages: true
+  }
+}>;

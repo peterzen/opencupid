@@ -100,15 +100,15 @@ export const useProfileStore = defineStore('profile', {
 
     /** 
     * Set the “main” profile image.
-    * Calls POST /profiles/image/:imageId/main
+    * Calls POST /profiles/image/:imageId/primary
     */
     async setProfileImage(imageId: string) {
       try {
-        const { data } = await axios.post<{ success: true; profile: OwnerProfile }>(
-          `/profiles/image/${imageId}/main`
+        const res = await axios.post<{ success: true; profile: OwnerProfile }>(
+          `/profiles/image/${imageId}/primary`
         )
         // update the entire profile (including new profileImage)
-        this.profile = data.profile
+        this.profile = res.data.profile
         return { success: true }
       } catch (err: unknown) {
         let msg = 'Failed to set profile image'
