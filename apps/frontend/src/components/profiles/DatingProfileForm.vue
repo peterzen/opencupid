@@ -2,9 +2,12 @@
   <div class="col-md-8 offset-md-2">
 
 
-    <div class="mb-4">
-      <div class="col-sm-6 offset-sm-3">
-        <ImageUpload @image:uploaded="emit('update:modelValue', formData)" />
+    <div class="mb-4 row">
+      <div class="col-sm-6">
+        <ProfileImageComponent :image="formData.profileImage" v-if="formData.profileImage"/>
+      </div>
+      <div class="col-sm-6">
+        <ImageUpload @image:uploaded="handleImageUploaded" />
       </div>
     </div>
 
@@ -160,6 +163,8 @@ import { getGenderOptions, getHasKidsOptionsOptions, getRelationshipStatusOption
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import ImageUpload from './ImageUpload.vue'
 import { OwnerProfile, UpdateProfile } from '@zod/profile.schema'
+import { OwnerProfileImage } from '@zod/media.schema'
+import ProfileImageComponent from './ProfileImageComponent.vue'
 
 // Props & Emits
 const props = defineProps<{
@@ -169,6 +174,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: UpdateProfile): void
+  (e: 'update:profileImage', value: OwnerProfileImage): void
   (e: 'submit', value: UpdateProfile): void
 }>()
 
@@ -208,5 +214,13 @@ const birthYearMax = computed(() => {
 // Submit handler
 function submitForm() {
   emit('submit', { ...formData })
+}
+
+function handleImageUploaded(image: OwnerProfileImage) {
+  console.log('Image uploaded:', image)
+  formData.profileImage = image
+  // emit('submit', { ...formData })
+  emit('update:profileImage',image)
+  emit('update:modelValue', formData)
 }
 </script>

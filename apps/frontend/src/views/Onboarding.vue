@@ -14,6 +14,7 @@
            class="tab-pane active">
         <div class="mt-4">
           <DatingProfileForm :isLoading="isLoading"
+                             @update:profileImage="handleProfileImage"
                              :modelValue="profile"
                              @submit="saveProfile" />
         </div>
@@ -23,6 +24,7 @@
         <div class="mt-4">
           <ProfileForm :isLoading="isLoading"
                        v-model="profile"
+                       @update:profileImage="handleProfileImage"
                        @submit="saveProfile" />
         </div>
       </div>
@@ -40,6 +42,7 @@ import ProfileForm from '@/components/profiles/ProfileForm.vue'
 import DatingProfileForm from '@/components/profiles/DatingProfileForm.vue'
 import { OwnerProfile, UpdateProfile } from '@zod/profile.schema'
 import { ConnectionTypeType } from '@zod/generated'
+import { OwnerProfileImage } from '@zod/media.schema'
 
 const profileStore = useProfileStore()
 
@@ -71,6 +74,18 @@ async function saveProfile(formData: UpdateProfile) {
   } finally {
     state.isLoading = false
   }
+}
+
+async function handleProfileImage(image: OwnerProfileImage) {
+  console.log('handleProfileImage', image)
+  try {
+    await profileStore.setProfileImage(image.id)
+  } catch (err: any) {
+    state.error = err.message || 'An error occurred while updating the profile image.'
+  }
+  Object.assign(state.profile, {
+    profileImage: image
+  })
 }
 
 onMounted(async () => {

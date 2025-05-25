@@ -65,7 +65,7 @@ import type { ProfileImage } from '@zod/generated'
 import { useProfileStore } from '@/store/profileStore'
 
 import AvatarUploadIcon from '@/assets/icons/files/avatar-upload.svg'
-import { PublicProfileImage } from '@zod/media.schema'
+import { OwnerProfileImage, PublicProfileImage } from '@zod/media.schema'
 
 const profileStore = useProfileStore()
 
@@ -80,7 +80,7 @@ const captionText = ref<string>('')
 
 // Emitters
 const emit = defineEmits<{
-  (e: 'image:uploaded', payload: PublicProfileImage): void
+  (e: 'image:uploaded', payload: OwnerProfileImage): void
   (e: 'image:deleted', payload: { id: string }): void
 }>()
 
@@ -120,7 +120,7 @@ async function handleUpload() {
     isLoading.value = false
     return
   }
-  const image = res.profileImage
+  const image = res.profileImage as OwnerProfileImage
   emit('image:uploaded', image)
 
   // Clear after upload
