@@ -19,7 +19,7 @@
                    class="form-label">Please enter your email address to continue</label>
             <input v-model="email"
                    id="email"
-                   type="text"
+                   type="email"
                    class="form-control form-control-lg"
                    required />
           </div>
