@@ -75,9 +75,6 @@ async function saveProfile(formData: OwnerProfile) {
   try {
     console.log('Saving profile', payload)
     await profileStore.updateProfile(payload)
-    // optionally navigate away:
-    // const router = useRouter()
-    // router.push('/dashboard')
   } catch (err: any) {
     state.error = err.message || 'An error occurred while updating the profile.'
   } finally {
@@ -86,7 +83,6 @@ async function saveProfile(formData: OwnerProfile) {
 }
 
 async function handleProfileImage(image: OwnerProfileImage) {
-  // console.log('handleProfileImage', image)
   try {
     await profileStore.setProfileImage(image.id)
   } catch (err: any) {

@@ -19,29 +19,28 @@
 import { computed, ref } from 'vue';
 import Multiselect from 'vue-multiselect';
 import { useTagsStore } from '@/store/tagStore';
-import type { Tag } from '@zod/tags.schema';
+import type { PublicTag } from '@zod/tags.schema';
 
 // Instantiate Pinia store
 const tagStore = useTagsStore();
 
 // Reactive state
-const tags = ref<Tag[]>([]);
+const tags = ref<PublicTag[]>([]);
 const isLoading = ref(false);
 
 // Props & Emits
-const props = defineProps<{
-  modelValue: Tag[]
-}>()
-
+const props = withDefaults(
+  defineProps<{
+    modelValue?: PublicTag[]
+  }>(),
+  {
+    modelValue: () => [] as PublicTag[]
+  }
+)
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: Tag[]): void
-  (e: 'tags:selected', value: Tag[]): void
+  (e: 'update:modelValue', value: PublicTag[]): void
+  (e: 'tags:selected', value: PublicTag[]): void
 }>()
-
-// const emit = defineEmits<{
-//   (e: 'tags:selected', value: Tag[]): void
-// }>()
-
 
 /**
  * Called when the user types in the search input
@@ -61,19 +60,12 @@ async function asyncFind(query: string) {
   }
 }
 
-// function handleChange(selected: Tag[]) {
-//   console.log('handleChange:', selected);
-//   selectedTags.value = selected
-//     // Emit the change event to parent component
-//     emit('tags:selected', selectedTags.value);
-// }
-
 // Computed v-model proxy (get from parent, set emits back)
-const selected = computed<Tag[]>({
+const selected = computed<PublicTag[]>({
   get() {
     return props.modelValue || []
   },
-  set(val: Tag[]) {
+  set(val: PublicTag[]) {
     emit('update:modelValue', val)
     emit('tags:selected', val)
   }

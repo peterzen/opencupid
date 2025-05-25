@@ -74,7 +74,7 @@
                      track-by="label"
                      placeholder="I identify as...">
           <template v-slot:noResult></template>
-          <!-- <template #singleLabel="props">
+<!-- <template #singleLabel="props">
             {{ t(props.option.label) }}
           </template>
 
@@ -119,12 +119,11 @@
         </div>
 
         <div class="mb-3">
-          <TagSelectComponent v-model="formData.tags"
+          <TagSelectComponent v-model="formData.tags!"
                               :isLoading="props.isLoading"
                               label="My interests are..."
-                              placeholder="Select or search for your interests" 
-                              @tags:selected="handleTagsChange"
-                              />
+                              placeholder="Select or search for your interests"
+                              @tags:selected="handleTagsChange" />
         </div>
         <div class="mb-3">
           <FormKit type="textarea"
@@ -164,6 +163,7 @@ import { OwnerProfile, UpdateProfile } from '@zod/profile.schema'
 import { OwnerProfileImage } from '@zod/media.schema'
 import ProfileImageComponent from './ProfileImageComponent.vue'
 import TagSelectComponent from './TagSelectComponent.vue'
+import { PublicTag } from '@zod/tags.schema'
 
 // Props & Emits
 const props = defineProps<{
@@ -172,9 +172,9 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: UpdateProfile): void
+  (e: 'update:modelValue', value: OwnerProfile): void
   (e: 'update:profileImage', value: OwnerProfileImage): void
-  (e: 'submit', value: UpdateProfile): void
+  (e: 'submit', value: OwnerProfile): void
 }>()
 
 // i18n
@@ -212,22 +212,20 @@ const birthYearMax = computed(() => {
 
 // Submit handler
 function submitForm() {
-  console.log('Saving form data:', formData)
+  console.log('Saving form data:', formData as OwnerProfile)
   emit('submit', { ...formData })
 }
 
 function handleImageUploaded(image: OwnerProfileImage) {
   console.log('Image uploaded:', image)
   formData.profileImage = image
-  // emit('submit', { ...formData })
   emit('update:profileImage', image)
   emit('update:modelValue', formData)
 }
 
-function handleTagsChange(tags: any) {
+function handleTagsChange(tags: PublicTag[]) {
   console.log('Selected tags:', tags)
   formData.tags = tags
   emit('update:modelValue', formData)
-  // emit('update:tags', tags)
 }
 </script>

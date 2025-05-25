@@ -4,14 +4,13 @@ import { ProfileSchema } from "@zod/generated";
 
 import { publicTagSchema } from "./tags.schema";
 import {
-  OwnerProfileImage,
   ownerProfileImageSchema,
-  PublicProfileImage,
   publicProfileImageSchema,
 } from "./media.schema";
 
 const publicProfileFields = {
   id: true,
+  languages: true,
   publicName: true,
   introSocial: true,
   city: true,

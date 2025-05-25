@@ -97,7 +97,6 @@
 import { reactive, ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { Profile } from '@zod/generated'
 import { getCountryOptions } from '@/lib/countries';
 
 import Multiselect from 'vue-multiselect'
@@ -112,15 +111,12 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: UpdateProfile): void
-  (e: 'submit', value: UpdateProfile): void
+  (e: 'update:modelValue', value: OwnerProfile): void
+  (e: 'submit', value: OwnerProfile): void
 }>()
 
 // i18n
 const { t } = useI18n()
-
-console.log('ProfileForm', props.modelValue)
-
 
 // Local form state
 const formData = reactive<OwnerProfile>({ ...props.modelValue })

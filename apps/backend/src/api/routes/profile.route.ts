@@ -20,7 +20,7 @@ import { ImageGalleryService } from 'src/services/gallery.service'
 import { uploadTmpDir } from 'src/lib/media';
 import { sendError } from '../helpers';
 import env from 'src/env';
-import { publicTagSearchSchema, TagParamsSchema } from '@zod/tags.schema';
+import { PublicTag, publicTagSearchSchema, TagParamsSchema } from '@zod/tags.schema';
 
 
 
@@ -59,7 +59,7 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       imageGalleryService.toOwnerProfileImage(img)
     )
 
-    const publicTags: Tag[] = profile.tags.map((tag: ProfileTag) => publicTagSearchSchema.parse(tag.tag))
+    const publicTags: PublicTag[] = profile.tags.map((tag: ProfileTag) => publicTagSearchSchema.parse(tag.tag))
 
     // Merge scalars (from safe) with your newly-shaped images
     return {
@@ -82,11 +82,13 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     const transformedOtherImages = profile.otherImages.map((img: ProfileImage) =>
       imageGalleryService.toPublicProfileImage(img)
     )
+    const publicTags: PublicTag[] = profile.tags.map((tag: ProfileTag) => publicTagSearchSchema.parse(tag.tag))
 
     return {
       ...safe,
       profileImage: transformedProfileImage,
       otherImages: transformedOtherImages,
+      tags: publicTags, // Add the tags property from the safe object
     }
   }
 
