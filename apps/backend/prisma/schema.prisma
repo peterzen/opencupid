@@ -154,6 +154,7 @@ model Profile {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
 
+  languages    String[]            @default([])
   introDating  String              @default("")
   birthday     DateTime?
   gender       Gender?

@@ -30,7 +30,6 @@
                     min: 'Name must be at least 2 characters long',
                     max: 'Name must be less than 50 characters long'
                   }" />
-
         </div>
 
         <div class="mb-4">
@@ -79,6 +78,30 @@
                    validation="required"
                    v-model="formData.introSocial" />
         </div>
+
+        <div class="mb-4">
+          <Multiselect v-model="languages"
+                       :options="languageOptions"
+                       :close-on-select="false"
+                       :clear-on-select="false"
+                       :multiple="true"
+                       :searchable="true"
+                       open-direction="bottom"
+                       id="languages"
+                       label="label"
+                       track-by="label"
+                       placeholder="I speak...">
+            <template v-slot:noResult></template>
+            <template #singleLabel="props">
+              {{ t(props.option.label) }}
+            </template>
+
+            <template #option="props">
+              {{ t(props.option.label) }}
+            </template>
+          </Multiselect>
+        </div>
+
       </fieldset>
       <ErrorComponent :error="error" />
 
@@ -103,6 +126,7 @@ import Multiselect from 'vue-multiselect'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import ImageUpload from './ImageUpload.vue'
 import { OwnerProfile, UpdateProfile } from '@zod/profile.schema';
+import { getLanguageSelectorOptions, MultiselectOption } from '@/lib/languages';
 
 // Props & Emits
 const props = defineProps<{
@@ -130,14 +154,18 @@ watch(
   { deep: true }
 )
 
-const countrySelectOptions = getCountryOptions()
-
 // Computed proxies for multiselect v-models
+const countrySelectOptions = getCountryOptions()
 const country = computed({
   get: () => countrySelectOptions.find((o) => o.value === formData.country),
   set: (opt: any) => { formData.country = opt.value },
 })
 
+const languageOptions = getLanguageSelectorOptions()
+const languages = computed({
+  get: () => formData.languages.map((lang) => languageOptions.find((opt) => opt.value === lang)),
+  set: (options: MultiselectOption[]) => { formData.languages = options.map((opt) => opt.value) },
+})
 
 // Submit handler
 function submitForm() {
