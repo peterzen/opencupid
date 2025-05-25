@@ -1,5 +1,6 @@
 import { FastifyPluginAsync } from 'fastify'
 import multipart, { MultipartValue } from '@fastify/multipart';
+import { z } from 'zod';
 
 import { validateBody } from '@utils/zodValidate'
 import {
@@ -12,15 +13,14 @@ import {
   publicScalarsSchema,
   updateProfileSchema
 } from '@zod/profile.schema'
+import { ProfileImage, ProfileTag, Tag } from '@zod/generated';
 
 import { ProfileService } from 'src/services/profile.service'
 import { ImageGalleryService } from 'src/services/gallery.service'
 import { uploadTmpDir } from 'src/lib/media';
 import { sendError } from '../helpers';
 import env from 'src/env';
-import { z } from 'zod';
-import { Profile, ProfileImage } from '@zod/generated';
-import { OwnerProfileImage, PublicProfileImage } from '@zod/media.schema';
+import { publicTagSearchSchema, TagParamsSchema } from '@zod/tags.schema';
 
 
 
@@ -59,11 +59,14 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       imageGalleryService.toOwnerProfileImage(img)
     )
 
+    const publicTags: Tag[] = profile.tags.map((tag: ProfileTag) => publicTagSearchSchema.parse(tag.tag))
+
     // Merge scalars (from safe) with your newly-shaped images
     return {
       ...safe,
       profileImage: transformedProfileImage,
       otherImages: transformedOtherImages,
+      tags: publicTags,
     }
   }
 
@@ -298,6 +301,48 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       return sendError(reply, 500, 'Failed to list images')
     }
   })
+
+
+  /**
+  * Add a tag to a profile
+  */
+  fastify.post(
+    '/:id/tags/:tagId',
+    { onRequest: [fastify.authenticate] },
+    async (req, reply) => {
+      const { id: profileId, tagId } = TagParamsSchema.merge(
+        z.object({ tagId: z.string().cuid() })
+      ).parse(req.params);
+      try {
+        await profileService.addTagToProfile(profileId, tagId);
+        return reply.code(204).send();
+      } catch (err) {
+        fastify.log.error(err);
+        return sendError(reply, 500, 'Failed to attach tag');
+      }
+    }
+  );
+
+  /**
+   * Remove a tag from a profile
+   */
+  fastify.delete(
+    '/:id/tags/:tagId',
+    { onRequest: [fastify.authenticate] },
+    async (req, reply) => {
+      const { id: profileId, tagId } = TagParamsSchema.merge(
+        z.object({ tagId: z.string().cuid() })
+      ).parse(req.params);
+      try {
+        await profileService.removeTagFromProfile(profileId, tagId);
+        return reply.code(204).send();
+      } catch (err) {
+        fastify.log.error(err);
+        return sendError(reply, 500, 'Failed to remove tag');
+      }
+    }
+  );
+
 }
 
 export default profileRoutes

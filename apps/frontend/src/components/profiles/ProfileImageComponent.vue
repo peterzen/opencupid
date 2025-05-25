@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, type PropType } from 'vue'
+import { type PropType } from 'vue'
 import type { OwnerProfileImage, PublicProfileImage } from '@zod/media.schema'
 
 const props = defineProps({
@@ -24,5 +24,4 @@ const props = defineProps({
 img {
   object-fit: cover;
 }
-
 </style>

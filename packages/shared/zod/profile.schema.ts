@@ -69,7 +69,11 @@ export type OwnerProfile = z.infer<typeof ownerProfileSchema>;
 export const updateProfileSchema = ProfileSchema.pick({
   ...publicProfileFields,
   ...publicDatingProfileFields,
-}).partial();
+})
+  .partial()
+  .extend({
+    tags: z.array(z.string().cuid()).optional(),
+  });
 
 export type UpdateProfile = z.infer<typeof updateProfileSchema>;
 

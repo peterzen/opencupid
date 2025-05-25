@@ -31,7 +31,7 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
         { attempts: 3, backoff: { type: 'exponential', delay: 5000 } }
       )
       // If the user is new, initialize their profiles
-      profileService.initializeProfiles(user.id, ['friend', 'dating'])
+      profileService.initializeProfiles(user.id)
     }
 
     const payload = { userId: user.id, email: user.email, tokenVersion: user.tokenVersion ?? 0 }

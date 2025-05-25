@@ -1,6 +1,5 @@
-import { ConnectionTypeType } from '@zod/generated'
 import { prisma } from '../lib/prisma'
-import { User, Profile, DatingProfile } from '@prisma/client'
+import { User, Profile } from '@prisma/client'
 import { randomBytes } from 'crypto'
 
 // Define types for service return values

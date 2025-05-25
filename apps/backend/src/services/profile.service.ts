@@ -1,7 +1,7 @@
 import { prisma } from '../lib/prisma'
 import { Profile, ProfileImage, ProfileTag, Prisma } from '@prisma/client'
 import { Tag } from '@prisma/client'
-import { OwnerProfile, ownerProfileSchema, PublicProfile, publicProfileSchema } from '@zod/profile.schema'
+import { OwnerProfile, ownerProfileSchema, PublicProfile, publicProfileSchema, UpdateProfile } from '@zod/profile.schema'
 
 // Define types for service return values
 export type ProfileWithImages = Profile & {
@@ -63,11 +63,37 @@ export class ProfileService {
 
 
 
-  async updateProfile(userId: string, data: Prisma.ProfileUpdateInput): Promise<Profile> {
-    return prisma.profile.update({
-      where: { userId: userId },
-      data
-    })
+  async updateProfile(userId: string, data: UpdateProfile): Promise<Profile> {
+    // 1) pull out the tags array
+    const { tags, ...rest } = data;
+
+    // interactive $transaction callback
+    const updated = await prisma.$transaction(async (tx) => {
+      // 1) Update all scalar fields
+      const profile = await tx.profile.update({
+        where: { userId },
+        data: rest,
+      });
+
+      const profileId = profile.id;
+
+      // 2) Delete _all_ existing tag links for this profile
+      await tx.profileTag.deleteMany({
+        where: { profileId },
+      });
+
+      // 3) Re-create only the tags the user sent
+      if (tags && tags.length > 0) {
+        await tx.profileTag.createMany({
+          data: tags.map((tagId) => ({ profileId, tagId })),
+          skipDuplicates: true,
+        });
+      }
+
+      return profile;
+    });
+
+    return updated;
   }
 
 
@@ -182,6 +208,23 @@ export class ProfileService {
     })
   }
 
+  /**
+    * Attach a tag to a profile.
+    */
+  public async addTagToProfile(profileId: string, tagId: string): Promise<ProfileTag> {
+    return prisma.profileTag.create({
+      data: { profileId, tagId },
+    });
+  }
+
+  /**
+   * Remove a tag from a profile.
+   */
+  public async removeTagFromProfile(profileId: string, tagId: string): Promise<ProfileTag> {
+    return prisma.profileTag.delete({
+      where: { profileId_tagId: { profileId, tagId } },
+    });
+  }
 
   async initializeProfiles(userId: string): Promise<Profile> {
     const profile = await prisma.profile.findUnique({

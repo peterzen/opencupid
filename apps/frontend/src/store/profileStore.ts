@@ -31,7 +31,7 @@ export const useProfileStore = defineStore('profile', {
 
   actions: {
     // Fetch the current user's profile
-    async getUserProfile():Promise<OwnerProfile> {
+    async getUserProfile(): Promise<OwnerProfile> {
       try {
         const res = await axios.get('/profiles/me')
         this.profile = res.data.profile as OwnerProfile
@@ -55,7 +55,7 @@ export const useProfileStore = defineStore('profile', {
     },
 
     // Update the current user's social profile
-    async updateProfile(profileData: Partial<OwnerProfile> & UpdateProfile): Promise<OwnerProfile> {
+    async updateProfile(profileData: UpdateProfile): Promise<OwnerProfile> {
       try {
         const res = await axios.patch('/profiles/profile', profileData)
         this.profile = res.data.profile
@@ -163,5 +163,48 @@ export const useProfileStore = defineStore('profile', {
       }
     },
 
+    /**
+     * Attach a tag to the current user's profile.
+     * Calls POST /profiles/:id/tags/:tagId
+     */
+    async addTagToProfile(tagId: string): Promise<{ success: true } | { success: false; message: string }> {
+      if (!this.profile) {
+        return { success: false, message: 'No profile loaded' };
+      }
+      try {
+        await axios.post(`/profiles/${this.profile.id}/tags/${tagId}`);
+        // optimistically add to local state
+        this.profile.tags = [...(this.profile.tags || []), { tagId } as any];
+        return { success: true };
+      } catch (err: any) {
+        console.error('Failed to add tag to profile:', err);
+        return {
+          success: false,
+          message: err.response?.data?.message || 'Failed to add tag to profile',
+        };
+      }
+    },
+
+    /**
+     * Remove a tag from the current user's profile.
+     * Calls DELETE /profiles/:id/tags/:tagId
+     */
+    async removeTagFromProfile(tagId: string): Promise<{ success: true } | { success: false; message: string }> {
+      if (!this.profile) {
+        return { success: false, message: 'No profile loaded' };
+      }
+      try {
+        await axios.delete(`/profiles/${this.profile.id}/tags/${tagId}`);
+        // update local state
+        this.profile.tags = (this.profile.tags || []).filter(t => t.id !== tagId);
+        return { success: true };
+      } catch (err: any) {
+        console.error('Failed to remove tag from profile:', err);
+        return {
+          success: false,
+          message: err.response?.data?.message || 'Failed to remove tag from profile',
+        };
+      }
+    },
   },
 })

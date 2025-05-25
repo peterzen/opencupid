@@ -60,12 +60,21 @@ const { profile, activeTab, isLoading, error } = toRefs(state)
  * Save the profile back to the store.
  * Mutates `state` directly and never uses `.value`.
  */
-async function saveProfile(formData: UpdateProfile) {
+async function saveProfile(formData: OwnerProfile) {
   state.isLoading = true
   state.error = ''
 
+  let tags: string[] = []
+  if (formData.tags && formData.tags.length > 0) tags = formData.tags.map(tag => tag.id)
+
+  const payload: UpdateProfile = {
+    ...formData,
+    tags: tags,
+  }
+
   try {
-    await profileStore.updateProfile(formData)
+    console.log('Saving profile', payload)
+    await profileStore.updateProfile(payload)
     // optionally navigate away:
     // const router = useRouter()
     // router.push('/dashboard')
@@ -77,7 +86,7 @@ async function saveProfile(formData: UpdateProfile) {
 }
 
 async function handleProfileImage(image: OwnerProfileImage) {
-  console.log('handleProfileImage', image)
+  // console.log('handleProfileImage', image)
   try {
     await profileStore.setProfileImage(image.id)
   } catch (err: any) {

@@ -4,7 +4,8 @@
 
     <div class="mb-4 row">
       <div class="col-sm-6">
-        <ProfileImageComponent :image="formData.profileImage" v-if="formData.profileImage"/>
+        <ProfileImageComponent :image="formData.profileImage"
+                               v-if="formData.profileImage" />
       </div>
       <div class="col-sm-6">
         <ImageUpload @image:uploaded="handleImageUploaded" />
@@ -52,17 +53,6 @@
                     min: 'Wow, you are really old!',
                     max: 'Wow, you are really young! You should be at least 18 to be here.'
                   }" />
-
-          <!-- <Multiselect v-model="birthYear"
-                     :options="birthYearSelectOptions"
-                     :close-on-select="true"
-                     :clear-on-select="false"
-                     id="birthyear"
-                     :show-labels="false"
-                     open-direction="bottom"
-                     placeholder="I was born in...">
-          <template v-slot:tag></template>
-</Multiselect> -->
         </div>
 
         <div class="mb-3">
@@ -129,6 +119,14 @@
         </div>
 
         <div class="mb-3">
+          <TagSelectComponent v-model="formData.tags"
+                              :isLoading="props.isLoading"
+                              label="My interests are..."
+                              placeholder="Select or search for your interests" 
+                              @tags:selected="handleTagsChange"
+                              />
+        </div>
+        <div class="mb-3">
           <FormKit type="textarea"
                    input-class="form-control-lg"
                    v-model="formData.introDating"
@@ -165,6 +163,7 @@ import ImageUpload from './ImageUpload.vue'
 import { OwnerProfile, UpdateProfile } from '@zod/profile.schema'
 import { OwnerProfileImage } from '@zod/media.schema'
 import ProfileImageComponent from './ProfileImageComponent.vue'
+import TagSelectComponent from './TagSelectComponent.vue'
 
 // Props & Emits
 const props = defineProps<{
@@ -181,7 +180,7 @@ const emit = defineEmits<{
 // i18n
 const { t } = useI18n()
 
-console.log('DatingProfileForm', props.modelValue)
+// console.log('DatingProfileForm', props.modelValue)
 
 // Local form state
 const formData = reactive<OwnerProfile>({ ...props.modelValue })
@@ -213,6 +212,7 @@ const birthYearMax = computed(() => {
 
 // Submit handler
 function submitForm() {
+  console.log('Saving form data:', formData)
   emit('submit', { ...formData })
 }
 
@@ -220,7 +220,14 @@ function handleImageUploaded(image: OwnerProfileImage) {
   console.log('Image uploaded:', image)
   formData.profileImage = image
   // emit('submit', { ...formData })
-  emit('update:profileImage',image)
+  emit('update:profileImage', image)
   emit('update:modelValue', formData)
+}
+
+function handleTagsChange(tags: any) {
+  console.log('Selected tags:', tags)
+  formData.tags = tags
+  emit('update:modelValue', formData)
+  // emit('update:tags', tags)
 }
 </script>
