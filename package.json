@@ -6,6 +6,7 @@
     "packages/*"
   ],
   "devDependencies": {
+    "@modelcontextprotocol/server-filesystem": "^2025.3.28",
     "turbo": "^1.10.12"
   },
   "scripts": {
@@ -13,7 +14,8 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "generate": "turbo run generate",
-    "migrate": "turbo run migrate"
+    "migrate": "turbo run migrate",
+    "mcp-server": "npx -y supergateway --stdio \"npx -y @modelcontextprotocol/server-filesystem $(pwd)\" --port 9999"
   },
   "dependencies": {
     "zod": "^3.24.4"

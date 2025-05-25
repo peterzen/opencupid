@@ -1,0 +1,19 @@
+{
+  "name": "local-assistant",
+  "version": "0.0.1",
+  "schema": "v1",
+  "models": [
+    {
+      "name": "openai-gpt4o",
+      "provider": "openai",
+      "model": "gpt-4o-mini",
+      "apiKey": "${OPENAI_API_KEY}"
+    }
+  ],
+  "mcpServers": [
+    {
+      "name": "repo",
+      "url": "http://localhost:9999"
+    }
+  ]
+}
