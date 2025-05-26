@@ -122,6 +122,7 @@ async function main() {
       create: { 
         name: name,
         slug: slugify(name, { lower: true }),
+        isApproved: true,
        },
     });
   }

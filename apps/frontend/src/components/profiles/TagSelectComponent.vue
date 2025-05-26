@@ -8,6 +8,9 @@
                  :close-on-select="false"
                  :clear-on-select="false"
                  :internal-search="false"
+                 :taggable="true"
+                 tag-placeholder="Add this as new tag"
+                 @tag="addTag"
                  label="name"
                  track-by="id"
                  placeholder="Search tags"
@@ -71,6 +74,24 @@ const selected = computed<PublicTag[]>({
   }
 })
 
+async function addTag(name: string) {
+  const create = {
+    name: name,
+  }
+  isLoading.value = true;
+  try {
+    const newTag = await tagStore.addUserTag(create)
+    console.log('Adding new tag:', newTag);
+    tags.value.push(newTag)
+    selected.value.push(newTag) // Update the selected tags
+    emit('update:modelValue', selected.value)
+  } catch (error) {
+    console.error('Failed to add tag:', error);
+    return;
+  } finally {
+    isLoading.value = false;
+  }
+}
 
 </script>
 

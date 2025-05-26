@@ -100,6 +100,33 @@ const tagsRoutes: FastifyPluginAsync = async (fastify) => {
   });
 
   /**
+   * Create a new tag
+   */
+  fastify.put('/user', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    const userId = req.user.userId
+    if(!userId) {
+      return sendError(reply, 401, 'Unauthorized');
+    }
+    const data = await validateBody(CreateTagBodySchema, req, reply) as UpdateTagInput;
+    if (!data) return;
+    try {
+      const created = await tagService.create({
+        ...data,
+        createdBy: userId, // Set the creator to the authenticated user
+        isUserCreated: true, // Mark as user-created
+      } as CreateTagInput);
+      const safeTag = publicTagSchema.parse(created);
+      return reply.code(200).send({ success: true, tag: safeTag });
+    } catch (err: any) {
+      fastify.log.error(err);
+      if (err.code === 'P2025') {
+        return sendError(reply, 404, 'Tag not found');
+      }
+      return sendError(reply, 500, 'Failed to create tag');
+    }
+  });
+
+  /**
    * Soft delete a tag
    */
   fastify.delete('/:id', { onRequest: [fastify.authenticate] }, async (req, reply) => {

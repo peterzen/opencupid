@@ -27,6 +27,8 @@ export const CreateTagBodySchema = z.object({
   createdBy: z.string().optional(),
 });
 
+
+
 const UpdateTagBodySchema = z.object({
   name: z.string().min(1).optional(),
   isApproved: z.boolean().optional(),
