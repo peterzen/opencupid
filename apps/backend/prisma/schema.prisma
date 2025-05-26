@@ -195,6 +195,7 @@ model Profile {
   introDating  String              @default("")
   birthday     DateTime?
   gender       Gender?
+  pronouns     Pronouns?
   relationship RelationshipStatus?
   hasKids      HasKids?
 

@@ -8,9 +8,42 @@
   "gender": {
     "male": "Male",
     "female": "Female",
+    "agender": "Agender",
+    "androgynous": "Androgynous",
+    "bigender": "Bigender",
+    "cis_man": "Cisgender man",
+    "cis_woman": "Cisgender woman",
+    "genderfluid": "Genderfluid",
+    "genderqueer": "Genderqueer",
+    "gender_nonconforming": "Gender non-conforming",
+    "hijra": "Hijra",
+    "intersex": "Intersex",
+    "pangender": "Pangender",
+    "transfeminine": "Transfeminine",
+    "trans_man": "Trans man",
+    "transmasculine": "Transmasculine",
+    "transsexual": "Transsexual",
+    "trans_woman": "Trans woman",
+    "two_spirit": "Two-spirit",
     "non_binary": "Non-binary",
     "other": "Other",
     "unspecified": "I'd rather not say"
+  },
+  "pronouns": {
+    "subject": {
+      "he_him": "He",
+      "she_her": "She",
+      "they_them": "They",
+      "other": "Other",
+      "unspecified": "I'd rather not say"
+    },
+    "object": {
+      "he_him": "Him",
+      "she_her": "Her",
+      "they_them": "Them",
+      "other": "Other",
+      "unspecified": "I'd rather not say"
+    }
   },
   "relationship": {
     "single": "Single",
