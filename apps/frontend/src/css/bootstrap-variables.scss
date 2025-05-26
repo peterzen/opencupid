@@ -1,0 +1,17 @@
+// src/assets/styles/_variables.scss
+// —————————————————————————————————————————
+// Override Bootstrap’s font stacks before you import bootstrap.scss
+
+// 1. Define your primary "happy" stack
+$happy-sans: "Nunito", "Poppins", sans-serif !default;
+$headings-font-family: "Rubik", "Mukta", sans-serif !default;
+
+// 2. Apply to Bootstrap’s defaults:
+$font-family-sans-serif: $happy-sans !default;
+$body-font-family:        $happy-sans !default;
+$headings-font-family:    $happy-sans !default;
+
+$font-size-root:              null !default;
+$font-size-base:              1.25rem !default; // Assumes the browser default, typically `16px`
+$font-size-sm:                $font-size-base * .875 !default;
+$font-size-lg:                $font-size-base * 1.25 !default;

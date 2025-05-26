@@ -53,7 +53,7 @@ fieldset[disabled] .multiselect {
 .multiselect__input,
 .multiselect__single {
   font-family: inherit;
-  font-size: 16px;
+  // font-size: 16px;
   touch-action: manipulation;
 }
 
@@ -157,7 +157,7 @@ fieldset[disabled] .multiselect {
   border-radius: 5px;
   border: 1px solid var(--bs-border-color);
   background: var(--bs-body-bg);
-  font-size: 14px;
+  // font-size: 14px;
 }
 
 .multiselect__tag {
@@ -194,7 +194,7 @@ fieldset[disabled] .multiselect {
 
 .multiselect__tag-icon::after {
   content: "×";
-  color: var(--bs-success);
+  color: var(--bs-secondary-color);
   font-size: 14px;
 }
 

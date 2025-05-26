@@ -1,7 +1,7 @@
 // FormKit
 import { plugin as formKitPlugin, defaultConfig } from '@formkit/vue'
 import { en } from '@formkit/i18n'
-import '@/lib/formkit/formkit-custom.scss'
+// import '@/css/formkit-custom.scss'
 
 import { generateClasses } from '@formkit/themes'
 import { createAutoAnimatePlugin, createAutoHeightTextareaPlugin, createFloatingLabelsPlugin } from '@formkit/addons'

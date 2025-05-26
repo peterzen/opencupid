@@ -115,6 +115,9 @@ importers:
       '@fontsource/fredoka-one':
         specifier: ^5.2.5
         version: 5.2.5
+      '@fontsource/nunito':
+        specifier: ^5.2.5
+        version: 5.2.5
       '@fontsource/rubik':
         specifier: ^5.2.5
         version: 5.2.5
@@ -127,6 +130,9 @@ importers:
       bootstrap-vue-next:
         specifier: ^0.29.3
         version: 0.29.3(@vueuse/core@13.2.0(vue@3.5.13(typescript@5.8.3)))(vue-router@4.5.1(vue@3.5.13(typescript@5.8.3)))(vue@3.5.13(typescript@5.8.3))
+      bootswatch:
+        specifier: ^5.3.6
+        version: 5.3.6
       i18n-iso-countries:
         specifier: ^7.14.0
         version: 7.14.0
@@ -709,6 +715,9 @@ packages:
 
   '@fontsource/fredoka-one@5.2.5':
     resolution: {integrity: sha512-Fan2k5pTOmmN8eydeUOk20/NALW+qtRu6WdqPBNhFq2WaquxKpBMUzdxFXgy9asICtbEhxTM51XHeU+OKfPQnQ==}
+
+  '@fontsource/nunito@5.2.5':
+    resolution: {integrity: sha512-KeB3US1uHB3GpVo0FewYRtHpG+UZJiRqu4xzvCRkZ8ceJPTx7lf0ZsKKWpvXCMALUJSeaD/ol/BSvLaqli5ZRQ==}
 
   '@fontsource/rubik@5.2.5':
     resolution: {integrity: sha512-vr7hwIRJfK+OGi8+pEcNdLCzMoOAxfHPOmfDfZ63mDzG1/OUSeTLWiAtYywKCwPluTcV84hY2CHBUBF+OpKEcw==}
@@ -1703,6 +1712,9 @@ packages:
     resolution: {integrity: sha512-jX0GAcRzvdwISuvArXn3m7KZscWWFAf1MKBcnzaN02qWMb3jpMoUX4/qgeiGzqyIb4ojulRzs89UCUmGcFSzTA==}
     peerDependencies:
       '@popperjs/core': ^2.11.8
+
+  bootswatch@5.3.6:
+    resolution: {integrity: sha512-d2Kwu5IaALz9gb7fmW20mXU4oCJqBrXmJ3ffk8bZPIOMohJOt0/549liK2Jp9zalkxg30dZ+1wf4OH2m1lJC9w==}
 
   brace-expansion@1.1.11:
     resolution: {integrity: sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==}
@@ -5169,6 +5181,8 @@ snapshots:
 
   '@fontsource/fredoka-one@5.2.5': {}
 
+  '@fontsource/nunito@5.2.5': {}
+
   '@fontsource/rubik@5.2.5': {}
 
   '@formkit/addons@1.6.9':
@@ -6311,6 +6325,8 @@ snapshots:
   bootstrap@5.3.6(@popperjs/core@2.11.8):
     dependencies:
       '@popperjs/core': 2.11.8
+
+  bootswatch@5.3.6: {}
 
   brace-expansion@1.1.11:
     dependencies:

@@ -22,3 +22,26 @@
   pointer-events: none;
   opacity: 0.5;
 }
+
+
+.form-check-label {
+  &:hover {
+    cursor: pointer;
+  }
+  user-select: none;
+}
+
+fieldset:disabled{
+  opacity: 0.3;
+  .form-control {
+    background-color: inherit;
+  }
+}
+
+body.modal-open #app {
+  -webkit-filter: blur(5px);
+  -moz-filter: blur(5px);
+  -o-filter: blur(5px);
+  -ms-filter: blur(5px);
+  filter: blur(5px);
+}

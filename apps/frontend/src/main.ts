@@ -1,10 +1,4 @@
-
-// import './assets/main.css'
-import 'bootstrap/scss/bootstrap.scss'
-import '@/lib/bootstrap-customizations.scss'
-import '@/lib/utils.scss'
-import 'bootstrap-vue-next/dist/bootstrap-vue-next.css'
-import "@/lib/vue-multiselect.scss"
+import '@/css'
 
 import { Settings } from 'luxon'
 Settings.defaultZone = 'Europe/Berlin'
