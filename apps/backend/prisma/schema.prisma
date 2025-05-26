@@ -53,6 +53,18 @@ enum RelationshipStatus {
   unspecified
 }
 
+model City {
+  id      Int    @id
+  name    String
+  country String // ISO2 code e.g. "US", "DE"
+  lat     Float
+  lon     Float
+
+  // indexes to speed up lookups
+  @@index([name])
+  @@index([country, name])
+}
+
 model Tag {
   id            String           @id @default(cuid())
   slug          String           @unique
