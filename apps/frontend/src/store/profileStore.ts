@@ -102,7 +102,7 @@ export const useProfileStore = defineStore('profile', {
     * Set the “main” profile image.
     * Calls POST /profiles/image/:imageId/primary
     */
-    async setProfileImage(imageId: string) {
+    async setProfileImage(imageId?: string) {
       try {
         const res = await axios.post<{ success: true; profile: OwnerProfile }>(
           `/profiles/image/${imageId}/primary`
@@ -144,7 +144,7 @@ export const useProfileStore = defineStore('profile', {
       }
     },
 
-    async deleteImage(image: ProfileImage) {
+    async deleteImage(image: OwnerProfileImage) {
       try {
         const res = await axios.delete(`/profiles/image/${image.id}`)
       } catch (error: any) {
@@ -156,7 +156,7 @@ export const useProfileStore = defineStore('profile', {
     async getUserImages() {
       try {
         const res = await axios.get('/profiles/image/list')
-        return res.data.images as ProfileImage[]
+        return res.data.images as OwnerProfileImage[]
       } catch (error: any) {
         console.error('Failed to fetch user profile:', error)
         throw error.response?.data?.message || 'Failed to fetch user profile'

@@ -1,15 +1,91 @@
+<script setup lang="ts">
+import { reactive, computed, watch, toRefs } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { getGenderOptions, getHasKidsOptionsOptions, getRelationshipStatusOptions } from '@/lib/i18n'
+import ErrorComponent from '@/components/ErrorComponent.vue'
+import { OwnerProfile } from '@zod/profile.schema'
+import { OwnerProfileImage } from '@zod/media.schema'
+import TagSelectComponent from './TagSelectComponent.vue'
+import { PublicTag } from '@zod/tags.schema'
+import ImageEditor from './ImageEditor.vue'
+import { useProfileStore } from '@/store/profileStore'
+
+const profileStore = useProfileStore()
+
+const state = reactive({
+  error: ''
+})
+
+// Props & Emits
+const props = defineProps<{
+  modelValue: OwnerProfile,
+  isLoading: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: OwnerProfile): void
+  (e: 'submit', value: OwnerProfile): void
+}>()
+
+// i18n
+const { t } = useI18n()
+
+// Local form state
+const formData = reactive<OwnerProfile>({ ...props.modelValue })
+
+// Sync prop changes into formData
+watch(
+  () => props.modelValue,
+  (newVal) => Object.assign(formData, newVal),
+  { deep: true }
+)
+
+// Options for selects/radios
+const genderOptions = getGenderOptions(t)
+const relationshipStatusOptions = getRelationshipStatusOptions(t)
+const haveKidsRadioOptions = getHasKidsOptionsOptions(t)
+
+// Computed proxies for multiselect v-models
+const birthYear = computed({
+  get: () => formData.birthday ? new Date(formData.birthday).getFullYear() : null,
+  set: (year: number) => {
+    if (year) formData.birthday = new Date(year, 0, 1)
+  },
+})
+
+const birthYearMax = computed(() => {
+  return new Date().getFullYear() - 18
+})
+
+// Submit handler
+function submitForm() {
+  emit('submit', { ...formData })
+}
+
+function handleTagsChange(tags: PublicTag[]) {
+  console.log('Selected tags:', tags)
+  formData.tags = tags
+  emit('update:modelValue', formData)
+}
+
+async function handleProfileImage(image: OwnerProfileImage|null) {
+  const imageId = image ? image.id : ''
+  try {
+    await profileStore.setProfileImage(imageId)
+  } catch (err: any) {
+    state.error = err.message || 'An error occurred while updating the profile image.'
+  }
+  emit('update:modelValue', formData)
+}
+</script>
+
+
 <template>
   <div class="col-md-8 offset-md-2">
 
-
-    <div class="mb-4 row">
-      <div class="col-sm-6">
-        <ProfileImageComponent :image="formData.profileImage"
-                               v-if="formData.profileImage" />
-      </div>
-      <div class="col-sm-6">
-        <ImageUpload @image:uploaded="handleImageUploaded" />
-      </div>
+    <div class="mb-4 ">
+      <ImageEditor v-model="props.modelValue"
+                   @update:profileImage="handleProfileImage" />
     </div>
 
     <FormKit type="form"
@@ -19,7 +95,6 @@
              @submit="submitForm">
 
       <fieldset :disabled="!modelValue.isActive || isLoading">
-
 
         <div class="mb-4">
           <FormKit type="text"
@@ -140,7 +215,7 @@
         </div>
       </fieldset>
 
-      <ErrorComponent :error="error" />
+      <ErrorComponent :error="state.error" />
 
       <FormKit type="submit"
                wrapper-class="d-grid gap-2 mb-3"
@@ -151,81 +226,3 @@
     </FormKit>
   </div>
 </template>
-
-
-<script setup lang="ts">
-import { reactive, ref, computed, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { getGenderOptions, getHasKidsOptionsOptions, getRelationshipStatusOptions } from '@/lib/i18n'
-import ErrorComponent from '@/components/ErrorComponent.vue'
-import ImageUpload from './ImageUpload.vue'
-import { OwnerProfile, UpdateProfile } from '@zod/profile.schema'
-import { OwnerProfileImage } from '@zod/media.schema'
-import ProfileImageComponent from './ProfileImageComponent.vue'
-import TagSelectComponent from './TagSelectComponent.vue'
-import { PublicTag } from '@zod/tags.schema'
-
-// Props & Emits
-const props = defineProps<{
-  modelValue: OwnerProfile
-  isLoading: boolean
-}>()
-
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: OwnerProfile): void
-  (e: 'update:profileImage', value: OwnerProfileImage): void
-  (e: 'submit', value: OwnerProfile): void
-}>()
-
-// i18n
-const { t } = useI18n()
-
-// console.log('DatingProfileForm', props.modelValue)
-
-// Local form state
-const formData = reactive<OwnerProfile>({ ...props.modelValue })
-
-const error = ref('')
-
-// Sync prop changes into formData
-watch(
-  () => props.modelValue,
-  (newVal) => Object.assign(formData, newVal),
-  { deep: true }
-)
-
-// Options for selects/radios
-const genderOptions = getGenderOptions(t)
-const relationshipStatusOptions = getRelationshipStatusOptions(t)
-const haveKidsRadioOptions = getHasKidsOptionsOptions(t)
-
-// Computed proxies for multiselect v-models
-const birthYear = computed({
-  get: () => formData.birthday ? new Date(formData.birthday).getFullYear() : null,
-  set: (year: number) => {
-    if (year) formData.birthday = new Date(year, 0, 1)
-  },
-})
-const birthYearMax = computed(() => {
-  return new Date().getFullYear() - 18
-})
-
-// Submit handler
-function submitForm() {
-  console.log('Saving form data:', formData as OwnerProfile)
-  emit('submit', { ...formData })
-}
-
-function handleImageUploaded(image: OwnerProfileImage) {
-  console.log('Image uploaded:', image)
-  formData.profileImage = image
-  emit('update:profileImage', image)
-  emit('update:modelValue', formData)
-}
-
-function handleTagsChange(tags: PublicTag[]) {
-  console.log('Selected tags:', tags)
-  formData.tags = tags
-  emit('update:modelValue', formData)
-}
-</script>

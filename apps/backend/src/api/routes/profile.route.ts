@@ -24,8 +24,12 @@ import { PublicTag, publicTagSearchSchema, TagParamsSchema } from '@zod/tags.sch
 
 
 
+const setProfileImageParamsSchema = z.object({
+  imageId: z.string().nullable() // empty id means clear the profile image
+})
+
 const attachImageParamsSchema = z.object({
-  imageId: z.string().cuid(),        // or whatever format your IDs are
+  imageId: z.string().cuid()
 })
 
 const profileRoutes: FastifyPluginAsync = async (fastify) => {
@@ -268,15 +272,11 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       if (!req.user.userId) {
         return sendError(reply, 401, 'Unauthorized')
       }
-      const { imageId } = attachImageParamsSchema.parse(req.params)
-      console.log('Setting primary image for user:', req.user.userId, 'Image ID:', imageId)
+      // console.log('Setting profile image for user:', req.params)
+      const { imageId } = setProfileImageParamsSchema.parse(req.params)
 
       try {
-        const updated = await profileService.setProfileImage(req.user.userId, imageId)
-        console.log('Updated profile after setting primary image:', updated)
-        // validate with your ownerProfileSchema so the shape is safe
-        // const safe = ownerProfileSchema.parse(updated)
-        // updated.profileImage = imageGalleryService.toOwnerProfileImage(safe.profileImage)
+        await profileService.setProfileImage(req.user.userId, imageId)
         return reply
           .code(200)
           .send({ success: true })

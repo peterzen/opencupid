@@ -60,9 +60,6 @@ export class ProfileService {
     })
   }
 
-
-
-
   async updateProfile(userId: string, data: UpdateProfile): Promise<Profile> {
     // 1) pull out the tags array
     const { tags, ...rest } = data;
@@ -96,17 +93,29 @@ export class ProfileService {
     return updated;
   }
 
-
-
-  async setProfileImage(userId: string, imageId: string): Promise<Profile> {
-    return prisma.profile.update({
-      where: { userId },
-      data: {
-        profileImage: {
-          connect: { id: imageId }
+  async setProfileImage(userId: string, imageId: string|null): Promise<Profile> {
+    console.log(`Setting profile image for user ${userId} to image ${imageId}`)
+    if (imageId ) {
+      // Connect the profile image
+      return prisma.profile.update({
+        where: { userId },
+        data: {
+          profileImage: {
+            connect: { id: imageId }
+          }
         }
-      }
-    })
+      })
+    } else {
+      // Disconnect the profile image
+      return prisma.profile.update({
+        where: { userId },
+        data: {
+          profileImage: {
+            disconnect: true
+          }
+        }
+      })
+    }
   }
 
   public async addImageToProfile(userId: string, imageId: string): Promise<Profile> {

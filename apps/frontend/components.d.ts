@@ -8,7 +8,6 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    BButton: typeof import('bootstrap-vue-next/components/BButton')['BButton']
     BModal: typeof import('bootstrap-vue-next/components/BModal')['BModal']
     ConnectionTypeSelector: typeof import('./src/components/ConnectionTypeSelector.vue')['default']
     DatingProfileForm: typeof import('./src/components/profiles/DatingProfileForm.vue')['default']
@@ -18,6 +17,7 @@ declare module 'vue' {
     IconEcosystem: typeof import('./src/components/icons/IconEcosystem.vue')['default']
     IconSupport: typeof import('./src/components/icons/IconSupport.vue')['default']
     IconTooling: typeof import('./src/components/icons/IconTooling.vue')['default']
+    ImageEditor: typeof import('./src/components/profiles/ImageEditor.vue')['default']
     ImageUpload: typeof import('./src/components/profiles/ImageUpload.vue')['default']
     LightSwitch: typeof import('./src/components/LightSwitch.vue')['default']
     LoadingComponent: typeof import('./src/components/LoadingComponent.vue')['default']

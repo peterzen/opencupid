@@ -14,7 +14,6 @@
            class="tab-pane active">
         <div class="mt-4">
           <DatingProfileForm :isLoading="isLoading"
-                             @update:profileImage="handleProfileImage"
                              :modelValue="profile"
                              @submit="saveProfile" />
         </div>
@@ -24,7 +23,6 @@
         <div class="mt-4">
           <ProfileForm :isLoading="isLoading"
                        v-model="profile"
-                       @update:profileImage="handleProfileImage"
                        @submit="saveProfile" />
         </div>
       </div>
@@ -82,16 +80,16 @@ async function saveProfile(formData: OwnerProfile) {
   }
 }
 
-async function handleProfileImage(image: OwnerProfileImage) {
-  try {
-    await profileStore.setProfileImage(image.id)
-  } catch (err: any) {
-    state.error = err.message || 'An error occurred while updating the profile image.'
-  }
-  Object.assign(state.profile, {
-    profileImage: image
-  })
-}
+// async function handleProfileImage(image: OwnerProfileImage) {
+//   try {
+//     await profileStore.setProfileImage(image.id)
+//   } catch (err: any) {
+//     state.error = err.message || 'An error occurred while updating the profile image.'
+//   }
+//   Object.assign(state.profile, {
+//     profileImage: image
+//   })
+// }
 
 onMounted(async () => {
   state.isLoading = true

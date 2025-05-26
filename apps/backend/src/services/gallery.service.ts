@@ -1,11 +1,7 @@
 import cuid from 'cuid';
 import path from 'path';
-import { createHash } from 'crypto';
-import { Transform } from 'stream';
 import fs from 'fs';
-import { createWriteStream } from 'fs';
-import { pipeline } from 'stream/promises';
-import { MultipartFile, SavedMultipartFile } from '@fastify/multipart';
+import { SavedMultipartFile } from '@fastify/multipart';
 
 import { prisma } from '../lib/prisma'
 import { ProfileImage } from '@prisma/client';
@@ -58,7 +54,7 @@ export class ImageGalleryService {
   async listImages(userId: string): Promise<ProfileImage[]> {
     return prisma.profileImage.findMany({
       where: { userId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: 'asc' },
     });
   }
 

@@ -2,6 +2,7 @@
   <div class="profile-image">
     <div class="ratio ratio-1x1">
       <img v-if="props.image"
+           :alt="props.image.altText"
            :src="props.image.url!"
            class="rounded" />
     </div>
