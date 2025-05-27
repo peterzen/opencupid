@@ -49,7 +49,11 @@ const haveKidsRadioOptions = getHasKidsOptionsOptions(t)
 const birthYear = computed({
   get: () => formData.birthday ? new Date(formData.birthday).getFullYear() : null,
   set: (year: number) => {
-    if (year) formData.birthday = new Date(year, 0, 1)
+    if (year && year < birthYearMax.value && year > 1920) {
+      formData.birthday = new Date(year, 0, 1)
+      // state.error = 'You must be at least 18 years old to create a profile.'
+      return
+    }
   },
 })
 
@@ -68,7 +72,7 @@ function handleTagsChange(tags: PublicTag[]) {
   emit('update:modelValue', formData)
 }
 
-async function handleProfileImage(image: OwnerProfileImage|null) {
+async function handleProfileImage(image: OwnerProfileImage | null) {
   const imageId = image ? image.id : ''
   try {
     await profileStore.setProfileImage(imageId)
