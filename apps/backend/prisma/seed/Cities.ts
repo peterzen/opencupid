@@ -5,7 +5,6 @@ import cities from 'all-the-cities'
 const prisma = new PrismaClient()
 
 async function main() {
-  // Simplify fields you care about
   const toUpsert = cities.map(c => ({
     id: c.cityId,
     name: c.name,

@@ -36,9 +36,6 @@ importers:
       '@prisma/client':
         specifier: ^6.8.2
         version: 6.8.2(prisma@6.8.2(typescript@5.8.3))(typescript@5.8.3)
-      all-the-cities:
-        specifier: ^3.1.0
-        version: 3.1.0
       bcrypt:
         specifier: ^5.1.1
         version: 5.1.1
@@ -85,6 +82,9 @@ importers:
       '@types/nodemailer':
         specifier: ^6.4.17
         version: 6.4.17
+      all-the-cities:
+        specifier: ^3.1.0
+        version: 3.1.0
       pino-pretty:
         specifier: ^13.0.0
         version: 13.0.0

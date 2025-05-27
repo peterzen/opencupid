@@ -119,14 +119,14 @@ async function main() {
     await prisma.tag.upsert({
       where: { name },
       update: {},
-      create: { 
+      create: {
         name: name,
         slug: slugify(name, { lower: true }),
         isApproved: true,
-       },
+      },
     });
   }
-  console.log('Seeded interest tags!');
+  console.log(`Seeded ${interestTags.length} interest tags!`);
 }
 
 main()

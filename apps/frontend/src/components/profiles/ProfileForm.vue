@@ -46,7 +46,7 @@
 
         <div class="mb-4">
           <FormKit type="text"
-                   v-model="formData.city"
+                   v-model="formData.cityName"
                    label="My city..."
                    id="city"
                    input-class="form-control-lg"
@@ -160,6 +160,7 @@ const country = computed({
   get: () => countrySelectOptions.find((o) => o.value === formData.country),
   set: (opt: any) => { formData.country = opt.value },
 })
+
 
 const languageOptions = getLanguageSelectorOptions()
 const languages = computed({

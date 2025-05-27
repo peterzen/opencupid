@@ -13,9 +13,10 @@ const publicProfileFields = {
   languages: true,
   publicName: true,
   introSocial: true,
-  city: true,
+  cityName: true,
   country: true,
   isSocialActive: true,
+  work: true,
 } as const;
 
 const publicDatingProfileFields = {
@@ -25,6 +26,7 @@ const publicDatingProfileFields = {
   gender: true,
   birthday: true,
   isDatingActive: true,
+  pronouns: true,
 } as const;
 
 export const publicScalarsSchema = ProfileSchema.pick({

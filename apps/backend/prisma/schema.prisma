@@ -85,6 +85,8 @@ model City {
   lat     Float
   lon     Float
 
+  profiles Profile[]
+
   // indexes to speed up lookups
   @@index([name])
   @@index([country, name])
@@ -178,7 +180,9 @@ model Profile {
   id          String @id @default(cuid())
   publicName  String
   country     String @default("")
-  city        String @default("")
+  cityName    String @default("")
+  cityId      Int? 
+  city        City?   @relation(fields: [cityId], references: [id])
   introSocial String @default("")
 
   isSocialActive Boolean @default(false)
@@ -191,6 +195,7 @@ model Profile {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
 
+  work         String              @default("")
   languages    String[]            @default([])
   introDating  String              @default("")
   birthday     DateTime?
