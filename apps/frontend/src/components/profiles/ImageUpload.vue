@@ -1,3 +1,90 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import type { ProfileImage } from '@zod/generated'
+import { useProfileStore } from '@/store/profileStore'
+
+import AvatarUploadIcon from '@/assets/icons/files/avatar-upload.svg'
+import { OwnerProfileImage, PublicProfileImage } from '@zod/media.schema'
+import { OwnerProfile } from '@zod/profile.schema'
+
+const profileStore = useProfileStore()
+
+// State
+const preview = ref<string | null>(null)
+const selectedFile = ref<File | null>(null)
+const isLoading = ref(false)
+const error = ref<string | null>(null)
+const fileInput = ref<HTMLInputElement>()
+const modal = ref(false)
+const captionText = ref<string>('')
+
+// Emitters
+const emit = defineEmits<{
+  (e: 'image:uploaded', payload: OwnerProfile): void
+  (e: 'image:deleted', payload: { id: string }): void
+}>()
+
+/**
+ * Handle file selection: set preview and keep file
+ */
+function handleFileChange(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0] ?? null
+  selectedFile.value = file
+  if (!file) {
+    preview.value = null
+    return
+  }
+  const reader = new FileReader()
+  reader.onload = () => {
+    preview.value = typeof reader.result === 'string'
+      ? reader.result
+      : null
+  }
+  reader.readAsDataURL(file)
+  modal.value = true
+}
+
+/**
+ * Upload the selected file
+ */
+async function handleUpload() {
+  if (!selectedFile.value) return
+  isLoading.value = true
+  error.value = null
+  const res = await profileStore.uploadProfileImage(selectedFile.value, captionText.value)
+
+  if (!res.success) {
+    console.error('Upload error:', res.message)
+    error.value = res.message
+    isLoading.value = false
+    return
+  }
+  const updatedProfile = res.profile as OwnerProfile
+  emit('image:uploaded', updatedProfile)
+
+  // Clear after upload
+  preview.value = null
+  selectedFile.value = null
+  if (fileInput.value) fileInput.value.value = ''
+
+  isLoading.value = false
+}
+
+/**
+ * Remove preview and reset state
+ */
+async function handleRemovePreview() {
+  preview.value = null
+  selectedFile.value = null
+  if (fileInput.value) {
+    fileInput.value.value = ''
+  }
+  modal.value = false
+}
+</script>
+
+
 <template>
   <div class="image-upload">
     <FormKit ref="fileInput"
@@ -59,90 +146,7 @@
   </BModal>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue'
-import type { ProfileImage } from '@zod/generated'
-import { useProfileStore } from '@/store/profileStore'
 
-import AvatarUploadIcon from '@/assets/icons/files/avatar-upload.svg'
-import { OwnerProfileImage, PublicProfileImage } from '@zod/media.schema'
-
-const profileStore = useProfileStore()
-
-// State
-const preview = ref<string | null>(null)
-const selectedFile = ref<File | null>(null)
-const isLoading = ref(false)
-const error = ref<string | null>(null)
-const fileInput = ref<HTMLInputElement>()
-const modal = ref(false)
-const captionText = ref<string>('')
-
-// Emitters
-const emit = defineEmits<{
-  (e: 'image:uploaded', payload: OwnerProfileImage): void
-  (e: 'image:deleted', payload: { id: string }): void
-}>()
-
-/**
- * Handle file selection: set preview and keep file
- */
-function handleFileChange(event: Event) {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0] ?? null
-  selectedFile.value = file
-  if (!file) {
-    preview.value = null
-    return
-  }
-  const reader = new FileReader()
-  reader.onload = () => {
-    preview.value = typeof reader.result === 'string'
-      ? reader.result
-      : null
-  }
-  reader.readAsDataURL(file)
-  modal.value = true
-}
-
-/**
- * Upload the selected file
- */
-async function handleUpload() {
-  if (!selectedFile.value) return
-  isLoading.value = true
-  error.value = null
-  const res = await profileStore.uploadProfileImage(selectedFile.value, captionText.value)
-
-  if (!res.success) {
-    console.error('Upload error:', res.message)
-    error.value = res.message
-    isLoading.value = false
-    return
-  }
-  const image = res.profileImage as OwnerProfileImage
-  emit('image:uploaded', image)
-
-  // Clear after upload
-  preview.value = null
-  selectedFile.value = null
-  if (fileInput.value) fileInput.value.value = ''
-
-  isLoading.value = false
-}
-
-/**
- * Remove preview and reset state
- */
-async function handleRemovePreview() {
-  preview.value = null
-  selectedFile.value = null
-  if (fileInput.value) {
-    fileInput.value.value = ''
-  }
-  modal.value = false
-}
-</script>
 
 <style lang="scss">
 .image-upload {

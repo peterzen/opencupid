@@ -10,7 +10,7 @@ axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '/api'
 // Success / Error response shapes
 interface UploadSuccess {
   success: true
-  profileImage: PublicProfileImage
+  profile: OwnerProfile
 }
 
 
@@ -44,7 +44,7 @@ export const useProfileStore = defineStore('profile', {
     },
 
     // Fetch a profile by ID
-    async findProfile(profileId: string) {
+    async getPublicProfile(profileId: string) {
       try {
         const res = await axios.get(`/profiles/${profileId}`)
         return res.data.profile

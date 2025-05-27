@@ -6,7 +6,7 @@
     "build": "tsup",
     "start": "node dist/main.js",
     "generate": "prisma generate --no-hints",
-    "migrate": "prisma migrate dev --name init",
+    "migrate": "prisma migrate dev",
     "seed": "prisma db seed",
     "watch": "tsc-watch"
   },

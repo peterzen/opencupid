@@ -9,10 +9,11 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { OwnerProfile } from '@zod/profile.schema'
 import { OwnerProfileImage } from '@zod/media.schema'
 import { VueDraggableNext } from 'vue-draggable-next'
+import { orderProfileImages } from '@/lib/profileutils'
 
 const profileStore = useProfileStore()
 
-const images = ref<OwnerProfileImage[]>([])
+// const images = ref<OwnerProfileImage[]>([])
 const isLoading = ref(false)
 const isRemoving = reactive<Record<string, boolean>>({})
 
@@ -33,50 +34,31 @@ watch(
   () => props.modelValue,
   async (newVal) => {
     Object.assign(formData, newVal)
-    await fetchImages()
+    // await fetchImages()
   },
-  { deep: true, immediate: true }
+  { deep: true }
 )
 
-/**
- * Fetch all images for current user
- */
-async function fetchImages() {
-  isLoading.value = true
-  try {
-    const fetched = await profileStore.getUserImages()
-    console.log('Fetched images:', fetched)
-    images.value = orderImages(fetched)
-    if(formData.profileImage === null && images.value.length > 0) {
-      // If no profile image is set, set the first image as profile image
-      formData.profileImage = images.value[0]
-      emit('update:profileImage', images.value[0])
-    }
-  } catch (err) {
-    console.error('Failed to load images', err)
-  } finally {
-    isLoading.value = false
-  }
-}
-
-/**
- * Moves the profile image to the front of the images array if it exists.
- * @param images Array of images to order
- */
-function orderImages(images: OwnerProfileImage[]) {
-  debugger
-  if (formData.profileImage === null || images.length === 0) {
-    // If no profile image is set, just return the images as they are
-    return images
-  }
-  // Order images so that the profile image is first, if it exists
-  const profileImage = images.find(img => img.id === formData.profileImage?.id)
-  if (profileImage) {
-    return [profileImage, ...images.filter(img => img.id !== profileImage.id)]
-  }
-  console.log('should not find profile image in images', formData.profileImage, images)
-  return images
-}
+// /**
+//  * Fetch all images for current user
+//  */
+// async function fetchImages() {
+//   isLoading.value = true
+//   try {
+//     const fetched = await profileStore.getUserImages()
+//     console.log('Fetched images:', fetched)
+//     images.value = orderProfileImages(formData.profileImage, fetched)
+//     if(formData.profileImage === null && images.value.length > 0) {
+//       // If no profile image is set, set the first image as profile image
+//       formData.profileImage = images.value[0]
+//       emit('update:profileImage', images.value[0])
+//     }
+//   } catch (err) {
+//     console.error('Failed to load images', err)
+//   } finally {
+//     isLoading.value = false
+//   }
+// }
 
 /**
  * Remove an image by ID
@@ -85,9 +67,9 @@ async function remove(image: OwnerProfileImage) {
   isRemoving[image.id] = true
   try {
     await profileStore.deleteImage(image)
-    images.value = images.value.filter(img => img.id !== image.id)
+    formData.otherImages = formData.otherImages.filter(img => img.id !== image.id)
     // set profileImage to the next available image, or null if none exist
-    const nextProfileImage = images.value[0] || null
+    const nextProfileImage = formData.otherImages[0] || null
     formData.profileImage = nextProfileImage
     emit('update:profileImage', null)
     // emit('update:modelValue', formData)
@@ -99,13 +81,15 @@ async function remove(image: OwnerProfileImage) {
 }
 
 
-async function handleImageUploaded(image: OwnerProfileImage) {
-  console.log('Image uploaded:', image)
-  if (formData.profileImage === null) {
-    formData.profileImage = image
-    emit('update:profileImage', image)
-  }
-  await fetchImages()
+async function handleImageUploaded(updatedProfile: OwnerProfile) {
+  Object.assign(formData, updatedProfile)
+  emit('update:modelValue', formData)
+  // console.log('Image uploaded:', image)
+  // if (formData.profileImage === null) {
+  //   formData.profileImage = image
+  //   emit('update:profileImage', image)
+  // }
+  // await fetchImages()
 }
 
 function checkMove(evt: any) {
@@ -145,7 +129,7 @@ async function handleReorder(event: any) {
         </div>
         <div class="col-sm-6">
           <VueDraggableNext class="row row-cols-3 row-cols-sm-3 row-cols-md-3 g-4 sortable-grid"
-                            v-model="images"
+                            v-model="formData.otherImages"
                             ghost-class="ghost"
                             :sort="true"
                             filter="#upload-button"
@@ -153,7 +137,7 @@ async function handleReorder(event: any) {
                             :move="checkMove"
                             @change="handleReorder">
             <TransitionGroup name="fade">
-              <div v-for="img in images"
+              <div v-for="img in formData.otherImages"
                    :key="img.id"
                    class="col thumbnail"
                    :id="img.id">

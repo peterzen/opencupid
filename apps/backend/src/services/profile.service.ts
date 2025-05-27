@@ -30,6 +30,7 @@ export class ProfileService {
   }
 
   async getProfileById(profileId: string): Promise<ProfileComplete | null> {
+    console.log(`Fetching profile with ID: ${profileId}`)
     return prisma.profile.findUnique({
       where: { id: profileId },
       include: {
@@ -93,9 +94,9 @@ export class ProfileService {
     return updated;
   }
 
-  async setProfileImage(userId: string, imageId: string|null): Promise<Profile> {
+  async setProfileImage(userId: string, imageId: string | null): Promise<Profile> {
     console.log(`Setting profile image for user ${userId} to image ${imageId}`)
-    if (imageId ) {
+    if (imageId) {
       // Connect the profile image
       return prisma.profile.update({
         where: { userId },
@@ -118,7 +119,29 @@ export class ProfileService {
     }
   }
 
-  public async addImageToProfile(userId: string, imageId: string): Promise<Profile> {
+  public async addProfileImage(profile: ProfileComplete, imageId: string): Promise<{
+    otherImages: ProfileImage[];
+    profileImage: ProfileImage | null;
+  }> {
+    const data: Prisma.ProfileUpdateInput = {
+      otherImages: { connect: { id: imageId } },
+      // only add `profileImage` if it wasn’t set yet
+      ...(!profile.profileImage
+        ? { profileImage: { connect: { id: imageId } } }
+        : {}),
+    };
+
+    return prisma.profile.update({
+      where: { id: profile.id },
+      data,
+      select: {
+        profileImage: true,
+        otherImages: true,
+      }
+    })
+  }
+
+  public async addOtherImageToProfile(userId: string, imageId: string): Promise<Profile> {
     return prisma.profile.update({
       where: { userId },
       data: {
@@ -189,7 +212,7 @@ export class ProfileService {
     if (query) {
       where.OR = [
         { publicName: { contains: query, mode: 'insensitive' } },
-        { city: { contains: query, mode: 'insensitive' } }
+        { cityName: { contains: query, mode: 'insensitive' } }
       ]
     }
 

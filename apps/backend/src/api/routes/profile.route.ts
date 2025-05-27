@@ -137,13 +137,19 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
    * Get a profile by ID
    * @param {string} id - The ID of the profile to retrieve
    */
-  fastify.get('/:id', { onRequest: [fastify.authenticate] }, async (req, reply) => {
-    const { id } = req.params as { id: string }
+  fastify.get('/:profileId', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+
+    if (!req.user.userId) {
+      return sendError(reply, 401, 'Unauthorized')
+    }
+    const { profileId } = z.object({ profileId: z.string().cuid() }).parse(req.params)
     try {
-      const raw = await profileService.getProfileById(id)
+      const raw = await profileService.getProfileById(profileId)
+      console.log('Raw profile data:', raw)
       if (!raw) return sendError(reply, 404, 'Profile not found')
-      const profile = publicProfileSchema.parse(raw)
-      return reply.code(200).send({ success: true, profile })
+      const profile = mapToPublic(raw)
+      // const profile = publicProfileSchema.parse(raw)
+      return reply.code(200).send({ success: true, profile: raw })
     } catch (err) {
       fastify.log.error(err)
       return sendError(reply, 500, 'Failed to fetch profile')
@@ -213,10 +219,20 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
         : fileUpload.fields.captionText) as MultipartValue
       ).value ?? '') as string
 
+    const profile = await profileService.getProfileByUserId(req.user.userId)
+    if (!profile) {
+      return sendError(reply, 404, 'No user profile to link the image to')
+    }
+
     try {
       const stored = await imageGalleryService.storeImage(req.user.userId, fileUpload, captionText)
-      const image = imageGalleryService.toOwnerProfileImage(stored)
-      return reply.code(200).send({ success: true, profileImage: image })
+      if (!stored) {
+        return sendError(reply, 500, 'Failed to store image')
+      }
+      const updated = await profileService.addProfileImage(profile, stored.id)
+      console.log('Image stored and profile updated:', updated)
+      // const image = imageGalleryService.toOwnerProfileImage(stored)
+      return reply.code(200).send({ success: true, profile: updated })
     } catch (err) {
       fastify.log.error('Error storing image:', err)
       return sendError(reply, 500, 'Failed to store image')
@@ -251,7 +267,7 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       const { imageId } = attachImageParamsSchema.parse(req.params)
 
       try {
-        const updated = profileService.addImageToProfile(req.user.userId, imageId)
+        const updated = profileService.addOtherImageToProfile(req.user.userId, imageId)
         if (!updated) return sendError(reply, 404, 'Profile not found')
         const profile = ownerProfileSchema.parse(updated)
         return reply

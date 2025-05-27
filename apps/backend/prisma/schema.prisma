@@ -181,8 +181,8 @@ model Profile {
   publicName  String
   country     String @default("")
   cityName    String @default("")
-  cityId      Int? 
-  city        City?   @relation(fields: [cityId], references: [id])
+  cityId      Int?
+  city        City?  @relation(fields: [cityId], references: [id])
   introSocial String @default("")
 
   isSocialActive Boolean @default(false)
@@ -206,26 +206,28 @@ model Profile {
 
   tags ProfileTag[]
 
-  profileImageId String?        @unique
-  profileImage   ProfileImage?  @relation(name: "ProfilePrimaryImage", fields: [profileImageId], references: [id])
-  otherImages    ProfileImage[] @relation(name: "ProfileOtherImages")
+  profileImageId String?       @unique
+  profileImage   ProfileImage? @relation("ProfilePrimaryImage", fields: [profileImageId], references: [id])
+
+  // Other images: one-to-many
+  profileImages ProfileImage[] @relation("ProfileImages")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model ProfileImage {
-  id       String @id @default(cuid())
-  mimeType String
-  userId   String
-  user     User   @relation(fields: [userId], references: [id])
+  id             String   @id @default(cuid())
+  mimeType       String
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  profileId      String?
+  profile        Profile? @relation("ProfileImages", fields: [profileId], references: [id])
+  primaryProfile Profile? @relation("ProfilePrimaryImage")
 
   altText     String  @default("")
   storagePath String  @unique
   url         String?
-
-  primaryForProfile Profile?  @relation("ProfilePrimaryImage")
-  otherForProfiles  Profile[] @relation("ProfileOtherImages")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
