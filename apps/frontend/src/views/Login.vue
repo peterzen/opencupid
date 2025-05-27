@@ -65,7 +65,7 @@ export default defineComponent({
         const res = await authStore.otpLogin(token);
 
         if (res.success === true) {
-          this.$router.push({ name: 'UserHome' })
+          this.$router.push({ name: 'PublicProfile' })
         } else {
           // Handle different status flags
           if (res.status === 'missing_token') {

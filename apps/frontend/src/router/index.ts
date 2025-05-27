@@ -6,7 +6,7 @@ import { useLocalStore } from '@/store/localStore';
 import { showToast } from '@/lib/toastify';
 
 import Login from '@/views/Login.vue';
-import UserHome from '@/views/UserHome.vue';
+import PublicProfile from '@/views/PublicProfile.vue';
 import Messaging from '@/views/Messaging.vue';
 import Onboarding from '@/views/Onboarding.vue';
 import BrowseProfiles from '@/views/BrowseProfiles.vue';
@@ -21,8 +21,8 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/me',
-    name: 'UserHome',
-    component: UserHome,
+    name: 'PublicProfile',
+    component: PublicProfile,
     meta: { requiresAuth: true }
   },
   {

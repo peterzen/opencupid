@@ -20,7 +20,7 @@
           <li class="nav-item me-auto">
             <RouterLink to="/me"
                         :class="{ 'active': currentRoute === '/me' }"
-                        class="nav-link ">{{ t('nav.home') }}</RouterLink>
+                        class="nav-link ">{{ t('nav.profile') }}</RouterLink>
           </li>
           <li class="nav-item me-auto">
             <RouterLink to="/onboarding"
