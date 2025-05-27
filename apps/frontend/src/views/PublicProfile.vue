@@ -5,9 +5,7 @@
     <LoadingComponent v-if="state.isLoading" />
 
     <BCarousel controls>
-      <BCarouselSlide img-src="https://picsum.photos/1024/480/?image=1" />
-      <BCarouselSlide img-src="https://picsum.photos/1024/480/?image=2" />
-      <BCarouselSlide img-src="https://picsum.photos/1024/480/?image=3" />
+      <BCarouselSlide v-for="img in profile.profileImages"  :img-src="img.url!" />
     </BCarousel>
 
   </div>
@@ -28,6 +26,7 @@ const state = reactive({
   isLoading: false,
 });
 
+const profile = ref<PublicProfile>(state.profile);
 
 onMounted(async () => {
   state.isLoading = true

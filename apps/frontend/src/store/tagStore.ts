@@ -116,7 +116,7 @@ export const useTagsStore = defineStore('tags', {
      */
     async addUserTag(input: CreateTagInput): Promise<PublicTag> {
       try {
-        const res = await axios.put<{ success: true; tag: PublicTag }>('/tags/user', input);
+        const res = await axios.post<{ success: true; tag: PublicTag }>('/tags/user', input);
         return res.data.tag;
       } catch (error: any) {
         console.error('Failed to add user tag:', error);

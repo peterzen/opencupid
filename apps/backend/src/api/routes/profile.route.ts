@@ -178,7 +178,10 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     const { id: profileImageId } = IdLookupParamsSchema.parse(req.params)
 
     try {
-      await imageService.deleteImage(req.user.userId, profileImageId)
+      const ok = await imageService.deleteImage(req.user.userId, profileImageId)
+      if (!ok) {
+        return sendError(reply, 500, 'Failed to delete image')
+      }
       const updated = await profileService.getProfileByUserId(req.user.userId)
       if (!updated) {
         return sendError(reply, 400, 'No user profile found to update after image deletion')

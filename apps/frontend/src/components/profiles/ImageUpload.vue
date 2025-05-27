@@ -4,6 +4,7 @@ import { useProfileStore } from '@/store/profileStore'
 
 import AvatarUploadIcon from '@/assets/icons/files/avatar-upload.svg'
 import { OwnerProfile } from '@zod/profile.schema'
+import LoadingComponent from '../LoadingComponent.vue'
 
 const profileStore = useProfileStore()
 
@@ -13,7 +14,7 @@ const selectedFile = ref<File | null>(null)
 const isLoading = ref(false)
 const error = ref<string | null>(null)
 const fileInput = ref<HTMLInputElement>()
-const modal = ref(false)
+const modalOpen = ref(false)
 const captionText = ref<string>('')
 
 // Emitters
@@ -42,7 +43,7 @@ function handleFileChange(event: Event) {
       : null
   }
   reader.readAsDataURL(file)
-  modal.value = true
+  modalOpen.value = true
 }
 
 /**
@@ -52,6 +53,7 @@ async function handleUpload() {
   if (!selectedFile.value) return
   isLoading.value = true
   error.value = null
+
   const res = await profileStore.uploadProfileImage(selectedFile.value, captionText.value)
 
   if (!res.success) {
@@ -69,6 +71,7 @@ async function handleUpload() {
   if (fileInput.value) fileInput.value.value = ''
 
   isLoading.value = false
+  modalOpen.value = false
 }
 
 /**
@@ -80,7 +83,7 @@ async function handleRemovePreview() {
   if (fileInput.value) {
     fileInput.value.value = ''
   }
-  modal.value = false
+  modalOpen.value = false
 }
 </script>
 
@@ -112,21 +115,26 @@ async function handleRemovePreview() {
       {{ error }}
     </div>
   </div>
-  <BModal v-model="modal"
+  <BModal v-model="modalOpen"
           centered
           button-size="sm"
+          :focus="false"
+          :no-close-on-backdrop="true"
+          :no-footer="true"
           cancel-title="Nevermind"
           initial-animation
-          title="Add a photo"
-          @cancel="handleRemovePreview"
-          @ok="handleUpload">
+          title="Add a photo">
     <div v-if="preview"
          class="preview-container">
       <div class="mb-3">
-        <img :src="preview"
-             alt="Preview"
-             width="200"
-             class="preview-image" />
+        <LoadingComponent v-if="isLoading" />
+        <div class="ratio ratio-1x1">
+          <img :src="preview"
+               alt="Preview"
+               width="200"
+               :class="isLoading ? 'loading' : ''"
+               class="preview-image" />
+        </div>
       </div>
       <div class="mb-3">
         <FormKit type="textarea"
@@ -142,10 +150,24 @@ async function handleRemovePreview() {
                   max: 'Name must be less than 50 characters long'
                 }" />
       </div>
+      <ErrorComponent :error="error" />
+      <div class="mb-3  justify-content-end d-flex gap-2">
+        <FormKit type="button"
+                 wrapper-class=""
+                 input-class="btn btn-outline-secondary btn-sm"
+                 label="Nevermind"
+                 @click.prevent="handleRemovePreview" />
+
+        <FormKit type="button"
+                 wrapper-class=""
+                 input-class="btn btn-primary btn-sm"
+                 label="Save"
+                 :disabled="isLoading"
+                 @click.prevent="handleUpload" />
+      </div>
     </div>
   </BModal>
 </template>
-
 
 
 <style lang="scss">
@@ -165,5 +187,24 @@ async function handleRemovePreview() {
     width: 100%;
     height: 100%;
   }
+}
+
+img {
+  object-fit: cover;
+}
+
+.preview-image {
+  .loading {
+    opacity: 0.5;
+  }
+}
+
+.loading-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2rem;
+  height: 2rem;
 }
 </style>

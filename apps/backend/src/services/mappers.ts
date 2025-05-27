@@ -46,8 +46,8 @@ export function mapProfileToPublic(profile: ProfileWithImages): PublicProfile {
   }
 }
 
-export function mapProfileImagesToOwner(images: ProfileImage[]): ProfileWithImages {
-  return images.map((img: ProfileImage) => toOwnerProfileImage(img))
+export function mapProfileImagesToOwner(images: ProfileImage[]): OwnerProfileImage[] {
+  return images.map((img) => toOwnerProfileImage(img));
 }
 
 export function mapProfileImagesToPublic(images: ProfileImage[]): PublicProfileImage[] {
@@ -67,8 +67,8 @@ function getImageUrl(image: ProfileImage): string {
  * by removing any non-public fields
  */
 export function toPublicProfileImage(image: ProfileImage): PublicProfileImage {
-  image.url = getImageUrl(image);
-  return PublicProfileImageSchema.parse(image)
+  const withUrl = { ...image, url: getImageUrl(image) };
+  return PublicProfileImageSchema.parse(withUrl);
 }
 
 /**

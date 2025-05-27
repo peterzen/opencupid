@@ -37,7 +37,10 @@ const tagsRoutes: FastifyPluginAsync = async (fastify) => {
   /**
      * Create a new tag
      */
-  fastify.put('/user', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+  fastify.post('/user', { 
+   onRequest: [fastify.authenticate],
+   config: { rateLimit: { max: 10, timeWindow: '1 minute' } }
+ }, async (req, reply) => {
     const userId = req.user.userId
     if (!userId) {
       return sendError(reply, 401, 'Unauthorized');

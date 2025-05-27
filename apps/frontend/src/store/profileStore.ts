@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
-import type { Profile, ProfileImage } from '@zod/generated'
-import type { OwnerProfile, UpdateProfilePayload } from '@zod/profile.schema'
-import { OwnerProfileImage, ProfileImagePosition } from '@zod/profileimage.schema'
+import { OwnerProfile, OwnerProfileSchema, PublicProfileSchema, UpdateProfilePayload } from '@zod/profile.schema'
+import { type OwnerProfileImage, type ProfileImagePosition } from '@zod/profileimage.schema'
 
 
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '/api'
@@ -34,7 +33,7 @@ export const useProfileStore = defineStore('profile', {
     async getUserProfile(): Promise<OwnerProfile> {
       try {
         const res = await axios.get('/profiles/me')
-        this.profile = res.data.profile as OwnerProfile
+        this.profile = OwnerProfileSchema.parse(res.data.profile)
         console.log('Fetched user profile:', this.profile)
         return this.profile
       } catch (error: any) {
@@ -47,7 +46,7 @@ export const useProfileStore = defineStore('profile', {
     async getPublicProfile(profileId: string) {
       try {
         const res = await axios.get(`/profiles/${profileId}`)
-        return res.data.profile
+        return PublicProfileSchema.parse(res.data.profile)
       } catch (error: any) {
         console.error('Failed to fetch profile:', error)
         throw error.response?.data?.message || 'Failed to fetch profile'
@@ -58,7 +57,7 @@ export const useProfileStore = defineStore('profile', {
     async updateProfile(profileData: UpdateProfilePayload): Promise<OwnerProfile> {
       try {
         const res = await axios.patch('/profiles/profile', profileData)
-        this.profile = res.data.profile  as OwnerProfile
+        this.profile = OwnerProfileSchema.parse(res.data.profile)
         return this.profile
       } catch (error: any) {
         console.error('Store: cannot to update profile:', error)
@@ -109,7 +108,7 @@ export const useProfileStore = defineStore('profile', {
       }
     },
 
- 
+
     async reorderImages(images: ProfileImagePosition[]): Promise<UploadResponse> {
       try {
         const { data } = await axios.patch<UploadSuccess>('/profiles/image/order', { images })

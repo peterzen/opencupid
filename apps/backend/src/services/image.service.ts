@@ -42,7 +42,7 @@ export class ImageGalleryService {
   }
 
   /**
-   * List all images for a given user, most recent first
+   * List all images for a given user, most recent last
    */
   async listImages(userId: string): Promise<ProfileImage[]> {
     return prisma.profileImage.findMany({
@@ -71,11 +71,17 @@ export class ImageGalleryService {
     const storageRelPath = getStorageRelativePath(storagePrefix, filename, fileExtension);
     const fullPath = path.join(uploadBaseDir, storageRelPath);
 
-    // Move the uploaded temp file to the final location
-    await fs.promises.rename(fileUpload.filepath, fullPath);
+    try {
+      await fs.promises.rename(fileUpload.filepath, fullPath);
+    } catch (err: any) {
+      console.error('Failed to move upload', err);
+      throw new Error('Failed to move uploaded file');
+    }
 
     // compute the content hash of the file
     const contentHash = await generateContentHash(fullPath)
+    // set position to be the last position
+    const position = await prisma.profileImage.count({ where: { userId } })
 
     // Create a new ProfileImage record
     return await prisma.profileImage.create({
@@ -86,7 +92,7 @@ export class ImageGalleryService {
         storagePath: storageRelPath,
         isModerated: false,
         contentHash: contentHash,
-        position: -1, // last position
+        position: position,
       }
     });
   }
@@ -120,9 +126,14 @@ export class ImageGalleryService {
       console.error('Image not found or does not belong to user');
       return false;
     }
-    const result = await prisma.profileImage.delete({
-      where: { id: image.id },
-    });
+    try {
+      await prisma.profileImage.delete({
+        where: { id: image.id },
+      });
+    } catch (err) {
+      console.error('Error deleting image from database:', err);
+      return false;
+    }
 
     // Delete the file from the filesystem
     const file = path.join(getUploadBaseDir(), image.storagePath);
@@ -131,7 +142,6 @@ export class ImageGalleryService {
       fs.unlinkSync(file);
     } catch (err) {
       console.error('Error deleting file:', err);
-      return false;
     }
     return true
   }
