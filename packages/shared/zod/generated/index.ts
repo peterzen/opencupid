@@ -26,9 +26,9 @@ export const ConnectionRequestScalarFieldEnumSchema = z.enum(['id','fromUserId',
 
 export const UserScalarFieldEnumSchema = z.enum(['id','email','tokenVersion','loginToken','loginTokenExp','isActive','isBlocked','isRegistrationConfirmed','createdAt','updatedAt','lastLoginAt','language']);
 
-export const ProfileScalarFieldEnumSchema = z.enum(['id','publicName','country','cityName','cityId','introSocial','isSocialActive','isDatingActive','isActive','isReported','isBlocked','userId','work','languages','introDating','birthday','gender','pronouns','relationship','hasKids','profileImageId','createdAt','updatedAt']);
+export const ProfileScalarFieldEnumSchema = z.enum(['id','publicName','country','cityName','cityId','introSocial','isSocialActive','isDatingActive','isActive','isReported','isBlocked','userId','work','languages','introDating','birthday','gender','pronouns','relationship','hasKids','createdAt','updatedAt']);
 
-export const ProfileImageScalarFieldEnumSchema = z.enum(['id','mimeType','userId','profileId','altText','storagePath','url','createdAt','updatedAt','contentHash','isModerated','isFlagged']);
+export const ProfileImageScalarFieldEnumSchema = z.enum(['id','mimeType','userId','profileId','position','altText','storagePath','url','createdAt','updatedAt','contentHash','isModerated','isFlagged']);
 
 export const SortOrderSchema = z.enum(['asc','desc']);
 
@@ -204,7 +204,6 @@ export const ProfileSchema = z.object({
   languages: z.string().array(),
   introDating: z.string(),
   birthday: z.coerce.date().nullable(),
-  profileImageId: z.string().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
@@ -220,6 +219,7 @@ export const ProfileImageSchema = z.object({
   mimeType: z.string(),
   userId: z.string(),
   profileId: z.string().nullable(),
+  position: z.number().int(),
   altText: z.string(),
   storagePath: z.string(),
   url: z.string().nullable(),
@@ -438,7 +438,6 @@ export const ProfileIncludeSchema: z.ZodType<Prisma.ProfileInclude> = z.object({
   city: z.union([z.boolean(),z.lazy(() => CityArgsSchema)]).optional(),
   user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
   tags: z.union([z.boolean(),z.lazy(() => ProfileTagFindManyArgsSchema)]).optional(),
-  profileImage: z.union([z.boolean(),z.lazy(() => ProfileImageArgsSchema)]).optional(),
   profileImages: z.union([z.boolean(),z.lazy(() => ProfileImageFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => ProfileCountOutputTypeArgsSchema)]).optional(),
 }).strict()
@@ -478,13 +477,11 @@ export const ProfileSelectSchema: z.ZodType<Prisma.ProfileSelect> = z.object({
   pronouns: z.boolean().optional(),
   relationship: z.boolean().optional(),
   hasKids: z.boolean().optional(),
-  profileImageId: z.boolean().optional(),
   createdAt: z.boolean().optional(),
   updatedAt: z.boolean().optional(),
   city: z.union([z.boolean(),z.lazy(() => CityArgsSchema)]).optional(),
   user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
   tags: z.union([z.boolean(),z.lazy(() => ProfileTagFindManyArgsSchema)]).optional(),
-  profileImage: z.union([z.boolean(),z.lazy(() => ProfileImageArgsSchema)]).optional(),
   profileImages: z.union([z.boolean(),z.lazy(() => ProfileImageFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => ProfileCountOutputTypeArgsSchema)]).optional(),
 }).strict()
@@ -495,7 +492,6 @@ export const ProfileSelectSchema: z.ZodType<Prisma.ProfileSelect> = z.object({
 export const ProfileImageIncludeSchema: z.ZodType<Prisma.ProfileImageInclude> = z.object({
   user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
   profile: z.union([z.boolean(),z.lazy(() => ProfileArgsSchema)]).optional(),
-  primaryProfile: z.union([z.boolean(),z.lazy(() => ProfileArgsSchema)]).optional(),
 }).strict()
 
 export const ProfileImageArgsSchema: z.ZodType<Prisma.ProfileImageDefaultArgs> = z.object({
@@ -508,6 +504,7 @@ export const ProfileImageSelectSchema: z.ZodType<Prisma.ProfileImageSelect> = z.
   mimeType: z.boolean().optional(),
   userId: z.boolean().optional(),
   profileId: z.boolean().optional(),
+  position: z.boolean().optional(),
   altText: z.boolean().optional(),
   storagePath: z.boolean().optional(),
   url: z.boolean().optional(),
@@ -518,7 +515,6 @@ export const ProfileImageSelectSchema: z.ZodType<Prisma.ProfileImageSelect> = z.
   isFlagged: z.boolean().optional(),
   user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
   profile: z.union([z.boolean(),z.lazy(() => ProfileArgsSchema)]).optional(),
-  primaryProfile: z.union([z.boolean(),z.lazy(() => ProfileArgsSchema)]).optional(),
 }).strict()
 
 
@@ -1124,13 +1120,11 @@ export const ProfileWhereInputSchema: z.ZodType<Prisma.ProfileWhereInput> = z.ob
   pronouns: z.union([ z.lazy(() => EnumPronounsNullableFilterSchema),z.lazy(() => PronounsSchema) ]).optional().nullable(),
   relationship: z.union([ z.lazy(() => EnumRelationshipStatusNullableFilterSchema),z.lazy(() => RelationshipStatusSchema) ]).optional().nullable(),
   hasKids: z.union([ z.lazy(() => EnumHasKidsNullableFilterSchema),z.lazy(() => HasKidsSchema) ]).optional().nullable(),
-  profileImageId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   city: z.union([ z.lazy(() => CityNullableScalarRelationFilterSchema),z.lazy(() => CityWhereInputSchema) ]).optional().nullable(),
   user: z.union([ z.lazy(() => UserScalarRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional(),
   tags: z.lazy(() => ProfileTagListRelationFilterSchema).optional(),
-  profileImage: z.union([ z.lazy(() => ProfileImageNullableScalarRelationFilterSchema),z.lazy(() => ProfileImageWhereInputSchema) ]).optional().nullable(),
   profileImages: z.lazy(() => ProfileImageListRelationFilterSchema).optional()
 }).strict();
 
@@ -1155,48 +1149,29 @@ export const ProfileOrderByWithRelationInputSchema: z.ZodType<Prisma.ProfileOrde
   pronouns: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   relationship: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   hasKids: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-  profileImageId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   city: z.lazy(() => CityOrderByWithRelationInputSchema).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
   tags: z.lazy(() => ProfileTagOrderByRelationAggregateInputSchema).optional(),
-  profileImage: z.lazy(() => ProfileImageOrderByWithRelationInputSchema).optional(),
   profileImages: z.lazy(() => ProfileImageOrderByRelationAggregateInputSchema).optional()
 }).strict();
 
 export const ProfileWhereUniqueInputSchema: z.ZodType<Prisma.ProfileWhereUniqueInput> = z.union([
   z.object({
     id: z.string().cuid(),
-    userId: z.string(),
-    profileImageId: z.string()
-  }),
-  z.object({
-    id: z.string().cuid(),
-    userId: z.string(),
-  }),
-  z.object({
-    id: z.string().cuid(),
-    profileImageId: z.string(),
+    userId: z.string()
   }),
   z.object({
     id: z.string().cuid(),
   }),
   z.object({
     userId: z.string(),
-    profileImageId: z.string(),
-  }),
-  z.object({
-    userId: z.string(),
-  }),
-  z.object({
-    profileImageId: z.string(),
   }),
 ])
 .and(z.object({
   id: z.string().cuid().optional(),
   userId: z.string().optional(),
-  profileImageId: z.string().optional(),
   AND: z.union([ z.lazy(() => ProfileWhereInputSchema),z.lazy(() => ProfileWhereInputSchema).array() ]).optional(),
   OR: z.lazy(() => ProfileWhereInputSchema).array().optional(),
   NOT: z.union([ z.lazy(() => ProfileWhereInputSchema),z.lazy(() => ProfileWhereInputSchema).array() ]).optional(),
@@ -1223,7 +1198,6 @@ export const ProfileWhereUniqueInputSchema: z.ZodType<Prisma.ProfileWhereUniqueI
   city: z.union([ z.lazy(() => CityNullableScalarRelationFilterSchema),z.lazy(() => CityWhereInputSchema) ]).optional().nullable(),
   user: z.union([ z.lazy(() => UserScalarRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional(),
   tags: z.lazy(() => ProfileTagListRelationFilterSchema).optional(),
-  profileImage: z.union([ z.lazy(() => ProfileImageNullableScalarRelationFilterSchema),z.lazy(() => ProfileImageWhereInputSchema) ]).optional().nullable(),
   profileImages: z.lazy(() => ProfileImageListRelationFilterSchema).optional()
 }).strict());
 
@@ -1248,7 +1222,6 @@ export const ProfileOrderByWithAggregationInputSchema: z.ZodType<Prisma.ProfileO
   pronouns: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   relationship: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   hasKids: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
-  profileImageId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   _count: z.lazy(() => ProfileCountOrderByAggregateInputSchema).optional(),
@@ -1282,7 +1255,6 @@ export const ProfileScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.Profi
   pronouns: z.union([ z.lazy(() => EnumPronounsNullableWithAggregatesFilterSchema),z.lazy(() => PronounsSchema) ]).optional().nullable(),
   relationship: z.union([ z.lazy(() => EnumRelationshipStatusNullableWithAggregatesFilterSchema),z.lazy(() => RelationshipStatusSchema) ]).optional().nullable(),
   hasKids: z.union([ z.lazy(() => EnumHasKidsNullableWithAggregatesFilterSchema),z.lazy(() => HasKidsSchema) ]).optional().nullable(),
-  profileImageId: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
   createdAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
 }).strict();
@@ -1295,6 +1267,7 @@ export const ProfileImageWhereInputSchema: z.ZodType<Prisma.ProfileImageWhereInp
   mimeType: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   userId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   profileId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  position: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
   altText: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   storagePath: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   url: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
@@ -1305,7 +1278,6 @@ export const ProfileImageWhereInputSchema: z.ZodType<Prisma.ProfileImageWhereInp
   isFlagged: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   user: z.union([ z.lazy(() => UserScalarRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional(),
   profile: z.union([ z.lazy(() => ProfileNullableScalarRelationFilterSchema),z.lazy(() => ProfileWhereInputSchema) ]).optional().nullable(),
-  primaryProfile: z.union([ z.lazy(() => ProfileNullableScalarRelationFilterSchema),z.lazy(() => ProfileWhereInputSchema) ]).optional().nullable(),
 }).strict();
 
 export const ProfileImageOrderByWithRelationInputSchema: z.ZodType<Prisma.ProfileImageOrderByWithRelationInput> = z.object({
@@ -1313,6 +1285,7 @@ export const ProfileImageOrderByWithRelationInputSchema: z.ZodType<Prisma.Profil
   mimeType: z.lazy(() => SortOrderSchema).optional(),
   userId: z.lazy(() => SortOrderSchema).optional(),
   profileId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  position: z.lazy(() => SortOrderSchema).optional(),
   altText: z.lazy(() => SortOrderSchema).optional(),
   storagePath: z.lazy(() => SortOrderSchema).optional(),
   url: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
@@ -1322,8 +1295,7 @@ export const ProfileImageOrderByWithRelationInputSchema: z.ZodType<Prisma.Profil
   isModerated: z.lazy(() => SortOrderSchema).optional(),
   isFlagged: z.lazy(() => SortOrderSchema).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
-  profile: z.lazy(() => ProfileOrderByWithRelationInputSchema).optional(),
-  primaryProfile: z.lazy(() => ProfileOrderByWithRelationInputSchema).optional()
+  profile: z.lazy(() => ProfileOrderByWithRelationInputSchema).optional()
 }).strict();
 
 export const ProfileImageWhereUniqueInputSchema: z.ZodType<Prisma.ProfileImageWhereUniqueInput> = z.union([
@@ -1347,6 +1319,7 @@ export const ProfileImageWhereUniqueInputSchema: z.ZodType<Prisma.ProfileImageWh
   mimeType: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   userId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   profileId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  position: z.union([ z.lazy(() => IntFilterSchema),z.number().int() ]).optional(),
   altText: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   url: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
@@ -1356,7 +1329,6 @@ export const ProfileImageWhereUniqueInputSchema: z.ZodType<Prisma.ProfileImageWh
   isFlagged: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
   user: z.union([ z.lazy(() => UserScalarRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional(),
   profile: z.union([ z.lazy(() => ProfileNullableScalarRelationFilterSchema),z.lazy(() => ProfileWhereInputSchema) ]).optional().nullable(),
-  primaryProfile: z.union([ z.lazy(() => ProfileNullableScalarRelationFilterSchema),z.lazy(() => ProfileWhereInputSchema) ]).optional().nullable(),
 }).strict());
 
 export const ProfileImageOrderByWithAggregationInputSchema: z.ZodType<Prisma.ProfileImageOrderByWithAggregationInput> = z.object({
@@ -1364,6 +1336,7 @@ export const ProfileImageOrderByWithAggregationInputSchema: z.ZodType<Prisma.Pro
   mimeType: z.lazy(() => SortOrderSchema).optional(),
   userId: z.lazy(() => SortOrderSchema).optional(),
   profileId: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  position: z.lazy(() => SortOrderSchema).optional(),
   altText: z.lazy(() => SortOrderSchema).optional(),
   storagePath: z.lazy(() => SortOrderSchema).optional(),
   url: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
@@ -1373,8 +1346,10 @@ export const ProfileImageOrderByWithAggregationInputSchema: z.ZodType<Prisma.Pro
   isModerated: z.lazy(() => SortOrderSchema).optional(),
   isFlagged: z.lazy(() => SortOrderSchema).optional(),
   _count: z.lazy(() => ProfileImageCountOrderByAggregateInputSchema).optional(),
+  _avg: z.lazy(() => ProfileImageAvgOrderByAggregateInputSchema).optional(),
   _max: z.lazy(() => ProfileImageMaxOrderByAggregateInputSchema).optional(),
-  _min: z.lazy(() => ProfileImageMinOrderByAggregateInputSchema).optional()
+  _min: z.lazy(() => ProfileImageMinOrderByAggregateInputSchema).optional(),
+  _sum: z.lazy(() => ProfileImageSumOrderByAggregateInputSchema).optional()
 }).strict();
 
 export const ProfileImageScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.ProfileImageScalarWhereWithAggregatesInput> = z.object({
@@ -1385,6 +1360,7 @@ export const ProfileImageScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.
   mimeType: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   userId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   profileId: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  position: z.union([ z.lazy(() => IntWithAggregatesFilterSchema),z.number() ]).optional(),
   altText: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   storagePath: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   url: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
@@ -1922,7 +1898,6 @@ export const ProfileCreateInputSchema: z.ZodType<Prisma.ProfileCreateInput> = z.
   city: z.lazy(() => CityCreateNestedOneWithoutProfilesInputSchema).optional(),
   user: z.lazy(() => UserCreateNestedOneWithoutProfileInputSchema),
   tags: z.lazy(() => ProfileTagCreateNestedManyWithoutProfileInputSchema).optional(),
-  profileImage: z.lazy(() => ProfileImageCreateNestedOneWithoutPrimaryProfileInputSchema).optional(),
   profileImages: z.lazy(() => ProfileImageCreateNestedManyWithoutProfileInputSchema).optional()
 }).strict();
 
@@ -1947,7 +1922,6 @@ export const ProfileUncheckedCreateInputSchema: z.ZodType<Prisma.ProfileUnchecke
   pronouns: z.lazy(() => PronounsSchema).optional().nullable(),
   relationship: z.lazy(() => RelationshipStatusSchema).optional().nullable(),
   hasKids: z.lazy(() => HasKidsSchema).optional().nullable(),
-  profileImageId: z.string().optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   tags: z.lazy(() => ProfileTagUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
@@ -1978,7 +1952,6 @@ export const ProfileUpdateInputSchema: z.ZodType<Prisma.ProfileUpdateInput> = z.
   city: z.lazy(() => CityUpdateOneWithoutProfilesNestedInputSchema).optional(),
   user: z.lazy(() => UserUpdateOneRequiredWithoutProfileNestedInputSchema).optional(),
   tags: z.lazy(() => ProfileTagUpdateManyWithoutProfileNestedInputSchema).optional(),
-  profileImage: z.lazy(() => ProfileImageUpdateOneWithoutPrimaryProfileNestedInputSchema).optional(),
   profileImages: z.lazy(() => ProfileImageUpdateManyWithoutProfileNestedInputSchema).optional()
 }).strict();
 
@@ -2003,7 +1976,6 @@ export const ProfileUncheckedUpdateInputSchema: z.ZodType<Prisma.ProfileUnchecke
   pronouns: z.union([ z.lazy(() => PronounsSchema),z.lazy(() => NullableEnumPronounsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => NullableEnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => NullableEnumHasKidsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  profileImageId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   tags: z.lazy(() => ProfileTagUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
@@ -2031,7 +2003,6 @@ export const ProfileCreateManyInputSchema: z.ZodType<Prisma.ProfileCreateManyInp
   pronouns: z.lazy(() => PronounsSchema).optional().nullable(),
   relationship: z.lazy(() => RelationshipStatusSchema).optional().nullable(),
   hasKids: z.lazy(() => HasKidsSchema).optional().nullable(),
-  profileImageId: z.string().optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional()
 }).strict();
@@ -2080,7 +2051,6 @@ export const ProfileUncheckedUpdateManyInputSchema: z.ZodType<Prisma.ProfileUnch
   pronouns: z.union([ z.lazy(() => PronounsSchema),z.lazy(() => NullableEnumPronounsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => NullableEnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => NullableEnumHasKidsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  profileImageId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
@@ -2088,6 +2058,7 @@ export const ProfileUncheckedUpdateManyInputSchema: z.ZodType<Prisma.ProfileUnch
 export const ProfileImageCreateInputSchema: z.ZodType<Prisma.ProfileImageCreateInput> = z.object({
   id: z.string().cuid().optional(),
   mimeType: z.string(),
+  position: z.number().int().optional(),
   altText: z.string().optional(),
   storagePath: z.string(),
   url: z.string().optional().nullable(),
@@ -2097,8 +2068,7 @@ export const ProfileImageCreateInputSchema: z.ZodType<Prisma.ProfileImageCreateI
   isModerated: z.boolean().optional(),
   isFlagged: z.boolean().optional(),
   user: z.lazy(() => UserCreateNestedOneWithoutProfileImageInputSchema),
-  profile: z.lazy(() => ProfileCreateNestedOneWithoutProfileImagesInputSchema).optional(),
-  primaryProfile: z.lazy(() => ProfileCreateNestedOneWithoutProfileImageInputSchema).optional()
+  profile: z.lazy(() => ProfileCreateNestedOneWithoutProfileImagesInputSchema).optional()
 }).strict();
 
 export const ProfileImageUncheckedCreateInputSchema: z.ZodType<Prisma.ProfileImageUncheckedCreateInput> = z.object({
@@ -2106,6 +2076,7 @@ export const ProfileImageUncheckedCreateInputSchema: z.ZodType<Prisma.ProfileIma
   mimeType: z.string(),
   userId: z.string(),
   profileId: z.string().optional().nullable(),
+  position: z.number().int().optional(),
   altText: z.string().optional(),
   storagePath: z.string(),
   url: z.string().optional().nullable(),
@@ -2113,13 +2084,13 @@ export const ProfileImageUncheckedCreateInputSchema: z.ZodType<Prisma.ProfileIma
   updatedAt: z.coerce.date().optional(),
   contentHash: z.string().optional().nullable(),
   isModerated: z.boolean().optional(),
-  isFlagged: z.boolean().optional(),
-  primaryProfile: z.lazy(() => ProfileUncheckedCreateNestedOneWithoutProfileImageInputSchema).optional()
+  isFlagged: z.boolean().optional()
 }).strict();
 
 export const ProfileImageUpdateInputSchema: z.ZodType<Prisma.ProfileImageUpdateInput> = z.object({
   id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   mimeType: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  position: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   altText: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   storagePath: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -2129,8 +2100,7 @@ export const ProfileImageUpdateInputSchema: z.ZodType<Prisma.ProfileImageUpdateI
   isModerated: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isFlagged: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   user: z.lazy(() => UserUpdateOneRequiredWithoutProfileImageNestedInputSchema).optional(),
-  profile: z.lazy(() => ProfileUpdateOneWithoutProfileImagesNestedInputSchema).optional(),
-  primaryProfile: z.lazy(() => ProfileUpdateOneWithoutProfileImageNestedInputSchema).optional()
+  profile: z.lazy(() => ProfileUpdateOneWithoutProfileImagesNestedInputSchema).optional()
 }).strict();
 
 export const ProfileImageUncheckedUpdateInputSchema: z.ZodType<Prisma.ProfileImageUncheckedUpdateInput> = z.object({
@@ -2138,6 +2108,7 @@ export const ProfileImageUncheckedUpdateInputSchema: z.ZodType<Prisma.ProfileIma
   mimeType: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   profileId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  position: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   altText: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   storagePath: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -2146,7 +2117,6 @@ export const ProfileImageUncheckedUpdateInputSchema: z.ZodType<Prisma.ProfileIma
   contentHash: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   isModerated: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isFlagged: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  primaryProfile: z.lazy(() => ProfileUncheckedUpdateOneWithoutProfileImageNestedInputSchema).optional()
 }).strict();
 
 export const ProfileImageCreateManyInputSchema: z.ZodType<Prisma.ProfileImageCreateManyInput> = z.object({
@@ -2154,6 +2124,7 @@ export const ProfileImageCreateManyInputSchema: z.ZodType<Prisma.ProfileImageCre
   mimeType: z.string(),
   userId: z.string(),
   profileId: z.string().optional().nullable(),
+  position: z.number().int().optional(),
   altText: z.string().optional(),
   storagePath: z.string(),
   url: z.string().optional().nullable(),
@@ -2167,6 +2138,7 @@ export const ProfileImageCreateManyInputSchema: z.ZodType<Prisma.ProfileImageCre
 export const ProfileImageUpdateManyMutationInputSchema: z.ZodType<Prisma.ProfileImageUpdateManyMutationInput> = z.object({
   id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   mimeType: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  position: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   altText: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   storagePath: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -2182,6 +2154,7 @@ export const ProfileImageUncheckedUpdateManyInputSchema: z.ZodType<Prisma.Profil
   mimeType: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   profileId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  position: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   altText: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   storagePath: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -2858,11 +2831,6 @@ export const CityNullableScalarRelationFilterSchema: z.ZodType<Prisma.CityNullab
   isNot: z.lazy(() => CityWhereInputSchema).optional().nullable()
 }).strict();
 
-export const ProfileImageNullableScalarRelationFilterSchema: z.ZodType<Prisma.ProfileImageNullableScalarRelationFilter> = z.object({
-  is: z.lazy(() => ProfileImageWhereInputSchema).optional().nullable(),
-  isNot: z.lazy(() => ProfileImageWhereInputSchema).optional().nullable()
-}).strict();
-
 export const ProfileCountOrderByAggregateInputSchema: z.ZodType<Prisma.ProfileCountOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   publicName: z.lazy(() => SortOrderSchema).optional(),
@@ -2884,7 +2852,6 @@ export const ProfileCountOrderByAggregateInputSchema: z.ZodType<Prisma.ProfileCo
   pronouns: z.lazy(() => SortOrderSchema).optional(),
   relationship: z.lazy(() => SortOrderSchema).optional(),
   hasKids: z.lazy(() => SortOrderSchema).optional(),
-  profileImageId: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional()
 }).strict();
@@ -2913,7 +2880,6 @@ export const ProfileMaxOrderByAggregateInputSchema: z.ZodType<Prisma.ProfileMaxO
   pronouns: z.lazy(() => SortOrderSchema).optional(),
   relationship: z.lazy(() => SortOrderSchema).optional(),
   hasKids: z.lazy(() => SortOrderSchema).optional(),
-  profileImageId: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional()
 }).strict();
@@ -2938,7 +2904,6 @@ export const ProfileMinOrderByAggregateInputSchema: z.ZodType<Prisma.ProfileMinO
   pronouns: z.lazy(() => SortOrderSchema).optional(),
   relationship: z.lazy(() => SortOrderSchema).optional(),
   hasKids: z.lazy(() => SortOrderSchema).optional(),
-  profileImageId: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional()
 }).strict();
@@ -2992,6 +2957,7 @@ export const ProfileImageCountOrderByAggregateInputSchema: z.ZodType<Prisma.Prof
   mimeType: z.lazy(() => SortOrderSchema).optional(),
   userId: z.lazy(() => SortOrderSchema).optional(),
   profileId: z.lazy(() => SortOrderSchema).optional(),
+  position: z.lazy(() => SortOrderSchema).optional(),
   altText: z.lazy(() => SortOrderSchema).optional(),
   storagePath: z.lazy(() => SortOrderSchema).optional(),
   url: z.lazy(() => SortOrderSchema).optional(),
@@ -3002,11 +2968,16 @@ export const ProfileImageCountOrderByAggregateInputSchema: z.ZodType<Prisma.Prof
   isFlagged: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
+export const ProfileImageAvgOrderByAggregateInputSchema: z.ZodType<Prisma.ProfileImageAvgOrderByAggregateInput> = z.object({
+  position: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
 export const ProfileImageMaxOrderByAggregateInputSchema: z.ZodType<Prisma.ProfileImageMaxOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   mimeType: z.lazy(() => SortOrderSchema).optional(),
   userId: z.lazy(() => SortOrderSchema).optional(),
   profileId: z.lazy(() => SortOrderSchema).optional(),
+  position: z.lazy(() => SortOrderSchema).optional(),
   altText: z.lazy(() => SortOrderSchema).optional(),
   storagePath: z.lazy(() => SortOrderSchema).optional(),
   url: z.lazy(() => SortOrderSchema).optional(),
@@ -3022,6 +2993,7 @@ export const ProfileImageMinOrderByAggregateInputSchema: z.ZodType<Prisma.Profil
   mimeType: z.lazy(() => SortOrderSchema).optional(),
   userId: z.lazy(() => SortOrderSchema).optional(),
   profileId: z.lazy(() => SortOrderSchema).optional(),
+  position: z.lazy(() => SortOrderSchema).optional(),
   altText: z.lazy(() => SortOrderSchema).optional(),
   storagePath: z.lazy(() => SortOrderSchema).optional(),
   url: z.lazy(() => SortOrderSchema).optional(),
@@ -3030,6 +3002,10 @@ export const ProfileImageMinOrderByAggregateInputSchema: z.ZodType<Prisma.Profil
   contentHash: z.lazy(() => SortOrderSchema).optional(),
   isModerated: z.lazy(() => SortOrderSchema).optional(),
   isFlagged: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const ProfileImageSumOrderByAggregateInputSchema: z.ZodType<Prisma.ProfileImageSumOrderByAggregateInput> = z.object({
+  position: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const ProfileCreateNestedManyWithoutCityInputSchema: z.ZodType<Prisma.ProfileCreateNestedManyWithoutCityInput> = z.object({
@@ -3475,12 +3451,6 @@ export const ProfileTagCreateNestedManyWithoutProfileInputSchema: z.ZodType<Pris
   connect: z.union([ z.lazy(() => ProfileTagWhereUniqueInputSchema),z.lazy(() => ProfileTagWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
-export const ProfileImageCreateNestedOneWithoutPrimaryProfileInputSchema: z.ZodType<Prisma.ProfileImageCreateNestedOneWithoutPrimaryProfileInput> = z.object({
-  create: z.union([ z.lazy(() => ProfileImageCreateWithoutPrimaryProfileInputSchema),z.lazy(() => ProfileImageUncheckedCreateWithoutPrimaryProfileInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => ProfileImageCreateOrConnectWithoutPrimaryProfileInputSchema).optional(),
-  connect: z.lazy(() => ProfileImageWhereUniqueInputSchema).optional()
-}).strict();
-
 export const ProfileImageCreateNestedManyWithoutProfileInputSchema: z.ZodType<Prisma.ProfileImageCreateNestedManyWithoutProfileInput> = z.object({
   create: z.union([ z.lazy(() => ProfileImageCreateWithoutProfileInputSchema),z.lazy(() => ProfileImageCreateWithoutProfileInputSchema).array(),z.lazy(() => ProfileImageUncheckedCreateWithoutProfileInputSchema),z.lazy(() => ProfileImageUncheckedCreateWithoutProfileInputSchema).array() ]).optional(),
   connectOrCreate: z.union([ z.lazy(() => ProfileImageCreateOrConnectWithoutProfileInputSchema),z.lazy(() => ProfileImageCreateOrConnectWithoutProfileInputSchema).array() ]).optional(),
@@ -3555,16 +3525,6 @@ export const ProfileTagUpdateManyWithoutProfileNestedInputSchema: z.ZodType<Pris
   deleteMany: z.union([ z.lazy(() => ProfileTagScalarWhereInputSchema),z.lazy(() => ProfileTagScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
-export const ProfileImageUpdateOneWithoutPrimaryProfileNestedInputSchema: z.ZodType<Prisma.ProfileImageUpdateOneWithoutPrimaryProfileNestedInput> = z.object({
-  create: z.union([ z.lazy(() => ProfileImageCreateWithoutPrimaryProfileInputSchema),z.lazy(() => ProfileImageUncheckedCreateWithoutPrimaryProfileInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => ProfileImageCreateOrConnectWithoutPrimaryProfileInputSchema).optional(),
-  upsert: z.lazy(() => ProfileImageUpsertWithoutPrimaryProfileInputSchema).optional(),
-  disconnect: z.union([ z.boolean(),z.lazy(() => ProfileImageWhereInputSchema) ]).optional(),
-  delete: z.union([ z.boolean(),z.lazy(() => ProfileImageWhereInputSchema) ]).optional(),
-  connect: z.lazy(() => ProfileImageWhereUniqueInputSchema).optional(),
-  update: z.union([ z.lazy(() => ProfileImageUpdateToOneWithWhereWithoutPrimaryProfileInputSchema),z.lazy(() => ProfileImageUpdateWithoutPrimaryProfileInputSchema),z.lazy(() => ProfileImageUncheckedUpdateWithoutPrimaryProfileInputSchema) ]).optional(),
-}).strict();
-
 export const ProfileImageUpdateManyWithoutProfileNestedInputSchema: z.ZodType<Prisma.ProfileImageUpdateManyWithoutProfileNestedInput> = z.object({
   create: z.union([ z.lazy(() => ProfileImageCreateWithoutProfileInputSchema),z.lazy(() => ProfileImageCreateWithoutProfileInputSchema).array(),z.lazy(() => ProfileImageUncheckedCreateWithoutProfileInputSchema),z.lazy(() => ProfileImageUncheckedCreateWithoutProfileInputSchema).array() ]).optional(),
   connectOrCreate: z.union([ z.lazy(() => ProfileImageCreateOrConnectWithoutProfileInputSchema),z.lazy(() => ProfileImageCreateOrConnectWithoutProfileInputSchema).array() ]).optional(),
@@ -3619,18 +3579,6 @@ export const ProfileCreateNestedOneWithoutProfileImagesInputSchema: z.ZodType<Pr
   connect: z.lazy(() => ProfileWhereUniqueInputSchema).optional()
 }).strict();
 
-export const ProfileCreateNestedOneWithoutProfileImageInputSchema: z.ZodType<Prisma.ProfileCreateNestedOneWithoutProfileImageInput> = z.object({
-  create: z.union([ z.lazy(() => ProfileCreateWithoutProfileImageInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutProfileImageInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => ProfileCreateOrConnectWithoutProfileImageInputSchema).optional(),
-  connect: z.lazy(() => ProfileWhereUniqueInputSchema).optional()
-}).strict();
-
-export const ProfileUncheckedCreateNestedOneWithoutProfileImageInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateNestedOneWithoutProfileImageInput> = z.object({
-  create: z.union([ z.lazy(() => ProfileCreateWithoutProfileImageInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutProfileImageInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => ProfileCreateOrConnectWithoutProfileImageInputSchema).optional(),
-  connect: z.lazy(() => ProfileWhereUniqueInputSchema).optional()
-}).strict();
-
 export const UserUpdateOneRequiredWithoutProfileImageNestedInputSchema: z.ZodType<Prisma.UserUpdateOneRequiredWithoutProfileImageNestedInput> = z.object({
   create: z.union([ z.lazy(() => UserCreateWithoutProfileImageInputSchema),z.lazy(() => UserUncheckedCreateWithoutProfileImageInputSchema) ]).optional(),
   connectOrCreate: z.lazy(() => UserCreateOrConnectWithoutProfileImageInputSchema).optional(),
@@ -3647,26 +3595,6 @@ export const ProfileUpdateOneWithoutProfileImagesNestedInputSchema: z.ZodType<Pr
   delete: z.union([ z.boolean(),z.lazy(() => ProfileWhereInputSchema) ]).optional(),
   connect: z.lazy(() => ProfileWhereUniqueInputSchema).optional(),
   update: z.union([ z.lazy(() => ProfileUpdateToOneWithWhereWithoutProfileImagesInputSchema),z.lazy(() => ProfileUpdateWithoutProfileImagesInputSchema),z.lazy(() => ProfileUncheckedUpdateWithoutProfileImagesInputSchema) ]).optional(),
-}).strict();
-
-export const ProfileUpdateOneWithoutProfileImageNestedInputSchema: z.ZodType<Prisma.ProfileUpdateOneWithoutProfileImageNestedInput> = z.object({
-  create: z.union([ z.lazy(() => ProfileCreateWithoutProfileImageInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutProfileImageInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => ProfileCreateOrConnectWithoutProfileImageInputSchema).optional(),
-  upsert: z.lazy(() => ProfileUpsertWithoutProfileImageInputSchema).optional(),
-  disconnect: z.union([ z.boolean(),z.lazy(() => ProfileWhereInputSchema) ]).optional(),
-  delete: z.union([ z.boolean(),z.lazy(() => ProfileWhereInputSchema) ]).optional(),
-  connect: z.lazy(() => ProfileWhereUniqueInputSchema).optional(),
-  update: z.union([ z.lazy(() => ProfileUpdateToOneWithWhereWithoutProfileImageInputSchema),z.lazy(() => ProfileUpdateWithoutProfileImageInputSchema),z.lazy(() => ProfileUncheckedUpdateWithoutProfileImageInputSchema) ]).optional(),
-}).strict();
-
-export const ProfileUncheckedUpdateOneWithoutProfileImageNestedInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateOneWithoutProfileImageNestedInput> = z.object({
-  create: z.union([ z.lazy(() => ProfileCreateWithoutProfileImageInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutProfileImageInputSchema) ]).optional(),
-  connectOrCreate: z.lazy(() => ProfileCreateOrConnectWithoutProfileImageInputSchema).optional(),
-  upsert: z.lazy(() => ProfileUpsertWithoutProfileImageInputSchema).optional(),
-  disconnect: z.union([ z.boolean(),z.lazy(() => ProfileWhereInputSchema) ]).optional(),
-  delete: z.union([ z.boolean(),z.lazy(() => ProfileWhereInputSchema) ]).optional(),
-  connect: z.lazy(() => ProfileWhereUniqueInputSchema).optional(),
-  update: z.union([ z.lazy(() => ProfileUpdateToOneWithWhereWithoutProfileImageInputSchema),z.lazy(() => ProfileUpdateWithoutProfileImageInputSchema),z.lazy(() => ProfileUncheckedUpdateWithoutProfileImageInputSchema) ]).optional(),
 }).strict();
 
 export const NestedIntFilterSchema: z.ZodType<Prisma.NestedIntFilter> = z.object({
@@ -4044,7 +3972,6 @@ export const ProfileCreateWithoutCityInputSchema: z.ZodType<Prisma.ProfileCreate
   updatedAt: z.coerce.date().optional(),
   user: z.lazy(() => UserCreateNestedOneWithoutProfileInputSchema),
   tags: z.lazy(() => ProfileTagCreateNestedManyWithoutProfileInputSchema).optional(),
-  profileImage: z.lazy(() => ProfileImageCreateNestedOneWithoutPrimaryProfileInputSchema).optional(),
   profileImages: z.lazy(() => ProfileImageCreateNestedManyWithoutProfileInputSchema).optional()
 }).strict();
 
@@ -4068,7 +3995,6 @@ export const ProfileUncheckedCreateWithoutCityInputSchema: z.ZodType<Prisma.Prof
   pronouns: z.lazy(() => PronounsSchema).optional().nullable(),
   relationship: z.lazy(() => RelationshipStatusSchema).optional().nullable(),
   hasKids: z.lazy(() => HasKidsSchema).optional().nullable(),
-  profileImageId: z.string().optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   tags: z.lazy(() => ProfileTagUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
@@ -4125,7 +4051,6 @@ export const ProfileScalarWhereInputSchema: z.ZodType<Prisma.ProfileScalarWhereI
   pronouns: z.union([ z.lazy(() => EnumPronounsNullableFilterSchema),z.lazy(() => PronounsSchema) ]).optional().nullable(),
   relationship: z.union([ z.lazy(() => EnumRelationshipStatusNullableFilterSchema),z.lazy(() => RelationshipStatusSchema) ]).optional().nullable(),
   hasKids: z.union([ z.lazy(() => EnumHasKidsNullableFilterSchema),z.lazy(() => HasKidsSchema) ]).optional().nullable(),
-  profileImageId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
 }).strict();
@@ -4350,7 +4275,6 @@ export const ProfileCreateWithoutTagsInputSchema: z.ZodType<Prisma.ProfileCreate
   updatedAt: z.coerce.date().optional(),
   city: z.lazy(() => CityCreateNestedOneWithoutProfilesInputSchema).optional(),
   user: z.lazy(() => UserCreateNestedOneWithoutProfileInputSchema),
-  profileImage: z.lazy(() => ProfileImageCreateNestedOneWithoutPrimaryProfileInputSchema).optional(),
   profileImages: z.lazy(() => ProfileImageCreateNestedManyWithoutProfileInputSchema).optional()
 }).strict();
 
@@ -4375,7 +4299,6 @@ export const ProfileUncheckedCreateWithoutTagsInputSchema: z.ZodType<Prisma.Prof
   pronouns: z.lazy(() => PronounsSchema).optional().nullable(),
   relationship: z.lazy(() => RelationshipStatusSchema).optional().nullable(),
   hasKids: z.lazy(() => HasKidsSchema).optional().nullable(),
-  profileImageId: z.string().optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   profileImages: z.lazy(() => ProfileImageUncheckedCreateNestedManyWithoutProfileInputSchema).optional()
@@ -4459,7 +4382,6 @@ export const ProfileUpdateWithoutTagsInputSchema: z.ZodType<Prisma.ProfileUpdate
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   city: z.lazy(() => CityUpdateOneWithoutProfilesNestedInputSchema).optional(),
   user: z.lazy(() => UserUpdateOneRequiredWithoutProfileNestedInputSchema).optional(),
-  profileImage: z.lazy(() => ProfileImageUpdateOneWithoutPrimaryProfileNestedInputSchema).optional(),
   profileImages: z.lazy(() => ProfileImageUpdateManyWithoutProfileNestedInputSchema).optional()
 }).strict();
 
@@ -4484,7 +4406,6 @@ export const ProfileUncheckedUpdateWithoutTagsInputSchema: z.ZodType<Prisma.Prof
   pronouns: z.union([ z.lazy(() => PronounsSchema),z.lazy(() => NullableEnumPronounsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => NullableEnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => NullableEnumHasKidsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  profileImageId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   profileImages: z.lazy(() => ProfileImageUncheckedUpdateManyWithoutProfileNestedInputSchema).optional()
@@ -4689,7 +4610,6 @@ export const ProfileCreateWithoutUserInputSchema: z.ZodType<Prisma.ProfileCreate
   updatedAt: z.coerce.date().optional(),
   city: z.lazy(() => CityCreateNestedOneWithoutProfilesInputSchema).optional(),
   tags: z.lazy(() => ProfileTagCreateNestedManyWithoutProfileInputSchema).optional(),
-  profileImage: z.lazy(() => ProfileImageCreateNestedOneWithoutPrimaryProfileInputSchema).optional(),
   profileImages: z.lazy(() => ProfileImageCreateNestedManyWithoutProfileInputSchema).optional()
 }).strict();
 
@@ -4713,7 +4633,6 @@ export const ProfileUncheckedCreateWithoutUserInputSchema: z.ZodType<Prisma.Prof
   pronouns: z.lazy(() => PronounsSchema).optional().nullable(),
   relationship: z.lazy(() => RelationshipStatusSchema).optional().nullable(),
   hasKids: z.lazy(() => HasKidsSchema).optional().nullable(),
-  profileImageId: z.string().optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   tags: z.lazy(() => ProfileTagUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
@@ -4728,6 +4647,7 @@ export const ProfileCreateOrConnectWithoutUserInputSchema: z.ZodType<Prisma.Prof
 export const ProfileImageCreateWithoutUserInputSchema: z.ZodType<Prisma.ProfileImageCreateWithoutUserInput> = z.object({
   id: z.string().cuid().optional(),
   mimeType: z.string(),
+  position: z.number().int().optional(),
   altText: z.string().optional(),
   storagePath: z.string(),
   url: z.string().optional().nullable(),
@@ -4736,14 +4656,14 @@ export const ProfileImageCreateWithoutUserInputSchema: z.ZodType<Prisma.ProfileI
   contentHash: z.string().optional().nullable(),
   isModerated: z.boolean().optional(),
   isFlagged: z.boolean().optional(),
-  profile: z.lazy(() => ProfileCreateNestedOneWithoutProfileImagesInputSchema).optional(),
-  primaryProfile: z.lazy(() => ProfileCreateNestedOneWithoutProfileImageInputSchema).optional()
+  profile: z.lazy(() => ProfileCreateNestedOneWithoutProfileImagesInputSchema).optional()
 }).strict();
 
 export const ProfileImageUncheckedCreateWithoutUserInputSchema: z.ZodType<Prisma.ProfileImageUncheckedCreateWithoutUserInput> = z.object({
   id: z.string().cuid().optional(),
   mimeType: z.string(),
   profileId: z.string().optional().nullable(),
+  position: z.number().int().optional(),
   altText: z.string().optional(),
   storagePath: z.string(),
   url: z.string().optional().nullable(),
@@ -4751,8 +4671,7 @@ export const ProfileImageUncheckedCreateWithoutUserInputSchema: z.ZodType<Prisma
   updatedAt: z.coerce.date().optional(),
   contentHash: z.string().optional().nullable(),
   isModerated: z.boolean().optional(),
-  isFlagged: z.boolean().optional(),
-  primaryProfile: z.lazy(() => ProfileUncheckedCreateNestedOneWithoutProfileImageInputSchema).optional()
+  isFlagged: z.boolean().optional()
 }).strict();
 
 export const ProfileImageCreateOrConnectWithoutUserInputSchema: z.ZodType<Prisma.ProfileImageCreateOrConnectWithoutUserInput> = z.object({
@@ -4851,7 +4770,6 @@ export const ProfileUpdateWithoutUserInputSchema: z.ZodType<Prisma.ProfileUpdate
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   city: z.lazy(() => CityUpdateOneWithoutProfilesNestedInputSchema).optional(),
   tags: z.lazy(() => ProfileTagUpdateManyWithoutProfileNestedInputSchema).optional(),
-  profileImage: z.lazy(() => ProfileImageUpdateOneWithoutPrimaryProfileNestedInputSchema).optional(),
   profileImages: z.lazy(() => ProfileImageUpdateManyWithoutProfileNestedInputSchema).optional()
 }).strict();
 
@@ -4875,7 +4793,6 @@ export const ProfileUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prisma.Prof
   pronouns: z.union([ z.lazy(() => PronounsSchema),z.lazy(() => NullableEnumPronounsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => NullableEnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => NullableEnumHasKidsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  profileImageId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   tags: z.lazy(() => ProfileTagUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
@@ -4906,6 +4823,7 @@ export const ProfileImageScalarWhereInputSchema: z.ZodType<Prisma.ProfileImageSc
   mimeType: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   userId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   profileId: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  position: z.union([ z.lazy(() => IntFilterSchema),z.number() ]).optional(),
   altText: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   storagePath: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   url: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
@@ -5042,9 +4960,10 @@ export const ProfileTagCreateManyProfileInputEnvelopeSchema: z.ZodType<Prisma.Pr
   skipDuplicates: z.boolean().optional()
 }).strict();
 
-export const ProfileImageCreateWithoutPrimaryProfileInputSchema: z.ZodType<Prisma.ProfileImageCreateWithoutPrimaryProfileInput> = z.object({
+export const ProfileImageCreateWithoutProfileInputSchema: z.ZodType<Prisma.ProfileImageCreateWithoutProfileInput> = z.object({
   id: z.string().cuid().optional(),
   mimeType: z.string(),
+  position: z.number().int().optional(),
   altText: z.string().optional(),
   storagePath: z.string(),
   url: z.string().optional().nullable(),
@@ -5053,15 +4972,14 @@ export const ProfileImageCreateWithoutPrimaryProfileInputSchema: z.ZodType<Prism
   contentHash: z.string().optional().nullable(),
   isModerated: z.boolean().optional(),
   isFlagged: z.boolean().optional(),
-  user: z.lazy(() => UserCreateNestedOneWithoutProfileImageInputSchema),
-  profile: z.lazy(() => ProfileCreateNestedOneWithoutProfileImagesInputSchema).optional()
+  user: z.lazy(() => UserCreateNestedOneWithoutProfileImageInputSchema)
 }).strict();
 
-export const ProfileImageUncheckedCreateWithoutPrimaryProfileInputSchema: z.ZodType<Prisma.ProfileImageUncheckedCreateWithoutPrimaryProfileInput> = z.object({
+export const ProfileImageUncheckedCreateWithoutProfileInputSchema: z.ZodType<Prisma.ProfileImageUncheckedCreateWithoutProfileInput> = z.object({
   id: z.string().cuid().optional(),
   mimeType: z.string(),
   userId: z.string(),
-  profileId: z.string().optional().nullable(),
+  position: z.number().int().optional(),
   altText: z.string().optional(),
   storagePath: z.string(),
   url: z.string().optional().nullable(),
@@ -5070,41 +4988,6 @@ export const ProfileImageUncheckedCreateWithoutPrimaryProfileInputSchema: z.ZodT
   contentHash: z.string().optional().nullable(),
   isModerated: z.boolean().optional(),
   isFlagged: z.boolean().optional()
-}).strict();
-
-export const ProfileImageCreateOrConnectWithoutPrimaryProfileInputSchema: z.ZodType<Prisma.ProfileImageCreateOrConnectWithoutPrimaryProfileInput> = z.object({
-  where: z.lazy(() => ProfileImageWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => ProfileImageCreateWithoutPrimaryProfileInputSchema),z.lazy(() => ProfileImageUncheckedCreateWithoutPrimaryProfileInputSchema) ]),
-}).strict();
-
-export const ProfileImageCreateWithoutProfileInputSchema: z.ZodType<Prisma.ProfileImageCreateWithoutProfileInput> = z.object({
-  id: z.string().cuid().optional(),
-  mimeType: z.string(),
-  altText: z.string().optional(),
-  storagePath: z.string(),
-  url: z.string().optional().nullable(),
-  createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional(),
-  contentHash: z.string().optional().nullable(),
-  isModerated: z.boolean().optional(),
-  isFlagged: z.boolean().optional(),
-  user: z.lazy(() => UserCreateNestedOneWithoutProfileImageInputSchema),
-  primaryProfile: z.lazy(() => ProfileCreateNestedOneWithoutProfileImageInputSchema).optional()
-}).strict();
-
-export const ProfileImageUncheckedCreateWithoutProfileInputSchema: z.ZodType<Prisma.ProfileImageUncheckedCreateWithoutProfileInput> = z.object({
-  id: z.string().cuid().optional(),
-  mimeType: z.string(),
-  userId: z.string(),
-  altText: z.string().optional(),
-  storagePath: z.string(),
-  url: z.string().optional().nullable(),
-  createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional(),
-  contentHash: z.string().optional().nullable(),
-  isModerated: z.boolean().optional(),
-  isFlagged: z.boolean().optional(),
-  primaryProfile: z.lazy(() => ProfileUncheckedCreateNestedOneWithoutProfileImageInputSchema).optional()
 }).strict();
 
 export const ProfileImageCreateOrConnectWithoutProfileInputSchema: z.ZodType<Prisma.ProfileImageCreateOrConnectWithoutProfileInput> = z.object({
@@ -5207,47 +5090,6 @@ export const ProfileTagUpdateManyWithWhereWithoutProfileInputSchema: z.ZodType<P
   data: z.union([ z.lazy(() => ProfileTagUpdateManyMutationInputSchema),z.lazy(() => ProfileTagUncheckedUpdateManyWithoutProfileInputSchema) ]),
 }).strict();
 
-export const ProfileImageUpsertWithoutPrimaryProfileInputSchema: z.ZodType<Prisma.ProfileImageUpsertWithoutPrimaryProfileInput> = z.object({
-  update: z.union([ z.lazy(() => ProfileImageUpdateWithoutPrimaryProfileInputSchema),z.lazy(() => ProfileImageUncheckedUpdateWithoutPrimaryProfileInputSchema) ]),
-  create: z.union([ z.lazy(() => ProfileImageCreateWithoutPrimaryProfileInputSchema),z.lazy(() => ProfileImageUncheckedCreateWithoutPrimaryProfileInputSchema) ]),
-  where: z.lazy(() => ProfileImageWhereInputSchema).optional()
-}).strict();
-
-export const ProfileImageUpdateToOneWithWhereWithoutPrimaryProfileInputSchema: z.ZodType<Prisma.ProfileImageUpdateToOneWithWhereWithoutPrimaryProfileInput> = z.object({
-  where: z.lazy(() => ProfileImageWhereInputSchema).optional(),
-  data: z.union([ z.lazy(() => ProfileImageUpdateWithoutPrimaryProfileInputSchema),z.lazy(() => ProfileImageUncheckedUpdateWithoutPrimaryProfileInputSchema) ]),
-}).strict();
-
-export const ProfileImageUpdateWithoutPrimaryProfileInputSchema: z.ZodType<Prisma.ProfileImageUpdateWithoutPrimaryProfileInput> = z.object({
-  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  mimeType: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  altText: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  storagePath: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  contentHash: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  isModerated: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  isFlagged: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  user: z.lazy(() => UserUpdateOneRequiredWithoutProfileImageNestedInputSchema).optional(),
-  profile: z.lazy(() => ProfileUpdateOneWithoutProfileImagesNestedInputSchema).optional()
-}).strict();
-
-export const ProfileImageUncheckedUpdateWithoutPrimaryProfileInputSchema: z.ZodType<Prisma.ProfileImageUncheckedUpdateWithoutPrimaryProfileInput> = z.object({
-  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  mimeType: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  profileId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  altText: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  storagePath: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  contentHash: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  isModerated: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  isFlagged: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-}).strict();
-
 export const ProfileImageUpsertWithWhereUniqueWithoutProfileInputSchema: z.ZodType<Prisma.ProfileImageUpsertWithWhereUniqueWithoutProfileInput> = z.object({
   where: z.lazy(() => ProfileImageWhereUniqueInputSchema),
   update: z.union([ z.lazy(() => ProfileImageUpdateWithoutProfileInputSchema),z.lazy(() => ProfileImageUncheckedUpdateWithoutProfileInputSchema) ]),
@@ -5328,8 +5170,7 @@ export const ProfileCreateWithoutProfileImagesInputSchema: z.ZodType<Prisma.Prof
   updatedAt: z.coerce.date().optional(),
   city: z.lazy(() => CityCreateNestedOneWithoutProfilesInputSchema).optional(),
   user: z.lazy(() => UserCreateNestedOneWithoutProfileInputSchema),
-  tags: z.lazy(() => ProfileTagCreateNestedManyWithoutProfileInputSchema).optional(),
-  profileImage: z.lazy(() => ProfileImageCreateNestedOneWithoutPrimaryProfileInputSchema).optional()
+  tags: z.lazy(() => ProfileTagCreateNestedManyWithoutProfileInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedCreateWithoutProfileImagesInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateWithoutProfileImagesInput> = z.object({
@@ -5353,7 +5194,6 @@ export const ProfileUncheckedCreateWithoutProfileImagesInputSchema: z.ZodType<Pr
   pronouns: z.lazy(() => PronounsSchema).optional().nullable(),
   relationship: z.lazy(() => RelationshipStatusSchema).optional().nullable(),
   hasKids: z.lazy(() => HasKidsSchema).optional().nullable(),
-  profileImageId: z.string().optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   tags: z.lazy(() => ProfileTagUncheckedCreateNestedManyWithoutProfileInputSchema).optional()
@@ -5362,65 +5202,6 @@ export const ProfileUncheckedCreateWithoutProfileImagesInputSchema: z.ZodType<Pr
 export const ProfileCreateOrConnectWithoutProfileImagesInputSchema: z.ZodType<Prisma.ProfileCreateOrConnectWithoutProfileImagesInput> = z.object({
   where: z.lazy(() => ProfileWhereUniqueInputSchema),
   create: z.union([ z.lazy(() => ProfileCreateWithoutProfileImagesInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutProfileImagesInputSchema) ]),
-}).strict();
-
-export const ProfileCreateWithoutProfileImageInputSchema: z.ZodType<Prisma.ProfileCreateWithoutProfileImageInput> = z.object({
-  id: z.string().cuid().optional(),
-  publicName: z.string(),
-  country: z.string().optional(),
-  cityName: z.string().optional(),
-  introSocial: z.string().optional(),
-  isSocialActive: z.boolean().optional(),
-  isDatingActive: z.boolean().optional(),
-  isActive: z.boolean().optional(),
-  isReported: z.boolean().optional(),
-  isBlocked: z.boolean().optional(),
-  work: z.string().optional(),
-  languages: z.union([ z.lazy(() => ProfileCreatelanguagesInputSchema),z.string().array() ]).optional(),
-  introDating: z.string().optional(),
-  birthday: z.coerce.date().optional().nullable(),
-  gender: z.lazy(() => GenderSchema).optional().nullable(),
-  pronouns: z.lazy(() => PronounsSchema).optional().nullable(),
-  relationship: z.lazy(() => RelationshipStatusSchema).optional().nullable(),
-  hasKids: z.lazy(() => HasKidsSchema).optional().nullable(),
-  createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional(),
-  city: z.lazy(() => CityCreateNestedOneWithoutProfilesInputSchema).optional(),
-  user: z.lazy(() => UserCreateNestedOneWithoutProfileInputSchema),
-  tags: z.lazy(() => ProfileTagCreateNestedManyWithoutProfileInputSchema).optional(),
-  profileImages: z.lazy(() => ProfileImageCreateNestedManyWithoutProfileInputSchema).optional()
-}).strict();
-
-export const ProfileUncheckedCreateWithoutProfileImageInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateWithoutProfileImageInput> = z.object({
-  id: z.string().cuid().optional(),
-  publicName: z.string(),
-  country: z.string().optional(),
-  cityName: z.string().optional(),
-  cityId: z.number().int().optional().nullable(),
-  introSocial: z.string().optional(),
-  isSocialActive: z.boolean().optional(),
-  isDatingActive: z.boolean().optional(),
-  isActive: z.boolean().optional(),
-  isReported: z.boolean().optional(),
-  isBlocked: z.boolean().optional(),
-  userId: z.string(),
-  work: z.string().optional(),
-  languages: z.union([ z.lazy(() => ProfileCreatelanguagesInputSchema),z.string().array() ]).optional(),
-  introDating: z.string().optional(),
-  birthday: z.coerce.date().optional().nullable(),
-  gender: z.lazy(() => GenderSchema).optional().nullable(),
-  pronouns: z.lazy(() => PronounsSchema).optional().nullable(),
-  relationship: z.lazy(() => RelationshipStatusSchema).optional().nullable(),
-  hasKids: z.lazy(() => HasKidsSchema).optional().nullable(),
-  createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional(),
-  tags: z.lazy(() => ProfileTagUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
-  profileImages: z.lazy(() => ProfileImageUncheckedCreateNestedManyWithoutProfileInputSchema).optional()
-}).strict();
-
-export const ProfileCreateOrConnectWithoutProfileImageInputSchema: z.ZodType<Prisma.ProfileCreateOrConnectWithoutProfileImageInput> = z.object({
-  where: z.lazy(() => ProfileWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => ProfileCreateWithoutProfileImageInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutProfileImageInputSchema) ]),
 }).strict();
 
 export const UserUpsertWithoutProfileImageInputSchema: z.ZodType<Prisma.UserUpsertWithoutProfileImageInput> = z.object({
@@ -5504,8 +5285,7 @@ export const ProfileUpdateWithoutProfileImagesInputSchema: z.ZodType<Prisma.Prof
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   city: z.lazy(() => CityUpdateOneWithoutProfilesNestedInputSchema).optional(),
   user: z.lazy(() => UserUpdateOneRequiredWithoutProfileNestedInputSchema).optional(),
-  tags: z.lazy(() => ProfileTagUpdateManyWithoutProfileNestedInputSchema).optional(),
-  profileImage: z.lazy(() => ProfileImageUpdateOneWithoutPrimaryProfileNestedInputSchema).optional()
+  tags: z.lazy(() => ProfileTagUpdateManyWithoutProfileNestedInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedUpdateWithoutProfileImagesInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateWithoutProfileImagesInput> = z.object({
@@ -5529,75 +5309,9 @@ export const ProfileUncheckedUpdateWithoutProfileImagesInputSchema: z.ZodType<Pr
   pronouns: z.union([ z.lazy(() => PronounsSchema),z.lazy(() => NullableEnumPronounsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => NullableEnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => NullableEnumHasKidsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  profileImageId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   tags: z.lazy(() => ProfileTagUncheckedUpdateManyWithoutProfileNestedInputSchema).optional()
-}).strict();
-
-export const ProfileUpsertWithoutProfileImageInputSchema: z.ZodType<Prisma.ProfileUpsertWithoutProfileImageInput> = z.object({
-  update: z.union([ z.lazy(() => ProfileUpdateWithoutProfileImageInputSchema),z.lazy(() => ProfileUncheckedUpdateWithoutProfileImageInputSchema) ]),
-  create: z.union([ z.lazy(() => ProfileCreateWithoutProfileImageInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutProfileImageInputSchema) ]),
-  where: z.lazy(() => ProfileWhereInputSchema).optional()
-}).strict();
-
-export const ProfileUpdateToOneWithWhereWithoutProfileImageInputSchema: z.ZodType<Prisma.ProfileUpdateToOneWithWhereWithoutProfileImageInput> = z.object({
-  where: z.lazy(() => ProfileWhereInputSchema).optional(),
-  data: z.union([ z.lazy(() => ProfileUpdateWithoutProfileImageInputSchema),z.lazy(() => ProfileUncheckedUpdateWithoutProfileImageInputSchema) ]),
-}).strict();
-
-export const ProfileUpdateWithoutProfileImageInputSchema: z.ZodType<Prisma.ProfileUpdateWithoutProfileImageInput> = z.object({
-  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  publicName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  country: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  cityName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  introSocial: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  isSocialActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  isDatingActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  isBlocked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  work: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  languages: z.union([ z.lazy(() => ProfileUpdatelanguagesInputSchema),z.string().array() ]).optional(),
-  introDating: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => NullableEnumGenderFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  pronouns: z.union([ z.lazy(() => PronounsSchema),z.lazy(() => NullableEnumPronounsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => NullableEnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => NullableEnumHasKidsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  city: z.lazy(() => CityUpdateOneWithoutProfilesNestedInputSchema).optional(),
-  user: z.lazy(() => UserUpdateOneRequiredWithoutProfileNestedInputSchema).optional(),
-  tags: z.lazy(() => ProfileTagUpdateManyWithoutProfileNestedInputSchema).optional(),
-  profileImages: z.lazy(() => ProfileImageUpdateManyWithoutProfileNestedInputSchema).optional()
-}).strict();
-
-export const ProfileUncheckedUpdateWithoutProfileImageInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateWithoutProfileImageInput> = z.object({
-  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  publicName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  country: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  cityName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  cityId: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  introSocial: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  isSocialActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  isDatingActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  isBlocked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  work: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  languages: z.union([ z.lazy(() => ProfileUpdatelanguagesInputSchema),z.string().array() ]).optional(),
-  introDating: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
-  birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => NullableEnumGenderFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  pronouns: z.union([ z.lazy(() => PronounsSchema),z.lazy(() => NullableEnumPronounsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => NullableEnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => NullableEnumHasKidsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
-  tags: z.lazy(() => ProfileTagUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
-  profileImages: z.lazy(() => ProfileImageUncheckedUpdateManyWithoutProfileNestedInputSchema).optional()
 }).strict();
 
 export const ProfileCreateManyCityInputSchema: z.ZodType<Prisma.ProfileCreateManyCityInput> = z.object({
@@ -5620,7 +5334,6 @@ export const ProfileCreateManyCityInputSchema: z.ZodType<Prisma.ProfileCreateMan
   pronouns: z.lazy(() => PronounsSchema).optional().nullable(),
   relationship: z.lazy(() => RelationshipStatusSchema).optional().nullable(),
   hasKids: z.lazy(() => HasKidsSchema).optional().nullable(),
-  profileImageId: z.string().optional().nullable(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional()
 }).strict();
@@ -5648,7 +5361,6 @@ export const ProfileUpdateWithoutCityInputSchema: z.ZodType<Prisma.ProfileUpdate
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   user: z.lazy(() => UserUpdateOneRequiredWithoutProfileNestedInputSchema).optional(),
   tags: z.lazy(() => ProfileTagUpdateManyWithoutProfileNestedInputSchema).optional(),
-  profileImage: z.lazy(() => ProfileImageUpdateOneWithoutPrimaryProfileNestedInputSchema).optional(),
   profileImages: z.lazy(() => ProfileImageUpdateManyWithoutProfileNestedInputSchema).optional()
 }).strict();
 
@@ -5672,7 +5384,6 @@ export const ProfileUncheckedUpdateWithoutCityInputSchema: z.ZodType<Prisma.Prof
   pronouns: z.union([ z.lazy(() => PronounsSchema),z.lazy(() => NullableEnumPronounsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => NullableEnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => NullableEnumHasKidsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  profileImageId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   tags: z.lazy(() => ProfileTagUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
@@ -5699,7 +5410,6 @@ export const ProfileUncheckedUpdateManyWithoutCityInputSchema: z.ZodType<Prisma.
   pronouns: z.union([ z.lazy(() => PronounsSchema),z.lazy(() => NullableEnumPronounsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => NullableEnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => NullableEnumHasKidsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
-  profileImageId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
@@ -5751,6 +5461,7 @@ export const ProfileImageCreateManyUserInputSchema: z.ZodType<Prisma.ProfileImag
   id: z.string().cuid().optional(),
   mimeType: z.string(),
   profileId: z.string().optional().nullable(),
+  position: z.number().int().optional(),
   altText: z.string().optional(),
   storagePath: z.string(),
   url: z.string().optional().nullable(),
@@ -5780,6 +5491,7 @@ export const ConnectionRequestCreateManyToUserInputSchema: z.ZodType<Prisma.Conn
 export const ProfileImageUpdateWithoutUserInputSchema: z.ZodType<Prisma.ProfileImageUpdateWithoutUserInput> = z.object({
   id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   mimeType: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  position: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   altText: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   storagePath: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -5788,14 +5500,14 @@ export const ProfileImageUpdateWithoutUserInputSchema: z.ZodType<Prisma.ProfileI
   contentHash: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   isModerated: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isFlagged: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  profile: z.lazy(() => ProfileUpdateOneWithoutProfileImagesNestedInputSchema).optional(),
-  primaryProfile: z.lazy(() => ProfileUpdateOneWithoutProfileImageNestedInputSchema).optional()
+  profile: z.lazy(() => ProfileUpdateOneWithoutProfileImagesNestedInputSchema).optional()
 }).strict();
 
 export const ProfileImageUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prisma.ProfileImageUncheckedUpdateWithoutUserInput> = z.object({
   id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   mimeType: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   profileId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  position: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   altText: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   storagePath: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -5804,13 +5516,13 @@ export const ProfileImageUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prisma
   contentHash: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   isModerated: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isFlagged: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  primaryProfile: z.lazy(() => ProfileUncheckedUpdateOneWithoutProfileImageNestedInputSchema).optional()
 }).strict();
 
 export const ProfileImageUncheckedUpdateManyWithoutUserInputSchema: z.ZodType<Prisma.ProfileImageUncheckedUpdateManyWithoutUserInput> = z.object({
   id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   mimeType: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   profileId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  position: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   altText: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   storagePath: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -5878,6 +5590,7 @@ export const ProfileImageCreateManyProfileInputSchema: z.ZodType<Prisma.ProfileI
   id: z.string().cuid().optional(),
   mimeType: z.string(),
   userId: z.string(),
+  position: z.number().int().optional(),
   altText: z.string().optional(),
   storagePath: z.string(),
   url: z.string().optional().nullable(),
@@ -5906,6 +5619,7 @@ export const ProfileTagUncheckedUpdateManyWithoutProfileInputSchema: z.ZodType<P
 export const ProfileImageUpdateWithoutProfileInputSchema: z.ZodType<Prisma.ProfileImageUpdateWithoutProfileInput> = z.object({
   id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   mimeType: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  position: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   altText: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   storagePath: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -5914,14 +5628,14 @@ export const ProfileImageUpdateWithoutProfileInputSchema: z.ZodType<Prisma.Profi
   contentHash: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   isModerated: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isFlagged: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  user: z.lazy(() => UserUpdateOneRequiredWithoutProfileImageNestedInputSchema).optional(),
-  primaryProfile: z.lazy(() => ProfileUpdateOneWithoutProfileImageNestedInputSchema).optional()
+  user: z.lazy(() => UserUpdateOneRequiredWithoutProfileImageNestedInputSchema).optional()
 }).strict();
 
 export const ProfileImageUncheckedUpdateWithoutProfileInputSchema: z.ZodType<Prisma.ProfileImageUncheckedUpdateWithoutProfileInput> = z.object({
   id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   mimeType: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  position: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   altText: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   storagePath: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
@@ -5930,13 +5644,13 @@ export const ProfileImageUncheckedUpdateWithoutProfileInputSchema: z.ZodType<Pri
   contentHash: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   isModerated: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
   isFlagged: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
-  primaryProfile: z.lazy(() => ProfileUncheckedUpdateOneWithoutProfileImageNestedInputSchema).optional()
 }).strict();
 
 export const ProfileImageUncheckedUpdateManyWithoutProfileInputSchema: z.ZodType<Prisma.ProfileImageUncheckedUpdateManyWithoutProfileInput> = z.object({
   id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   mimeType: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  position: z.union([ z.number().int(),z.lazy(() => IntFieldUpdateOperationsInputSchema) ]).optional(),
   altText: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   storagePath: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   url: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),

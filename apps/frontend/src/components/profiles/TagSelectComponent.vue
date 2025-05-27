@@ -22,7 +22,7 @@
 import { computed, ref } from 'vue';
 import Multiselect from 'vue-multiselect';
 import { useTagsStore } from '@/store/tagStore';
-import type { PublicTag } from '@zod/tags.schema';
+import { PublicTag } from '@zod/tag.schema';
 
 // Instantiate Pinia store
 const tagStore = useTagsStore();

@@ -206,10 +206,6 @@ model Profile {
 
   tags ProfileTag[]
 
-  profileImageId String?       @unique
-  profileImage   ProfileImage? @relation("ProfilePrimaryImage", fields: [profileImageId], references: [id])
-
-  // Other images: one-to-many
   profileImages ProfileImage[] @relation("ProfileImages")
 
   createdAt DateTime @default(now())
@@ -217,14 +213,14 @@ model Profile {
 }
 
 model ProfileImage {
-  id             String   @id @default(cuid())
-  mimeType       String
-  userId         String
-  user           User     @relation(fields: [userId], references: [id])
-  profileId      String?
-  profile        Profile? @relation("ProfileImages", fields: [profileId], references: [id])
-  primaryProfile Profile? @relation("ProfilePrimaryImage")
+  id        String   @id @default(cuid())
+  mimeType  String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  profileId String?
+  profile   Profile? @relation("ProfileImages", fields: [profileId], references: [id])
 
+  position    Int     @default(0) // order of images, 0 is the primary profile image
   altText     String  @default("")
   storagePath String  @unique
   url         String?

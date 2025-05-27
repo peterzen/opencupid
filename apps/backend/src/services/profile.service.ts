@@ -1,12 +1,11 @@
 import { prisma } from '../lib/prisma'
 import { Profile, ProfileImage, ProfileTag, Prisma } from '@prisma/client'
 import { Tag } from '@prisma/client'
-import { OwnerProfile, ownerProfileSchema, PublicProfile, publicProfileSchema, UpdateProfile } from '@zod/profile.schema'
+import { OwnerProfile, OwnerProfileSchema, PublicProfile, PublicProfileSchema, UpdatedProfileFragment, UpdatedProfileFragmentSchema, UpdateProfilePayload } from '@zod/profile.schema'
 
 // Define types for service return values
 export type ProfileWithImages = Profile & {
-  profileImage: ProfileImage | null
-  otherImages: ProfileImage[]
+  profileImages: ProfileImage[]
 }
 
 export type ProfileWithTags = Profile & {
@@ -16,6 +15,8 @@ export type ProfileWithTags = Profile & {
 export type ProfileComplete = ProfileWithImages & ProfileWithTags
 
 export class ProfileService {
+
+
   private static instance: ProfileService
 
   private constructor() {
@@ -35,8 +36,9 @@ export class ProfileService {
       where: { id: profileId },
       include: {
         user: false,
-        profileImage: true,
-        otherImages: true,
+        profileImages: {
+          orderBy: { position: 'asc' },
+        },
         tags: {
           include: {
             tag: true
@@ -50,8 +52,9 @@ export class ProfileService {
     return prisma.profile.findUnique({
       where: { userId },
       include: {
-        profileImage: true,
-        otherImages: true,
+        profileImages: {
+          orderBy: { position: 'asc' },
+        },
         tags: {
           include: {
             tag: true,
@@ -61,7 +64,7 @@ export class ProfileService {
     })
   }
 
-  async updateProfile(userId: string, data: UpdateProfile): Promise<Profile> {
+  async updateProfile(userId: string, data: UpdateProfilePayload): Promise<UpdatedProfileFragment> {
     // 1) pull out the tags array
     const { tags, ...rest } = data;
 
@@ -87,70 +90,30 @@ export class ProfileService {
           skipDuplicates: true,
         });
       }
-
       return profile;
-    });
+    })
 
-    return updated;
+    return UpdatedProfileFragmentSchema.parse(updated)
   }
 
-  async setProfileImage(userId: string, imageId: string | null): Promise<Profile> {
-    console.log(`Setting profile image for user ${userId} to image ${imageId}`)
-    if (imageId) {
-      // Connect the profile image
-      return prisma.profile.update({
-        where: { userId },
-        data: {
-          profileImage: {
-            connect: { id: imageId }
-          }
-        }
-      })
-    } else {
-      // Disconnect the profile image
-      return prisma.profile.update({
-        where: { userId },
-        data: {
-          profileImage: {
-            disconnect: true
-          }
-        }
-      })
-    }
-  }
 
   public async addProfileImage(profile: ProfileComplete, imageId: string): Promise<{
-    otherImages: ProfileImage[];
-    profileImage: ProfileImage | null;
+    profileImages: ProfileImage[];
   }> {
-    const data: Prisma.ProfileUpdateInput = {
-      otherImages: { connect: { id: imageId } },
-      // only add `profileImage` if it wasn’t set yet
-      ...(!profile.profileImage
-        ? { profileImage: { connect: { id: imageId } } }
-        : {}),
-    };
-
     return prisma.profile.update({
-      where: { id: profile.id },
-      data,
-      select: {
-        profileImage: true,
-        otherImages: true,
-      }
-    })
-  }
-
-  public async addOtherImageToProfile(userId: string, imageId: string): Promise<Profile> {
-    return prisma.profile.update({
-      where: { userId },
+      where: {
+        id: profile.id
+      },
       data: {
-        otherImages: {
-          connect: { id: imageId }
-        }
+        profileImages: { connect: { id: imageId } },
+      },
+      select: {
+        profileImages: true,
       }
     })
   }
+
+
 
   async addProfileTag(profileId: string, tagId: string): Promise<ProfileTag> {
     return prisma.profileTag.create({
@@ -227,8 +190,7 @@ export class ProfileService {
     return prisma.profile.findMany({
       where,
       include: {
-        profileImage: true,
-        otherImages: true,
+        profileImages: true,
         tags: {
           include: {
             tag: true
@@ -271,16 +233,10 @@ export class ProfileService {
       data: {
         userId,
         publicName: '',
-        introSocial: ''
+        introSocial: '',
       }
     })
   }
 
-  toPublicProfile(profile: Profile): PublicProfile {
-    return publicProfileSchema.parse(profile)
-  }
 
-  toOwnerProfile(profile: Profile): OwnerProfile {
-    return ownerProfileSchema.parse(profile)
-  }
 }

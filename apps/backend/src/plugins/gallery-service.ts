@@ -1,5 +1,5 @@
 import fp from 'fastify-plugin'
-import { ImageGalleryService } from 'src/services/gallery.service'
+import { ImageGalleryService } from 'src/services/image.service'
 
 export default fp(async (fastify) => {
 

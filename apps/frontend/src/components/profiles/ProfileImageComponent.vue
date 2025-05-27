@@ -1,8 +1,8 @@
 <template>
-  <div class="profile-image">
+  <div class="profile-image"
+       v-if="props.image">
     <div class="ratio ratio-1x1">
-      <img v-if="props.image"
-           :alt="props.image.altText"
+      <img :alt="props.image.altText"
            :src="props.image.url!"
            class="rounded" />
     </div>
@@ -10,8 +10,8 @@
 </template>
 
 <script setup lang="ts">
+import { OwnerProfileImage, PublicProfileImage } from '@zod/profileimage.schema';
 import { type PropType } from 'vue'
-import type { OwnerProfileImage, PublicProfileImage } from '@zod/media.schema'
 
 const props = defineProps({
   image: {

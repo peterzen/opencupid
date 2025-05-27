@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
-import type { PublicTag } from '@zod/tags.schema';
-import type { CreateTagInput, UpdateTagInput } from '@zod/tags.schema';
+import { PublicTag, CreateTagInput } from '@zod/tag.schema';
+import { Tag } from '@zod/generated';
 
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '/api';
 
@@ -86,7 +86,7 @@ export const useTagsStore = defineStore('tags', {
     /**
      * Update an existing tag
      */
-    async updateTag(id: string, input: UpdateTagInput): Promise<PublicTag> {
+    async updateTag(id: string, input: Partial<Tag>): Promise<PublicTag> {
       try {
         const res = await axios.patch<{ success: true; tag: PublicTag }>(`/tags/${id}`, input);
         const idx = this.tags.findIndex(t => t.id === id);

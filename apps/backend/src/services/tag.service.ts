@@ -1,7 +1,7 @@
 import slugify from 'slugify';
 import { prisma } from '../lib/prisma'
 import { Tag } from "@zod/generated";
-import { CreateTagInput, UpdateTagInput } from '@zod/tags.schema';
+import { CreateTagInput } from '@zod/tag.schema';
 
 
 
@@ -72,8 +72,8 @@ export class TagService {
     });
   }
 
-  public async update(id: string, data: UpdateTagInput): Promise<Tag> {
-    const updateData: Partial<UpdateTagInput & { slug: string }> = { ...data };
+  public async update(id: string, data: Tag): Promise<Tag> {
+    const updateData: Partial<Tag & { slug: string }> = { ...data };
     if (data.name) {
       updateData.slug = slugify(data.name, {
         lower: true,

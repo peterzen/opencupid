@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import type { Profile, ProfileImage } from '@zod/generated'
-import type { OwnerProfile, UpdateProfile } from '@zod/profile.schema'
+import type { OwnerProfile, UpdateProfilePayload } from '@zod/profile.schema'
+import { OwnerProfileImage, ProfileImagePosition } from '@zod/profileimage.schema'
 
-import { OwnerProfileImage, PublicProfileImage } from '@zod/media.schema'
 
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '/api'
 
@@ -55,18 +55,16 @@ export const useProfileStore = defineStore('profile', {
     },
 
     // Update the current user's social profile
-    async updateProfile(profileData: UpdateProfile): Promise<OwnerProfile> {
+    async updateProfile(profileData: UpdateProfilePayload): Promise<OwnerProfile> {
       try {
         const res = await axios.patch('/profiles/profile', profileData)
-        this.profile = res.data.profile
-        return this.profile as OwnerProfile
+        this.profile = res.data.profile  as OwnerProfile
+        return this.profile
       } catch (error: any) {
         console.error('Store: cannot to update profile:', error)
         throw error.response?.data?.message || 'Failed to update profile'
       }
     },
-
-
 
     async uploadProfileImage(
       file: File,
@@ -98,112 +96,30 @@ export const useProfileStore = defineStore('profile', {
       }
     },
 
-    /** 
-    * Set the “main” profile image.
-    * Calls POST /profiles/image/:imageId/primary
-    */
-    async setProfileImage(imageId?: string) {
+    async deleteImage(image: OwnerProfileImage): Promise<UploadResponse> {
       try {
-        const res = await axios.post<{ success: true; profile: OwnerProfile }>(
-          `/profiles/image/${imageId}/primary`
-        )
-        // update the entire profile (including new profileImage)
-        this.profile = res.data.profile
-        return { success: true }
-      } catch (err: unknown) {
-        let msg = 'Failed to set profile image'
-        if (axios.isAxiosError(err) && err.response?.data?.message) {
-          msg = err.response.data.message
-        } else if (err instanceof Error) {
-          msg = err.message
-        }
-        return { success: false, error: msg }
-      }
-    },
-
-    /**
-     * Add an image to the “otherImages” list.
-     * Calls POST /profiles/image/:imageId/other
-     */
-    async addImageToProfile(imageId: string) {
-      try {
-        const { data } = await axios.post<{ success: true; otherImages: OwnerProfileImage[] }>(
-          `/profiles/image/${imageId}/other`
-        )
-        // replace the otherImages array
-        this.profileImages = data.otherImages
-        return { success: true }
-      } catch (err: unknown) {
-        let msg = 'Failed to add image to profile'
-        if (axios.isAxiosError(err) && err.response?.data?.message) {
-          msg = err.response.data.message
-        } else if (err instanceof Error) {
-          msg = err.message
-        }
-        return { success: false, error: msg }
-      }
-    },
-
-    async deleteImage(image: OwnerProfileImage) {
-      try {
-        const res = await axios.delete(`/profiles/image/${image.id}`)
+        const { data } = await axios.delete<UploadSuccess>(`/profiles/image/${image.id}`)
+        return data
       } catch (error: any) {
-        console.error('Failed to delete profile image:', error)
-        throw error.response?.data?.message || 'Failed to delete profile image'
+        const out: UploadError = {
+          success: false,
+          message: 'An unexpected error occurred'
+        }
+        return out
       }
     },
 
-    async getUserImages() {
+ 
+    async reorderImages(images: ProfileImagePosition[]): Promise<UploadResponse> {
       try {
-        const res = await axios.get('/profiles/image/list')
-        return res.data.images as OwnerProfileImage[]
+        const { data } = await axios.patch<UploadSuccess>('/profiles/image/order', { images })
+        return data
       } catch (error: any) {
-        console.error('Failed to fetch user profile:', error)
-        throw error.response?.data?.message || 'Failed to fetch user profile'
-      }
-    },
-
-    /**
-     * Attach a tag to the current user's profile.
-     * Calls POST /profiles/:id/tags/:tagId
-     */
-    async addTagToProfile(tagId: string): Promise<{ success: true } | { success: false; message: string }> {
-      if (!this.profile) {
-        return { success: false, message: 'No profile loaded' };
-      }
-      try {
-        await axios.post(`/profiles/${this.profile.id}/tags/${tagId}`);
-        // optimistically add to local state
-        this.profile.tags = [...(this.profile.tags || []), { tagId } as any];
-        return { success: true };
-      } catch (err: any) {
-        console.error('Failed to add tag to profile:', err);
-        return {
+        const out: UploadError = {
           success: false,
-          message: err.response?.data?.message || 'Failed to add tag to profile',
-        };
-      }
-    },
-
-    /**
-     * Remove a tag from the current user's profile.
-     * Calls DELETE /profiles/:id/tags/:tagId
-     */
-    async removeTagFromProfile(tagId: string): Promise<{ success: true } | { success: false; message: string }> {
-      if (!this.profile) {
-        return { success: false, message: 'No profile loaded' };
-      }
-      try {
-        await axios.delete(`/profiles/${this.profile.id}/tags/${tagId}`);
-        // update local state
-        this.profile.tags = (this.profile.tags || []).filter(t => t.id !== tagId);
-        return { success: true };
-      } catch (err: any) {
-        console.error('Failed to remove tag from profile:', err);
-        return {
-          success: false,
-          message: err.response?.data?.message || 'Failed to remove tag from profile',
-        };
+          message: 'An unexpected error occurred'
+        }
+        return out
       }
     },
   },

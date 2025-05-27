@@ -4,11 +4,10 @@ import { useI18n } from 'vue-i18n'
 import { getGenderOptions, getHasKidsOptionsOptions, getRelationshipStatusOptions } from '@/lib/i18n'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import { OwnerProfile } from '@zod/profile.schema'
-import { OwnerProfileImage } from '@zod/media.schema'
 import TagSelectComponent from './TagSelectComponent.vue'
-import { PublicTag } from '@zod/tags.schema'
 import ImageEditor from './ImageEditor.vue'
 import { useProfileStore } from '@/store/profileStore'
+import { PublicTag } from '@zod/tag.schema'
 
 const profileStore = useProfileStore()
 
@@ -40,11 +39,6 @@ watch(
   { deep: true }
 )
 
-// Options for selects/radios
-const genderOptions = getGenderOptions(t)
-const relationshipStatusOptions = getRelationshipStatusOptions(t)
-const haveKidsRadioOptions = getHasKidsOptionsOptions(t)
-
 // Computed proxies for multiselect v-models
 const birthYear = computed({
   get: () => formData.birthday ? new Date(formData.birthday).getFullYear() : null,
@@ -61,6 +55,12 @@ const birthYearMax = computed(() => {
   return new Date().getFullYear() - 18
 })
 
+
+// Options for selects/radios
+const genderOptions = getGenderOptions(t)
+const relationshipStatusOptions = getRelationshipStatusOptions(t)
+const haveKidsRadioOptions = getHasKidsOptionsOptions(t)
+
 // Submit handler
 function submitForm() {
   emit('submit', { ...formData })
@@ -72,15 +72,6 @@ function handleTagsChange(tags: PublicTag[]) {
   emit('update:modelValue', formData)
 }
 
-async function handleProfileImage(image: OwnerProfileImage | null) {
-  const imageId = image ? image.id : ''
-  try {
-    await profileStore.setProfileImage(imageId)
-  } catch (err: any) {
-    state.error = err.message || 'An error occurred while updating the profile image.'
-  }
-  emit('update:modelValue', formData)
-}
 </script>
 
 
@@ -88,8 +79,7 @@ async function handleProfileImage(image: OwnerProfileImage | null) {
   <div class="col-md-8 offset-md-2">
 
     <div class="mb-4 ">
-      <ImageEditor v-model="props.modelValue"
-                   @update:profileImage="handleProfileImage" />
+      <ImageEditor v-model="formData"  />
     </div>
 
     <FormKit type="form"

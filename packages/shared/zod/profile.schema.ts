@@ -2,11 +2,8 @@ import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { ProfileSchema } from "@zod/generated";
 
-import { publicTagSchema } from "./tags.schema";
-import {
-  ownerProfileImageSchema,
-  publicProfileImageSchema,
-} from "./media.schema";
+import { PublicTagSchema } from "./tag.schema";
+import { OwnerProfileImageSchema, PublicProfileImageSchema } from "./profileimage.schema";
 
 const publicProfileFields = {
   id: true,
@@ -29,45 +26,41 @@ const publicDatingProfileFields = {
   pronouns: true,
 } as const;
 
-export const publicScalarsSchema = ProfileSchema.pick({
+export const PublicScalarsSchema = ProfileSchema.pick({
   ...publicProfileFields,
 });
 
-export const publicProfileSchema = publicScalarsSchema.extend({
-  profileImage: publicProfileImageSchema.nullable().default(null),
-  otherImages: z.array(publicProfileImageSchema).default([]),
-  tags: z.array(publicTagSchema).default([]),
+export const PublicProfileSchema = PublicScalarsSchema.extend({
+  profileImages: z.array(PublicProfileImageSchema).default([]),
+  tags: z.array(PublicTagSchema).default([]),
 });
 
-export type PublicProfile = z.infer<typeof publicProfileSchema>;
+export type PublicProfile = z.infer<typeof PublicProfileSchema>;
 
-export const publicDatingProfileSchema = ProfileSchema.pick({
+export const PublicDatingProfileSchema = ProfileSchema.pick({
   ...publicProfileFields,
   ...publicDatingProfileFields,
 }).extend({
-  profileImage: publicProfileImageSchema.nullable().default(null),
-  otherImages: z.array(publicProfileImageSchema).default([]),
-  tags: z.array(publicTagSchema).default([]),
+  profileImages: z.array(PublicProfileImageSchema).default([]),
+  tags: z.array(PublicTagSchema).default([]),
 });
 
-export type PublicDatingProfile = z.infer<typeof publicDatingProfileSchema>;
+export type PublicDatingProfile = z.infer<typeof PublicDatingProfileSchema>;
 
-export const ownerScalarSchema = ProfileSchema.pick({
+export const OwnerScalarSchema = ProfileSchema.pick({
   ...publicProfileFields,
   ...publicDatingProfileFields,
   id: true,
   isActive: true,
 });
 
-export const ownerProfileSchema = ownerScalarSchema.extend({
-  profileImage: ownerProfileImageSchema.nullable().default(null),
-  otherImages: z.array(ownerProfileImageSchema).default([]),
-  tags: z.array(publicTagSchema).default([]),
+export const OwnerProfileSchema = OwnerScalarSchema.extend({
+  profileImages: z.array(OwnerProfileImageSchema).default([]),
+  tags: z.array(PublicTagSchema).default([]),
 });
+export type OwnerProfile = z.infer<typeof OwnerProfileSchema>;
 
-export type OwnerProfile = z.infer<typeof ownerProfileSchema>;
-
-export const updateProfileSchema = ProfileSchema.pick({
+export const UpdateProfilePayloadSchema = ProfileSchema.pick({
   ...publicProfileFields,
   ...publicDatingProfileFields,
 })
@@ -75,12 +68,40 @@ export const updateProfileSchema = ProfileSchema.pick({
   .extend({
     tags: z.array(z.string().cuid()).optional(),
   });
+export type UpdateProfilePayload = z.infer<typeof UpdateProfilePayloadSchema>;
 
-export type UpdateProfile = z.infer<typeof updateProfileSchema>;
+// Updated profile fragment with tags but no images
+export const UpdatedProfileFragmentSchema = OwnerScalarSchema.extend({
+  tags: z.array(PublicTagSchema).default([]),
+});
+export type UpdatedProfileFragment = z.infer<typeof UpdatedProfileFragmentSchema>;
+
 
 export type ProfileWithImages = Prisma.ProfileGetPayload<{
   include: {
-    profileImage: true;
-    otherImages: true
+    profileImages: true;
   }
 }>;
+
+// Fragment for updated profile images
+export const UpdatedProfileImageFragmentSchema = ProfileSchema
+  .pick({})
+  .extend({
+    profileImages: z.array(OwnerProfileImageSchema).default([]),
+  });
+export type UpdatedProfileImageFragment = z.infer<typeof UpdatedProfileImageFragmentSchema>;
+
+
+
+// Route params for profile ID lookups
+export const ProfileLookupParamsSchema = z.object({
+  profileId: z.string().cuid(),
+})
+export type ProfileLookupParams = z.infer<typeof ProfileLookupParamsSchema>
+
+
+// Route params for ID lookups
+export const IdLookupParamsSchema = z.object({
+  id: z.string().cuid(),
+})
+export type IdLookupParams = z.infer<typeof IdLookupParamsSchema>

@@ -38,9 +38,8 @@ import { useProfileStore } from '@/store/profileStore'
 import ConnectionTypeSelector from '@/components/ConnectionTypeSelector.vue'
 import ProfileForm from '@/components/profiles/ProfileForm.vue'
 import DatingProfileForm from '@/components/profiles/DatingProfileForm.vue'
-import { OwnerProfile, UpdateProfile } from '@zod/profile.schema'
+import { OwnerProfile, UpdateProfilePayload } from '@zod/profile.schema'
 import { ConnectionTypeType } from '@zod/generated'
-import { OwnerProfileImage } from '@zod/media.schema'
 
 const profileStore = useProfileStore()
 
@@ -65,7 +64,7 @@ async function saveProfile(formData: OwnerProfile) {
   let tags: string[] = []
   if (formData.tags && formData.tags.length > 0) tags = formData.tags.map(tag => tag.id)
 
-  const payload: UpdateProfile = {
+  const payload: UpdateProfilePayload = {
     ...formData,
     tags: tags,
   }

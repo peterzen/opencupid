@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { ProfileImage } from '@zod/generated'
 import { useProfileStore } from '@/store/profileStore'
 
 import AvatarUploadIcon from '@/assets/icons/files/avatar-upload.svg'
-import { OwnerProfileImage, PublicProfileImage } from '@zod/media.schema'
 import { OwnerProfile } from '@zod/profile.schema'
 
 const profileStore = useProfileStore()
@@ -22,6 +20,8 @@ const captionText = ref<string>('')
 const emit = defineEmits<{
   (e: 'image:uploaded', payload: OwnerProfile): void
   (e: 'image:deleted', payload: { id: string }): void
+  (e: 'update:modelValue', value: OwnerProfile): void
+
 }>()
 
 /**
@@ -60,7 +60,7 @@ async function handleUpload() {
     isLoading.value = false
     return
   }
-  const updatedProfile = res.profile as OwnerProfile
+  const updatedProfile = res.profile
   emit('image:uploaded', updatedProfile)
 
   // Clear after upload

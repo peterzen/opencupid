@@ -12,15 +12,8 @@ import {
   getUploadBaseDir
 } from 'src/lib/media';
 
-import {
-  ownerProfileImageSchema,
-  OwnerProfileImage,
-  PublicProfileImage,
-  publicProfileImageSchema,
-  type CreateProfileImageSchema
-} from '@zod/media.schema';
-import env from 'src/env';
 import { generateContentHash } from '@utils/hash';
+import { ProfileImagePosition } from '@zod/profileimage.schema';
 
 
 export class ImageGalleryService {
@@ -60,6 +53,9 @@ export class ImageGalleryService {
 
   /**
    * Store an image uploaded by the user
+   * @param userId - ID of the user uploading the image
+   * @param fileUpload - The uploaded file object
+   * @param captionText - Optional caption or alt text for the image
    * Returns the created ProfileImage record
    */
   async storeImage(userId: string, fileUpload: SavedMultipartFile, captionText: string): Promise<ProfileImage> {
@@ -82,25 +78,22 @@ export class ImageGalleryService {
     const contentHash = await generateContentHash(fullPath)
 
     // Create a new ProfileImage record
-    return await this.createImage({
-      userId: userId,
-      mimeType: fileUpload.mimetype,
-      altText: captionText,
-      storagePath: storageRelPath,
-      isModerated: false,
-      contentHash: contentHash
-    })
-  }
-
-  /**
-   * Create a new ProfileImage record
-   */
-  async createImage(data: CreateProfileImageSchema): Promise<ProfileImage> {
-    return prisma.profileImage.create({ data });
+    return await prisma.profileImage.create({
+      data: {
+        userId: userId,
+        mimeType: fileUpload.mimetype,
+        altText: captionText,
+        storagePath: storageRelPath,
+        isModerated: false,
+        contentHash: contentHash,
+        position: -1, // last position
+      }
+    });
   }
 
   /**
    * Update an existing ProfileImage's metadata
+   * @param image - The ProfileImage object with updated fields
    * Returns number of records updated (0 or 1)
    */
   async updateImage(image: ProfileImage): Promise<ProfileImage> {
@@ -114,6 +107,8 @@ export class ImageGalleryService {
 
   /**
    * Delete a ProfileImage record
+   * @param userId - ID of the user who owns the image
+   * @param imageId - ID of the image to delete
    * Returns true if successful, false if not
    */
   async deleteImage(userId: string, imageId: string): Promise<boolean> {
@@ -126,16 +121,14 @@ export class ImageGalleryService {
       return false;
     }
     const result = await prisma.profileImage.delete({
-      where: { id: image.id }
+      where: { id: image.id },
     });
-    console.log('Deleted ProfileImage record:', result);
 
     // Delete the file from the filesystem
     const file = path.join(getUploadBaseDir(), image.storagePath);
 
     try {
       fs.unlinkSync(file);
-      console.log('File deleted:', file);
     } catch (err) {
       console.error('Error deleting file:', err);
       return false;
@@ -144,29 +137,33 @@ export class ImageGalleryService {
   }
 
   /**
-   * Constructs the public URL for the image
+   * Reorder images by updating their positions
+   * @param userId - ID of the user whose images are being reordered
+   * @param items - Array of image IDs and their new positions
+   * Returns the updated images sorted by position
    */
-  getImageUrl(image: ProfileImage): string {
-    const urlBase = env.IMAGE_URL_BASE
-    return `${urlBase}/${image.storagePath}`;
-  }
+  async reorderImages(userId: string, items: ProfileImagePosition[]) {
 
-  /**
-   * Add the public URL to the image object and sanitize it
-   * by removing any non-public fields
-   */
-  toPublicProfileImage(image: ProfileImage): PublicProfileImage {
-    image.url = this.getImageUrl(image);
-    return publicProfileImageSchema.parse(image)
-  }
+    const valid = await prisma.profileImage.findMany({
+      where: { userId, id: { in: items.map((i) => i.id) } },
+      select: { id: true },
+    })
 
-  /**
-   * Add the public URL to the image object and sanitize it
-   * by removing fields that are not accessible to the owner
-   */
-  toOwnerProfileImage(image: ProfileImage): OwnerProfileImage {
-    image.url = this.getImageUrl(image);
-    return ownerProfileImageSchema.parse(image)
-  }
+    const validIds = new Set(valid.map((v) => v.id))
+    if (items.some((i) => !validIds.has(i.id))) {
+      throw new Error('Invalid image ID')
+    }
 
+    // Bulk‐update positions in a single transaction
+    const ops = items.map((item) =>
+      prisma.profileImage.update({
+        where: { id: item.id },
+        data: { position: item.position },
+      })
+    )
+    const updated = await prisma.$transaction(ops)
+
+    // Return them sorted by position
+    return updated.sort((a, b) => a.position - b.position)
+  }
 }
