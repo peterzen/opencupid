@@ -78,6 +78,13 @@ enum RelationshipStatus {
   unspecified
 }
 
+enum UserRole {
+  user
+  user_dating
+  admin
+  moderator
+}
+
 model City {
   id      Int    @id
   name    String
@@ -155,19 +162,19 @@ model ConnectionRequest {
 }
 
 model User {
-  id                      String    @id @default(cuid())
-  email                   String    @unique
-  tokenVersion            Int       @default(0)
-  loginToken              String?   @unique
+  id                      String     @id @default(cuid())
+  email                   String     @unique
+  tokenVersion            Int        @default(0)
+  loginToken              String?    @unique
   loginTokenExp           DateTime?
-  isActive                Boolean   @default(true)
-  isBlocked               Boolean   @default(false)
-  isRegistrationConfirmed Boolean   @default(false)
-  createdAt               DateTime  @default(now())
-  updatedAt               DateTime  @updatedAt
+  isActive                Boolean    @default(true)
+  isBlocked               Boolean    @default(false)
+  isRegistrationConfirmed Boolean    @default(false)
+  createdAt               DateTime   @default(now())
+  updatedAt               DateTime   @updatedAt
   lastLoginAt             DateTime?
-  language                String?   @default("en")
-  isDatingActive          Boolean   @default(false)
+  language                String?    @default("en")
+  roles                   UserRole[] @default([user])
 
   // relations
   profile      Profile?       @relation

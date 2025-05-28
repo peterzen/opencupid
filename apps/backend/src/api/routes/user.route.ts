@@ -73,10 +73,11 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
 
     if (req.user === null) return sendUnauthorizedError(reply)
 
-    const user = userService.getUserById(req.user.userId, {
+    const user = await userService.getUserById(req.user.userId, {
       select: {
         email: true,
         language: true,
+        roles: true,
       }
     })
 
@@ -84,28 +85,6 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
 
     return reply.status(200).send({ success: true, data: user })
   })
-
-
-  // fastify.patch('/me', {
-  //   onRequest: [fastify.authenticate]
-  // }, async (req, reply) => {
-  //   if (req.user === null) {
-  //     return reply.status(401).send({ error: 'Unauthorized' })
-  //   }
-  //   const data = validateBody(UpdateUserSchema, req, reply)
-  //   if (!data) return
-
-  //   const user = await fastify.prisma.user.update({
-  //     where: { id: req.user.userId },
-  //     data,
-  //   })
-
-  //   if (!user) {
-  //     return reply.status(401).send({ error: 'Unauthorized' })
-  //   }
-
-  //   return reply.status(200).send({ success: true  })
-  // })
 }
 
 export default userRoutes

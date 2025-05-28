@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
-import { OwnerProfile, OwnerProfileSchema, PublicProfileSchema, UpdateProfilePayload } from '@zod/profile.schema'
+import { 
+  OwnerProfile, 
+  OwnerProfileSchema, 
+  PublicDatingProfileSchema, 
+  UpdateProfilePayload 
+} from '@zod/profile.schema'
 import { type OwnerProfileImage, type ProfileImagePosition } from '@zod/profileimage.schema'
 
 
@@ -46,7 +51,7 @@ export const useProfileStore = defineStore('profile', {
     async getPublicProfile(profileId: string) {
       try {
         const res = await axios.get(`/profiles/${profileId}`)
-        return PublicProfileSchema.parse(res.data.profile)
+        return PublicDatingProfileSchema.parse(res.data.profile)
       } catch (error: any) {
         console.error('Failed to fetch profile:', error)
         throw error.response?.data?.message || 'Failed to fetch profile'

@@ -4,9 +4,11 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import fastifyJwt from '@fastify/jwt'
 
 import Redis from 'ioredis'
-import { SessionService } from '../services/session.service'
+import {  SessionService } from '../services/session.service'
 
 import { sendUnauthorizedError } from 'src/api/helpers'
+import { UserRole } from '@prisma/client' 
+import { SessionData } from '@zod/user.schema'
 
 // Extend Fastify types
 declare module 'fastify' {
@@ -14,11 +16,7 @@ declare module 'fastify' {
     redis: Redis
   }
   interface FastifyRequest {
-    session: {
-      userId: string
-      lang: string
-      isDatingActive: boolean
-    }
+    session: SessionData
   }
 }
 
@@ -67,13 +65,13 @@ export default fp(async (fastify: FastifyInstance) => {
       //   }
       // })
       const userId = req.user?.userId
-      const isDatingActive = true // Mocked for example purposes
       const lang = 'en' // Mocked for example purposes
+      const roles = ['user','user_dating'] as UserRole[] //req.user?.roles || ['user','user_dating']
 
       if (!userId) {
         return sendUnauthorizedError(reply, 'Invalid session')
       }
-      sess = await sessions.getOrCreate(sessionId, { userId, isDatingActive, lang })
+      sess = await sessions.getOrCreate(sessionId, { userId, roles, lang })
     } else {
       // Refresh TTL on simple reads
       await sessions.refreshTtl(sessionId)

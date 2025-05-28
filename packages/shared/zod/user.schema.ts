@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { ConnectionTypeSchema, UserSchema } from '@zod/generated'
+import { ConnectionTypeSchema, UserRoleSchema } from '@zod/generated'
 
 
 
@@ -18,3 +18,11 @@ export const UpdateUserSchema = z.object({
   latitude: z.number().optional(),
   longitude: z.number().optional(),
 })
+
+export const SessionDataSchema = z.object({
+  userId: z.string(),
+  lang: z.string(),
+  roles: z.array(UserRoleSchema)
+})
+
+export type SessionData = z.infer<typeof SessionDataSchema>

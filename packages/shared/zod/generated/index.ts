@@ -24,7 +24,7 @@ export const DatingPreferenceScalarFieldEnumSchema = z.enum(['userId','prefAgeMi
 
 export const ConnectionRequestScalarFieldEnumSchema = z.enum(['id','fromUserId','toUserId','scope','status','createdAt']);
 
-export const UserScalarFieldEnumSchema = z.enum(['id','email','tokenVersion','loginToken','loginTokenExp','isActive','isBlocked','isRegistrationConfirmed','createdAt','updatedAt','lastLoginAt','language']);
+export const UserScalarFieldEnumSchema = z.enum(['id','email','tokenVersion','loginToken','loginTokenExp','isActive','isBlocked','isRegistrationConfirmed','createdAt','updatedAt','lastLoginAt','language','roles']);
 
 export const ProfileScalarFieldEnumSchema = z.enum(['id','publicName','country','cityName','cityId','introSocial','isSocialActive','isDatingActive','isActive','isReported','isBlocked','userId','work','languages','introDating','birthday','gender','pronouns','relationship','hasKids','createdAt','updatedAt']);
 
@@ -63,6 +63,10 @@ export type PreferenceGenderType = `${z.infer<typeof PreferenceGenderSchema>}`
 export const RelationshipStatusSchema = z.enum(['single','in_relationship','married','other','unspecified']);
 
 export type RelationshipStatusType = `${z.infer<typeof RelationshipStatusSchema>}`
+
+export const UserRoleSchema = z.enum(['user','user_dating','admin','moderator']);
+
+export type UserRoleType = `${z.infer<typeof UserRoleSchema>}`
 
 /////////////////////////////////////////
 // MODELS
@@ -163,6 +167,7 @@ export type ConnectionRequest = z.infer<typeof ConnectionRequestSchema>
 /////////////////////////////////////////
 
 export const UserSchema = z.object({
+  roles: UserRoleSchema.array(),
   id: z.string().cuid(),
   email: z.string(),
   tokenVersion: z.number().int(),
@@ -424,6 +429,7 @@ export const UserSelectSchema: z.ZodType<Prisma.UserSelect> = z.object({
   updatedAt: z.boolean().optional(),
   lastLoginAt: z.boolean().optional(),
   language: z.boolean().optional(),
+  roles: z.boolean().optional(),
   profile: z.union([z.boolean(),z.lazy(() => ProfileArgsSchema)]).optional(),
   ProfileImage: z.union([z.boolean(),z.lazy(() => ProfileImageFindManyArgsSchema)]).optional(),
   requestsSent: z.union([z.boolean(),z.lazy(() => ConnectionRequestFindManyArgsSchema)]).optional(),
@@ -983,6 +989,7 @@ export const UserWhereInputSchema: z.ZodType<Prisma.UserWhereInput> = z.object({
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   lastLoginAt: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
   language: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  roles: z.lazy(() => EnumUserRoleNullableListFilterSchema).optional(),
   profile: z.union([ z.lazy(() => ProfileNullableScalarRelationFilterSchema),z.lazy(() => ProfileWhereInputSchema) ]).optional().nullable(),
   ProfileImage: z.lazy(() => ProfileImageListRelationFilterSchema).optional(),
   requestsSent: z.lazy(() => ConnectionRequestListRelationFilterSchema).optional(),
@@ -1002,6 +1009,7 @@ export const UserOrderByWithRelationInputSchema: z.ZodType<Prisma.UserOrderByWit
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   lastLoginAt: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   language: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  roles: z.lazy(() => SortOrderSchema).optional(),
   profile: z.lazy(() => ProfileOrderByWithRelationInputSchema).optional(),
   ProfileImage: z.lazy(() => ProfileImageOrderByRelationAggregateInputSchema).optional(),
   requestsSent: z.lazy(() => ConnectionRequestOrderByRelationAggregateInputSchema).optional(),
@@ -1052,6 +1060,7 @@ export const UserWhereUniqueInputSchema: z.ZodType<Prisma.UserWhereUniqueInput> 
   updatedAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   lastLoginAt: z.union([ z.lazy(() => DateTimeNullableFilterSchema),z.coerce.date() ]).optional().nullable(),
   language: z.union([ z.lazy(() => StringNullableFilterSchema),z.string() ]).optional().nullable(),
+  roles: z.lazy(() => EnumUserRoleNullableListFilterSchema).optional(),
   profile: z.union([ z.lazy(() => ProfileNullableScalarRelationFilterSchema),z.lazy(() => ProfileWhereInputSchema) ]).optional().nullable(),
   ProfileImage: z.lazy(() => ProfileImageListRelationFilterSchema).optional(),
   requestsSent: z.lazy(() => ConnectionRequestListRelationFilterSchema).optional(),
@@ -1071,6 +1080,7 @@ export const UserOrderByWithAggregationInputSchema: z.ZodType<Prisma.UserOrderBy
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   lastLoginAt: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
   language: z.union([ z.lazy(() => SortOrderSchema),z.lazy(() => SortOrderInputSchema) ]).optional(),
+  roles: z.lazy(() => SortOrderSchema).optional(),
   _count: z.lazy(() => UserCountOrderByAggregateInputSchema).optional(),
   _avg: z.lazy(() => UserAvgOrderByAggregateInputSchema).optional(),
   _max: z.lazy(() => UserMaxOrderByAggregateInputSchema).optional(),
@@ -1094,6 +1104,7 @@ export const UserScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.UserScal
   updatedAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
   lastLoginAt: z.union([ z.lazy(() => DateTimeNullableWithAggregatesFilterSchema),z.coerce.date() ]).optional().nullable(),
   language: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
+  roles: z.lazy(() => EnumUserRoleNullableListFilterSchema).optional()
 }).strict();
 
 export const ProfileWhereInputSchema: z.ZodType<Prisma.ProfileWhereInput> = z.object({
@@ -1766,6 +1777,7 @@ export const UserCreateInputSchema: z.ZodType<Prisma.UserCreateInput> = z.object
   updatedAt: z.coerce.date().optional(),
   lastLoginAt: z.coerce.date().optional().nullable(),
   language: z.string().optional().nullable(),
+  roles: z.union([ z.lazy(() => UserCreaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
   profile: z.lazy(() => ProfileCreateNestedOneWithoutUserInputSchema).optional(),
   ProfileImage: z.lazy(() => ProfileImageCreateNestedManyWithoutUserInputSchema).optional(),
   requestsSent: z.lazy(() => ConnectionRequestCreateNestedManyWithoutFromUserInputSchema).optional(),
@@ -1785,6 +1797,7 @@ export const UserUncheckedCreateInputSchema: z.ZodType<Prisma.UserUncheckedCreat
   updatedAt: z.coerce.date().optional(),
   lastLoginAt: z.coerce.date().optional().nullable(),
   language: z.string().optional().nullable(),
+  roles: z.union([ z.lazy(() => UserCreaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
   profile: z.lazy(() => ProfileUncheckedCreateNestedOneWithoutUserInputSchema).optional(),
   ProfileImage: z.lazy(() => ProfileImageUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   requestsSent: z.lazy(() => ConnectionRequestUncheckedCreateNestedManyWithoutFromUserInputSchema).optional(),
@@ -1804,6 +1817,7 @@ export const UserUpdateInputSchema: z.ZodType<Prisma.UserUpdateInput> = z.object
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   lastLoginAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   language: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  roles: z.union([ z.lazy(() => UserUpdaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
   profile: z.lazy(() => ProfileUpdateOneWithoutUserNestedInputSchema).optional(),
   ProfileImage: z.lazy(() => ProfileImageUpdateManyWithoutUserNestedInputSchema).optional(),
   requestsSent: z.lazy(() => ConnectionRequestUpdateManyWithoutFromUserNestedInputSchema).optional(),
@@ -1823,6 +1837,7 @@ export const UserUncheckedUpdateInputSchema: z.ZodType<Prisma.UserUncheckedUpdat
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   lastLoginAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   language: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  roles: z.union([ z.lazy(() => UserUpdaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
   profile: z.lazy(() => ProfileUncheckedUpdateOneWithoutUserNestedInputSchema).optional(),
   ProfileImage: z.lazy(() => ProfileImageUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   requestsSent: z.lazy(() => ConnectionRequestUncheckedUpdateManyWithoutFromUserNestedInputSchema).optional(),
@@ -1841,7 +1856,8 @@ export const UserCreateManyInputSchema: z.ZodType<Prisma.UserCreateManyInput> = 
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
   lastLoginAt: z.coerce.date().optional().nullable(),
-  language: z.string().optional().nullable()
+  language: z.string().optional().nullable(),
+  roles: z.union([ z.lazy(() => UserCreaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
 }).strict();
 
 export const UserUpdateManyMutationInputSchema: z.ZodType<Prisma.UserUpdateManyMutationInput> = z.object({
@@ -1857,6 +1873,7 @@ export const UserUpdateManyMutationInputSchema: z.ZodType<Prisma.UserUpdateManyM
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   lastLoginAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   language: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  roles: z.union([ z.lazy(() => UserUpdaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
 }).strict();
 
 export const UserUncheckedUpdateManyInputSchema: z.ZodType<Prisma.UserUncheckedUpdateManyInput> = z.object({
@@ -1872,6 +1889,7 @@ export const UserUncheckedUpdateManyInputSchema: z.ZodType<Prisma.UserUncheckedU
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   lastLoginAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   language: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  roles: z.union([ z.lazy(() => UserUpdaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
 }).strict();
 
 export const ProfileCreateInputSchema: z.ZodType<Prisma.ProfileCreateInput> = z.object({
@@ -2703,6 +2721,14 @@ export const DateTimeNullableFilterSchema: z.ZodType<Prisma.DateTimeNullableFilt
   not: z.union([ z.coerce.date(),z.lazy(() => NestedDateTimeNullableFilterSchema) ]).optional().nullable(),
 }).strict();
 
+export const EnumUserRoleNullableListFilterSchema: z.ZodType<Prisma.EnumUserRoleNullableListFilter> = z.object({
+  equals: z.lazy(() => UserRoleSchema).array().optional().nullable(),
+  has: z.lazy(() => UserRoleSchema).optional().nullable(),
+  hasEvery: z.lazy(() => UserRoleSchema).array().optional(),
+  hasSome: z.lazy(() => UserRoleSchema).array().optional(),
+  isEmpty: z.boolean().optional()
+}).strict();
+
 export const ProfileImageListRelationFilterSchema: z.ZodType<Prisma.ProfileImageListRelationFilter> = z.object({
   every: z.lazy(() => ProfileImageWhereInputSchema).optional(),
   some: z.lazy(() => ProfileImageWhereInputSchema).optional(),
@@ -2735,7 +2761,8 @@ export const UserCountOrderByAggregateInputSchema: z.ZodType<Prisma.UserCountOrd
   createdAt: z.lazy(() => SortOrderSchema).optional(),
   updatedAt: z.lazy(() => SortOrderSchema).optional(),
   lastLoginAt: z.lazy(() => SortOrderSchema).optional(),
-  language: z.lazy(() => SortOrderSchema).optional()
+  language: z.lazy(() => SortOrderSchema).optional(),
+  roles: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
 export const UserAvgOrderByAggregateInputSchema: z.ZodType<Prisma.UserAvgOrderByAggregateInput> = z.object({
@@ -3266,6 +3293,10 @@ export const UserUpdateOneRequiredWithoutRequestsReceivedNestedInputSchema: z.Zo
   update: z.union([ z.lazy(() => UserUpdateToOneWithWhereWithoutRequestsReceivedInputSchema),z.lazy(() => UserUpdateWithoutRequestsReceivedInputSchema),z.lazy(() => UserUncheckedUpdateWithoutRequestsReceivedInputSchema) ]).optional(),
 }).strict();
 
+export const UserCreaterolesInputSchema: z.ZodType<Prisma.UserCreaterolesInput> = z.object({
+  set: z.lazy(() => UserRoleSchema).array()
+}).strict();
+
 export const ProfileCreateNestedOneWithoutUserInputSchema: z.ZodType<Prisma.ProfileCreateNestedOneWithoutUserInput> = z.object({
   create: z.union([ z.lazy(() => ProfileCreateWithoutUserInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutUserInputSchema) ]).optional(),
   connectOrCreate: z.lazy(() => ProfileCreateOrConnectWithoutUserInputSchema).optional(),
@@ -3322,6 +3353,11 @@ export const ConnectionRequestUncheckedCreateNestedManyWithoutToUserInputSchema:
 
 export const NullableDateTimeFieldUpdateOperationsInputSchema: z.ZodType<Prisma.NullableDateTimeFieldUpdateOperationsInput> = z.object({
   set: z.coerce.date().optional().nullable()
+}).strict();
+
+export const UserUpdaterolesInputSchema: z.ZodType<Prisma.UserUpdaterolesInput> = z.object({
+  set: z.lazy(() => UserRoleSchema).array().optional(),
+  push: z.union([ z.lazy(() => UserRoleSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
 }).strict();
 
 export const ProfileUpdateOneWithoutUserNestedInputSchema: z.ZodType<Prisma.ProfileUpdateOneWithoutUserNestedInput> = z.object({
@@ -4424,6 +4460,7 @@ export const UserCreateWithoutRequestsSentInputSchema: z.ZodType<Prisma.UserCrea
   updatedAt: z.coerce.date().optional(),
   lastLoginAt: z.coerce.date().optional().nullable(),
   language: z.string().optional().nullable(),
+  roles: z.union([ z.lazy(() => UserCreaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
   profile: z.lazy(() => ProfileCreateNestedOneWithoutUserInputSchema).optional(),
   ProfileImage: z.lazy(() => ProfileImageCreateNestedManyWithoutUserInputSchema).optional(),
   requestsReceived: z.lazy(() => ConnectionRequestCreateNestedManyWithoutToUserInputSchema).optional()
@@ -4442,6 +4479,7 @@ export const UserUncheckedCreateWithoutRequestsSentInputSchema: z.ZodType<Prisma
   updatedAt: z.coerce.date().optional(),
   lastLoginAt: z.coerce.date().optional().nullable(),
   language: z.string().optional().nullable(),
+  roles: z.union([ z.lazy(() => UserCreaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
   profile: z.lazy(() => ProfileUncheckedCreateNestedOneWithoutUserInputSchema).optional(),
   ProfileImage: z.lazy(() => ProfileImageUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   requestsReceived: z.lazy(() => ConnectionRequestUncheckedCreateNestedManyWithoutToUserInputSchema).optional()
@@ -4465,6 +4503,7 @@ export const UserCreateWithoutRequestsReceivedInputSchema: z.ZodType<Prisma.User
   updatedAt: z.coerce.date().optional(),
   lastLoginAt: z.coerce.date().optional().nullable(),
   language: z.string().optional().nullable(),
+  roles: z.union([ z.lazy(() => UserCreaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
   profile: z.lazy(() => ProfileCreateNestedOneWithoutUserInputSchema).optional(),
   ProfileImage: z.lazy(() => ProfileImageCreateNestedManyWithoutUserInputSchema).optional(),
   requestsSent: z.lazy(() => ConnectionRequestCreateNestedManyWithoutFromUserInputSchema).optional()
@@ -4483,6 +4522,7 @@ export const UserUncheckedCreateWithoutRequestsReceivedInputSchema: z.ZodType<Pr
   updatedAt: z.coerce.date().optional(),
   lastLoginAt: z.coerce.date().optional().nullable(),
   language: z.string().optional().nullable(),
+  roles: z.union([ z.lazy(() => UserCreaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
   profile: z.lazy(() => ProfileUncheckedCreateNestedOneWithoutUserInputSchema).optional(),
   ProfileImage: z.lazy(() => ProfileImageUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   requestsSent: z.lazy(() => ConnectionRequestUncheckedCreateNestedManyWithoutFromUserInputSchema).optional()
@@ -4517,6 +4557,7 @@ export const UserUpdateWithoutRequestsSentInputSchema: z.ZodType<Prisma.UserUpda
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   lastLoginAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   language: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  roles: z.union([ z.lazy(() => UserUpdaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
   profile: z.lazy(() => ProfileUpdateOneWithoutUserNestedInputSchema).optional(),
   ProfileImage: z.lazy(() => ProfileImageUpdateManyWithoutUserNestedInputSchema).optional(),
   requestsReceived: z.lazy(() => ConnectionRequestUpdateManyWithoutToUserNestedInputSchema).optional()
@@ -4535,6 +4576,7 @@ export const UserUncheckedUpdateWithoutRequestsSentInputSchema: z.ZodType<Prisma
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   lastLoginAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   language: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  roles: z.union([ z.lazy(() => UserUpdaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
   profile: z.lazy(() => ProfileUncheckedUpdateOneWithoutUserNestedInputSchema).optional(),
   ProfileImage: z.lazy(() => ProfileImageUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   requestsReceived: z.lazy(() => ConnectionRequestUncheckedUpdateManyWithoutToUserNestedInputSchema).optional()
@@ -4564,6 +4606,7 @@ export const UserUpdateWithoutRequestsReceivedInputSchema: z.ZodType<Prisma.User
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   lastLoginAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   language: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  roles: z.union([ z.lazy(() => UserUpdaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
   profile: z.lazy(() => ProfileUpdateOneWithoutUserNestedInputSchema).optional(),
   ProfileImage: z.lazy(() => ProfileImageUpdateManyWithoutUserNestedInputSchema).optional(),
   requestsSent: z.lazy(() => ConnectionRequestUpdateManyWithoutFromUserNestedInputSchema).optional()
@@ -4582,6 +4625,7 @@ export const UserUncheckedUpdateWithoutRequestsReceivedInputSchema: z.ZodType<Pr
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   lastLoginAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   language: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  roles: z.union([ z.lazy(() => UserUpdaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
   profile: z.lazy(() => ProfileUncheckedUpdateOneWithoutUserNestedInputSchema).optional(),
   ProfileImage: z.lazy(() => ProfileImageUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   requestsSent: z.lazy(() => ConnectionRequestUncheckedUpdateManyWithoutFromUserNestedInputSchema).optional()
@@ -4912,6 +4956,7 @@ export const UserCreateWithoutProfileInputSchema: z.ZodType<Prisma.UserCreateWit
   updatedAt: z.coerce.date().optional(),
   lastLoginAt: z.coerce.date().optional().nullable(),
   language: z.string().optional().nullable(),
+  roles: z.union([ z.lazy(() => UserCreaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
   ProfileImage: z.lazy(() => ProfileImageCreateNestedManyWithoutUserInputSchema).optional(),
   requestsSent: z.lazy(() => ConnectionRequestCreateNestedManyWithoutFromUserInputSchema).optional(),
   requestsReceived: z.lazy(() => ConnectionRequestCreateNestedManyWithoutToUserInputSchema).optional()
@@ -4930,6 +4975,7 @@ export const UserUncheckedCreateWithoutProfileInputSchema: z.ZodType<Prisma.User
   updatedAt: z.coerce.date().optional(),
   lastLoginAt: z.coerce.date().optional().nullable(),
   language: z.string().optional().nullable(),
+  roles: z.union([ z.lazy(() => UserCreaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
   ProfileImage: z.lazy(() => ProfileImageUncheckedCreateNestedManyWithoutUserInputSchema).optional(),
   requestsSent: z.lazy(() => ConnectionRequestUncheckedCreateNestedManyWithoutFromUserInputSchema).optional(),
   requestsReceived: z.lazy(() => ConnectionRequestUncheckedCreateNestedManyWithoutToUserInputSchema).optional()
@@ -5051,6 +5097,7 @@ export const UserUpdateWithoutProfileInputSchema: z.ZodType<Prisma.UserUpdateWit
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   lastLoginAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   language: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  roles: z.union([ z.lazy(() => UserUpdaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
   ProfileImage: z.lazy(() => ProfileImageUpdateManyWithoutUserNestedInputSchema).optional(),
   requestsSent: z.lazy(() => ConnectionRequestUpdateManyWithoutFromUserNestedInputSchema).optional(),
   requestsReceived: z.lazy(() => ConnectionRequestUpdateManyWithoutToUserNestedInputSchema).optional()
@@ -5069,6 +5116,7 @@ export const UserUncheckedUpdateWithoutProfileInputSchema: z.ZodType<Prisma.User
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   lastLoginAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   language: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  roles: z.union([ z.lazy(() => UserUpdaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
   ProfileImage: z.lazy(() => ProfileImageUncheckedUpdateManyWithoutUserNestedInputSchema).optional(),
   requestsSent: z.lazy(() => ConnectionRequestUncheckedUpdateManyWithoutFromUserNestedInputSchema).optional(),
   requestsReceived: z.lazy(() => ConnectionRequestUncheckedUpdateManyWithoutToUserNestedInputSchema).optional()
@@ -5119,6 +5167,7 @@ export const UserCreateWithoutProfileImageInputSchema: z.ZodType<Prisma.UserCrea
   updatedAt: z.coerce.date().optional(),
   lastLoginAt: z.coerce.date().optional().nullable(),
   language: z.string().optional().nullable(),
+  roles: z.union([ z.lazy(() => UserCreaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
   profile: z.lazy(() => ProfileCreateNestedOneWithoutUserInputSchema).optional(),
   requestsSent: z.lazy(() => ConnectionRequestCreateNestedManyWithoutFromUserInputSchema).optional(),
   requestsReceived: z.lazy(() => ConnectionRequestCreateNestedManyWithoutToUserInputSchema).optional()
@@ -5137,6 +5186,7 @@ export const UserUncheckedCreateWithoutProfileImageInputSchema: z.ZodType<Prisma
   updatedAt: z.coerce.date().optional(),
   lastLoginAt: z.coerce.date().optional().nullable(),
   language: z.string().optional().nullable(),
+  roles: z.union([ z.lazy(() => UserCreaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
   profile: z.lazy(() => ProfileUncheckedCreateNestedOneWithoutUserInputSchema).optional(),
   requestsSent: z.lazy(() => ConnectionRequestUncheckedCreateNestedManyWithoutFromUserInputSchema).optional(),
   requestsReceived: z.lazy(() => ConnectionRequestUncheckedCreateNestedManyWithoutToUserInputSchema).optional()
@@ -5228,6 +5278,7 @@ export const UserUpdateWithoutProfileImageInputSchema: z.ZodType<Prisma.UserUpda
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   lastLoginAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   language: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  roles: z.union([ z.lazy(() => UserUpdaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
   profile: z.lazy(() => ProfileUpdateOneWithoutUserNestedInputSchema).optional(),
   requestsSent: z.lazy(() => ConnectionRequestUpdateManyWithoutFromUserNestedInputSchema).optional(),
   requestsReceived: z.lazy(() => ConnectionRequestUpdateManyWithoutToUserNestedInputSchema).optional()
@@ -5246,6 +5297,7 @@ export const UserUncheckedUpdateWithoutProfileImageInputSchema: z.ZodType<Prisma
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   lastLoginAt: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   language: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  roles: z.union([ z.lazy(() => UserUpdaterolesInputSchema),z.lazy(() => UserRoleSchema).array() ]).optional(),
   profile: z.lazy(() => ProfileUncheckedUpdateOneWithoutUserNestedInputSchema).optional(),
   requestsSent: z.lazy(() => ConnectionRequestUncheckedUpdateManyWithoutFromUserNestedInputSchema).optional(),
   requestsReceived: z.lazy(() => ConnectionRequestUncheckedUpdateManyWithoutToUserNestedInputSchema).optional()

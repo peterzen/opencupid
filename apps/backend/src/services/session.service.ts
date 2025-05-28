@@ -1,47 +1,112 @@
-
+// src/services/session.service.ts
 import Redis from 'ioredis'
+import { UserRole } from '@prisma/client'
+import { SessionData } from '@zod/user.schema'
 
-export interface SessionData {
-  userId: string
-  isDatingActive: boolean
-  lang: string
-}
 
 export class SessionService {
-  constructor(private redis: Redis, private ttlSec = 60 * 60 * 24 * 7) { }
+  constructor(
+    private redis: Redis,
+    private ttlSec = 60 * 60 * 24 * 7  // 7 days
+  ) { }
 
-  /** 
-   * Fetch or create a session. 
-   * If absent, creates it based on the user’s current flag.
-   */
-  async getOrCreate(sessionId: string, session: SessionData): Promise<SessionData> {
-    const key = `session:${sessionId}`
-    const exists = await this.redis.exists(key)
-
-    // HSET will create the key if needed; then refresh TTL below
-    await this.redis.hset(
-      key,
-      'userId', session.userId,
-      'isDatingActive', String(session.isDatingActive),
-      'lang', session.lang
-    )
-    await this.redis.expire(key, this.ttlSec)
-
-    return session
+  private sessionKey(id: string) {
+    return `session:${id}`
+  }
+  private rolesKey(id: string) {
+    return `session:${id}:roles`
   }
 
-  async get(sessionId: string) {
-    const data = await this.redis.hgetall(`session:${sessionId}`)
-    if (!data.userId) return null
+  /**
+   * Fetch or create the session hash and roles set
+   */
+  async getOrCreate(id: string, data: SessionData): Promise<SessionData> {
+    const hkey = this.sessionKey(id)
+    const rkey = this.rolesKey(id)
+
+    // Store hash fields (userId, lang) and overwrite roles set atomically
+    await this.redis.multi()
+      // Update hash
+      .hset(
+        hkey,
+        'userId', data.userId,
+        'lang', data.lang
+      )
+      // Reset TTL on hash
+      .expire(hkey, this.ttlSec)
+      // Overwrite roles set
+      .del(rkey)
+      .sadd(rkey, ...data.roles)
+      // Reset TTL on set
+      .expire(rkey, this.ttlSec)
+      .exec()
+
+    return data
+  }
+
+  /**
+   * Get session data; returns null if none exists
+   */
+  async get(id: string): Promise<SessionData | null> {
+    const hkey = this.sessionKey(id)
+    const rkey = this.rolesKey(id)
+
+    const [hash, roles] = await Promise.all([
+      this.redis.hgetall(hkey),
+      this.redis.smembers(rkey),
+    ])
+    if (!hash.userId) return null
+
     return {
-      userId: data.userId,
-      isDatingActive: data.isDatingActive === 'true',
-      lang: data.lang
+      userId: hash.userId,
+      lang: hash.lang || 'en',
+      roles: roles as UserRole[],
     }
   }
 
-  // Call to refresh TTL on each access 
-  async refreshTtl(sessionId: string) {
-    await this.redis.expire(`session:${sessionId}`, this.ttlSec)
+  /**
+   * Refresh TTL on session data
+   */
+  async refreshTtl(id: string): Promise<void> {
+    const hkey = this.sessionKey(id)
+    const rkey = this.rolesKey(id)
+    await this.redis.multi()
+      .expire(hkey, this.ttlSec)
+      .expire(rkey, this.ttlSec)
+      .exec()
+  }
+
+  /**
+   * Add a role and refresh TTL atomically
+   */
+  async setRole(id: string, role: UserRole): Promise<void> {
+    const rkey = this.rolesKey(id)
+    await this.redis.multi()
+      .sadd(rkey, role)
+      .expire(rkey, this.ttlSec)
+      .exec()
+  }
+
+  /**
+   * Remove a role and refresh TTL atomically
+   */
+  async removeRole(id: string, role: UserRole): Promise<void> {
+    const rkey = this.rolesKey(id)
+    await this.redis.multi()
+      .srem(rkey, role)
+      .expire(rkey, this.ttlSec)
+      .exec()
+  }
+
+  /**
+   * Delete a session and its roles
+   */
+  async delete(id: string): Promise<void> {
+    const hkey = this.sessionKey(id)
+    const rkey = this.rolesKey(id)
+    await this.redis.multi()
+      .del(hkey)
+      .del(rkey)
+      .exec()
   }
 }

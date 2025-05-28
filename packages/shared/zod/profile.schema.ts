@@ -12,8 +12,8 @@ const publicProfileFields = {
   introSocial: true,
   cityName: true,
   country: true,
-  isSocialActive: true,
   work: true,
+  isDatingActive: true,
 } as const;
 
 const publicDatingProfileFields = {
@@ -22,7 +22,6 @@ const publicDatingProfileFields = {
   relationship: true,
   gender: true,
   birthday: true,
-  isDatingActive: true,
   pronouns: true,
 } as const;
 

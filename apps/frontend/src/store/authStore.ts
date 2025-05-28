@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { UserRoleType } from '@zod/generated'
+import type { SessionData } from '@zod/user.schema'
 
 // ensure base URL is set (e.g. via VITE_API_BASE_URL)
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '/api'
@@ -12,6 +14,7 @@ interface JwtPayload {
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     jwt: '',
+    session: null as SessionData | null,
     userId: null as string | null,
     email: null as string | null,
     isInitialized: false,
@@ -89,6 +92,11 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    hasRole(role: UserRoleType) {
+
+      // TODO implement me
+      return true
+    },
     // Update the current user's profile
     // async updateUser(userData: Record<string, any>) {
     //   try {
