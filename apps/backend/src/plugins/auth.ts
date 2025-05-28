@@ -1,5 +1,6 @@
 import fp from 'fastify-plugin'
 import fastifyJwt from '@fastify/jwt'
+import { sendUnauthorizedError } from 'src/api/helpers'
 
 export default fp(async (fastify) => {
   fastify.register(fastifyJwt, {
@@ -10,7 +11,7 @@ export default fp(async (fastify) => {
     try {
       await request.jwtVerify()
     } catch (err) {
-      reply.status(401).send({ error: 'Unauthorized' })
+      sendUnauthorizedError(reply)
     }
   })
 })

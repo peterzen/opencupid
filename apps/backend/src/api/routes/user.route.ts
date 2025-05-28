@@ -4,6 +4,7 @@ import { validateBody } from '../../utils/zodValidate'
 import { emailQueue } from '../../queues/emailQueue'
 import { UserService } from 'src/services/user.service'
 import { ProfileService } from 'src/services/profile.service'
+import { sendUnauthorizedError } from '../helpers'
 
 
 const userRoutes: FastifyPluginAsync = async (fastify) => {
@@ -70,9 +71,7 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
     onRequest: [fastify.authenticate]
   }, async (req, reply) => {
 
-    if (req.user === null) {
-      return reply.status(401).send({ error: 'Unauthorized' })
-    }
+    if (req.user === null) return sendUnauthorizedError(reply)
 
     const user = userService.getUserById(req.user.userId, {
       select: {
@@ -81,9 +80,7 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
       }
     })
 
-    if (!user) {
-      return reply.status(401).send({ error: 'Unauthorized' })
-    }
+    if (!user) return sendUnauthorizedError(reply)
 
     return reply.status(200).send({ success: true, data: user })
   })

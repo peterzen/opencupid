@@ -11,3 +11,10 @@ export function sendError(
   if (fieldErrors) payload.fieldErrors = fieldErrors
   return reply.code(statusCode).send(payload)
 }
+
+export function sendUnauthorizedError(
+  reply: FastifyPluginAsync['prototype']['reply'],
+  message: string = 'Unauthorized'
+) {
+  return sendError(reply, 401, message)
+}

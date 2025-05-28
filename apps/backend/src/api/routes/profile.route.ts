@@ -11,7 +11,7 @@ import { ProfileService } from 'src/services/profile.service'
 import { ImageGalleryService } from 'src/services/image.service'
 import { validateBody } from '@utils/zodValidate'
 import { uploadTmpDir } from 'src/lib/media';
-import { sendError } from '../helpers';
+import { sendError, sendUnauthorizedError } from '../helpers';
 import env from 'src/env';
 import { mapProfileImagesToOwner, mapProfileToOwner, mapProfileToPublic } from 'src/services/mappers';
 import { ReorderProfileImagesPayloadSchema } from '@zod/profileimage.schema';
@@ -42,9 +42,9 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
    * @description This route retrieves the current user's social and dating profiles.
    */
   fastify.get('/me', { onRequest: [fastify.authenticate] }, async (req, reply) => {
-    if (!req.user.userId) {
-      return sendError(reply, 401, 'Unauthorized')
-    }
+
+    if (!req.user.userId) return sendUnauthorizedError(reply)
+
     try {
       const fetched = await profileService.getProfileByUserId(req.user.userId)
       if (!fetched) return sendError(reply, 404, 'Social profile not found')
@@ -65,15 +65,12 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
    */
   fastify.get('/:id', { onRequest: [fastify.authenticate] }, async (req, reply) => {
 
-    if (!req.user.userId) {
-      return sendError(reply, 401, 'Unauthorized')
-    }
+    if (!req.user.userId) return sendUnauthorizedError(reply)
 
     const { id: profileId } = IdLookupParamsSchema.parse(req.params)
 
     try {
       const raw = await profileService.getProfileById(profileId)
-      console.log('Raw profile data:', raw)
       if (!raw) return sendError(reply, 404, 'Profile not found')
       const profile = mapProfileToPublic(raw)
       // const profile = publicProfileSchema.parse(raw)
@@ -88,11 +85,15 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
    * Update the current user's profile
    */
   fastify.patch('/profile', { onRequest: [fastify.authenticate] }, async (req, reply) => {
-    if (!req.user.userId) {
-      return sendError(reply, 401, 'Unauthorized')
-    }
+
+    if (!req.user.userId) return sendUnauthorizedError(reply)
+
     const data = await validateBody(UpdateProfilePayloadSchema, req, reply)
     if (!data) return
+
+    // TODO
+    // const auth = req.headers.authorization.split(' ')[1]
+    // await fastify.redis.hset(`session:${auth}`, 'isDatingActive', String(updated.isDatingActive))
 
     try {
       const updated = await profileService.updateProfile(req.user.userId, data)
@@ -113,9 +114,7 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     onRequest: [fastify.authenticate]
   }, async (req, reply) => {
 
-    if (!req.user.userId) {
-      return sendError(reply, 401, 'Unauthorized')
-    }
+    if (!req.user.userId) return sendUnauthorizedError(reply)
 
     let files
 
@@ -172,9 +171,9 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
    * Delete a profile image
    */
   fastify.delete('/image/:id', { onRequest: [fastify.authenticate] }, async (req, reply) => {
-    if (!req.user.userId) {
-      return sendError(reply, 401, 'Unauthorized')
-    }
+
+    if (!req.user.userId) return sendUnauthorizedError(reply)
+
     const { id: profileImageId } = IdLookupParamsSchema.parse(req.params)
 
     try {
@@ -199,9 +198,7 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
    */
   fastify.patch('/image/order', { onRequest: [fastify.authenticate] }, async (req, reply) => {
 
-    if (!req.user.userId) {
-      return sendError(reply, 401, 'Unauthorized')
-    }
+    if (!req.user.userId) return sendUnauthorizedError(reply)
 
     const { images } = ReorderProfileImagesPayloadSchema.parse(req.body)
 
