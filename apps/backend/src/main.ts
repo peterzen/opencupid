@@ -30,7 +30,8 @@ app.register(cors, {
 })
 
 app.register(import('./plugins/prisma'))
-app.register(import('./plugins/auth'))
+// app.register(import('./plugins/auth'))
+app.register(import('./plugins/session-auth'))
 app.register(import('./plugins/user-service'))
 app.register(import('./plugins/profile-service'))
 app.register(import('./plugins/gallery-service'))
