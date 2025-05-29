@@ -3,6 +3,7 @@ import {
   Prisma
 } from '@prisma/client'
 import {
+  ProfileComplete,
   UpdatedProfileFragment,
   UpdatedProfileFragmentSchema,
   UpdateProfilePayload
@@ -12,20 +13,8 @@ import {
   Profile,
   ProfileImage,
   ProfileTag,
-  Tag
 } from '@zod/generated'
 
-
-// Define types for service return values
-export type ProfileWithImages = Profile & {
-  profileImages: ProfileImage[]
-}
-
-export type ProfileWithTags = Profile & {
-  tags: (ProfileTag & { tag: Tag })[]
-}
-
-export type ProfileComplete = ProfileWithImages & ProfileWithTags
 
 export class ProfileService {
   private static instance: ProfileService

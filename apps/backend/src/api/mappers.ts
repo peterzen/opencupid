@@ -4,8 +4,8 @@ import {
   OwnerScalarSchema,
   PublicProfile,
   OwnerProfile,
-  ProfileWithImages,
   ProfileUnionSchema,
+  ProfileComplete,
 } from "@zod/profile.schema";
 import { OwnerProfileImage, OwnerProfileImageSchema, PublicProfileImage, PublicProfileImageSchema } from "@zod/profileimage.schema";
 import { ProfileTagJoinSchema, PublicTag, PublicTagSchema } from "@zod/tag.schema";
@@ -13,7 +13,7 @@ import type { ProfileImage, UserRole } from "@prisma/client";
 import { ProfileTag } from "@zod/generated";
 
 
-export function mapProfileToOwner(profile: ProfileWithImages): OwnerProfile {
+export function mapProfileToOwner(profile: ProfileComplete): OwnerProfile {
   const safe = OwnerScalarSchema.parse(profile)
 
   // Transform each image using the service
@@ -36,7 +36,7 @@ function mapProfileTags(profileTags: ProfileTag[]): PublicTag[] {
     .map((tag: PublicTag) => PublicTagSchema.parse(tag));
 }
 
-export function mapProfileToPublic(profile: ProfileWithImages, roles: UserRole[]): PublicProfile {
+export function mapProfileToPublic(profile: ProfileComplete, roles: UserRole[]): PublicProfile {
   // shape discriminated union ProfileUnionSchema
   const dProf = {
     ...profile,
