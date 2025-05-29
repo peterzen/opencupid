@@ -95,10 +95,6 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     const data = await validateBody(UpdateProfilePayloadSchema, req, reply)
     if (!data) return
 
-    // TODO
-    // const auth = req.headers.authorization.split(' ')[1]
-    // await fastify.redis.hset(`session:${auth}`, 'isDatingActive', String(updated.isDatingActive))
-
     try {
       const updated = await profileService.updateProfile(req.user.userId, data)
       if (!updated) return sendError(reply, 404, 'Profile not found')
@@ -109,6 +105,8 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
         await userService.removeRole(req.user.userId, 'user_dating')
       }
       const profile = UpdateProfilePayloadSchema.parse(updated)
+      // Clear session to force re-fetch on next request, we need the roles updated
+      await req.deleteSession()
       return reply.code(200).send({ success: true, profile })
     } catch (err) {
       fastify.log.error(err)

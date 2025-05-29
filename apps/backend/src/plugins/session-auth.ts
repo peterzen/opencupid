@@ -1,14 +1,13 @@
-// src/plugins/session-auth.ts
 import fp from 'fastify-plugin'
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import fastifyJwt from '@fastify/jwt'
-
 import Redis from 'ioredis'
-import {  SessionService } from '../services/session.service'
 
+import { type SessionData } from '@zod/user.schema'
+
+import { UserService } from 'src/services/user.service'
+import { SessionService } from '../services/session.service'
 import { sendUnauthorizedError } from 'src/api/helpers'
-import { UserRole } from '@prisma/client' 
-import { SessionData } from '@zod/user.schema'
 
 // Extend Fastify types
 declare module 'fastify' {
@@ -17,6 +16,7 @@ declare module 'fastify' {
   }
   interface FastifyRequest {
     session: SessionData
+    deleteSession: () => Promise<void>
   }
 }
 
@@ -34,7 +34,7 @@ export default fp(async (fastify: FastifyInstance) => {
   // Initialize Redis client
   const redis = new Redis(redisUrl)
   fastify.decorate('redis', redis)
-  const sessions = new SessionService(redis)
+  const sessionService = new SessionService(redis)
 
   // Auth hook reads Bearer token as session ID
   fastify.decorate('authenticate', async (req: FastifyRequest, reply: FastifyReply) => {
@@ -55,28 +55,39 @@ export default fp(async (fastify: FastifyInstance) => {
     }
 
     // Try to fetch an existing session
-    let sess = await sessions.get(sessionId)
+    let sess = await sessionService.get(sessionId)
     if (!sess) {
-      // If it doesn’t exist, fall back to DB to “recreate” it
-      // (you’ll need a way to derive userId—e.g. via a short-lived JWT or another header)
-      // const { userId, isDatingActive, lang } = await fastify.prisma.user.findUnique({
-      //   where: {
-      //     id: req.user?.userId
-      //   }
-      // })
-      const userId = req.user?.userId
-      const lang = 'en' // Mocked for example purposes
-      const roles = ['user','user_dating'] as UserRole[] //req.user?.roles || ['user','user_dating']
 
+      const userId = req.user?.userId
       if (!userId) {
         return sendUnauthorizedError(reply, 'Invalid session')
       }
-      sess = await sessions.getOrCreate(sessionId, { userId, roles, lang })
+
+      let user
+
+      try {
+        user = await UserService.getInstance().getUserById(userId)
+        if (!user) {
+          return sendUnauthorizedError(reply, 'User not found')
+        }
+      } catch (error) {
+        fastify.log.error('Error fetching user for session refresh:', error)
+        return sendUnauthorizedError(reply, 'Session refresh failed')
+      }
+
+      const sessionData: SessionData = {
+        lang: user.language || 'en', // Default to 'en' if no language is set
+        roles: user.roles,
+        userId: user.id,
+      }
+      sess = await sessionService.getOrCreate(sessionId, sessionData)
     } else {
       // Refresh TTL on simple reads
-      await sessions.refreshTtl(sessionId)
+      await sessionService.refreshTtl(sessionId)
     }
     req.session = sess
-
+    req.deleteSession = async () => {
+      return await sessionService.delete(sessionId)
+    }
   })
 })

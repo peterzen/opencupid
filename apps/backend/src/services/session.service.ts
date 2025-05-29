@@ -30,7 +30,7 @@ export class SessionService {
       .hset(
         hkey,
         'userId', data.userId,
-        'lang', data.lang
+        'lang', data.lang,
       )
       // Reset TTL on hash
       .expire(hkey, this.ttlSec)
@@ -72,28 +72,6 @@ export class SessionService {
     const rkey = this.rolesKey(id)
     await this.redis.multi()
       .expire(hkey, this.ttlSec)
-      .expire(rkey, this.ttlSec)
-      .exec()
-  }
-
-  /**
-   * Add a role and refresh TTL atomically
-   */
-  async setRole(id: string, role: UserRole): Promise<void> {
-    const rkey = this.rolesKey(id)
-    await this.redis.multi()
-      .sadd(rkey, role)
-      .expire(rkey, this.ttlSec)
-      .exec()
-  }
-
-  /**
-   * Remove a role and refresh TTL atomically
-   */
-  async removeRole(id: string, role: UserRole): Promise<void> {
-    const rkey = this.rolesKey(id)
-    await this.redis.multi()
-      .srem(rkey, role)
       .expire(rkey, this.ttlSec)
       .exec()
   }
