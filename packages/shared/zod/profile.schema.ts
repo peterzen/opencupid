@@ -1,11 +1,11 @@
 import type { Prisma } from "@prisma/client";
 import { z } from "zod";
-import { ProfileSchema } from "@zod/generated";
+import { ProfileSchema, TagSchema } from "@zod/generated";
 
 import { PublicTagSchema } from "./tag.schema";
 import { OwnerProfileImageSchema, PublicProfileImageSchema } from "./profileimage.schema";
 
-const publicProfileFields = {
+const baseFields = {
   id: true,
   languages: true,
   publicName: true,
@@ -14,6 +14,7 @@ const publicProfileFields = {
   country: true,
   work: true,
   isDatingActive: true,
+  isSocialActive: true,
 } as const;
 
 const publicDatingProfileFields = {
@@ -26,18 +27,39 @@ const publicDatingProfileFields = {
 } as const;
 
 export const PublicScalarsSchema = ProfileSchema.pick({
-  ...publicProfileFields,
-});
+  ...baseFields,
+}).extend({
+  isDatingActive: z.literal(false)
+})
 
-export const PublicProfileSchema = PublicScalarsSchema.extend({
-  profileImages: z.array(PublicProfileImageSchema).default([]),
-  tags: z.array(PublicTagSchema).default([]),
-});
+export const PublicDatingScalarsSchema = ProfileSchema.pick({
+  ...baseFields,
+  ...publicDatingProfileFields,
+}).extend({
+  isDatingActive: z.literal(true)
+})
+
+
+export const ProfileUnionSchema = z.discriminatedUnion('isDatingActive', [
+  // when isDatingActive = false, use the base
+  PublicScalarsSchema,
+  // when isDatingActive = true, require the dating picks
+  PublicDatingScalarsSchema,
+])
+
+// export type ProfileUnion = z.infer<typeof ProfileUnionSchema>
+
+export const PublicProfileSchema = ProfileUnionSchema.and(
+  z.object({
+    profileImages: z.array(PublicProfileImageSchema).default([]),
+    tags: z.array(PublicTagSchema).default([]),
+  })
+);
 
 export type PublicProfile = z.infer<typeof PublicProfileSchema>;
 
 export const PublicDatingProfileSchema = ProfileSchema.pick({
-  ...publicProfileFields,
+  ...baseFields,
   ...publicDatingProfileFields,
 }).extend({
   profileImages: z.array(PublicProfileImageSchema).default([]),
@@ -47,7 +69,7 @@ export const PublicDatingProfileSchema = ProfileSchema.pick({
 export type PublicDatingProfile = z.infer<typeof PublicDatingProfileSchema>;
 
 export const OwnerScalarSchema = ProfileSchema.pick({
-  ...publicProfileFields,
+  ...baseFields,
   ...publicDatingProfileFields,
   id: true,
   isActive: true,
@@ -59,10 +81,7 @@ export const OwnerProfileSchema = OwnerScalarSchema.extend({
 });
 export type OwnerProfile = z.infer<typeof OwnerProfileSchema>;
 
-export const UpdateProfilePayloadSchema = ProfileSchema.pick({
-  ...publicProfileFields,
-  ...publicDatingProfileFields,
-})
+export const UpdateProfilePayloadSchema = OwnerScalarSchema
   .partial()
   .extend({
     tags: z.array(z.string().cuid()).optional(),

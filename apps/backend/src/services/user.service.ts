@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma'
-import { User, Profile } from '@prisma/client'
+import { User, Profile, UserRole } from '@prisma/client'
 import { randomBytes } from 'crypto'
 
 // Define types for service return values
@@ -98,24 +98,27 @@ export class UserService {
     })
   }
 
-  // async getUserWithProfile(userId: string): Promise<UserWithProfile | null> {
-  //   return prisma.user.findUnique({
-  //     where: { id: userId },
-  //     include: { profile: true }
-  //   })
-  // }
+  async addRole(userId: string, role: UserRole): Promise<User | null> {
+    return prisma.user.update({
+      where: { id: userId },
+      data: {
+        roles: {
+          push: role
+        }
+      }
+    })
+  }
 
-  // async getUserProfiles(options?: { active?: boolean }): Promise<Profile[]> {
-  //   return prisma.profile.findMany({
-  //     where: options?.active !== undefined
-  //       ? { isActive: options.active }
-  //       : undefined,
-  //     include: {
-  //       profileImage: true,
-  //       otherImages: true
-  //     }
-  //   })
-  // }
-
-
+  async removeRole(userId: string, role: UserRole): Promise<User | null> {
+    const user = await this.getUserById(userId)
+    const updatedRoles = user?.roles.filter(r => r !== role) || []
+    return prisma.user.update({
+      where: { id: userId },
+      data: {
+        roles: {
+            set: updatedRoles
+        }
+      }
+    })
+  }
 }

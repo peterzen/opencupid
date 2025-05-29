@@ -1,8 +1,6 @@
 <template>
   <Navbar />
-  <div class="container mt-5">
-    <router-view />
-  </div>
+  <RouterView />
 </template>
 
 <script lang="ts">
@@ -11,10 +9,10 @@ import Navbar from '@/components/Navbar.vue';
 import { applySystemTheme } from './lib/utils';
 
 export default defineComponent({
-   name: "App",
-   components: { Navbar },
-   mounted(){
-      applySystemTheme()
-   }
+  name: "App",
+  components: { Navbar },
+  mounted() {
+    applySystemTheme()
+  }
 })
 </script>

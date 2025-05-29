@@ -1,16 +1,15 @@
-import { z } from "zod";
 import env from "src/env";
 
 import {
-  PublicScalarsSchema,
   OwnerScalarSchema,
   PublicProfile,
   OwnerProfile,
   ProfileWithImages,
+  ProfileUnionSchema,
 } from "@zod/profile.schema";
 import { OwnerProfileImage, OwnerProfileImageSchema, PublicProfileImage, PublicProfileImageSchema } from "@zod/profileimage.schema";
 import { ProfileTagJoinSchema, PublicTag, PublicTagSchema } from "@zod/tag.schema";
-import type { ProfileImage } from "@prisma/client";
+import type { ProfileImage, UserRole } from "@prisma/client";
 import { ProfileTag } from "@zod/generated";
 
 
@@ -31,19 +30,27 @@ export function mapProfileToOwner(profile: ProfileWithImages): OwnerProfile {
   }
 }
 
+function mapProfileTags(profileTags: ProfileTag[]): PublicTag[] {
+  return profileTags
+    .map((pt: ProfileTag) => ProfileTagJoinSchema.parse(pt))
+    .map((tag: PublicTag) => PublicTagSchema.parse(tag));
+}
 
-export function mapProfileToPublic(profile: ProfileWithImages): PublicProfile {
-  const safe = PublicScalarsSchema.parse(profile)
+export function mapProfileToPublic(profile: ProfileWithImages, roles: UserRole[]): PublicProfile {
+  // shape discriminated union ProfileUnionSchema
+  const dProf = {
+    ...profile,
+    isDatingActive: roles.includes('user_dating') && profile.isDatingActive,
+  }
+  const scalars = ProfileUnionSchema.parse(dProf)
   const publicImages = profile.profileImages ? mapProfileImagesToPublic(profile.profileImages) : []
-  const publicTags: PublicTag[] = profile.tags
-    .map((pt: ProfileTag) => ProfileTagJoinSchema.parse(pt))   // yields Tag
-    .map((tag: PublicTag) => PublicTagSchema.parse(tag))
+  const publicTags = profile.tags ? mapProfileTags(profile.tags) : []
 
   return {
-    ...safe,
+    ...scalars,
     profileImages: publicImages,
-    tags: publicTags, // Add the tags property from the safe object
-  }
+    tags: publicTags,
+  } as PublicProfile
 }
 
 export function mapProfileImagesToOwner(images: ProfileImage[]): OwnerProfileImage[] {

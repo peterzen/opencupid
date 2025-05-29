@@ -11,10 +11,11 @@ import { ProfileService } from 'src/services/profile.service'
 import { ImageGalleryService } from 'src/services/image.service'
 import { validateBody } from '@utils/zodValidate'
 import { uploadTmpDir } from 'src/lib/media';
-import { sendError, sendUnauthorizedError } from '../helpers';
+import { getUserRoles, sendError, sendUnauthorizedError } from '../helpers';
 import env from 'src/env';
-import { mapProfileImagesToOwner, mapProfileToOwner, mapProfileToPublic } from 'src/services/mappers';
+import { mapProfileImagesToOwner, mapProfileToOwner, mapProfileToPublic } from 'src/api/mappers';
 import { ReorderProfileImagesPayloadSchema } from '@zod/profileimage.schema';
+import { UserService } from 'src/services/user.service';
 
 
 
@@ -36,6 +37,7 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
   // instantiate services
   const profileService = ProfileService.getInstance()
   const imageService = ImageGalleryService.getInstance();
+  const userService = UserService.getInstance()
 
   /**
    * Get the current user's profile
@@ -67,12 +69,14 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
 
     if (!req.user.userId) return sendUnauthorizedError(reply)
 
+    const roles = getUserRoles(req)
+
     const { id: profileId } = IdLookupParamsSchema.parse(req.params)
 
     try {
       const raw = await profileService.getProfileById(profileId)
       if (!raw) return sendError(reply, 404, 'Profile not found')
-      const profile = mapProfileToPublic(raw)
+      const profile = mapProfileToPublic(raw, roles)
       // const profile = publicProfileSchema.parse(raw)
       return reply.code(200).send({ success: true, profile })
     } catch (err) {
@@ -98,7 +102,13 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     try {
       const updated = await profileService.updateProfile(req.user.userId, data)
       if (!updated) return sendError(reply, 404, 'Profile not found')
-      const profile = OwnerProfileSchema.parse(updated)
+
+      if (updated.isDatingActive) {
+        await userService.addRole(req.user.userId, 'user_dating')
+      } else {
+        await userService.removeRole(req.user.userId, 'user_dating')
+      }
+      const profile = UpdateProfilePayloadSchema.parse(updated)
       return reply.code(200).send({ success: true, profile })
     } catch (err) {
       fastify.log.error(err)
