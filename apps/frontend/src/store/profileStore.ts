@@ -131,5 +131,15 @@ export const useProfileStore = defineStore('profile', {
       }
     },
 
+    async findProfiles(): Promise<PublicProfile[]> {
+      try {
+        const res = await axios.get('/profiles')
+        const profiles = res.data.profiles.map((p: any) => PublicProfileSchema.parse(p))
+        return profiles
+      } catch (error: any) {
+        console.error('Failed to fetch profiles:', error)
+        throw error.response?.data?.message || 'Failed to fetch profiles'
+      }
+    }
   },
 })

@@ -125,7 +125,7 @@ import { getCountryOptions } from '@/lib/countries';
 import Multiselect from 'vue-multiselect'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import ImageUpload from './ImageUpload.vue'
-import { OwnerProfile, UpdateProfile } from '@zod/profile.schema';
+import { OwnerProfile } from '@zod/profile.schema';
 import { getLanguageSelectorOptions, MultiselectOption } from '@/lib/languages';
 
 // Props & Emits

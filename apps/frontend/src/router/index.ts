@@ -20,9 +20,10 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: false }
   },
   {
-    path: '/me',
+    path: '/profile/:id',
     name: 'PublicProfile',
     component: PublicProfile,
+    props: true,
     meta: { requiresAuth: true }
   },
   {

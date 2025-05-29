@@ -1,23 +1,48 @@
+<script setup lang="ts">
+import { reactive, onMounted, computed } from 'vue';
+import { useProfileStore } from '@/store/profileStore';
+import { PublicProfile } from '@zod/profile.schema';
+
+import LoadingComponent from '@/components/LoadingComponent.vue';
+import ProfileCardComponent from '@/components/profiles/ProfileCardComponent.vue';
+import router from '@/router';
+
+const profileStore = useProfileStore()
+
+// Define your component logic here
+const state = reactive({
+  profiles: [] as PublicProfile[],
+  isLoading: false,
+});
+
+onMounted(async () => {
+  state.isLoading = true
+  state.profiles = await profileStore.findProfiles()
+  state.isLoading = false
+})
+
+const handleCardClick = (profile: PublicProfile) => {
+  console.log('Card clicked:', profile);
+  router.push({ name: 'PublicProfile', params: { id: profile.id } });
+};
+
+</script>
+
+
+
 <template>
-<h2>Find people</h2>
-  </template>
+  <LoadingComponent v-if="state.isLoading" />
 
-  <script lang="ts">
-import { defineComponent } from 'vue';
+  <div class="container-fluid">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
 
-  export default defineComponent({
-    name: 'BrowseProfiles',
-    data() {
-      return {
-        // Add your component data here
-      };
-    },
-    methods: {
-      // Add your component methods here
-    },
-    mounted() {
-      // Lifecycle hook
-    }
-  })
-  </script>
+      <div v-for="profile in state.profiles"
+           :key="profile.id"
+           class="col">
+        <ProfileCardComponent :profile="profile" @click="handleCardClick(profile)"/>
+      </div>
+    </div>
+  </div>
 
+
+</template>

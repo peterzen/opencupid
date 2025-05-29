@@ -218,8 +218,21 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       fastify.log.error(err)
       return reply.code(500).send({ success: false })
     }
-  })
+  }),
 
+  fastify.get('/', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+
+    if (!req.user.userId) return sendUnauthorizedError(reply)
+
+    try {
+      const profiles = await profileService.findProfilesFor(req.user.userId)
+      const mappedProfiles = profiles.map(p => mapProfileToPublic(p, getUserRoles(req)))
+      return reply.code(200).send({ success: true, profiles: mappedProfiles })
+    } catch (err) {
+      fastify.log.error(err)
+      return sendError(reply, 500, 'Failed to fetch profiles')
+    }
+  })
 }
 
 export default profileRoutes

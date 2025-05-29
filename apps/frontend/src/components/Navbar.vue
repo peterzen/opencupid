@@ -18,19 +18,9 @@
            id="navbar">
         <ul class="navbar-nav mb-2 mb-lg-0 d-flex">
           <li class="nav-item me-auto">
-            <RouterLink to="/me"
-                        :class="{ 'active': currentRoute === '/me' }"
-                        class="nav-link ">{{ t('nav.profile') }}</RouterLink>
-          </li>
-          <li class="nav-item me-auto">
             <RouterLink to="/onboarding"
                         :class="{ 'active': currentRoute === '/onboarding' }"
                         class="nav-link ">{{ t('nav.onboarding') }}</RouterLink>
-          </li>
-          <li class="nav-item me-auto">
-            <RouterLink to="/me/gallery"
-                        :class="{ 'active': currentRoute === '/me/gallery' }"
-                        class="nav-link ">{{ t('nav.gallery') }}</RouterLink>
           </li>
           <li class="nav-item me-auto">
             <RouterLink to="/browse"

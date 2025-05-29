@@ -15,8 +15,6 @@ export type ProfileWithTags = Profile & {
 export type ProfileComplete = ProfileWithImages & ProfileWithTags
 
 export class ProfileService {
-
-
   private static instance: ProfileService
 
   private constructor() {
@@ -237,6 +235,30 @@ export class ProfileService {
       }
     })
   }
+
+  async findProfilesFor(userId: string): Promise<Profile[]> {
+    return await prisma.profile.findMany({
+      where: {
+        isActive: true,
+        userId: {
+          not: userId
+        }
+      },
+      include: {
+        profileImages: {
+          orderBy: { position: 'asc' },
+        },
+        tags: {
+          include: {
+            tag: true,
+          }
+        }
+      }
+    })
+  }
+
+
+
 
 
 }

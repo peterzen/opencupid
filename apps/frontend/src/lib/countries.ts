@@ -26,6 +26,9 @@ export function getCountryOptions() {
   return options
 }
 
+export function countryCodeToName(code: string) {
+  return countries.getName(code, getLocale(), { select: 'official' }) 
+}
 
 
 export { countries }
