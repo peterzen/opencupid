@@ -4,7 +4,7 @@ import cors from '@fastify/cors' // Import the CORS plugin
 import env from './env'
 
 import './workers/emailWorker'   // ← side‐effect: starts the worker
-import { checkUploadBaseDir } from './lib/media'
+import { checkImageRoot } from '@/lib/media'
 
 const app = Fastify({
   logger: {
@@ -42,7 +42,7 @@ app.register(import('./api'))
 //   root: env.MEDIA_UPLOAD_DIR,
 // })
 
-const ok = checkUploadBaseDir()
+const ok = checkImageRoot()
 if (!ok) {
   app.log.error("Media upload directory cannot be created or is not writable")
   process.exit(1)

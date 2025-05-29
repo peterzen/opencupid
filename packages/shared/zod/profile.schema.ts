@@ -1,6 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { z } from "zod";
-import { ProfileSchema, TagSchema } from "@zod/generated";
+import { Profile, ProfileImage, ProfileSchema, ProfileTag, Tag, TagSchema } from "@zod/generated";
 
 import { PublicTagSchema } from "./tag.schema";
 import { OwnerProfileImageSchema, PublicProfileImageSchema } from "./profileimage.schema";
@@ -95,11 +95,17 @@ export const UpdatedProfileFragmentSchema = OwnerScalarSchema.extend({
 export type UpdatedProfileFragment = z.infer<typeof UpdatedProfileFragmentSchema>;
 
 
-export type ProfileWithImages = Prisma.ProfileGetPayload<{
-  include: {
-    profileImages: true;
-  }
-}>;
+// Define types for service return values
+export type ProfileWithImages = Profile & {
+  profileImages: ProfileImage[]
+}
+
+export type ProfileWithTags = Profile & {
+  tags: (ProfileTag & { tag: Tag })[]
+}
+
+export type ProfileComplete = ProfileWithImages & ProfileWithTags
+
 
 // Fragment for updated profile images
 export const UpdatedProfileImageFragmentSchema = ProfileSchema

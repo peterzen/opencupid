@@ -1,15 +1,14 @@
 import cuid from 'cuid';
-import path from 'path';
+import path, { dirname } from 'path';
 import fs from 'fs';
 import { SavedMultipartFile } from '@fastify/multipart';
 
 import { prisma } from '../lib/prisma'
 import { ProfileImage } from '@prisma/client';
 import {
-  createStorageDir,
   generateStorageDirPrefix,
-  getStorageRelativePath,
-  getUploadBaseDir
+  getImageRoot,
+  makeImageLocation
 } from 'src/lib/media';
 
 import { generateContentHash } from '@utils/hash';
@@ -60,26 +59,18 @@ export class ImageGalleryService {
    */
   async storeImage(userId: string, fileUpload: SavedMultipartFile, captionText: string): Promise<ProfileImage> {
 
-    // Generate a CUID for the ProfileImage
-    const filename = cuid();
-    const storagePrefix = generateStorageDirPrefix();
-    const uploadBaseDir = getUploadBaseDir();
-    const uploadDir = path.join(uploadBaseDir, storagePrefix)
-    createStorageDir(uploadDir);
-
-    const fileExtension = path.extname(fileUpload.filename);
-    const storageRelPath = getStorageRelativePath(storagePrefix, filename, fileExtension);
-    const fullPath = path.join(uploadBaseDir, storageRelPath);
+    let imageLocation
 
     try {
-      await fs.promises.rename(fileUpload.filepath, fullPath);
+      imageLocation = await makeImageLocation(fileUpload.filename)
+      await fs.promises.rename(fileUpload.filepath, imageLocation.absPath);
     } catch (err: any) {
       console.error('Failed to move upload', err);
       throw new Error('Failed to move uploaded file');
     }
 
     // compute the content hash of the file
-    const contentHash = await generateContentHash(fullPath)
+    const contentHash = await generateContentHash(imageLocation.absPath);
     // set position to be the last position
     const position = await prisma.profileImage.count({ where: { userId } })
 
@@ -89,7 +80,7 @@ export class ImageGalleryService {
         userId: userId,
         mimeType: fileUpload.mimetype,
         altText: captionText,
-        storagePath: storageRelPath,
+        storagePath: imageLocation.relPath,
         isModerated: false,
         contentHash: contentHash,
         position: position,
@@ -136,10 +127,10 @@ export class ImageGalleryService {
     }
 
     // Delete the file from the filesystem
-    const file = path.join(getUploadBaseDir(), image.storagePath);
+    const file = path.join(getImageRoot(), image.storagePath);
 
     try {
-      fs.unlinkSync(file);
+      await fs.promises.unlink(file);
     } catch (err) {
       console.error('Error deleting file:', err);
     }

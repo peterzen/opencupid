@@ -10,7 +10,7 @@ import {
 import { ProfileService } from 'src/services/profile.service'
 import { ImageGalleryService } from 'src/services/image.service'
 import { validateBody } from '@utils/zodValidate'
-import { uploadTmpDir } from 'src/lib/media';
+import { uploadTmpDir } from '@/lib/media';
 import { getUserRoles, sendError, sendUnauthorizedError } from '../helpers';
 import env from 'src/env';
 import { mapProfileImagesToOwner, mapProfileToOwner, mapProfileToPublic } from 'src/api/mappers';

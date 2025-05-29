@@ -1,7 +1,20 @@
-import { prisma } from '../lib/prisma'
-import { Profile, ProfileImage, ProfileTag, Prisma } from '@prisma/client'
-import { Tag } from '@prisma/client'
-import { OwnerProfile, OwnerProfileSchema, PublicProfile, PublicProfileSchema, UpdatedProfileFragment, UpdatedProfileFragmentSchema, UpdateProfilePayload } from '@zod/profile.schema'
+import { prisma } from '@/lib/prisma'
+import {
+  Prisma
+} from '@prisma/client'
+import {
+  UpdatedProfileFragment,
+  UpdatedProfileFragmentSchema,
+  UpdateProfilePayload
+} from '@zod/profile.schema'
+
+import {
+  Profile,
+  ProfileImage,
+  ProfileTag,
+  Tag
+} from '@zod/generated'
+
 
 // Define types for service return values
 export type ProfileWithImages = Profile & {
