@@ -1,8 +1,7 @@
-import { PrismaClient } from '@prisma/client'
-import type { LogLevel } from 'fastify'
+import { Prisma, PrismaClient } from '@prisma/client'
 
 // Define process-wide log level
-const logLevels = process.env.NODE_ENV === 'production' 
+const logLevels: Prisma.LogLevel[] = process.env.NODE_ENV === 'production'
   ? ['error'] // In production, log only errors
   : ['query', 'error', 'warn']
 
@@ -15,7 +14,7 @@ declare global {
 // Create the PrismaClient instance
 const prismaClientSingleton = () => {
   return new PrismaClient({
-    log: logLevels as LogLevel[],
+    log: logLevels
     // You can configure connection pooling settings here
     // datasources: {
     //   db: {
