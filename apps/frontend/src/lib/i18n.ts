@@ -6,6 +6,7 @@ declare global {
   }
 }
 
+// https://lokalise.com/blog/vue-i18n/
 
 // Import JSON locale files
 import en from '@opencupid/shared/i18n/en.json'
@@ -62,6 +63,8 @@ export function appUseI18n(app: any) {
     locale: getLocale(),
     fallbackLocale: 'en',
     messages: { en, hu, de, fr },
+    missingWarn: false,
+    fallbackWarn: false
   })
   window.__APP_I18N__ = i18n
   app.use(i18n)
