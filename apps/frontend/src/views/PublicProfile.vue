@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue';
-import { OwnerProfile, PublicProfile } from '@zod/profile.schema'
+import { reactive, onMounted, computed } from 'vue';
+import type { OwnerProfile } from '@zod/profile.schema'
 import { useProfileStore } from '@/store/profileStore';
 import { countryCodeToName } from '@/lib/countries';
 

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { reactive, onMounted, computed } from 'vue';
 import { useProfileStore } from '@/store/profileStore';
-import { PublicProfile } from '@zod/profile.schema';
+import router from '@/router';
+
+import { type PublicProfile } from '@zod/profile.schema';
 
 import LoadingComponent from '@/components/LoadingComponent.vue';
 import ProfileCardComponent from '@/components/profiles/ProfileCardComponent.vue';
-import router from '@/router';
+
 
 const profileStore = useProfileStore()
 
@@ -39,7 +41,8 @@ const handleCardClick = (profile: PublicProfile) => {
       <div v-for="profile in state.profiles"
            :key="profile.id"
            class="col">
-        <ProfileCardComponent :profile="profile" @click="handleCardClick(profile)"/>
+        <ProfileCardComponent :profile="profile"
+                              @click="handleCardClick(profile)" />
       </div>
     </div>
   </div>

@@ -1,4 +1,4 @@
-import { ToastMessage } from '@/lib/toastify'
+import { type ToastMessage } from '@/lib/toastify'
 import { defineStore } from 'pinia'
 
 

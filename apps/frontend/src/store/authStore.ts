@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
-import { UserRoleType } from '@zod/generated'
+import type { UserRoleType } from '@zod/generated'
 import type { SessionData } from '@zod/user.schema'
 
 // ensure base URL is set (e.g. via VITE_API_BASE_URL)

@@ -1,5 +1,5 @@
 // src/plugins/countries.ts
-import countries, { Alpha2Code } from 'i18n-iso-countries'
+import countries from 'i18n-iso-countries'
 
 // Always register English (fallback)
 import enLocale from 'i18n-iso-countries/langs/en.json'

@@ -3,8 +3,8 @@ import { ref } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
 
 import AvatarUploadIcon from '@/assets/icons/files/avatar-upload.svg'
-import { OwnerProfile } from '@zod/profile.schema'
-import LoadingComponent from '../LoadingComponent.vue'
+import { type OwnerProfile } from '@zod/profile.schema'
+import LoadingComponent from '@/components/LoadingComponent.vue'
 
 const profileStore = useProfileStore()
 

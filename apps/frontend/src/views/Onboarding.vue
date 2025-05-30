@@ -2,12 +2,19 @@
 import { onMounted, reactive, toRefs } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
 
+import type {
+  OwnerProfile,
+  ProfileFormSubmit,
+  UpdateProfilePayload
+} from '@zod/profile.schema'
+import { OwnerProfileSchema, } from '@zod/profile.schema'
+import { type ConnectionTypeType } from '@zod/generated'
+
 import ConnectionTypeSelector from '@/components/ConnectionTypeSelector.vue'
 import ProfileForm from '@/components/profiles/ProfileForm.vue'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import DatingProfileForm from '@/components/profiles/DatingProfileForm.vue'
-import { OwnerProfile, OwnerProfileSchema, ProfileFormSubmit, UpdateProfilePayload } from '@zod/profile.schema'
-import { ConnectionTypeType } from '@zod/generated'
+
 
 const profileStore = useProfileStore()
 
@@ -89,6 +96,7 @@ onMounted(async () => {
           <div class="mt-4">
             <DatingProfileForm :isLoading="isLoading"
                                :modelValue="profile"
+                               @update:modelValue="val => Object.assign(profile, val)"
                                @submit="handleProfileFormSubmit" />
           </div>
         </div>
@@ -96,7 +104,8 @@ onMounted(async () => {
              class="tab-pane active">
           <div class="mt-4">
             <ProfileForm :isLoading="isLoading"
-                         v-model="profile"
+                         :modelValue="profile"
+                         @update:modelValue="val => Object.assign(profile, val)"
                          @submit="handleProfileFormSubmit" />
           </div>
         </div>

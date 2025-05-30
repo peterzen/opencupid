@@ -3,7 +3,7 @@ import { reactive, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getGenderOptions, getHasKidsOptionsOptions, getRelationshipStatusOptions } from '@/lib/i18n'
 import ErrorComponent from '@/components/ErrorComponent.vue'
-import { OwnerProfile } from '@zod/profile.schema'
+import { type OwnerProfile } from '@zod/profile.schema'
 
 const state = reactive({
   error: ''

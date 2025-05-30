@@ -10,7 +10,6 @@ import PublicProfile from '@/views/PublicProfile.vue';
 import Messaging from '@/views/Messaging.vue';
 import Onboarding from '@/views/Onboarding.vue';
 import BrowseProfiles from '@/views/BrowseProfiles.vue';
-import ImageGallery from '@/views/ImageGallery.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -24,12 +23,6 @@ const routes: Array<RouteRecordRaw> = [
     name: 'PublicProfile',
     component: PublicProfile,
     props: true,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/me/gallery',
-    name: 'ImageGaller',
-    component: ImageGallery,
     meta: { requiresAuth: true }
   },
   {

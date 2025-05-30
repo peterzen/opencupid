@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { VueDraggableNext } from 'vue-draggable-next'
+
 import { useProfileStore } from '@/store/profileStore'
+
+import { type OwnerProfile } from '@zod/profile.schema'
+import { type OwnerProfileImage } from '@zod/profileimage.schema'
+
 import ImageUpload from '@/components/profiles/ImageUpload.vue'
 import LoadingComponent from '@/components/LoadingComponent.vue'
 import ProfileImageComponent from '@/components/profiles/ProfileImageComponent.vue'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { OwnerProfile } from '@zod/profile.schema'
-import { VueDraggableNext } from 'vue-draggable-next'
-import { OwnerProfileImage } from '@zod/profileimage.schema'
+
 
 const profileStore = useProfileStore()
 

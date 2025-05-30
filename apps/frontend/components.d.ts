@@ -22,7 +22,6 @@ declare module 'vue' {
     IconTooling: typeof import('./src/components/icons/IconTooling.vue')['default']
     ImageEditor: typeof import('./src/components/profiles/ImageEditor.vue')['default']
     ImageUpload: typeof import('./src/components/profiles/ImageUpload.vue')['default']
-    LightSwitch: typeof import('./src/components/LightSwitch.vue')['default']
     LoadingComponent: typeof import('./src/components/LoadingComponent.vue')['default']
     LogoutButton: typeof import('./src/components/LogoutButton.vue')['default']
     ModalDialogComponent: typeof import('./src/components/ModalDialogComponent.vue')['default']

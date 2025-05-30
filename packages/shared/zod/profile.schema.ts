@@ -1,9 +1,18 @@
-import type { Prisma } from "@prisma/client";
 import { z } from "zod";
-import { Profile, ProfileImage, ProfileSchema, ProfileTag, Tag, TagSchema } from "@zod/generated";
-
+import { ProfileSchema } from "@zod/generated";
 import { PublicTagSchema } from "./tag.schema";
-import { OwnerProfileImageSchema, PublicProfileImageSchema } from "./profileimage.schema";
+import {
+  OwnerProfileImageSchema,
+  PublicProfileImageSchema
+} from "./profileimage.schema";
+
+import type {
+  Profile,
+  ProfileImage,
+  ProfileTag,
+  Tag
+} from "@zod/generated";
+
 
 const baseFields = {
   id: true,

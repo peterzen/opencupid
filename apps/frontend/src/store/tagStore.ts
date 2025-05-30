@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
-import { PublicTag, CreateTagInput } from '@zod/tag.schema';
-import { Tag } from '@zod/generated';
+
+import type { PublicTag, CreateTagInput } from '@zod/tag.schema';
+import type { Tag } from '@zod/generated';
 
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '/api';
 

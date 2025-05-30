@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import ToggleSwitch from '@/components/ToggleSwitch.vue'
 import { useI18n } from 'vue-i18n';
-import { ConnectionTypeType } from '@zod/generated';
+import { type ConnectionTypeType } from '@zod/generated';
 
 const { t } = useI18n()
 

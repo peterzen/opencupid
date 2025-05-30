@@ -3,15 +3,15 @@ import { reactive, ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { getCountryOptions } from '@/lib/countries';
+import { getLanguageSelectorOptions, type MultiselectOption } from '@/lib/languages';
+
+import type { OwnerProfile } from '@zod/profile.schema';
+import type { PublicTag } from '@zod/tag.schema';
 
 import Multiselect from 'vue-multiselect'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import TagSelectComponent from '@/components/profiles/TagSelectComponent.vue'
 import ImageEditor from './ImageEditor.vue'
-
-import { OwnerProfile } from '@zod/profile.schema';
-import { getLanguageSelectorOptions, MultiselectOption } from '@/lib/languages';
-import { PublicTag } from '@zod/tag.schema';
 
 // Props & Emits
 const props = defineProps<{
@@ -36,7 +36,7 @@ const error = ref('')
 watch(
   () => props.modelValue,
   (newVal) => Object.assign(formData, newVal),
-  {  deep: true }
+  { deep: true }
 )
 
 // Computed proxies for multiselect v-models
@@ -50,11 +50,10 @@ const country = computed({
 const languageOptions = reactive([] as MultiselectOption[])
 const languages = computed({
   get: () => (formData.languages ?? []).map(
-  lang => languageOptions.find(opt => opt.value === lang)
-),
+    lang => languageOptions.find(opt => opt.value === lang)
+  ),
   set: (options: MultiselectOption[]) => { formData.languages = options.map((opt) => opt.value) },
 })
-
 function handleTagsChange(selected: PublicTag[]) {
   formData.tags = [...selected]                // replace array reactively
   emit('update:modelValue', { ...formData })   // emit a fresh copy
@@ -90,7 +89,8 @@ onMounted(() => {
       <fieldset :disabled="!modelValue.isActive || isLoading">
 
         <div class="mb-4 ">
-          <ImageEditor v-model="formData" />
+          <ImageEditor :modelValue="formData"
+                       @update:modelValue="val => Object.assign(formData, val)" />
         </div>
 
         <div class="mb-4">

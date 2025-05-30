@@ -1,28 +1,9 @@
-<template>
-  <div class="tags-multiselect">
-    <Multiselect v-model="selected"
-                 :options="tags"
-                 :multiple="true"
-                 :loading="isLoading"
-                 :searchable="true"
-                 :close-on-select="false"
-                 :clear-on-select="false"
-                 :internal-search="false"
-                 :taggable="true"
-                 tag-placeholder="Add this as new tag"
-                 @tag="addTag"
-                 label="name"
-                 track-by="id"
-                 placeholder="Search tags"
-                 @search-change="asyncFind" />
-  </div>
-</template>
-
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import Multiselect from 'vue-multiselect';
 import { useTagsStore } from '@/store/tagStore';
-import { PublicTag } from '@zod/tag.schema';
+
+import { type PublicTag } from '@zod/tag.schema';
 
 // Instantiate Pinia store
 const tagStore = useTagsStore();
@@ -94,6 +75,29 @@ async function addTag(name: string) {
 }
 
 </script>
+
+
+<template>
+  <div class="tags-multiselect">
+    <Multiselect v-model="selected"
+                 :options="tags"
+                 :multiple="true"
+                 :loading="isLoading"
+                 :searchable="true"
+                 :close-on-select="false"
+                 :clear-on-select="false"
+                 :internal-search="false"
+                 :taggable="true"
+                 tag-placeholder="Add this as new tag"
+                 @tag="addTag"
+                 label="name"
+                 track-by="id"
+                 placeholder="Search tags"
+                 @search-change="asyncFind" />
+  </div>
+</template>
+
+
 
 <style lang="scss" scoped>
 .tags-multiselect {

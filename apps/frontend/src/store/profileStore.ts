@@ -1,13 +1,15 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
-import {
+import type {
   OwnerProfile,
-  OwnerProfileSchema,
   PublicProfile,
-  PublicProfileSchema,
   UpdatedProfileFragment,
-  UpdatedProfileFragmentSchema,
   UpdateProfilePayload,
+} from '@zod/profile.schema'
+import  {
+  OwnerProfileSchema,
+  PublicProfileSchema,
+  UpdatedProfileFragmentSchema,
   UpdateProfilePayloadSchema
 } from '@zod/profile.schema'
 import { type OwnerProfileImage, type ProfileImagePosition } from '@zod/profileimage.schema'

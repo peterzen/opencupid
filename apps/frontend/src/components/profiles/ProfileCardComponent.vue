@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { PublicProfile } from '@zod/profile.schema';
 import { computed } from 'vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
-
+import type { PublicProfile } from '@zod/profile.schema';
 import ProfileImageComponent from '@/components/profiles/ProfileImageComponent.vue';
 import DatingFilter from './DatingFilter.vue';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 // Props & Emits
 const props = defineProps<{

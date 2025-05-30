@@ -28,8 +28,7 @@ export type MultiselectOption = {
 export function getLanguageSelectorOptions(): MultiselectOption[] {
   const langs = languages.getNames(getLocale())
   console.log('Registering locales:', langs);
-
-  return Object.keys(langs).map((code) => ({
+  return Object.keys(langs).map((code, label) => ({
     value: code,
     label: langs[code],
   }))
