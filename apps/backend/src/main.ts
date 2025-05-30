@@ -23,7 +23,7 @@ const app = Fastify({
 
 // Register CORS plugin
 app.register(cors, {
-  origin: '*',
+  origin: '*',//process.env.FRONTEND_URL || '*', // Allow requests from the frontend URL or all origins
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
   methods: ['GET', 'PUT', 'POST', 'DELETE', 'PATCH']
@@ -36,7 +36,7 @@ app.register(import('./plugins/user-service'))
 app.register(import('./plugins/profile-service'))
 app.register(import('./plugins/gallery-service'))
 app.register(import('./plugins/tag-service'))
-app.register(import('./api'))
+app.register(import('./api'), { prefix: '/api' })
 
 // app.register(staticSrv, {
 //   root: env.MEDIA_UPLOAD_DIR,
@@ -48,7 +48,10 @@ if (!ok) {
   process.exit(1)
 }
 
-app.listen({ port: env.PORT }, (err) => {
+app.listen({
+  port: env.PORT,
+  host: '0.0.0.0',// Listen on all interfaces
+}, (err) => {
   if (err) {
     app.log.error(err)
     process.exit(1)

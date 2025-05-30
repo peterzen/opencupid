@@ -9,6 +9,9 @@ import svgLoader from 'vite-svg-loader'
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    allowedHosts: ['localhost', 'oc.dev.froggle.org'],
+  },
   plugins: [
     vue(),
     vueJsx(),
