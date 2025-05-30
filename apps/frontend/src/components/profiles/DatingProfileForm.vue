@@ -1,15 +1,9 @@
 <script setup lang="ts">
-import { reactive, computed, watch, toRefs } from 'vue'
+import { reactive, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getGenderOptions, getHasKidsOptionsOptions, getRelationshipStatusOptions } from '@/lib/i18n'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import { OwnerProfile } from '@zod/profile.schema'
-import TagSelectComponent from './TagSelectComponent.vue'
-import ImageEditor from './ImageEditor.vue'
-import { useProfileStore } from '@/store/profileStore'
-import { PublicTag } from '@zod/tag.schema'
-
-const profileStore = useProfileStore()
 
 const state = reactive({
   error: ''
@@ -62,15 +56,11 @@ const relationshipStatusOptions = getRelationshipStatusOptions(t)
 const haveKidsRadioOptions = getHasKidsOptionsOptions(t)
 
 // Submit handler
-function submitForm() {
-  emit('submit', { ...formData })
-}
+function handleSubmit() {
+   const payload = { ...formData }
+   emit('submit', payload)
+ }
 
-function handleTagsChange(tags: PublicTag[]) {
-  console.log('Selected tags:', tags)
-  formData.tags = tags
-  emit('update:modelValue', formData)
-}
 
 </script>
 
@@ -78,19 +68,16 @@ function handleTagsChange(tags: PublicTag[]) {
 <template>
   <div class="col-md-8 offset-md-2">
 
-    <div class="mb-4 ">
-      <ImageEditor v-model="formData"  />
-    </div>
 
     <FormKit type="form"
              :actions="false"
              :disabled="isLoading"
              #default="{ state: { valid } }"
-             @submit="submitForm">
+             @submit="handleSubmit">
 
       <fieldset :disabled="!modelValue.isActive || isLoading">
 
-        <div class="mb-4">
+        <!-- <div class="mb-4">
           <FormKit type="text"
                    v-model="formData.publicName"
                    label="My name is..."
@@ -103,7 +90,7 @@ function handleTagsChange(tags: PublicTag[]) {
                     min: 'Name must be at least 2 characters long',
                     max: 'Name must be less than 50 characters long'
                   }" />
-        </div>
+        </div> -->
 
         <div class="mb-4">
           <FormKit type="number"
@@ -187,13 +174,6 @@ function handleTagsChange(tags: PublicTag[]) {
                    help="Kids?" />
         </div>
 
-        <div class="mb-3">
-          <TagSelectComponent v-model="formData.tags!"
-                              :isLoading="props.isLoading"
-                              label="My interests are..."
-                              placeholder="Select or search for your interests"
-                              @tags:selected="handleTagsChange" />
-        </div>
         <div class="mb-3">
           <FormKit type="textarea"
                    input-class="form-control-lg"

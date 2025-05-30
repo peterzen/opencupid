@@ -81,6 +81,14 @@ export const OwnerProfileSchema = OwnerScalarSchema.extend({
 });
 export type OwnerProfile = z.infer<typeof OwnerProfileSchema>;
 
+export const ProfileFormSubmitSchema = OwnerScalarSchema
+  .partial()
+  .extend({
+    tags: z.array(PublicTagSchema).default([]),
+  });
+export type ProfileFormSubmit = z.infer<typeof ProfileFormSubmitSchema>;
+
+
 export const UpdateProfilePayloadSchema = OwnerScalarSchema
   .partial()
   .extend({

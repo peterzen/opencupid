@@ -54,6 +54,7 @@ async function handleDelete(image: OwnerProfileImage) {
 
 async function handleUploaded(updatedProfile: OwnerProfile) {
   Object.assign(formData, updatedProfile)
+
   emit('update:modelValue', formData)
 }
 

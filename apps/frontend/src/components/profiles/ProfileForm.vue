@@ -1,19 +1,97 @@
+<script setup lang="ts">
+import { reactive, ref, computed, watch, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+import { getCountryOptions } from '@/lib/countries';
+
+import Multiselect from 'vue-multiselect'
+import ErrorComponent from '@/components/ErrorComponent.vue'
+import TagSelectComponent from '@/components/profiles/TagSelectComponent.vue'
+import ImageEditor from './ImageEditor.vue'
+
+import { OwnerProfile } from '@zod/profile.schema';
+import { getLanguageSelectorOptions, MultiselectOption } from '@/lib/languages';
+import { PublicTag } from '@zod/tag.schema';
+
+// Props & Emits
+const props = defineProps<{
+  modelValue: OwnerProfile
+  isLoading: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: OwnerProfile): void
+  (e: 'submit', value: OwnerProfile): void
+}>()
+
+// i18n
+const { t } = useI18n()
+
+// Local form state
+const formData = reactive<OwnerProfile>({ ...props.modelValue })
+
+const error = ref('')
+
+// Sync prop changes into formData
+watch(
+  () => props.modelValue,
+  (newVal) => Object.assign(formData, newVal),
+  {  deep: true }
+)
+
+// Computed proxies for multiselect v-models
+const countrySelectOptions = getCountryOptions()
+const country = computed({
+  get: () => countrySelectOptions.find((o) => o.value === formData.country),
+  set: (opt: any) => { formData.country = opt.value },
+})
+
+
+const languageOptions = reactive([] as MultiselectOption[])
+const languages = computed({
+  get: () => (formData.languages ?? []).map(
+  lang => languageOptions.find(opt => opt.value === lang)
+),
+  set: (options: MultiselectOption[]) => { formData.languages = options.map((opt) => opt.value) },
+})
+
+function handleTagsChange(selected: PublicTag[]) {
+  formData.tags = [...selected]                // replace array reactively
+  emit('update:modelValue', { ...formData })   // emit a fresh copy
+}
+
+// Submit handler
+function handleSubmit() {
+  const payload = { ...formData }
+  console.log('ProfileForm submit payload:', payload)
+  emit('submit', payload)
+}
+
+onMounted(() => {
+  // Ensure formData is initialized with modelValue on mount
+  // Object.assign(formData, props.modelValue)
+  languageOptions.push(...getLanguageSelectorOptions())
+})
+</script>
+
+
+
+
 <template>
   <div class="col-md-8 offset-md-2">
 
-    <div class="mb-4">
-      <div class="col-sm-6">
-        <ImageUpload @image:uploaded="emit('update:modelValue', formData)" />
-      </div>
-    </div>
 
     <FormKit type="form"
              :actions="false"
              :disabled="isLoading"
              #default="{ state: { valid } }"
-             @submit="submitForm">
+             @submit="handleSubmit">
 
       <fieldset :disabled="!modelValue.isActive || isLoading">
+
+        <div class="mb-4 ">
+          <ImageEditor v-model="formData" />
+        </div>
 
         <div class="mb-4">
           <FormKit type="text"
@@ -59,6 +137,15 @@
                     max: 'Name must be less than 50 characters long'
                   }" />
         </div>
+
+        <div class="mb-3">
+          <TagSelectComponent v-model="formData.tags!"
+                              :isLoading="props.isLoading"
+                              label="My interests are..."
+                              placeholder="Select or search for your interests"
+                              @tags:selected="handleTagsChange" />
+        </div>
+
 
         <div class="mb-4">
           <FormKit type="textarea"
@@ -114,63 +201,3 @@
     </FormKit>
   </div>
 </template>
-
-
-<script setup lang="ts">
-import { reactive, ref, computed, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
-
-import { getCountryOptions } from '@/lib/countries';
-
-import Multiselect from 'vue-multiselect'
-import ErrorComponent from '@/components/ErrorComponent.vue'
-import ImageUpload from './ImageUpload.vue'
-import { OwnerProfile } from '@zod/profile.schema';
-import { getLanguageSelectorOptions, MultiselectOption } from '@/lib/languages';
-
-// Props & Emits
-const props = defineProps<{
-  modelValue: OwnerProfile
-  isLoading: boolean
-}>()
-
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: OwnerProfile): void
-  (e: 'submit', value: OwnerProfile): void
-}>()
-
-// i18n
-const { t } = useI18n()
-
-// Local form state
-const formData = reactive<OwnerProfile>({ ...props.modelValue })
-
-const error = ref('')
-
-// Sync prop changes into formData
-watch(
-  () => props.modelValue,
-  (newVal) => Object.assign(formData, newVal),
-  { deep: true }
-)
-
-// Computed proxies for multiselect v-models
-const countrySelectOptions = getCountryOptions()
-const country = computed({
-  get: () => countrySelectOptions.find((o) => o.value === formData.country),
-  set: (opt: any) => { formData.country = opt.value },
-})
-
-
-const languageOptions = getLanguageSelectorOptions()
-const languages = computed({
-  get: () => formData.languages.map((lang) => languageOptions.find((opt) => opt.value === lang)),
-  set: (options: MultiselectOption[]) => { formData.languages = options.map((opt) => opt.value) },
-})
-
-// Submit handler
-function submitForm() {
-  emit('submit', { ...formData })
-}
-
-</script>
