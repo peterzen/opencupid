@@ -35,7 +35,7 @@ new Worker('emails', async job => {
 
     if (!user) throw new Error('User not found')
 
-    const emailToken = user.loginToken
+    const otp = user.loginToken
     const email = user.email
 
     await transporter.sendMail({
@@ -43,8 +43,9 @@ new Worker('emails', async job => {
       to: email,
       subject: 'Your login link',
       html: `<p>Hey there, welcome aboard!</p>
+      <h1>${otp}</h1>
       <p>Please click this link to jump right in:       
-      <a href="${process.env.FRONTEND_URL}/login?token=${emailToken}">Confirm Email</a></p>`
+      <a href="${process.env.FRONTEND_URL}/login?otp=${otp}">Confirm Email</a></p>`
     })
   }
 

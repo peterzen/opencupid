@@ -61,6 +61,8 @@ export const useAuthStore = defineStore('auth', {
 
         if (res.data.success === true) {
           this.setAuthState(res.data.token)
+        } else {
+          return {success:false,status:res.data.status}
         }
 
       } catch (error: any) {

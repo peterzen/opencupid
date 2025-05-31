@@ -1,19 +1,24 @@
 import { prisma } from '../lib/prisma'
 import { User, Profile, UserRole } from '@prisma/client'
-import { randomBytes } from 'crypto'
+import otpGenerator from 'otp-generator'
 
 // Define types for service return values
 export type UserWithProfile = User & { profile: Profile | null }
 
 
-function makeLoginToken() {
-  return randomBytes(32).toString('hex')
+function generateOTP() {
+// Generate a 6-digit OTP
+  return otpGenerator.generate(6, {
+    digits: true,
+    specialChars: false,
+    upperCaseAlphabets: false,
+    lowerCaseAlphabets: false
+  });
 }
 
 function getTokenExpiration() {
   return new Date(Date.now() + 1000 * 60 * 60 * 240)
 }
-
 
 
 export class UserService {
@@ -62,7 +67,7 @@ export class UserService {
   }> {
 
     const userExists = await prisma.user.findUnique({ where: { email } })
-    const emailConfirmationToken = makeLoginToken() // enerate email confirmation token
+    const emailConfirmationToken = generateOTP() // enerate email confirmation token
     const tokenExpiration = getTokenExpiration() // Set token expiration to 24 hours from now
 
     // user record exists
@@ -116,7 +121,7 @@ export class UserService {
       where: { id: userId },
       data: {
         roles: {
-            set: updatedRoles
+          set: updatedRoles
         }
       }
     })
