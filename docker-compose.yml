@@ -1,5 +1,22 @@
 
 services:
+  backend:
+    build:
+      context: ./apps/backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - redis
+    env_file:
+    - .env
+
+  frontend:
+    build:
+      context: ./apps/frontend
+    ports:
+      - "5173:80"
+
   db:
     image: postgres:15
     restart: unless-stopped
@@ -24,15 +41,29 @@ services:
     restart: unless-stopped
     ports:
       - "6379:6379"
-  nginx:
-    image: imagesrv
+
+  imgsrv:
+    build:
+      context: apps/imgsrv
     restart: unless-stopped
     env_file:
-    - ../backend/.env
+    - .env
     ports:
       - "3001:3001"
     volumes:
       - ${MEDIA_UPLOAD_DIR}:/srv/nginx
+
+  ingress:
+    build:
+      context: apps/proxy
+    restart: unless-stopped
+    depends_on:
+      - db
+      - imgsrv
+    env_file:
+    - .env
+    ports:
+      - "443:443"
 
 
 volumes:

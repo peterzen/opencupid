@@ -1,13 +1,21 @@
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package.json tsconfig.json ./
-COPY src ./src
-COPY prisma ./prisma
+COPY . .
 
-RUN npm install
-RUN npm install -g ts-node-dev
+# Optional: for native Prisma CLI if needed
+RUN apk add --no-cache libc6-compat
+
+# Enable corepack and install deps
+RUN corepack enable && pnpm install --no-frozen-lockfile
+
+# Build TS -> JS
+RUN pnpm run build
+
+# Use production node_modules only
+RUN pnpm install --prod
 
 EXPOSE 3000
-CMD ["ts-node-dev", "src/main.ts"]
+
+CMD ["node", "dist/main.js"]
