@@ -48,10 +48,22 @@ export const useAuthStore = defineStore('auth', {
       this.isInitialized = true
     },
 
-    async otpLogin(userId: string, otp: string) {
-      if (!userId || !otp) {
-        // console.error('otpLogin called with missing userId or otp')
-        return { success: false, status: 'Missing userId or otp' }
+    async otpLogin(otp: string) {
+      let userId: string | null
+      try {
+        userId = localStorage.getItem('uid')
+      } catch (error) {
+        console.warn('Failed to access localStorage:', error)
+        return { success: false, status: 'storage_error' }
+      }
+
+      if (!userId) {
+        // registration/login initiated in a different browser -> no userId
+        return { success: false, status: 'missing_userid' }
+      }
+      if (!otp) {
+        // OTP is missing - maybe it got garbled in the email link
+        return { success: false, status: 'missing_otp' }
       }
       try {
         const res = await api.get('/users/otp-login', {
@@ -60,6 +72,7 @@ export const useAuthStore = defineStore('auth', {
 
         if (res.data.success === true) {
           this.setAuthState(res.data.token)
+          localStorage.removeItem('uid') // Clear userId after successful login
         } else {
           return { success: false, status: res.data.status }
         }
@@ -72,10 +85,12 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async sendLoginLink(authId: AuthIdentifier) {
-      console.log('Sending login link with data:', authId)
+      // console.log('Sending login link with data:', authId)
       try {
         const res = await api.post('/users/send-login-link', authId)
         const user = OwnerUserSchema.parse(res.data.user)
+        // set userId in localStorage for the otplogin to pick up
+        localStorage.setItem('uid', user.id)
         // Return the status flag for the frontend to handle
         return { success: true, user, status: res.data.status };
       } catch (error: any) {

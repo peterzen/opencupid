@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import ErrorComponent from '@/components/ErrorComponent.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import type { AuthIdentifier, SendOtpPayload } from '@zod/user.schema'
+import type { SendOtpPayload } from '@zod/user.schema'
 import { emailRegex, phoneRegex } from '@/lib/utils';
 import CaptchaWidget from './CaptchaWidget.vue';
 
@@ -66,8 +65,6 @@ const authIdInputRef = ref<InstanceType<any> | null>(null)
 
 <template>
   <div class="auth-id-component">
-
-    <ErrorComponent :error="error" />
 
     <FormKit type="form"
              id="userIdForm"

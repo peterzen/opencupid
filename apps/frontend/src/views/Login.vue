@@ -3,8 +3,10 @@ import { ref, reactive, onMounted } from 'vue'
 import { useAuthStore } from '@/store/authStore'
 import { useRoute, useRouter } from 'vue-router'
 import AuthIdComponent from '@/components/auth/AuthIdComponent.vue'
-import type { AuthIdentifier, OwnerUser, SendOtpPayload } from '@zod/user.schema'
+import type { OwnerUser, SendOtpPayload } from '@zod/user.schema'
 import OtpLoginComponent from '@/components/auth/OtpLoginComponent.vue'
+import ErrorComponent from '@/components/ErrorComponent.vue'
+import LoginConfirmComponent from '@/components/auth/LoginConfirmComponent.vue'
 
 // Reactive variables
 const error = ref('' as string)
@@ -22,6 +24,7 @@ const user = reactive<OwnerUser>({
 // form state
 const showUserIdForm = ref(true)
 const showOtpForm = ref(false)
+const showConfirmScreen = ref(false)
 
 const router = useRouter()
 const route = useRoute()
@@ -30,13 +33,12 @@ const authStore = useAuthStore()
 
 // // On mounted lifecycle hook
 onMounted(async () => {
-  const queryOtp     = (route.query.otp     as string) || ''
-  const queryUserId  = (route.query.userId  as string) || ''
+  const queryOtp = (route.query.otp as string) || ''
 
-  if (queryOtp && queryUserId) {                    // <-- both must be present
-    const ok = await performOtpLogin(queryUserId, queryOtp)
+  if (queryOtp) {
+    const ok = await doOtpLogin(queryOtp)
     if (!ok) {
-      showOtpForm.value = true
+      // showOtpForm.value = true
     }
   } else {
     showUserIdForm.value = true
@@ -45,14 +47,13 @@ onMounted(async () => {
 
 // Method to handle sending login link
 async function handleSendOtp(payload: SendOtpPayload) {
-
   try {
     error.value = ''
     isLoading.value = true
     const res = await authStore.sendLoginLink(payload)
     if (res.success) {
       Object.assign(user, res.user)
-      console.log('Login link sent successfully:', user)
+      // console.log('Login link sent successfully:', user)
       showOtpForm.value = true
       showUserIdForm.value = false
     } else {
@@ -68,24 +69,34 @@ async function handleSendOtp(payload: SendOtpPayload) {
 
 // Method to handle OTP entered
 async function handleOTPSubmitted(otp: string): Promise<boolean> {
-  return performOtpLogin(user.id, otp)
+  return doOtpLogin(otp)
 }
 
-async function performOtpLogin(userId: string, otp: string) {
+async function doOtpLogin(otp: string) {
   isLoading.value = true
   try {
-    const res = await authStore.otpLogin(userId, otp)
+    const res = await authStore.otpLogin(otp)
     if (res.success) {
+      showConfirmScreen.value = true
+      showOtpForm.value = false
+      showUserIdForm.value = false
+      await new Promise(resolve => setTimeout(resolve, 2000))
       await router.push({ name: 'Onboarding' })
       return true
     } else {
-      console.log('otp', res)
+      console.log('OTP login failed:', res)
       // Handle different status flags
-      if (res.status === 'missing_token' || res.status === 'invalid_token') {
-        error.value = 'Please enter the code you received in the message.'
+      if (res.status === 'storage_error') {
+        error.value = 'Something is off with this browser. Please try again in a different one (or try clearing your browser storage.)'
       }
-      showUserIdForm.value = false
-      showOtpForm.value = true
+      if (res.status === 'missing_userid') {
+        error.value = 'Something went wrong here with the code.  Try again?'
+      }
+      if (res.status === 'missing_otp' || res.status === 'invalid_token') {
+        error.value = 'Oops, this code has probably expired. Try again?'
+      }
+      showUserIdForm.value = true
+      showOtpForm.value = false
       return false
     }
   } catch (err: any) {
@@ -122,9 +133,10 @@ function handleBackButton() {
       </div>
     </div>
 
-
     <div class="row justify-content-center">
       <div class="col-md-6 mb-3">
+
+        <ErrorComponent :error="error" />
 
         <AuthIdComponent :isLoading="isLoading"
                          @otp:send="handleSendOtp"
@@ -135,6 +147,8 @@ function handleBackButton() {
                            :user="user"
                            @otp:submit="handleOTPSubmitted"
                            v-if="showOtpForm" />
+
+        <LoginConfirmComponent v-if="showConfirmScreen" />
       </div>
     </div>
   </div>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import ErrorComponent from '@/components/ErrorComponent.vue'
 import { type OwnerUser } from '@zod/user.schema'
 import { otpRegex } from '@/lib/utils';
 
@@ -65,7 +64,6 @@ function validateOtp(node: any) {
                  validation-visibility="live" />
       </div>
 
-      <ErrorComponent :error="error" />
       <FormKit type="submit"
                wrapper-class="d-grid gap-2 mb-3"
                input-class="btn-primary btn-lg w-100"
