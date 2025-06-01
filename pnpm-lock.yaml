@@ -148,6 +148,9 @@ importers:
       '@formkit/addons':
         specifier: ^1.6.9
         version: 1.6.9
+      '@formkit/core':
+        specifier: ^1.6.9
+        version: 1.6.9
       '@formkit/i18n':
         specifier: ^1.6.9
         version: 1.6.9

@@ -32,20 +32,19 @@ new Worker('emails', async job => {
     const { userId } = job.data as { userId: string }
 
     const user = await prisma.user.findUnique({ where: { id: userId } })
-
     if (!user) throw new Error('User not found')
 
     const otp = user.loginToken
-    const email = user.email
+    if (!otp || !user.email) throw new Error('OTP or email not found for user')
 
     await transporter.sendMail({
       from: process.env.EMAIL_FROM,
-      to: email,
+      to: user.email,
       subject: 'Your login link',
       html: `<p>Hey there, welcome aboard!</p>
       <h1>${otp}</h1>
       <p>Please click this link to jump right in:       
-      <a href="${process.env.FRONTEND_URL}/login?otp=${otp}">Confirm Email</a></p>`
+      <a href="${process.env.FRONTEND_URL}/login?otp=${otp}&userId=${user.id}">Confirm Email</a></p>`
     })
   }
 
@@ -53,8 +52,8 @@ new Worker('emails', async job => {
     const { userId } = job.data as { userId: string }
 
     const user = await prisma.user.findUnique({ where: { id: userId } })
-
     if (!user) throw new Error('User not found')
+    if (!user.email) throw new Error('Email not found for user')
 
     await transporter.sendMail({
       from: process.env.EMAIL_FROM,

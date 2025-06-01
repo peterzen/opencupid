@@ -1,104 +1,144 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useAuthStore } from '@/store/authStore'
 import { useRoute, useRouter } from 'vue-router'
-import ErrorComponent from '@/components/ErrorComponent.vue'
+import AuthIdComponent from '@/components/auth/AuthIdComponent.vue'
+import { AuthIdentifier, OwnerUser } from '@zod/user.schema'
+import OtpLoginComponent from '@/components/auth/OtpLoginComponent.vue'
 
 // Reactive variables
-const email = ref('')
-const otp = ref('' as string)
 const error = ref('' as string)
-const showInstructions = ref(false)
-const showForm = ref(false)
+const isLoading = ref(false)
+
+// Supply every field required by `OwnerUser`, letting TS validate it.
+const user = reactive<OwnerUser>({
+  id: '',
+  email: '',
+  phonenumber: '',
+  language: '',
+  isRegistrationConfirmed: false,
+})
+
+// form state
+const showUserIdForm = ref(true)
+const showOtpForm = ref(false)
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 
-// On mounted lifecycle hook
-onMounted(() => {
-  const queryOtp = route.query.otp as string || ''
-  if (queryOtp !== '') {
-    otp.value = queryOtp
+
+// // On mounted lifecycle hook
+onMounted(async () => {
+  const queryOtp     = (route.query.otp     as string) || ''
+  const queryUserId  = (route.query.userId  as string) || ''
+
+  if (queryOtp && queryUserId) {                    // <-- both must be present
+    const ok = await performOtpLogin(queryUserId, queryOtp)
+    if (!ok) {
+      showOtpForm.value = true
+    }
   } else {
-    showForm.value = true
+    showUserIdForm.value = true
   }
 })
 
 // Method to handle sending login link
-async function handleSendLoginLink() {
+async function handleSendOtp(authIdentifier: AuthIdentifier) {
+
   try {
     error.value = ''
-    const res = await authStore.sendLoginLink(email.value)
+    isLoading.value = true
+    const res = await authStore.sendLoginLink(authIdentifier)
     if (res.success) {
-      showInstructions.value = true
-      showForm.value = false
+      Object.assign(user, res.user)
+      console.log('Login link sent successfully:', user)
+      showOtpForm.value = true
+      showUserIdForm.value = false
     } else {
       error.value = 'An unknown error occurred, please try again a bit later.'
     }
   } catch (err: any) {
     error.value = err || 'An unexpected error occurred.'
     console.error('Login error:', err)
+  } finally {
+    isLoading.value = false
   }
 }
 
 // Method to handle OTP entered
-async function handleOTPEntered() {
+async function handleOTPSubmitted(otp: string): Promise<boolean> {
+  return performOtpLogin(user.id, otp)
+}
+
+async function performOtpLogin(userId: string, otp: string) {
+  isLoading.value = true
   try {
-    const res = await authStore.otpLogin(otp.value)
+    const res = await authStore.otpLogin(userId, otp)
     if (res.success) {
-      router.push({ name: 'Onboarding' })
+      await router.push({ name: 'Onboarding' })
+      return true
     } else {
       console.log('otp', res)
       // Handle different status flags
       if (res.status === 'missing_token' || res.status === 'invalid_token') {
-        error.value = 'Something went wrong, maybe that link expired. Please try again.'
+        error.value = 'Please enter the code you received in the message.'
       }
-      showForm.value = false
-      showInstructions.value = true
+      showUserIdForm.value = false
+      showOtpForm.value = true
+      return false
     }
   } catch (err: any) {
     console.error(err)
     error.value = err.response?.data?.message || 'Failed to confirm email.'
+  } finally {
+    isLoading.value = false
   }
+  return false
 }
+
+function handleBackButton() {
+  showUserIdForm.value = true
+  showOtpForm.value = false
+  error.value = ''
+  isLoading.value = false
+} 
 </script>
 
 
 <template>
   <div class="container mt-5">
+
     <div class="row justify-content-center">
       <div class="col-md-6">
+        <div v-if="showOtpForm">
+          <button class="btn btn-link btn-secondary"
+                  @click="handleBackButton">
+            <FontAwesomeIcon icon="fa-solid fa-arrow-left" />
+            Back
 
-
-        <div v-if="showInstructions">
-          <h2>Check your email</h2>
-          <p>We have sent you a login link. Please check your inbox.</p>
-          <p>If you don't see it, please check your spam folder.</p>
-          <form @submit.prevent="handleOTPEntered">
-            <div class="mb-3">
-              <label for="otp" class="form-label">Please enter the code in the message.</label>
-              <input v-model="otp" id="otp" type="text" class="form-control form-control-lg" required  autocomplete="off"/>
-
-              <ErrorComponent :error="error" />
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100 btn-lg">Continue</button>
-          </form>
+          </button>
         </div>
+      </div>
+    </div>
 
-        <div v-if="showForm">
 
-          <form @submit.prevent="handleSendLoginLink">
-            <div class="mb-3">
-              <label for="email" class="form-label">Please enter your email address to continue</label>
-              <input v-model="email" id="email" type="email" class="form-control form-control-lg" required />
-            </div>
+    <div class="row justify-content-center">
+      <div class="col-md-6 mb-3">
 
-            <button type="submit" class="btn btn-primary w-100 btn-lg">Continue</button>
-          </form>
-        </div>
+        <AuthIdComponent :isLoading="isLoading"
+                         @otp:send="handleSendOtp"
+                         v-if="showUserIdForm" />
+
+
+        <OtpLoginComponent :isLoading="isLoading"
+                           :user="user"
+                           @otp:submit="handleOTPSubmitted"
+                           v-if="showOtpForm" />
       </div>
     </div>
   </div>
 </template>
+
+
+<style lang="scss"></style>

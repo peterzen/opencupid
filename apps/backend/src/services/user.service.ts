@@ -1,20 +1,11 @@
 import { prisma } from '../lib/prisma'
 import { User, Profile, UserRole } from '@prisma/client'
+import { AuthIdentifier } from '@zod/user.schema';
 import otpGenerator from 'otp-generator'
 
 // Define types for service return values
 export type UserWithProfile = User & { profile: Profile | null }
 
-
-function generateOTP() {
-// Generate a 6-digit OTP
-  return otpGenerator.generate(6, {
-    digits: true,
-    specialChars: false,
-    upperCaseAlphabets: false,
-    lowerCaseAlphabets: false
-  });
-}
 
 function getTokenExpiration() {
   return new Date(Date.now() + 1000 * 60 * 60 * 240)
@@ -35,12 +26,17 @@ export class UserService {
     return UserService.instance
   }
 
-  async otpLogin(token: string): Promise<{
+  async otpLogin(userId: string, otp: string): Promise<{
     user: User | null,
     isNewUser: boolean
   }> {
 
-    const user = await prisma.user.findUnique({ where: { loginToken: token } })
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+        loginToken: otp
+      }
+    })
     if (!user) {
       return { user: null, isNewUser: false }
     }
@@ -61,14 +57,15 @@ export class UserService {
     return { user: userUpdated, isNewUser }
   }
 
-  async createUserOTP(email: string, language: string): Promise<{
+  async setUserOTP(authId: AuthIdentifier, otp: string, language: string): Promise<{
     user: User,
     isNewUser: boolean
   }> {
 
-    const userExists = await prisma.user.findUnique({ where: { email } })
-    const emailConfirmationToken = generateOTP() // enerate email confirmation token
-    const tokenExpiration = getTokenExpiration() // Set token expiration to 24 hours from now
+    const authIdField = authId.email ? { email: authId.email } : { phonenumber: authId.phonenumber }
+    const userExists = await prisma.user.findUnique({ where: { ...authIdField } })
+    // const emailConfirmationToken = generateOTP() // enerate email confirmation token
+    const tokenExpiration = getTokenExpiration()
 
     // user record exists
     if (userExists) {
@@ -77,7 +74,7 @@ export class UserService {
       await prisma.user.update({
         where: { id: userExists.id },
         data: {
-          loginToken: emailConfirmationToken, // Clear the reset token
+          loginToken: otp, // Clear the reset token
           loginTokenExp: tokenExpiration, // Clear the expiration
         },
       })
@@ -88,9 +85,10 @@ export class UserService {
     // register email address
     const user = await prisma.user.create({
       data: {
-        email: email,
-        loginToken: emailConfirmationToken,
+        ...authIdField,
+        loginToken: otp,
         loginTokenExp: tokenExpiration,
+        language,
       }
     })
     return { user, isNewUser }
@@ -126,4 +124,16 @@ export class UserService {
       }
     })
   }
+
+
+  generateOTP() {
+    // Generate a 6-digit OTP
+    return otpGenerator.generate(6, {
+      digits: true,
+      specialChars: false,
+      upperCaseAlphabets: false,
+      lowerCaseAlphabets: false
+    });
+  }
+
 }

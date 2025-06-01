@@ -73,7 +73,10 @@ export class ProfileService {
       // 1) Update all scalar fields
       const profile = await tx.profile.update({
         where: { userId },
-        data: rest,
+        data: {
+          ...rest,
+          isActive: true, // TODO change this to isVisible when we have that field
+        },
       });
 
       const profileId = profile.id;

@@ -1,14 +1,13 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
-import type { UserRoleType } from '@zod/generated'
-import type { SessionData } from '@zod/user.schema'
+import { UserSchema, type UserRoleType } from '@zod/generated'
+import { OwnerUserSchema, type AuthIdentifier, type SessionData } from '@zod/user.schema'
 
 // ensure base URL is set (e.g. via VITE_API_BASE_URL)
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '/api'
 
 interface JwtPayload {
   userId: string
-  email: string
 }
 
 export const useAuthStore = defineStore('auth', {
@@ -37,11 +36,9 @@ export const useAuthStore = defineStore('auth', {
       try {
         const payload = JSON.parse(atob(token.split('.')[1])) as JwtPayload
         this.userId = payload.userId
-        this.email = payload.email
       } catch (e) {
         console.warn('Failed to parse JWT payload:', e)
         this.userId = null
-        this.email = null
       }
     },
 
@@ -53,16 +50,20 @@ export const useAuthStore = defineStore('auth', {
       this.isInitialized = true
     },
 
-    async otpLogin(otp: string) {
+    async otpLogin(userId: string, otp: string) {
+      if (!userId || !otp) {
+        // console.error('otpLogin called with missing userId or otp')
+        return { success: false, status: 'Missing userId or otp' }
+      }
       try {
         const res = await axios.get('/users/otp-login', {
-          params: { token: otp }
+          params: { userId, otp }
         })
 
         if (res.data.success === true) {
           this.setAuthState(res.data.token)
         } else {
-          return {success:false,status:res.data.status}
+          return { success: false, status: res.data.status }
         }
 
       } catch (error: any) {
@@ -72,11 +73,13 @@ export const useAuthStore = defineStore('auth', {
       return { success: true, status: '' };
     },
 
-    async sendLoginLink(email: string) {
+    async sendLoginLink(authId: AuthIdentifier) {
+      console.log('Sending login link with data:', authId)
       try {
-        const res = await axios.post('/users/send-login-link', { email })
+        const res = await axios.post('/users/send-login-link', authId)
+        const user = OwnerUserSchema.parse(res.data.user)
         // Return the status flag for the frontend to handle
-        return { success: true, status: res.data.status };
+        return { success: true, user, status: res.data.status };
       } catch (error: any) {
         console.error('Sending login link failed:', error)
         return { success: false, status: error.message }
@@ -86,8 +89,9 @@ export const useAuthStore = defineStore('auth', {
     async fetchUser() {
       try {
         const res = await axios.get('/users/me')
+        const user = UserSchema.parse(res.data.user)
         // Return the status flag for the frontend to handle
-        return { success: true, user: res.data.user, error: null };
+        return { success: true, user, error: null };
       } catch (error: any) {
         console.error('Could not fetch user:', error)
         return { success: false, user: null, error: error.message }

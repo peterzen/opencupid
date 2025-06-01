@@ -8,6 +8,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AuthIdComponent: typeof import('./src/components/auth/AuthIdComponent.vue')['default']
     BCarousel: typeof import('bootstrap-vue-next/components/BCarousel')['BCarousel']
     BCarouselSlide: typeof import('bootstrap-vue-next/components/BCarousel')['BCarouselSlide']
     BModal: typeof import('bootstrap-vue-next/components/BModal')['BModal']
@@ -23,9 +24,12 @@ declare module 'vue' {
     ImageEditor: typeof import('./src/components/profiles/ImageEditor.vue')['default']
     ImageUpload: typeof import('./src/components/profiles/ImageUpload.vue')['default']
     LoadingComponent: typeof import('./src/components/LoadingComponent.vue')['default']
+    LoginIntent: typeof import('./src/components/auth/LoginIntent.vue')['default']
     LogoutButton: typeof import('./src/components/LogoutButton.vue')['default']
     ModalDialogComponent: typeof import('./src/components/ModalDialogComponent.vue')['default']
     Navbar: typeof import('./src/components/Navbar.vue')['default']
+    OTPLogin: typeof import('./src/components/auth/OTPLogin.vue')['default']
+    OtpLoginComponent: typeof import('./src/components/auth/OtpLoginComponent.vue')['default']
     ProfileCardComponent: typeof import('./src/components/profiles/ProfileCardComponent.vue')['default']
     ProfileForm: typeof import('./src/components/profiles/ProfileForm.vue')['default']
     ProfileImageComponent: typeof import('./src/components/profiles/ProfileImageComponent.vue')['default']
