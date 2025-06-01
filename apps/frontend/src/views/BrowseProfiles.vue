@@ -33,19 +33,19 @@ const handleCardClick = (profile: PublicProfile) => {
 
 
 <template>
-  <LoadingComponent v-if="state.isLoading" />
+  <div class="browse-profiles-view">
+    <LoadingComponent v-if="state.isLoading" />
 
-  <div class="container-fluid">
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+    <div class="container-fluid">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
 
-      <div v-for="profile in state.profiles"
-           :key="profile.id"
-           class="col">
-        <ProfileCardComponent :profile="profile"
-                              @click="handleCardClick(profile)" />
+        <div v-for="profile in state.profiles"
+             :key="profile.id"
+             class="col">
+          <ProfileCardComponent :profile="profile"
+                                @click="handleCardClick(profile)" />
+        </div>
       </div>
     </div>
   </div>
-
-
 </template>

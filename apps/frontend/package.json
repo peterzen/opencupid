@@ -21,6 +21,7 @@
     "@fontsource/nunito": "^5.2.5",
     "@fontsource/rubik": "^5.2.5",
     "@formkit/addons": "^1.6.9",
+    "@formkit/auto-animate": "^0.8.2",
     "@formkit/core": "^1.6.9",
     "@formkit/i18n": "^1.6.9",
     "altcha": "^2.0.2",
