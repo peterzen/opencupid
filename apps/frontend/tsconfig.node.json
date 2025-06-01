@@ -21,6 +21,10 @@
       "node"
     ],
     "baseUrl": ".",
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
     "paths": {
       "@/*": [
         "src/*"
@@ -28,8 +32,8 @@
       "@zod/*": [
         "../../packages/shared/zod/*"
       ],
-      "@opencupid/shared/*": [
-        "packages/shared/*"
+      "@shared/*": [
+        "../../packages/shared/*"
       ],
     }
   },

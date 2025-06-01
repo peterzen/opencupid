@@ -1,16 +1,15 @@
 import { FastifyPluginAsync } from "fastify";
 import { createChallenge } from 'altcha-lib'
-import env from "@/env";
 import { sendError } from "../helpers";
+import {appConfig} from "@shared/config/appconfig";
 
-const ALTCHA_HMAC_KEY = env.ALTCHA_HMAC_KEY
 
 const captchaRoutes: FastifyPluginAsync = async (fastify) => {
 
   fastify.get('/challenge', async (request, reply) => {
     try {
       const challenge = await createChallenge({
-        hmacKey: ALTCHA_HMAC_KEY,
+        hmacKey: appConfig.ALTCHA_HMAC_KEY,
         maxNumber: 50_000,
       })
       return reply.send(challenge)

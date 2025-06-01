@@ -1,8 +1,8 @@
-// src/queues/emailQueue.ts
+import { appConfig } from '@shared/config/appconfig'
 import { Queue } from 'bullmq'
 import IORedis from 'ioredis'
 
-const redisUrl = process.env.REDIS_URL
+const redisUrl = appConfig.REDIS_URL
 if (!redisUrl) {
   throw new Error('REDIS_URL environment variable is not defined')
 }

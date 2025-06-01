@@ -1,10 +1,8 @@
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import { api } from '@/lib/api'
 import { UserSchema, type UserRoleType } from '@zod/generated'
 import { OwnerUserSchema, type AuthIdentifier, type SessionData } from '@zod/user.schema'
 
-// ensure base URL is set (e.g. via VITE_API_BASE_URL)
-axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '/api'
 
 interface JwtPayload {
   userId: string
@@ -30,7 +28,7 @@ export const useAuthStore = defineStore('auth', {
       // Set JWT in localStorage and axios headers
       this.jwt = token
       localStorage.setItem('token', token)
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`
 
       // Parse user data from token
       try {
@@ -56,7 +54,7 @@ export const useAuthStore = defineStore('auth', {
         return { success: false, status: 'Missing userId or otp' }
       }
       try {
-        const res = await axios.get('/users/otp-login', {
+        const res = await api.get('/users/otp-login', {
           params: { userId, otp }
         })
 
@@ -76,7 +74,7 @@ export const useAuthStore = defineStore('auth', {
     async sendLoginLink(authId: AuthIdentifier) {
       console.log('Sending login link with data:', authId)
       try {
-        const res = await axios.post('/users/send-login-link', authId)
+        const res = await api.post('/users/send-login-link', authId)
         const user = OwnerUserSchema.parse(res.data.user)
         // Return the status flag for the frontend to handle
         return { success: true, user, status: res.data.status };
@@ -88,7 +86,7 @@ export const useAuthStore = defineStore('auth', {
 
     async fetchUser() {
       try {
-        const res = await axios.get('/users/me')
+        const res = await api.get('/users/me')
         const user = UserSchema.parse(res.data.user)
         // Return the status flag for the frontend to handle
         return { success: true, user, error: null };
@@ -120,7 +118,7 @@ export const useAuthStore = defineStore('auth', {
       this.email = null
       this.jwt = ''
       localStorage.removeItem('token')
-      delete axios.defaults.headers.common['Authorization']
+      delete api.defaults.headers.common['Authorization']
     },
 
   },

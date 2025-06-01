@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue';
 import 'altcha';
 
-const challengeUrl = import.meta.env.VITE_API_BASE_URL + '/captcha/challenge'
+const challengeUrl = __APP_CONFIG__.API_BASE_URL + '/captcha/challenge'
 
 const altchaWidget = ref<HTMLElement | null>(null);
 

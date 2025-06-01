@@ -1,5 +1,3 @@
-import env from "src/env";
-
 import {
   OwnerScalarSchema,
   PublicProfile,
@@ -11,6 +9,7 @@ import { OwnerProfileImage, OwnerProfileImageSchema, PublicProfileImage, PublicP
 import { ProfileTagJoinSchema, PublicTag, PublicTagSchema } from "@zod/tag.schema";
 import type { ProfileImage, UserRole } from "@prisma/client";
 import { ProfileTag } from "@zod/generated";
+import { appConfig } from "@shared/config/appconfig";
 
 
 export function mapProfileToOwner(profile: ProfileComplete): OwnerProfile {
@@ -65,7 +64,7 @@ export function mapProfileImagesToPublic(images: ProfileImage[]): PublicProfileI
  * Constructs the public URL for the image
  */
 function getImageUrl(image: ProfileImage): string {
-  const urlBase = env.IMAGE_URL_BASE
+  const urlBase = appConfig.IMAGE_URL_BASE
   return `${urlBase}/${image.storagePath}`;
 }
 

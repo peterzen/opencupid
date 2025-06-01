@@ -13,12 +13,12 @@
       "@/*": [
         "src/*"
       ],
-      "@utils/*": [
-        "src/utils/*"
-      ],
       "@zod/*": [
         "../../packages/shared/zod/*"
       ],
+      "@shared/*": [
+        "../../packages/shared/*"
+      ]
     }
   },
   "include": [

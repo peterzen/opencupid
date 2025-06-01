@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import { api, axios } from '@/lib/api'
 import type {
   OwnerProfile,
   PublicProfile,
   UpdatedProfileFragment,
   UpdateProfilePayload,
 } from '@zod/profile.schema'
-import  {
+import {
   OwnerProfileSchema,
   PublicProfileSchema,
   UpdatedProfileFragmentSchema,
@@ -14,8 +14,6 @@ import  {
 } from '@zod/profile.schema'
 import { type OwnerProfileImage, type ProfileImagePosition } from '@zod/profileimage.schema'
 
-
-axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || '/api'
 
 // Success / Error response shapes
 interface UploadSuccess {
@@ -43,7 +41,7 @@ export const useProfileStore = defineStore('profile', {
     // Fetch the current user's profile
     async getUserProfile(): Promise<OwnerProfile> {
       try {
-        const res = await axios.get('/profiles/me')
+        const res = await api.get('/profiles/me')
         this.profile = OwnerProfileSchema.parse(res.data.profile)
         console.log('Fetched user profile:', this.profile)
         return this.profile
@@ -57,7 +55,7 @@ export const useProfileStore = defineStore('profile', {
     async updateProfile(profileData: UpdateProfilePayload): Promise<UpdatedProfileFragment> {
       try {
         const update = UpdateProfilePayloadSchema.parse(profileData)
-        const res = await axios.patch('/profiles/profile', update)
+        const res = await api.patch('/profiles/profile', update)
         return UpdatedProfileFragmentSchema.parse(res.data.profile)
       } catch (error: any) {
         console.error('Store: cannot to update profile:', error)
@@ -74,7 +72,7 @@ export const useProfileStore = defineStore('profile', {
       formData.append('captionText', captionText)
 
       try {
-        const { data } = await axios.post<UploadSuccess>('/profiles/image', formData)
+        const { data } = await api.post<UploadSuccess>('/profiles/image', formData)
         // data.success is guaranteed true here
         return data
       } catch (err: unknown) {
@@ -97,7 +95,7 @@ export const useProfileStore = defineStore('profile', {
 
     async deleteImage(image: OwnerProfileImage): Promise<UploadResponse> {
       try {
-        const { data } = await axios.delete<UploadSuccess>(`/profiles/image/${image.id}`)
+        const { data } = await api.delete<UploadSuccess>(`/profiles/image/${image.id}`)
         return data
       } catch (error: any) {
         const out: UploadError = {
@@ -110,7 +108,7 @@ export const useProfileStore = defineStore('profile', {
 
     async reorderImages(images: ProfileImagePosition[]): Promise<UploadResponse> {
       try {
-        const { data } = await axios.patch<UploadSuccess>('/profiles/image/order', { images })
+        const { data } = await api.patch<UploadSuccess>('/profiles/image/order', { images })
         return data
       } catch (error: any) {
         const out: UploadError = {
@@ -124,7 +122,7 @@ export const useProfileStore = defineStore('profile', {
     // Fetch a profile by ID
     async getPublicProfile(profileId: string): Promise<PublicProfile> {
       try {
-        const res = await axios.get(`/profiles/${profileId}`)
+        const res = await api.get(`/profiles/${profileId}`)
         return PublicProfileSchema.parse(res.data.profile)
         // return res.data.profile
       } catch (error: any) {
@@ -135,7 +133,7 @@ export const useProfileStore = defineStore('profile', {
 
     async findProfiles(): Promise<PublicProfile[]> {
       try {
-        const res = await axios.get('/profiles')
+        const res = await api.get('/profiles')
         const profiles = res.data.profiles.map((p: any) => PublicProfileSchema.parse(p))
         return profiles
       } catch (error: any) {

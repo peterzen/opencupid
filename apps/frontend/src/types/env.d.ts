@@ -2,7 +2,6 @@
 
 interface ImportMetaEnv {
   readonly VITE_API_BASE_URL: string
-  // Add other environment variables you use
 }
 
 interface ImportMeta {
@@ -14,4 +13,11 @@ interface ImportMeta {
 declare module "*.json" {
   const value: any;
   export default value;
+}
+
+declare const __APP_CONFIG__: {
+  readonly API_BASE_URL: string
+  readonly IMAGE_URL_BASE: string
+  readonly FRONTEND_URL: string
+  readonly NODE_ENV: string
 }

@@ -9,13 +9,13 @@ import {
 
 import { ProfileService } from 'src/services/profile.service'
 import { ImageGalleryService } from 'src/services/image.service'
-import { validateBody } from '@utils/zodValidate'
+import { validateBody } from '@/utils/zodValidate'
 import { uploadTmpDir } from '@/lib/media';
 import { getUserRoles, sendError, sendUnauthorizedError } from '../helpers';
-import env from 'src/env';
 import { mapProfileImagesToOwner, mapProfileToOwner, mapProfileToPublic } from 'src/api/mappers';
 import { ReorderProfileImagesPayloadSchema } from '@zod/profileimage.schema';
 import { UserService } from 'src/services/user.service';
+import { appConfig } from '@shared/config/appconfig';
 
 
 
@@ -26,7 +26,7 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       fieldNameSize: 100, // Max field name size in bytes
       fieldSize: 100,     // Max field value size in bytes
       fields: 10,         // Max number of non-file fields
-      fileSize: env.IMAGE_MAX_SIZE, // Max file size in bytes
+      fileSize: appConfig.IMAGE_MAX_SIZE, // Max file size in bytes
       files: 1,           // Max number of file fields
       headerPairs: 2000,  // Max number of header key=>value pairs
       parts: 1000         // For multipart forms, the max number of parts (fields + files)
@@ -130,15 +130,16 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       files = await req.saveRequestFiles({
         tmpdir: uploadTmpDir(),
         limits: {
-          fileSize: env.IMAGE_MAX_SIZE * 1024 * 1024, // Convert MB to bytes
+          fileSize: appConfig.IMAGE_MAX_SIZE, // Convert MB to bytes
           files: 1,
           fields: 1,
         },
       })
     } catch (err: any) {
       fastify.log.warn('Upload error:', err)
+      const maxSizeMiB = appConfig.IMAGE_MAX_SIZE / (1024 * 1024) // Convert bytes to MB
       return sendError(reply, 400,
-        `The image is too large ${err.code === 'FST_ERR_MULTIPART_FILE_TOO_LARGE' ? ` ${env.IMAGE_MAX_SIZE}MB max` : ''}`
+        `The image is too large ${err.code === 'FST_ERR_MULTIPART_FILE_TOO_LARGE' ? ` ${maxSizeMiB}MB max` : ''}`
       )
     }
 
@@ -220,19 +221,19 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     }
   }),
 
-  fastify.get('/', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    fastify.get('/', { onRequest: [fastify.authenticate] }, async (req, reply) => {
 
-    if (!req.user.userId) return sendUnauthorizedError(reply)
+      if (!req.user.userId) return sendUnauthorizedError(reply)
 
-    try {
-      const profiles = await profileService.findProfilesFor(req.user.userId)
-      const mappedProfiles = profiles.map(p => mapProfileToPublic(p, getUserRoles(req)))
-      return reply.code(200).send({ success: true, profiles: mappedProfiles })
-    } catch (err) {
-      fastify.log.error(err)
-      return sendError(reply, 500, 'Failed to fetch profiles')
-    }
-  })
+      try {
+        const profiles = await profileService.findProfilesFor(req.user.userId)
+        const mappedProfiles = profiles.map(p => mapProfileToPublic(p, getUserRoles(req)))
+        return reply.code(200).send({ success: true, profiles: mappedProfiles })
+      } catch (err) {
+        fastify.log.error(err)
+        return sendError(reply, 500, 'Failed to fetch profiles')
+      }
+    })
 }
 
 export default profileRoutes

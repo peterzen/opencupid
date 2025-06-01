@@ -8,6 +8,7 @@ import { type SessionData } from '@zod/user.schema'
 import { UserService } from 'src/services/user.service'
 import { SessionService } from '../services/session.service'
 import { sendUnauthorizedError } from 'src/api/helpers'
+import { appConfig } from '@shared/config/appconfig'
 
 // Extend Fastify types
 declare module 'fastify' {
@@ -20,7 +21,7 @@ declare module 'fastify' {
   }
 }
 
-const redisUrl = process.env.REDIS_URL
+const redisUrl = appConfig.REDIS_URL
 if (!redisUrl) {
   throw new Error('REDIS_URL environment variable is not defined')
 }
@@ -28,7 +29,7 @@ if (!redisUrl) {
 export default fp(async (fastify: FastifyInstance) => {
 
   fastify.register(fastifyJwt, {
-    secret: process.env.JWT_SECRET || 'supersecret'
+    secret: appConfig.JWT_SECRET
   })
 
   // Initialize Redis client

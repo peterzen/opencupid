@@ -19,8 +19,8 @@
       "@zod/*": [
         "../../packages/shared/zod/*"
       ],
-      "@opencupid/shared/*": [
-        "packages/shared/*"
+      "@shared/*": [
+        "../../packages/shared/*"
       ],
     }
   }

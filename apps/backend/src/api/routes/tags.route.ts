@@ -1,4 +1,4 @@
-import { validateBody } from "@utils/zodValidate";
+import { validateBody } from "@/utils/zodValidate";
 import { PublicTagSchema, SearchQuerySchema, TagParamsSchema, UpdateTagPayloadSchema } from "@zod/tag.schema";
 import { FastifyPluginAsync } from "fastify";
 import { sendError } from "../helpers";

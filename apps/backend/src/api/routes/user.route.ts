@@ -7,15 +7,15 @@ import { ProfileService } from 'src/services/profile.service'
 import { sendError, sendUnauthorizedError } from '../helpers'
 import { SmsService } from '@/services/sms.service'
 import { CaptchaService } from '@/services/captcha.service'
-import env from '@/env'
 import cuid from 'cuid'
+import { appConfig } from '@shared/config/appconfig'
 
 
 const userRoutes: FastifyPluginAsync = async (fastify) => {
 
   const userService = UserService.getInstance()
   const profileService = ProfileService.getInstance()
-  const captchaService = new CaptchaService(env.ALTCHA_HMAC_KEY)
+  const captchaService = new CaptchaService(appConfig.ALTCHA_HMAC_KEY)
 
   fastify.get('/otp-login', async (req, reply) => {
     try {
@@ -67,7 +67,7 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
       otp = userService.generateOTP()
     } else {
 
-      const smsService = new SmsService(env.SMS_API_KEY)
+      const smsService = new SmsService(appConfig.SMS_API_KEY)
       const userId = cuid()
       const smsRes = await smsService.sendOtp(data.phonenumber, userId)
       if (smsRes.success && smsRes.otp && smsRes.otp !== '') {

@@ -1,7 +1,8 @@
 import { Prisma, PrismaClient } from '@prisma/client'
+import { appConfig } from '@shared/config/appconfig'
 
 // Define process-wide log level
-const logLevels: Prisma.LogLevel[] = process.env.NODE_ENV === 'production'
+const logLevels: Prisma.LogLevel[] = appConfig.NODE_ENV === 'production'
   ? ['error'] // In production, log only errors
   : ['query', 'error', 'warn']
 
@@ -15,10 +16,10 @@ declare global {
 const prismaClientSingleton = () => {
   return new PrismaClient({
     log: logLevels
-    // You can configure connection pooling settings here
+    // configure connection pooling settings here
     // datasources: {
     //   db: {
-    //     url: process.env.DATABASE_URL,
+    //     url: appConfig.DATABASE_URL,
     //     // These settings can improve performance under high load
     //     poolTimeout: 20, // 20 seconds
     //     connectionLimit: 10 // default is 10
@@ -31,6 +32,6 @@ const prismaClientSingleton = () => {
 export const prisma = global.prisma ?? prismaClientSingleton()
 
 // Cache in development only
-if (process.env.NODE_ENV !== 'production') {
+if (appConfig.NODE_ENV !== 'production') {
   global.prisma = prisma
 }

@@ -11,7 +11,7 @@ import {
   makeImageLocation
 } from 'src/lib/media';
 
-import { generateContentHash } from '@utils/hash';
+import { generateContentHash } from '@/utils/hash';
 import { ProfileImagePosition } from '@zod/profileimage.schema';
 
 

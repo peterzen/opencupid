@@ -9,10 +9,10 @@ declare global {
 // https://lokalise.com/blog/vue-i18n/
 
 // Import JSON locale files
-import en from '@opencupid/shared/i18n/en.json'
-import hu from '@opencupid/shared/i18n/hu.json'
-import de from '@opencupid/shared/i18n/de.json'
-import fr from '@opencupid/shared/i18n/fr.json'
+import en from '@shared/i18n/en.json'
+import hu from '@shared/i18n/hu.json'
+import de from '@shared/i18n/de.json'
+import fr from '@shared/i18n/fr.json'
 
 import { changeLocale } from '@formkit/vue'
 

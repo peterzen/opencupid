@@ -3,11 +3,11 @@ import { randomUUID } from 'crypto'
 import { createHash } from 'crypto'
 import fs from 'fs'
 
-import env from '../env'
 import cuid from 'cuid';
+import { appConfig } from '@shared/config/appconfig';
 
 export function uploadTmpDir() {
-  return path.join(env.MEDIA_UPLOAD_DIR, 'uploads')
+  return path.join(appConfig.MEDIA_UPLOAD_DIR, 'uploads')
 }
 
 export function generateStorageDirPrefix(): string {
@@ -25,7 +25,7 @@ export function generateStorageDirPrefix(): string {
 
 export function getImageRoot(): string {
   // Get the directory where the uploads are stored
-  return env.MEDIA_UPLOAD_DIR
+  return appConfig.MEDIA_UPLOAD_DIR
 }
 
 export function checkImageRoot(): boolean {

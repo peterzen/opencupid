@@ -1,14 +1,13 @@
 import Fastify from 'fastify'
-import cors from '@fastify/cors' // Import the CORS plugin
-// import staticSrv from '@fastify/static'
-import env from './env'
+import cors from '@fastify/cors' 
+import { appConfig } from '@shared/config/appconfig'
 
 import './workers/emailWorker'   // ← side‐effect: starts the worker
 import { checkImageRoot } from '@/lib/media'
 
 const app = Fastify({
   logger: {
-    transport: process.env.NODE_ENV === 'production'
+    transport: appConfig.NODE_ENV === 'production'
       ? undefined
       : {
         target: 'pino-pretty',
@@ -23,7 +22,7 @@ const app = Fastify({
 
 // Register CORS plugin
 app.register(cors, {
-  origin: '*',//process.env.FRONTEND_URL || '*', // Allow requests from the frontend URL or all origins
+  origin: appConfig.NODE_ENV === 'production' ? appConfig.FRONTEND_URL : '*',
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
   methods: ['GET', 'PUT', 'POST', 'DELETE', 'PATCH']
@@ -38,10 +37,6 @@ app.register(import('./plugins/gallery-service'))
 app.register(import('./plugins/tag-service'))
 app.register(import('./api'), { prefix: '/api' })
 
-// app.register(staticSrv, {
-//   root: env.MEDIA_UPLOAD_DIR,
-// })
-
 const ok = checkImageRoot()
 if (!ok) {
   app.log.error("Media upload directory cannot be created or is not writable")
@@ -49,7 +44,7 @@ if (!ok) {
 }
 
 app.listen({
-  port: env.PORT,
+  port: appConfig.API_PORT,
   host: '0.0.0.0',// Listen on all interfaces
 }, (err) => {
   if (err) {
