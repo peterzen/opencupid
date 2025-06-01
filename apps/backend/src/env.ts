@@ -9,6 +9,7 @@ const env = {
   IMAGE_URL_BASE: process.env.IMAGE_URL_BASE || '/uploads/',
   IMAGE_MAX_SIZE: parseInt(maxSize),
   SMS_API_KEY: process.env.SMS_API_KEY || '',
+  ALTCHA_HMAC_KEY: process.env.ALTCHA_HMAC_KEY!,
 }
 
 // PORT=3000

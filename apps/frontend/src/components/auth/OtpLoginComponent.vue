@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import ErrorComponent from '@/components/ErrorComponent.vue'
-import { OwnerUser } from '@zod/user.schema'
+import { type OwnerUser } from '@zod/user.schema'
 import { otpRegex } from '@/lib/utils';
 
 const props = defineProps<{
@@ -57,7 +57,7 @@ function validateOtp(node: any) {
                  input-class="form-control-lg"
                  aria-autocomplete="none"
                  autocomplete="off"
-                 autoFocus
+                 autofocus
                  validation="+validateOtp"
                  :validation-rules="{
                   validateOtp,
@@ -77,7 +77,7 @@ function validateOtp(node: any) {
 
 
 <style scoped>
-::v-deep ul.formkit-messages {
+:deep(ul.formkit-messages) {
   display: none;
 }
 

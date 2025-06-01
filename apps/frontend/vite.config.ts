@@ -13,7 +13,13 @@ export default defineConfig({
     allowedHosts: ['localhost', 'oc.dev.froggle.org'],
   },
   plugins: [
-    vue(),
+    vue({
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag) => tag === 'altcha-widget'
+        }
+      }
+    }),
     vueJsx(),
     vueDevTools(),
     svgLoader(),

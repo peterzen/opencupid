@@ -3,7 +3,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useAuthStore } from '@/store/authStore'
 import { useRoute, useRouter } from 'vue-router'
 import AuthIdComponent from '@/components/auth/AuthIdComponent.vue'
-import { AuthIdentifier, OwnerUser } from '@zod/user.schema'
+import type { AuthIdentifier, OwnerUser, SendOtpPayload } from '@zod/user.schema'
 import OtpLoginComponent from '@/components/auth/OtpLoginComponent.vue'
 
 // Reactive variables
@@ -44,12 +44,12 @@ onMounted(async () => {
 })
 
 // Method to handle sending login link
-async function handleSendOtp(authIdentifier: AuthIdentifier) {
+async function handleSendOtp(payload: SendOtpPayload) {
 
   try {
     error.value = ''
     isLoading.value = true
-    const res = await authStore.sendLoginLink(authIdentifier)
+    const res = await authStore.sendLoginLink(payload)
     if (res.success) {
       Object.assign(user, res.user)
       console.log('Login link sent successfully:', user)

@@ -1,11 +1,12 @@
 import { FastifyPluginAsync } from 'fastify'
-import { LoginSchema, OtpLoginSchema } from '@zod/user.schema'
+import { SendOtpSchema, OtpLoginSchema } from '@zod/user.schema'
 import { validateBody } from '../../utils/zodValidate'
 import { emailQueue } from '../../queues/emailQueue'
 import { UserService } from 'src/services/user.service'
 import { ProfileService } from 'src/services/profile.service'
 import { sendError, sendUnauthorizedError } from '../helpers'
 import { SmsService } from '@/services/sms.service'
+import { CaptchaService } from '@/services/captcha.service'
 import env from '@/env'
 import cuid from 'cuid'
 
@@ -14,6 +15,7 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
 
   const userService = UserService.getInstance()
   const profileService = ProfileService.getInstance()
+  const captchaService = new CaptchaService(env.ALTCHA_HMAC_KEY)
 
   fastify.get('/otp-login', async (req, reply) => {
     try {
@@ -26,7 +28,7 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
       // new user
       if (isNewUser) {
         // 2) enqueue the welcome email
-        if(user.email) await emailQueue.add(
+        if (user.email) await emailQueue.add(
           'sendWelcomeEmail',
           { userId: user.id },
           { attempts: 3, backoff: { type: 'exponential', delay: 5000 } }
@@ -46,8 +48,18 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
 
   fastify.post('/send-login-link', async (req, reply) => {
 
-    const data = validateBody(LoginSchema, req, reply)
+    const data = validateBody(SendOtpSchema, req, reply)
     if (!data) return
+
+    try {
+      const captchaOk = await captchaService.validate(data.captchaSolution)
+      if (!captchaOk) {
+        return reply.code(400).send({ success: false, status: 'invalid_captcha' })
+      }
+    } catch (err: any) {
+      fastify.log.error("Captcha validation error", err)
+      return reply.code(500).send({ success: false, status: 'captcha_validation_failed' })
+    }
 
     let otp = null
 

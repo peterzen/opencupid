@@ -12,6 +12,7 @@ declare module 'vue' {
     BCarousel: typeof import('bootstrap-vue-next/components/BCarousel')['BCarousel']
     BCarouselSlide: typeof import('bootstrap-vue-next/components/BCarousel')['BCarouselSlide']
     BModal: typeof import('bootstrap-vue-next/components/BModal')['BModal']
+    CaptchaWidget: typeof import('./src/components/auth/CaptchaWidget.vue')['default']
     ConnectionTypeSelector: typeof import('./src/components/ConnectionTypeSelector.vue')['default']
     DatingFilter: typeof import('./src/components/profiles/DatingFilter.vue')['default']
     DatingProfileForm: typeof import('./src/components/profiles/DatingProfileForm.vue')['default']

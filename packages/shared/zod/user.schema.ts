@@ -8,13 +8,18 @@ export const AuthIdSchema = z.object({
 })
 export type AuthIdentifier = z.infer<typeof AuthIdSchema>
 
-export const LoginSchema = AuthIdSchema.refine(
-  (data) => !!data.email || !!data.phonenumber,
-  {
-    message: 'Either email or phone number is required.',
-    path: ['email'], // mark the error on the email field (or 'phonenumber')
-  }
-)
+export const SendOtpSchema = AuthIdSchema
+  .extend({
+    captchaSolution: z.string().min(1, 'Captcha solution is required'),
+  })
+  .refine(
+    (data) => !!data.email || !!data.phonenumber,
+    {
+      message: 'Either email or phone number is required.',
+      path: ['email'], // mark the error on the email field (or 'phonenumber')
+    }
+  )
+export type SendOtpPayload = z.infer<typeof SendOtpSchema>
 
 export const SessionDataSchema = z.object({
   userId: z.string(),

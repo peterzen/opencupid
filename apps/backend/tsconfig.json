@@ -5,6 +5,10 @@
     "outDir": "./dist",
     "strict": true,
     "strictNullChecks": true,
+    "typeRoots": [
+      "./types",
+      "./node_modules/@types"
+    ],
     "paths": {
       "@/*": [
         "src/*"

@@ -2,27 +2,29 @@
 import { ref, computed } from 'vue'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { AuthIdentifier } from '@zod/user.schema'
+import type { AuthIdentifier, SendOtpPayload } from '@zod/user.schema'
 import { emailRegex, phoneRegex } from '@/lib/utils';
+import CaptchaWidget from './CaptchaWidget.vue';
 
 const props = defineProps<{
   isLoading: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: 'otp:send', identifier: AuthIdentifier): void
+  (e: 'otp:send', identifier: SendOtpPayload): void
 }>()
 
-
-// Reactive variables
+// State variables
 const authIdInput = ref('')
-const error = ref('' as string)
+const captchaPayload = ref('')
+const error = ref('')
 
 const authIdentifier = computed(() => {
-  console.log('authIdInput.value:', authIdInput.value)
+  // console.log('authIdInput.value:', authIdInput.value)
   return {
     email: emailRegex.test(authIdInput.value) ? authIdInput.value : '',
-    phonenumber: phoneRegex.test(authIdInput.value) ? authIdInput.value : ''
+    phonenumber: phoneRegex.test(authIdInput.value) ? authIdInput.value : '',
+    captchaSolution: captchaPayload.value || '',
   }
 })
 
@@ -38,14 +40,19 @@ async function handleSendLoginLink() {
 
 const validateAuthIdInput = (node: any) => {
   const value = node.value as string
-  console.log('Validating Auth ID empty:', value)
+  // console.log('Validating Auth ID empty:', value)
   if (!value || value === '') return false
-  console.log('Validating Auth ID Input:', value)
+  // console.log('Validating Auth ID Input:', value)
   if (emailRegex.test(value) || phoneRegex.test(value)) {
-    console.log('User ID is valid:', value)
+    // console.log('User ID is valid:', value)
     return true
   }
   return false
+}
+
+function handleCaptchaUpdatePayload(payload: string) {
+  // console.log('Captcha payload updated:', payload)
+  captchaPayload.value = payload
 }
 
 const authIdInputRef = ref<InstanceType<any> | null>(null)
@@ -75,7 +82,7 @@ const authIdInputRef = ref<InstanceType<any> | null>(null)
                  label="Your email address or phone number..."
                  id="authIdInput"
                  ref="authIdInputRef"
-                 autoFocus
+                 autofocus
                  :floating-label="true"
                  input-class="form-control-lg"
                  validation="+validateAuthIdInput"
@@ -100,8 +107,13 @@ const authIdInputRef = ref<InstanceType<any> | null>(null)
             </div>
           </template>
         </FormKit>
-
       </div>
+
+      <div class="mb-3">
+        <CaptchaWidget v-if="!props.isLoading"
+                       @update:payload="handleCaptchaUpdatePayload" />
+      </div>
+
       <FormKit type="submit"
                wrapper-class="d-grid gap-2 mb-3"
                input-class="btn-primary btn-lg w-100"
@@ -114,7 +126,7 @@ const authIdInputRef = ref<InstanceType<any> | null>(null)
 
 
 <style scoped>
-::v-deep ul.formkit-messages {
+:deep(ul.formkit-messages) {
   display: none;
 }
 
