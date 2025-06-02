@@ -6,8 +6,8 @@ export const configSchema = z.object({
   API_PORT: z.coerce.number().default(3000),
   FRONTEND_PORT: z.coerce.number().default(5173),
 
-  FRONTEND_URL: z.string().url(),
-  API_BASE_URL: z.string().url(),
+  FRONTEND_URL: z.string(),
+  API_BASE_URL: z.string(),
 
   JWT_SECRET: z.string().min(10),
 
@@ -22,7 +22,7 @@ export const configSchema = z.object({
 
   MEDIA_UPLOAD_DIR: z.string(),
   IMAGE_SRV_PORT: z.coerce.number(),
-  IMAGE_URL_BASE: z.string().url(),
+  IMAGE_URL_BASE: z.string(),
   IMAGE_MAX_SIZE: z.coerce.number(),
 
   SMS_API_KEY: z.string(),

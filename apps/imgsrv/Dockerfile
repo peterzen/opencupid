@@ -1,3 +1,4 @@
+
 FROM nginx:alpine
 
 # Remove default nginx configuration

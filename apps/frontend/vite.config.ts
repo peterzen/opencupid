@@ -1,3 +1,4 @@
+import fs from 'fs'
 import path from 'path'
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
@@ -6,6 +7,9 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 import Components from 'unplugin-vue-components/vite'
 import { BootstrapVueNextResolver } from 'bootstrap-vue-next'
 import svgLoader from 'vite-svg-loader'
+import serveStatic from 'serve-static'
+
+
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
@@ -22,6 +26,17 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       allowedHosts: ['localhost', 'oc.dev.froggle.org'],
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3000', // or https://localhost:3000 if backend runs TLS
+          changeOrigin: true,
+          secure: false, // accept self-signed TLS
+        },
+      },
+      https: {
+        key: fs.readFileSync(path.resolve(__dirname, '../../certs/key.pem')),
+        cert: fs.readFileSync(path.resolve(__dirname, '../../certs/cert.pem')),
+      },
     },
     plugins: [
       vue({
@@ -37,6 +52,15 @@ export default defineConfig(({ mode }) => {
       Components({
         resolvers: [BootstrapVueNextResolver()],
       }),
+      {
+        name: 'serve-static-images',
+        configureServer(server) {
+          server.middlewares.use(
+            '/images',
+            serveStatic(path.resolve(__dirname, rootEnv.MEDIA_UPLOAD_DIR))
+          )
+        }
+      }
     ],
     css: {
       preprocessorOptions: {

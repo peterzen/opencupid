@@ -20,7 +20,7 @@ import { ProfileComplete } from '@zod/profile.schema';
 const imageService = ImageGalleryService.getInstance()
 const profileService = ProfileService.getInstance()
 
-const howMany = 1
+const howMany = 5
 const languages = ['en', 'de', 'it', 'fr', 'es', 'pt', 'hu', 'nl']
 
 // faker.seed(123);

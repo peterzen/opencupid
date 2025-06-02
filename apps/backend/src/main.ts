@@ -1,11 +1,21 @@
 import Fastify from 'fastify'
-import cors from '@fastify/cors' 
+import cors from '@fastify/cors'
 import { appConfig } from '@shared/config/appconfig'
 
 import './workers/emailWorker'   // ← side‐effect: starts the worker
 import { checkImageRoot } from '@/lib/media'
 
+import fs from 'fs'
+import path from 'path'
+
+// const key = fs.readFileSync(path.join(__dirname, '../../../certs/key.pem'))
+// const cert = fs.readFileSync(path.join(__dirname, '../../../certs/cert.pem'))
+
 const app = Fastify({
+  // https: {
+  //   key,
+  //   cert,
+  // },
   logger: {
     transport: appConfig.NODE_ENV === 'production'
       ? undefined

@@ -1,21 +1,21 @@
 
 services:
-  backend:
-    build:
-      context: ./apps/backend
-    ports:
-      - "3000:3000"
-    depends_on:
-      - db
-      - redis
-    env_file:
-    - .env
+  # backend:
+  #   build:
+  #     context: ./apps/backend
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - db
+  #     - redis
+  #   env_file:
+  #   - .env
 
-  frontend:
-    build:
-      context: ./apps/frontend
-    ports:
-      - "5173:80"
+  # frontend:
+  #   build:
+  #     context: ./apps/frontend
+  #   ports:
+  #     - "5173:80"
 
   db:
     image: postgres:15

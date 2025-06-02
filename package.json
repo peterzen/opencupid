@@ -15,6 +15,7 @@
     "lint": "turbo run lint",
     "generate": "turbo run generate",
     "migrate": "turbo run migrate",
+    "gen-certs":"openssl req -x509 -nodes -days 365   -newkey rsa:2048   -keyout certs/localhost-key.pem   -out certs/localhost-cert.pem   -subj \"/C=US/ST=Dev/L=Local/O=Dev/CN=localhost\"",
     "mcp-server": "npx -y supergateway --stdio \"npx -y @modelcontextprotocol/server-filesystem $(pwd)\" --port 9999"
   },
   "dependencies": {
