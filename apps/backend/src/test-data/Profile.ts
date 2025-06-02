@@ -16,6 +16,7 @@ import {
 } from '@/lib/media';
 import { ProfileService } from '@/services/profile.service';
 import type { OwnerProfile, ProfileComplete } from '@zod/profile.schema';
+import cuid from 'cuid';
 
 const imageService = ImageGalleryService.getInstance()
 const profileService = ProfileService.getInstance()
@@ -48,14 +49,14 @@ export function createRandomProfile(user: User) {
   const isDatingActive = user.roles.includes('user_dating')
   const baseProfile = {
     userId: user.id,
+    slug: cuid.slug(),
     publicName: faker.person.firstName(),
     country: faker.location.countryCode(),
     cityName: faker.location.city(),
-    introSocial: faker.person.bio(),
+    introSocial: faker.person.bio() + ' ' + faker.lorem.sentences({ min: 1, max: 4 }),
 
     isActive: true,
     isDatingActive: isDatingActive,
-    isOnboarded: true,
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
   };

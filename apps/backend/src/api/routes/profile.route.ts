@@ -4,6 +4,8 @@ import multipart, { MultipartValue } from '@fastify/multipart';
 import {
   IdLookupParamsSchema,
   OwnerProfileSchema,
+  SlugLookupParamsSchema,
+  UpdatedProfileFragmentSchema,
   UpdateProfilePayloadSchema
 } from '@zod/profile.schema'
 
@@ -12,10 +14,11 @@ import { ImageGalleryService } from 'src/services/image.service'
 import { validateBody } from '@/utils/zodValidate'
 import { uploadTmpDir } from '@/lib/media';
 import { getUserRoles, sendError, sendForbiddenError, sendUnauthorizedError } from '../helpers';
-import { mapProfileImagesToOwner, mapProfileToOwner, mapProfileToPublic } from 'src/api/mappers';
+import { mapProfileImagesToOwner, mapProfileTags, mapProfileToOwner, mapProfileToPublic } from 'src/api/mappers';
 import { ReorderProfileImagesPayloadSchema } from '@zod/profileimage.schema';
 import { UserService } from 'src/services/user.service';
 import { appConfig } from '@shared/config/appconfig';
+import { Prisma } from '@prisma/client';
 
 
 
@@ -62,19 +65,19 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
 
 
   /**
-   * Get a profile by ID
-   * @param {string} id - The ID of the profile to retrieve
+   * Get a profile by slug
+   * @param {string} slug - The slug of the profile to retrieve
    */
-  fastify.get('/:id', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+  fastify.get('/:slug', { onRequest: [fastify.authenticate] }, async (req, reply) => {
 
     if (!req.user.userId) return sendUnauthorizedError(reply)
 
     const roles = getUserRoles(req)
 
-    const { id: profileId } = IdLookupParamsSchema.parse(req.params)
+    const { slug } = SlugLookupParamsSchema.parse(req.params)
 
     try {
-      const raw = await profileService.getProfileById(profileId)
+      const raw = await profileService.getProfileBySlug(slug)
       if (!raw) return sendError(reply, 404, 'Profile not found')
 
       if (raw.userId !== req.user.userId && !req.session.hasActiveProfile) {
@@ -132,7 +135,8 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       const updated = await fastify.prisma.$transaction(async (tx) => {
 
         const updatedProfile = await profileService.updateProfile(tx, req.user.userId, data)
-        if (!updatedProfile) return sendError(reply, 404, 'Profile not found')
+        // is this correctly handled here - will updateProfile be returning meaningful result from tx.profile.update() ?
+        // if (!updatedProfile) return sendError(reply, 404, 'Profile not found')
 
         // Mark user as onboarded
         user.isOnboarded = true
@@ -140,13 +144,23 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
         if (!updatedUser) return sendError(reply, 500, 'Failed to update user')
         return updatedProfile
       })
-      const profile = UpdateProfilePayloadSchema.parse(updated)
+
+      const { tags, profileImages, ...rest } = updated
+
+      const profile = UpdatedProfileFragmentSchema.parse({
+        tags: mapProfileTags(updated.tags),
+        ...rest
+      })
 
       // Clear session to force re-fetch on next request, we need the roles updated
       await req.deleteSession()
       return reply.code(200).send({ success: true, profile })
     } catch (err) {
       fastify.log.error(err)
+      // profileService.updateProfile() returned null, which means the profile was not found 
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+        return sendError(reply, 404, 'Profile not found')
+      }
       return sendError(reply, 500, 'Failed to update profile')
     }
   })

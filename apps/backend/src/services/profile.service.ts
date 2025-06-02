@@ -4,6 +4,7 @@ import {
 } from '@prisma/client'
 import {
   ProfileComplete,
+  ProfileWithTags,
   UpdatedProfileFragment,
   UpdatedProfileFragmentSchema,
   UpdateProfilePayload
@@ -14,6 +15,16 @@ import {
   ProfileImage,
   ProfileTag,
 } from '@zod/generated'
+import cuid from 'cuid'
+
+const profileCompleteInclude = {
+  profileImages: {
+    orderBy: { position: 'asc' },
+  },
+  tags: {
+    include: { tag: true },
+  },
+} satisfies Prisma.ProfileInclude
 
 
 export class ProfileService {
@@ -31,40 +42,29 @@ export class ProfileService {
   }
 
   async getProfileById(profileId: string): Promise<ProfileComplete | null> {
-    console.log(`Fetching profile with ID: ${profileId}`)
+    // console.log(`Fetching profile with ID: ${profileId}`)
     return prisma.profile.findUnique({
       where: { id: profileId },
-      include: {
-        user: false,
-        profileImages: {
-          orderBy: { position: 'asc' },
-        },
-        tags: {
-          include: {
-            tag: true
-          }
-        }
-      }
+      include: profileCompleteInclude,
+    })
+  }
+
+  getProfileBySlug(slug: string): Promise<ProfileComplete | null> {
+    // console.log(`Fetching profile with ID: ${slug}`)
+    return prisma.profile.findUnique({
+      where: { slug },
+      include: profileCompleteInclude,
     })
   }
 
   async getProfileByUserId(userId: string): Promise<ProfileComplete | null> {
     return prisma.profile.findUnique({
       where: { userId },
-      include: {
-        profileImages: {
-          orderBy: { position: 'asc' },
-        },
-        tags: {
-          include: {
-            tag: true,
-          }
-        }
-      }
+      include: profileCompleteInclude,
     })
   }
 
-  async updateProfile(tx: Prisma.TransactionClient, userId: string, data: UpdateProfilePayload): Promise<UpdatedProfileFragment> {
+  async updateProfile(tx: Prisma.TransactionClient, userId: string, data: UpdateProfilePayload): Promise<ProfileWithTags> {
     // 1) pull out the tags array
     const { tags, ...rest } = data;
 
@@ -74,6 +74,11 @@ export class ProfileService {
       data: {
         ...rest,
         isActive: true, // TODO change this to isVisible when we have that field
+      },
+      include: {
+        tags: {
+          include: { tag: true },
+        },
       },
     });
 
@@ -92,7 +97,7 @@ export class ProfileService {
       });
     }
 
-    return UpdatedProfileFragmentSchema.parse(updated)
+    return updated// UpdatedProfileFragmentSchema.parse(updated)
   }
 
 
@@ -228,16 +233,19 @@ export class ProfileService {
       return profile
     }
 
+    const slug = cuid.slug()
+
     return prisma.profile.create({
       data: {
         userId,
+        slug,
         publicName: '',
         introSocial: '',
       }
     })
   }
 
-  async findProfilesFor(userId: string): Promise<Profile[]> {
+  async findProfilesFor(userId: string): Promise<ProfileComplete[]> {
     return await prisma.profile.findMany({
       where: {
         isActive: true,

@@ -29,7 +29,7 @@ export function mapProfileToOwner(profile: ProfileComplete): OwnerProfile {
   }
 }
 
-function mapProfileTags(profileTags: ProfileTag[]): PublicTag[] {
+export function mapProfileTags(profileTags: ProfileTag[]): PublicTag[] {
   return profileTags
     .map((pt: ProfileTag) => ProfileTagJoinSchema.parse(pt))
     .map((tag: PublicTag) => PublicTagSchema.parse(tag));

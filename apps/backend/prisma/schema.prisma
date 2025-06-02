@@ -189,6 +189,7 @@ model User {
 
 model Profile {
   id          String @id @default(cuid())
+  slug        String @unique
   publicName  String
   country     String @default("")
   cityName    String @default("")

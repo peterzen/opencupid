@@ -15,7 +15,7 @@ import type {
 
 
 const baseFields = {
-  id: true,
+  slug: true,
   languages: true,
   publicName: true,
   introSocial: true,
@@ -133,16 +133,15 @@ export const UpdatedProfileImageFragmentSchema = ProfileSchema
 export type UpdatedProfileImageFragment = z.infer<typeof UpdatedProfileImageFragmentSchema>;
 
 
-
-// Route params for profile ID lookups
-export const ProfileLookupParamsSchema = z.object({
-  profileId: z.string().cuid(),
-})
-export type ProfileLookupParams = z.infer<typeof ProfileLookupParamsSchema>
-
-
 // Route params for ID lookups
 export const IdLookupParamsSchema = z.object({
   id: z.string().cuid(),
 })
 export type IdLookupParams = z.infer<typeof IdLookupParamsSchema>
+
+
+// Route params for ID lookups
+export const SlugLookupParamsSchema = z.object({
+  slug: z.string().min(1)
+})
+export type SlugLookupParams = z.infer<typeof SlugLookupParamsSchema>
