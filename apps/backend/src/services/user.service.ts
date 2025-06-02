@@ -1,6 +1,6 @@
 import { prisma } from '../lib/prisma'
-import { User, Profile, UserRole } from '@prisma/client'
-import { AuthIdentifier } from '@zod/user.schema';
+import { User, Profile, UserRole, Prisma } from '@prisma/client'
+import { AuthIdentifier, OwnerUser } from '@zod/user.schema';
 import otpGenerator from 'otp-generator'
 
 // Define types for service return values
@@ -101,30 +101,29 @@ export class UserService {
     })
   }
 
-  async addRole(userId: string, role: UserRole): Promise<User | null> {
-    return prisma.user.update({
-      where: { id: userId },
+  addRole(user: User, role: UserRole): User {
+    if (!user.roles.includes(role)) {
+      user.roles.push(role)
+    }
+    return user
+  }
+
+  removeRole(user: User, role: UserRole): User {
+    const index = user.roles.indexOf(role)
+    if (index !== -1) {
+      user.roles.splice(index, 1)
+    }
+    return user
+  }
+
+  async updateUser(tx: Prisma.TransactionClient, user: User): Promise<User | null> {
+    return tx.user.update({
+      where: { id: user.id },
       data: {
-        roles: {
-          push: role
-        }
+        ...user
       }
     })
   }
-
-  async removeRole(userId: string, role: UserRole): Promise<User | null> {
-    const user = await this.getUserById(userId)
-    const updatedRoles = user?.roles.filter(r => r !== role) || []
-    return prisma.user.update({
-      where: { id: userId },
-      data: {
-        roles: {
-          set: updatedRoles
-        }
-      }
-    })
-  }
-
 
   generateOTP() {
     // Generate a 6-digit OTP

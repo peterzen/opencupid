@@ -11,7 +11,7 @@ import { ProfileService } from 'src/services/profile.service'
 import { ImageGalleryService } from 'src/services/image.service'
 import { validateBody } from '@/utils/zodValidate'
 import { uploadTmpDir } from '@/lib/media';
-import { getUserRoles, sendError, sendUnauthorizedError } from '../helpers';
+import { getUserRoles, sendError, sendForbiddenError, sendUnauthorizedError } from '../helpers';
 import { mapProfileImagesToOwner, mapProfileToOwner, mapProfileToPublic } from 'src/api/mappers';
 import { ReorderProfileImagesPayloadSchema } from '@zod/profileimage.schema';
 import { UserService } from 'src/services/user.service';
@@ -56,7 +56,7 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
 
     } catch (err) {
       fastify.log.error(err)
-      return sendError(reply, 500, 'Failed to load profiles')
+      return sendError(reply, 500, 'Failed to load profile')
     }
   })
 
@@ -76,12 +76,34 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     try {
       const raw = await profileService.getProfileById(profileId)
       if (!raw) return sendError(reply, 404, 'Profile not found')
+
+      if (raw.userId !== req.user.userId && !req.session.hasActiveProfile) {
+        return sendForbiddenError(reply, 'You do not have access to this profile')
+      }
+
       const profile = mapProfileToPublic(raw, roles)
       // const profile = publicProfileSchema.parse(raw)
       return reply.code(200).send({ success: true, profile })
     } catch (err) {
       fastify.log.error(err)
       return sendError(reply, 500, 'Failed to fetch profile')
+    }
+  })
+
+  fastify.get('/', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+
+    if (!req.user.userId) return sendUnauthorizedError(reply)
+
+    console.log('session', req.session)
+    if (!req.session.hasActiveProfile) return sendForbiddenError(reply)
+
+    try {
+      const profiles = await profileService.findProfilesFor(req.user.userId)
+      const mappedProfiles = profiles.map(p => mapProfileToPublic(p, getUserRoles(req)))
+      return reply.code(200).send({ success: true, profiles: mappedProfiles })
+    } catch (err) {
+      fastify.log.error(err)
+      return sendError(reply, 500, 'Failed to fetch profiles')
     }
   })
 
@@ -95,16 +117,31 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     const data = await validateBody(UpdateProfilePayloadSchema, req, reply)
     if (!data) return
 
-    try {
-      const updated = await profileService.updateProfile(req.user.userId, data)
-      if (!updated) return sendError(reply, 404, 'Profile not found')
+    const user = await userService.getUserById(req.user.userId)
+    if (!user) return sendUnauthorizedError(reply)
 
-      if (updated.isDatingActive) {
-        await userService.addRole(req.user.userId, 'user_dating')
-      } else {
-        await userService.removeRole(req.user.userId, 'user_dating')
-      }
+    // set flags on user object (these are used in authorization)
+    if (data.isDatingActive) {
+      userService.addRole(user, 'user_dating')
+    } else {
+      userService.removeRole(user, 'user_dating')
+    }
+    user.hasActiveProfile = data.isActive || false
+
+    try {
+      const updated = await fastify.prisma.$transaction(async (tx) => {
+
+        const updatedProfile = await profileService.updateProfile(tx, req.user.userId, data)
+        if (!updatedProfile) return sendError(reply, 404, 'Profile not found')
+
+        // Mark user as onboarded
+        user.isOnboarded = true
+        const updatedUser = await userService.updateUser(tx, user)
+        if (!updatedUser) return sendError(reply, 500, 'Failed to update user')
+        return updatedProfile
+      })
       const profile = UpdateProfilePayloadSchema.parse(updated)
+
       // Clear session to force re-fetch on next request, we need the roles updated
       await req.deleteSession()
       return reply.code(200).send({ success: true, profile })
@@ -130,17 +167,21 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       files = await req.saveRequestFiles({
         tmpdir: uploadTmpDir(),
         limits: {
-          fileSize: appConfig.IMAGE_MAX_SIZE, // Convert MB to bytes
+          fileSize: appConfig.IMAGE_MAX_SIZE,
           files: 1,
           fields: 1,
         },
       })
     } catch (err: any) {
-      fastify.log.warn('Upload error:', err)
+      fastify.log.warn('Upload error:', err, err.code)
       const maxSizeMiB = appConfig.IMAGE_MAX_SIZE / (1024 * 1024) // Convert bytes to MB
-      return sendError(reply, 400,
-        `The image is too large ${err.code === 'FST_ERR_MULTIPART_FILE_TOO_LARGE' ? ` ${maxSizeMiB}MB max` : ''}`
-      )
+
+      const reason =
+        err.code === 'FST_ERR_MULTIPART_FILE_TOO_LARGE'
+          ? `The uploaded image is too large. Maximum size is ${maxSizeMiB}MB.`
+          : 'Failed to upload image.'
+
+      return sendError(reply, 400, reason)
     }
 
     if (files.length === 0) return sendError(reply, 400, 'No file uploaded')
@@ -219,21 +260,8 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       fastify.log.error(err)
       return reply.code(500).send({ success: false })
     }
-  }),
+  })
 
-    fastify.get('/', { onRequest: [fastify.authenticate] }, async (req, reply) => {
-
-      if (!req.user.userId) return sendUnauthorizedError(reply)
-
-      try {
-        const profiles = await profileService.findProfilesFor(req.user.userId)
-        const mappedProfiles = profiles.map(p => mapProfileToPublic(p, getUserRoles(req)))
-        return reply.code(200).send({ success: true, profiles: mappedProfiles })
-      } catch (err) {
-        fastify.log.error(err)
-        return sendError(reply, 500, 'Failed to fetch profiles')
-      }
-    })
 }
 
 export default profileRoutes

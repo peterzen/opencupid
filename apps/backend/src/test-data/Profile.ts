@@ -15,7 +15,7 @@ import {
   makeImageLocation
 } from '@/lib/media';
 import { ProfileService } from '@/services/profile.service';
-import { ProfileComplete } from '@zod/profile.schema';
+import type { OwnerProfile, ProfileComplete } from '@zod/profile.schema';
 
 const imageService = ImageGalleryService.getInstance()
 const profileService = ProfileService.getInstance()
@@ -37,6 +37,7 @@ export function createRandomUser() {
     createdAt: faker.date.past(),
     lastLoginAt: faker.date.recent(),
     isRegistrationConfirmed: true,
+    hasActiveProfile: true,
     isActive: true,
     roles: roles
   };
@@ -54,6 +55,7 @@ export function createRandomProfile(user: User) {
 
     isActive: true,
     isDatingActive: isDatingActive,
+    isOnboarded: true,
     createdAt: faker.date.past(),
     updatedAt: faker.date.recent(),
   };

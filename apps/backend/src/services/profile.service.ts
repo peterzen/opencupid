@@ -64,37 +64,33 @@ export class ProfileService {
     })
   }
 
-  async updateProfile(userId: string, data: UpdateProfilePayload): Promise<UpdatedProfileFragment> {
+  async updateProfile(tx: Prisma.TransactionClient, userId: string, data: UpdateProfilePayload): Promise<UpdatedProfileFragment> {
     // 1) pull out the tags array
     const { tags, ...rest } = data;
 
-    // interactive $transaction callback
-    const updated = await prisma.$transaction(async (tx) => {
-      // 1) Update all scalar fields
-      const profile = await tx.profile.update({
-        where: { userId },
-        data: {
-          ...rest,
-          isActive: true, // TODO change this to isVisible when we have that field
-        },
+    // 1) Update all scalar fields
+    const updated = await tx.profile.update({
+      where: { userId },
+      data: {
+        ...rest,
+        isActive: true, // TODO change this to isVisible when we have that field
+      },
+    });
+
+    const profileId = updated.id;
+
+    // 2) Delete _all_ existing tag links for this profile
+    await tx.profileTag.deleteMany({
+      where: { profileId },
+    });
+
+    // 3) Re-create only the tags the user sent
+    if (tags && tags.length > 0) {
+      await tx.profileTag.createMany({
+        data: tags.map((tagId) => ({ profileId, tagId })),
+        skipDuplicates: true,
       });
-
-      const profileId = profile.id;
-
-      // 2) Delete _all_ existing tag links for this profile
-      await tx.profileTag.deleteMany({
-        where: { profileId },
-      });
-
-      // 3) Re-create only the tags the user sent
-      if (tags && tags.length > 0) {
-        await tx.profileTag.createMany({
-          data: tags.map((tagId) => ({ profileId, tagId })),
-          skipDuplicates: true,
-        });
-      }
-      return profile;
-    })
+    }
 
     return UpdatedProfileFragmentSchema.parse(updated)
   }

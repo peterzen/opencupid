@@ -7,6 +7,7 @@ import { type PublicProfile } from '@zod/profile.schema';
 
 import LoadingComponent from '@/components/LoadingComponent.vue';
 import ProfileCardComponent from '@/components/profiles/ProfileCardComponent.vue';
+import NoProfileInfoCTAComponent from '@/components/profiles/NoProfileInfoCTAComponent.vue';
 
 
 const profileStore = useProfileStore()
@@ -15,12 +16,23 @@ const profileStore = useProfileStore()
 const state = reactive({
   profiles: [] as PublicProfile[],
   isLoading: false,
+  error: null as string | null,
+  showModal: false,
 });
 
 onMounted(async () => {
   state.isLoading = true
-  state.profiles = await profileStore.findProfiles()
-  state.isLoading = false
+  try {
+    // Fetch profiles from the store
+    const profiles = await profileStore.findProfiles()
+    if (profiles != null) state.profiles = profiles;
+  } catch (error) {
+    state.error = 'Failed to fetch profiles';
+    state.showModal = true;
+    // console.error('Error fetching profiles:', error);
+  } finally {
+    state.isLoading = false;
+  }
 })
 
 const handleCardClick = (profile: PublicProfile) => {
@@ -33,19 +45,37 @@ const handleCardClick = (profile: PublicProfile) => {
 
 
 <template>
-  <div class="browse-profiles-view">
-    <LoadingComponent v-if="state.isLoading" />
+  <div>
+    <div class="container">
 
-    <div class="container-fluid">
-      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+      <div class="browse-profiles-view">
+        <LoadingComponent v-if="state.isLoading" />
 
-        <div v-for="profile in state.profiles"
-             :key="profile.id"
-             class="col">
-          <ProfileCardComponent :profile="profile"
-                                @click="handleCardClick(profile)" />
+        <div class="container-fluid">
+          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+
+            <div v-for="profile in state.profiles"
+                 :key="profile.id"
+                 class="col">
+              <ProfileCardComponent :profile="profile"
+                                    @click="handleCardClick(profile)" />
+            </div>
+          </div>
         </div>
       </div>
     </div>
+    <BModal v-model="state.showModal"
+            centered
+            button-size="sm"
+            :focus="false"
+            :no-close-on-backdrop="true"
+            :no-footer="true"
+            :no-header="true"
+            cancel-title="Nevermind"
+            initial-animation
+            title="Add a photo">
+      <NoProfileInfoCTAComponent v-if="state.error" />
+
+    </BModal>
   </div>
 </template>

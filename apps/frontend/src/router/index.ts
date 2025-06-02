@@ -6,6 +6,7 @@ import { useLocalStore } from '@/store/localStore';
 import { showToast } from '@/lib/toastify';
 
 import Login from '@/views/Login.vue';
+import UserHome from '@/views/UserHome.vue';
 import PublicProfile from '@/views/PublicProfile.vue';
 import Messaging from '@/views/Messaging.vue';
 import Onboarding from '@/views/Onboarding.vue';
@@ -23,6 +24,12 @@ const routes: Array<RouteRecordRaw> = [
     name: 'PublicProfile',
     component: PublicProfile,
     props: true,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/',
+    name: 'UserHome',
+    component: UserHome,
     meta: { requiresAuth: true }
   },
   {
@@ -67,13 +74,12 @@ router.beforeEach(async (to, from, next) => {
   }
 
   if (to.meta.requiresAuth === false && authStore.isLoggedIn) {
-    next({ name: 'UserHome' });
-    return
+    return next({ name: 'UserHome' });
   }
 
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
     // If the route requires authentication and the user is not logged in, redirect to login
-    next({ name: 'Login' });
+    return next({ name: 'Login' });
   } else {
     // Otherwise, allow access
     next();

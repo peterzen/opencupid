@@ -20,6 +20,13 @@ export function sendUnauthorizedError(
   return sendError(reply, 401, message)
 }
 
+export function sendForbiddenError(
+  reply: FastifyPluginAsync['prototype']['reply'],
+  message: string = 'Forbidden'
+) {
+  return sendError(reply, 403, message)
+}
+
 
 export function getUserRoles(req: FastifyRequest): UserRole[] {
   return req.session?.roles || []

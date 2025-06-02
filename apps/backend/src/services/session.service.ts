@@ -31,6 +31,8 @@ export class SessionService {
         hkey,
         'userId', data.userId,
         'lang', data.lang,
+        'isOnboarded', data.isOnboarded ? 'true' : 'false',
+        'hasActiveProfile', data.hasActiveProfile ? 'true' : 'false'
       )
       // Reset TTL on hash
       .expire(hkey, this.ttlSec)
@@ -61,6 +63,8 @@ export class SessionService {
       userId: hash.userId,
       lang: hash.lang || 'en',
       roles: roles as UserRole[],
+      isOnboarded: hash.isOnboarded === 'true',
+      hasActiveProfile: hash.hasActiveProfile === 'true',
     }
   }
 

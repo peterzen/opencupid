@@ -19,7 +19,7 @@ import DatingProfileForm from '@/components/profiles/DatingProfileForm.vue'
 const profileStore = useProfileStore()
 
 const state = reactive({
-  activeTab: 'dating' as ConnectionTypeType,
+  activeTab: 'friend' as ConnectionTypeType,
   isLoading: false,
   error: ''
 })
@@ -67,7 +67,10 @@ async function handleProfileFormSubmit(formData: ProfileFormSubmit) {
 onMounted(async () => {
   state.isLoading = true
   const fetched = await profileStore.getUserProfile()
-  Object.assign(profile, fetched)
+  Object.assign(profile, {
+    ...fetched,
+    isActive: true
+  })
   state.isLoading = false
 })
 
@@ -82,11 +85,9 @@ onMounted(async () => {
   <div class="container">
     <div class="row justify-content-center">
 
-      <ConnectionTypeSelector :isSocialActive="!!profile.isSocialActive"
-                              :isDatingActive="!!profile.isDatingActive"
+      <ConnectionTypeSelector :isDatingActive="!!profile.isDatingActive"
                               :activeTab="activeTab"
                               @update:selectTab="activeTab = $event"
-                              @update:isSocialActive="(val: boolean) => profile.isSocialActive = val"
                               @update:isDatingActive="(val: boolean) => profile.isDatingActive = val" />
 
 

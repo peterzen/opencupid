@@ -10,12 +10,6 @@ const props = defineProps({
 })
 </script>
 
-<style scoped>
-img {
-  object-fit: cover;
-}
-</style>
-
 
 <template>
   <div class="profile-image"
@@ -27,3 +21,13 @@ img {
     </div>
   </div>
 </template>
+<style scoped>
+
+
+img {
+  object-fit: cover;
+  filter: grayscale(100%) blur(5px);
+  opacity: 0.25;
+}
+</style>
+

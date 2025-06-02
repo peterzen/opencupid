@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify'
-import { SendOtpSchema, OtpLoginSchema } from '@zod/user.schema'
+import { SendOtpSchema, OtpLoginSchema, OtpSendReturn } from '@zod/user.schema'
 import { validateBody } from '../../utils/zodValidate'
 import { emailQueue } from '../../queues/emailQueue'
 import { UserService } from 'src/services/user.service'
@@ -80,7 +80,7 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
 
     const { user, isNewUser } = await userService.setUserOTP(data, otp, data.locale)
 
-    const userReturned = {
+    const userReturned: OtpSendReturn = {
       id: user.id,
       email: user.email,
       phonenumber: user.phonenumber,

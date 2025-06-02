@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { api } from '@/lib/api'
 import { UserSchema, type UserRoleType } from '@zod/generated'
-import { OwnerUserSchema, type AuthIdentifier, type SessionData } from '@zod/user.schema'
+import { OtpSendReturnSchema, OwnerUserSchema, type AuthIdentifier, type SessionData } from '@zod/user.schema'
 
 
 interface JwtPayload {
@@ -15,6 +15,7 @@ export const useAuthStore = defineStore('auth', {
     userId: null as string | null,
     email: null as string | null,
     isInitialized: false,
+    hasActiveProfile: false as boolean,
   }),
 
   getters: {
@@ -88,7 +89,7 @@ export const useAuthStore = defineStore('auth', {
       // console.log('Sending login link with data:', authId)
       try {
         const res = await api.post('/users/send-login-link', authId)
-        const user = OwnerUserSchema.parse(res.data.user)
+        const user = OtpSendReturnSchema.parse(res.data.user)
         // set userId in localStorage for the otplogin to pick up
         localStorage.setItem('uid', user.id)
         // Return the status flag for the frontend to handle
@@ -102,7 +103,7 @@ export const useAuthStore = defineStore('auth', {
     async fetchUser() {
       try {
         const res = await api.get('/users/me')
-        const user = UserSchema.parse(res.data.user)
+        const user = OwnerUserSchema.parse(res.data.user)
         // Return the status flag for the frontend to handle
         return { success: true, user, error: null };
       } catch (error: any) {

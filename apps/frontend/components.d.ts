@@ -29,6 +29,7 @@ declare module 'vue' {
     LogoutButton: typeof import('./src/components/LogoutButton.vue')['default']
     ModalDialogComponent: typeof import('./src/components/ModalDialogComponent.vue')['default']
     Navbar: typeof import('./src/components/Navbar.vue')['default']
+    NoProfileInfoCTAComponent: typeof import('./src/components/profiles/NoProfileInfoCTAComponent.vue')['default']
     OtpLoginComponent: typeof import('./src/components/auth/OtpLoginComponent.vue')['default']
     ProfileCardComponent: typeof import('./src/components/profiles/ProfileCardComponent.vue')['default']
     ProfileForm: typeof import('./src/components/profiles/ProfileForm.vue')['default']

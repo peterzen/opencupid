@@ -80,6 +80,8 @@ export default fp(async (fastify: FastifyInstance) => {
         lang: user.language || 'en', // Default to 'en' if no language is set
         roles: user.roles,
         userId: user.id,
+        isOnboarded: user.isOnboarded || false,
+        hasActiveProfile: user.hasActiveProfile || false,
       }
       sess = await sessionService.getOrCreate(sessionId, sessionData)
     } else {

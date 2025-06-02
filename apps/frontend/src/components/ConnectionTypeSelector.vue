@@ -8,25 +8,16 @@ const { t } = useI18n()
 
 // Props
 const props = defineProps<{
-  isSocialActive: boolean
   isDatingActive: boolean
   activeTab: ConnectionTypeType
 }>()
 
 // Emits
 const emit = defineEmits<{
-  (e: 'update:isSocialActive', val: boolean): void
   (e: 'update:isDatingActive', val: boolean): void
   (e: 'update:selectTab', tab: ConnectionTypeType): void
 }>()
 
-// Computed disabling logic
-const friendsToggleDisabled = computed(() =>
-  props.isSocialActive && !props.isDatingActive
-)
-const datingToggleDisabled = computed(() =>
-  props.isDatingActive && !props.isSocialActive
-)
 
 </script>
 
@@ -37,11 +28,7 @@ const datingToggleDisabled = computed(() =>
       <span class="nav-link text-start"
             :class="{ active: activeTab === 'friend' }">
 
-        <ToggleSwitch value="friend"
-                      :disabled="false"
-                      label=""
-                      @update:modelValue="val => $emit('update:isSocialActive', val)"
-                      :modelValue="isSocialActive" />
+      
         <a class="tab-switch"
            @click="$emit('update:selectTab', 'friend')">
           {{ t('general.connectiontypes.socializing') }}

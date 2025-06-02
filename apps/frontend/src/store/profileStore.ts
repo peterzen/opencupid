@@ -120,26 +120,44 @@ export const useProfileStore = defineStore('profile', {
     },
 
     // Fetch a profile by ID
-    async getPublicProfile(profileId: string): Promise<PublicProfile> {
+    async getPublicProfile(profileId: string): Promise<PublicProfile | null> {
       try {
         const res = await api.get(`/profiles/${profileId}`)
         return PublicProfileSchema.parse(res.data.profile)
         // return res.data.profile
       } catch (error: any) {
-        console.error('Failed to fetch profile:', error)
-        throw error.response?.data?.message || 'Failed to fetch profile'
+        // console.error('Failed to fetch profile:', error)
+
+        const status = error?.response?.status
+        const message = error?.response?.data?.message || 'Failed to fetch profile'
+
+        if (status === 403) {
+          // You can throw a custom error, trigger a redirect, show a modal, etc.
+          // throw new Error('You are not authorized to view this profile.')
+          throw error.response?.data?.message || 'Failed to fetch profile'
+        }
       }
+      return null
     },
 
-    async findProfiles(): Promise<PublicProfile[]> {
+    async findProfiles(): Promise<PublicProfile[] | null> {
       try {
         const res = await api.get('/profiles')
         const profiles = res.data.profiles.map((p: any) => PublicProfileSchema.parse(p))
         return profiles
       } catch (error: any) {
-        console.error('Failed to fetch profiles:', error)
-        throw error.response?.data?.message || 'Failed to fetch profiles'
+        // console.error('Failed to fetch profiles:', error)
+
+        const status = error?.response?.status
+        const message = error?.response?.data?.message || 'Failed to fetch profile'
+
+        if (status === 403) {
+          // You can throw a custom error, trigger a redirect, show a modal, etc.
+          // throw new Error('You are not authorized to view this profile.')
+          throw error.response?.data?.message || 'Failed to fetch profile'
+        }
       }
+      return null
     }
   },
 })

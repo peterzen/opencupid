@@ -22,8 +22,8 @@ const baseFields = {
   cityName: true,
   country: true,
   work: true,
+  isActive: true,
   isDatingActive: true,
-  isSocialActive: true,
 } as const;
 
 const publicDatingProfileFields = {

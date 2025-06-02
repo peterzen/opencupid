@@ -12,7 +12,7 @@ const profileStore = useProfileStore()
 const preview = ref<string | null>(null)
 const selectedFile = ref<File | null>(null)
 const isLoading = ref(false)
-const error = ref<string | null>(null)
+const error = ref<string | null>('')
 const fileInput = ref<HTMLInputElement>()
 const modalOpen = ref(false)
 const captionText = ref<string>('')
@@ -52,7 +52,7 @@ function handleFileChange(event: Event) {
 async function handleUpload() {
   if (!selectedFile.value) return
   isLoading.value = true
-  error.value = null
+  error.value = ''
 
   const res = await profileStore.uploadProfileImage(selectedFile.value, captionText.value)
 

@@ -24,7 +24,9 @@ export type SendOtpPayload = z.infer<typeof SendOtpSchema>
 export const SessionDataSchema = z.object({
   userId: z.string(),
   lang: z.string(),
-  roles: z.array(UserRoleSchema)
+  roles: z.array(UserRoleSchema),
+  isOnboarded: z.boolean().default(false),
+  hasActiveProfile: z.boolean().default(false),
 })
 
 export type SessionData = z.infer<typeof SessionDataSchema>
@@ -34,10 +36,21 @@ export const OwnerUserSchema = UserSchema.pick({
   email: true,
   phonenumber: true,
   language: true,
+  isOnboarded: true,
+  hasActiveProfile: true,
   isRegistrationConfirmed: true,
 })
 export type OwnerUser = z.infer<typeof OwnerUserSchema>
 
+
+export const OtpSendReturnSchema = UserSchema.pick({
+  id: true,
+  email: true,
+  phonenumber: true,
+  isRegistrationConfirmed: true,
+  language: true,
+})
+export type OtpSendReturn = z.infer<typeof OtpSendReturnSchema>
 
 export const OtpLoginSchema = z.object({
   userId: z.string().cuid(),
