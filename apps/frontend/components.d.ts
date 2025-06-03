@@ -10,14 +10,18 @@ declare module 'vue' {
   export interface GlobalComponents {
     AuthIdComponent: typeof import('./src/components/auth/AuthIdComponent.vue')['default']
     BBadge: typeof import('bootstrap-vue-next/components/BBadge')['BBadge']
+    BButton: typeof import('bootstrap-vue-next/components/BButton')['BButton']
+    BCard: typeof import('bootstrap-vue-next/components/BCard')['BCard']
     BCarousel: typeof import('bootstrap-vue-next/components/BCarousel')['BCarousel']
     BCarouselSlide: typeof import('bootstrap-vue-next/components/BCarousel')['BCarouselSlide']
+    BCollapse: typeof import('bootstrap-vue-next/components/BCollapse')['BCollapse']
     BModal: typeof import('bootstrap-vue-next/components/BModal')['BModal']
     CaptchaWidget: typeof import('./src/components/auth/CaptchaWidget.vue')['default']
     ConnectionTypeSelector: typeof import('./src/components/ConnectionTypeSelector.vue')['default']
     DatingFilter: typeof import('./src/components/profiles/DatingFilter.vue')['default']
     DatingProfileForm: typeof import('./src/components/profiles/DatingProfileForm.vue')['default']
     ErrorComponent: typeof import('./src/components/ErrorComponent.vue')['default']
+    GenderPickerComponent: typeof import('./src/components/profiles/GenderPickerComponent.vue')['default']
     GenderSymbol: typeof import('./src/components/profiles/GenderSymbol.vue')['default']
     IconCommunity: typeof import('./src/components/icons/IconCommunity.vue')['default']
     IconDocumentation: typeof import('./src/components/icons/IconDocumentation.vue')['default']
@@ -43,5 +47,8 @@ declare module 'vue' {
     SubmitButtonComponent: typeof import('./src/components/SubmitButtonComponent.vue')['default']
     TagSelectComponent: typeof import('./src/components/profiles/TagSelectComponent.vue')['default']
     ToggleSwitch: typeof import('./src/components/ToggleSwitch.vue')['default']
+  }
+  export interface ComponentCustomProperties {
+    vBToggle: typeof import('bootstrap-vue-next/directives/BToggle')['vBToggle']
   }
 }

@@ -48,7 +48,7 @@ export const GenderSchema = z.enum(['male','female','agender','androgynous','big
 
 export type GenderType = `${z.infer<typeof GenderSchema>}`
 
-export const PronounsSchema = z.enum(['he_him','she_her','they_them','other','unspecified']);
+export const PronounsSchema = z.enum(['he_him','she_her','they_them','unspecified']);
 
 export type PronounsType = `${z.infer<typeof PronounsSchema>}`
 

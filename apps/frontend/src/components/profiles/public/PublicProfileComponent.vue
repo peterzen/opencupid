@@ -4,6 +4,10 @@ import { getLanguageList } from '@/lib/languages';
 import { PublicProfile } from '@zod/profile.schema';
 import { computed } from 'vue';
 import { countryCodeToName } from '@/lib/countries';
+import { getPronounsOptions, getRelationshipStatusOptions } from '@/lib/i18n';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n()
 
 
 const props = defineProps<{
@@ -42,22 +46,33 @@ const hasKidsLabel = computed(() => {
   return 'No kids'
 })
 
-const relationshipStatusLabels = {
-  single: 'Single',
-  in_relationship: 'In a relationship',
-  married: 'Married',
-  divorced: 'Divorced',
-  widowed: 'Widowed',
-  other: "Other (it's complicated)",
-  unspecified: '',
-}
+const relationshipStatusLabels = getRelationshipStatusOptions(t)
+
 
 const relationshipStatusLabel = computed(() => {
   if (!props.profile.isDatingActive) return ''
-  if (!props.profile.relationship) return ''
+  if (!props.profile.relationship || props.profile.relationship==='unspecified') return ''
 
-  return relationshipStatusLabels[props.profile.relationship] || ''
+  const rel = props.profile.relationship
+  if (!rel) return ''
+  const r = relationshipStatusLabels.find((v) => v.value === rel) || ''
+  if (!r) return ''
+  return r.label || ''
 })
+
+const pronounsOptions = getPronounsOptions(t)
+
+const pronounsLabel = computed(() => {
+  if (!props.profile.isDatingActive) return ''
+  if (!props.profile.pronouns || props.profile.pronouns==='unspecified') return ''
+
+  const rel = props.profile.pronouns
+  if (!rel) return ''
+  const r = pronounsOptions.find((v) => v.value === rel) || ''
+  if (!r) return ''
+  return r.label || ''
+})
+
 
 </script>
 
@@ -79,13 +94,16 @@ const relationshipStatusLabel = computed(() => {
         </div>
         <div class="publicname-wrapper">
           <span class="fw-bolder fs-2">{{ props.profile.publicName }}</span>
-          <div v-if="props.profile.isDatingActive">
-            <span class="fs-4 text-muted">
+          <span v-if="props.profile.isDatingActive">
+            <span class="text-muted fs-5">
               ({{ age }}
               <GenderSymbol v-if="props.profile.gender"
-                            :gender="props.profile.gender" />)
+                            :gender="props.profile.gender" />
+                            
+                            <span v-if="props.profile.pronouns && pronounsLabel"
+                                  class="ms-2">{{  pronounsLabel }}</span>)
             </span>
-          </div>
+          </span>
         </div>
         <div class="location fs-5">
 

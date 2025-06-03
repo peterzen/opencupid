@@ -30,25 +30,17 @@
     "unspecified": "I'd rather not say"
   },
   "pronouns": {
-    "subject": {
-      "he_him": "He",
-      "she_her": "She",
-      "they_them": "They",
-      "other": "Other",
-      "unspecified": "I'd rather not say"
-    },
-    "object": {
-      "he_him": "Him",
-      "she_her": "Her",
-      "they_them": "Them",
-      "other": "Other",
-      "unspecified": "I'd rather not say"
-    }
+    "he_him": "He/him",
+    "she_her": "She/her",
+    "they_them": "They/them",
+    "unspecified": "The default is fine"
   },
   "relationship": {
     "single": "Single",
     "in_relationship": "In a relationship",
     "married": "Married",
+    "divorced": "Divorced",
+    "widowed": "Widowed",
     "other": "Other (it's complicated)",
     "unspecified": "I'd rather not say"
   },

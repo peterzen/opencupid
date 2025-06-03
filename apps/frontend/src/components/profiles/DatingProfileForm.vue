@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { reactive, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getGenderOptions, getHasKidsOptionsOptions, getRelationshipStatusOptions } from '@/lib/i18n'
+import { getHasKidsOptionsOptions, getRelationshipStatusOptions } from '@/lib/i18n'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import { type OwnerProfile } from '@zod/profile.schema'
+import GenderPickerComponent from './GenderPickerComponent.vue'
 
 const state = reactive({
   error: ''
@@ -51,15 +52,19 @@ const birthYearMax = computed(() => {
 
 
 // Options for selects/radios
-const genderOptions = getGenderOptions(t)
 const relationshipStatusOptions = getRelationshipStatusOptions(t)
 const haveKidsRadioOptions = getHasKidsOptionsOptions(t)
 
+function handleGenderUpdate(value: OwnerProfile) {
+  const changed = { ...formData, ...value }
+  emit('update:modelValue', changed)
+}
+
 // Submit handler
 function handleSubmit() {
-   const payload = { ...formData }
-   emit('submit', payload)
- }
+  const payload = { ...formData }
+  emit('submit', payload)
+}
 
 
 </script>
@@ -112,11 +117,7 @@ function handleSubmit() {
         </div>
 
         <div class="mb-3">
-          <FormKit v-model="formData.gender!"
-                   type="radio"
-                   label=""
-                   :options="genderOptions"
-                   help="I identify as..." />
+          <GenderPickerComponent :modelValue="modelValue" @update:modelValue="handleGenderUpdate"/>
 
           <!-- <Multiselect v-model="gender"
                      :options="genderOptions"
