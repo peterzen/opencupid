@@ -31,6 +31,7 @@ declare module 'vue' {
     ImageEditor: typeof import('./src/components/profiles/ImageEditor.vue')['default']
     ImageUpload: typeof import('./src/components/profiles/ImageUpload.vue')['default']
     LoadingComponent: typeof import('./src/components/LoadingComponent.vue')['default']
+    LocationSelectorComponent: typeof import('./src/components/profiles/LocationSelectorComponent.vue')['default']
     LoginConfirmComponent: typeof import('./src/components/auth/LoginConfirmComponent.vue')['default']
     LogoutButton: typeof import('./src/components/nav/LogoutButton.vue')['default']
     ModalDialogComponent: typeof import('./src/components/ModalDialogComponent.vue')['default']

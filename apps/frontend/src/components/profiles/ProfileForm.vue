@@ -2,7 +2,6 @@
 import { reactive, ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { getCountryOptions } from '@/lib/countries';
 import { getLanguageSelectorOptions, type MultiselectOption } from '@/lib/languages';
 
 import type { OwnerProfile } from '@zod/profile.schema';
@@ -12,6 +11,7 @@ import Multiselect from 'vue-multiselect'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import TagSelectComponent from '@/components/profiles/TagSelectComponent.vue'
 import ImageEditor from './ImageEditor.vue'
+import LocationSelectorComponent from './LocationSelectorComponent.vue'
 
 // Props & Emits
 const props = defineProps<{
@@ -40,11 +40,6 @@ watch(
 )
 
 // Computed proxies for multiselect v-models
-const countrySelectOptions = getCountryOptions()
-const country = computed({
-  get: () => countrySelectOptions.find((o) => o.value === formData.country),
-  set: (opt: any) => { formData.country = opt.value },
-})
 
 const languageOptions = reactive([] as MultiselectOption[])
 const languages = computed({
@@ -66,6 +61,16 @@ function handleImageUpdate(val: any) {
   Object.assign(formData, {
     ...formData,
     profileImages: val.profileImages,
+  })
+  emit('update:modelValue', formData)
+}
+
+function handleLocationUpdate(val: any) {
+  Object.assign(formData, {
+    ...formData,
+    country: val.country,
+    // cityId: val.cityId,
+    cityName: val.cityName,
   })
   emit('update:modelValue', formData)
 }
@@ -122,31 +127,8 @@ onMounted(() => {
         </div>
 
         <div class="mb-4">
-          <Multiselect v-model="country"
-                       :options="countrySelectOptions"
-                       :close-on-select="true"
-                       :clear-on-select="false"
-                       open-direction="bottom"
-                       :required="true"
-                       placeholder="I'm from..."
-                       label="label"
-                       track-by="label" />
-        </div>
-
-        <div class="mb-4">
-          <FormKit type="text"
-                   v-model="formData.cityName"
-                   label="My city..."
-                   id="city"
-                   input-class="form-control-lg"
-                   :validation="[['required'], ['matches', /^[\p{L}]+(?:['-][\p{L}]+)*(?:\s+[\p{L}]+(?:['-][\p{L}]+)*)*$/u]]"
-                   validation-visibility="blur"
-                   :validation-messages="{
-                    matches: 'Hmm, that does not look like a city name?',
-                    required: 'Please enter your name',
-                    min: 'Name must be at least 2 characters long',
-                    max: 'Name must be less than 50 characters long'
-                  }" />
+          <LocationSelectorComponent :modelValue="modelValue"
+                                     @update:modelValue="handleLocationUpdate" />
         </div>
 
         <div class="mb-3">
