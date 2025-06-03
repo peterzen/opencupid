@@ -36,6 +36,8 @@ declare module 'vue' {
     ProfileCardComponent: typeof import('./src/components/profiles/ProfileCardComponent.vue')['default']
     ProfileForm: typeof import('./src/components/profiles/ProfileForm.vue')['default']
     ProfileImageComponent: typeof import('./src/components/profiles/ProfileImageComponent.vue')['default']
+    PublicProfileComponent: typeof import('./src/components/profiles/public/PublicProfileComponent.vue')['default']
+    RouteLink: typeof import('./src/components/nav/RouteLink.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SubmitButtonComponent: typeof import('./src/components/SubmitButtonComponent.vue')['default']

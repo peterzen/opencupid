@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, onMounted, ref } from 'vue';
+import { reactive, onMounted,ref} from 'vue';
 import type { PublicProfile } from '@zod/profile.schema'
 import { useProfileStore } from '@/store/profileStore';
 
@@ -8,19 +8,13 @@ import PublicProfileComponent from '@/components/profiles/public/PublicProfileCo
 
 const profileStore = useProfileStore()
 
-// Props
-const props = defineProps<{
-  slug: string
-}>()
-
 // Local state
 const isLoading = ref(false)
 const profile = reactive<PublicProfile>({} as PublicProfile)
 
 onMounted(async () => {
   isLoading.value = true
-  const profileId = props.slug
-  const fetched = await profileStore.getPublicProfile(profileId)
+  const fetched = await profileStore.getUserProfile()
   Object.assign(profile, fetched)
   isLoading.value = false
 })
@@ -31,6 +25,7 @@ onMounted(async () => {
 
 
 <template>
+
   <div class="container">
     <LoadingComponent v-if="isLoading" />
     <PublicProfileComponent :profile

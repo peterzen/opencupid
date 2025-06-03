@@ -12,5 +12,5 @@ const props = defineProps<{
 
 
 <template>
-  <slot v-if="profile.isDatingActive" />
+  <slot v-if="props.profile.isDatingActive" />
 </template>
