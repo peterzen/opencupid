@@ -62,15 +62,18 @@ function handleTagsChange(selected: PublicTag[]) {
   formData.tags = [...selected]                // replace array reactively
 }
 
+function handleImageUpdate(val: any) {
+  Object.assign(formData, {
+    ...formData,
+    profileImages: val.profileImages,
+  })
+  emit('update:modelValue', formData)
+}
+
 // Submit handler
 function handleSubmit() {
   const payload = { ...formData }
   emit('submit', payload)
-}
-
-function handleImageUpdate(val: any) {
-  Object.assign(formData, val)
-  emit('update:modelValue', formData)
 }
 
 
@@ -87,10 +90,10 @@ onMounted(() => {
   <div class="col-md-8 offset-md-2">
 
 
-        <div class="mb-4 ">
-          <ImageEditor :modelValue="modelValue"
-                       @update:modelValue="handleImageUpdate" />
-        </div>
+    <div class="mb-4 ">
+      <ImageEditor :modelValue="modelValue"
+                   @update:modelValue="handleImageUpdate" />
+    </div>
 
     <FormKit type="form"
              :actions="false"
@@ -105,7 +108,8 @@ onMounted(() => {
                    v-model="formData.publicName"
                    label="My name is..."
                    id="publicName"
-                   :floating-label="true"
+                   autofocus
+                   autocomplete="off"
                    input-class="form-control-lg"
                    :validation="[['required'], ['matches', /^[\p{L}]+(?:['-][\p{L}]+)*(?:\s+[\p{L}]+(?:['-][\p{L}]+)*)*$/u]]"
                    validation-visibility="blur"

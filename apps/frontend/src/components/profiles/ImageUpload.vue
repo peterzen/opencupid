@@ -102,6 +102,7 @@ async function handleRemovePreview() {
              :file-remove-icon="false"
              label="Add profile photo"
              label-class="btn btn-primary"
+             inner-class="$reset d-none"
              :multiple="false">
       <template #label>
         <label class="formkit-label file-upload-label btn btn-secondary"
@@ -172,7 +173,6 @@ async function handleRemovePreview() {
 
 <style lang="scss">
 .image-upload {
-
   .formkit-no-files,
   .formkit-file-list,
   .formkit-inner {
