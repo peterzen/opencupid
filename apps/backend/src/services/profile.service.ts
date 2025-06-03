@@ -68,21 +68,16 @@ export class ProfileService {
     // 1) pull out the tags array
     const { tags, ...rest } = data;
 
-    // 1) Update all scalar fields
-    const updated = await tx.profile.update({
+    const current = await tx.profile.findUnique({
+      select: { id: true },
       where: { userId },
-      data: {
-        ...rest,
-        isActive: true, // TODO change this to isVisible when we have that field
-      },
-      include: {
-        tags: {
-          include: { tag: true },
-        },
-      },
-    });
+    })
 
-    const profileId = updated.id;
+    if (!current) {
+      throw new Error(`Profile not found for userId: ${userId}`)
+    }
+
+    const profileId = current.id;
 
     // 2) Delete _all_ existing tag links for this profile
     await tx.profileTag.deleteMany({
@@ -97,7 +92,20 @@ export class ProfileService {
       });
     }
 
-    return updated// UpdatedProfileFragmentSchema.parse(updated)
+    // 1) Update all scalar fields
+    const updated = await tx.profile.update({
+      where: { userId },
+      data: {
+        ...rest,
+        isActive: true, // TODO change this to isVisible when we have that field
+      },
+      include: {
+        tags: {
+          include: { tag: true },
+        },
+      },
+    });
+    return updated
   }
 
 

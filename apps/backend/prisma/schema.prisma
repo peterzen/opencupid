@@ -74,6 +74,8 @@ enum RelationshipStatus {
   single
   in_relationship
   married
+  divorced
+  widowed
   other
   unspecified
 }

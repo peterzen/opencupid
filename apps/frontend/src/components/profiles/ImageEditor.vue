@@ -46,7 +46,6 @@ async function handleDelete(image: OwnerProfileImage) {
   isRemoving[image.id] = true
 
   const res = await profileStore.deleteImage(image)
-  console.log('Delete response:', res)
   if (!res.success) {
     error.value = res.message
     isRemoving[image.id] = false
@@ -58,7 +57,6 @@ async function handleDelete(image: OwnerProfileImage) {
 
 async function handleUploaded(updatedProfile: OwnerProfile) {
   Object.assign(formData, updatedProfile)
-
   emit('update:modelValue', formData)
 }
 

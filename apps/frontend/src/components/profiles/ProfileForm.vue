@@ -36,7 +36,7 @@ const error = ref('')
 watch(
   () => props.modelValue,
   (newVal) => Object.assign(formData, newVal),
-  { deep: true }
+  { deep: true, immediate: true }
 )
 
 // Computed proxies for multiselect v-models
@@ -46,7 +46,6 @@ const country = computed({
   set: (opt: any) => { formData.country = opt.value },
 })
 
-
 const languageOptions = reactive([] as MultiselectOption[])
 const languages = computed({
   get: () => (formData.languages ?? []).map(
@@ -54,23 +53,31 @@ const languages = computed({
   ),
   set: (options: MultiselectOption[]) => { formData.languages = options.map((opt) => opt.value) },
 })
+
+const haveImages = computed(() => {
+  return formData.profileImages && formData.profileImages.length > 0
+})
+
 function handleTagsChange(selected: PublicTag[]) {
   formData.tags = [...selected]                // replace array reactively
-  emit('update:modelValue', { ...formData })   // emit a fresh copy
 }
 
 // Submit handler
 function handleSubmit() {
   const payload = { ...formData }
-  console.log('ProfileForm submit payload:', payload)
   emit('submit', payload)
 }
 
+function handleImageUpdate(val: any) {
+  Object.assign(formData, val)
+  emit('update:modelValue', formData)
+}
+
+
 onMounted(() => {
-  // Ensure formData is initialized with modelValue on mount
-  // Object.assign(formData, props.modelValue)
   languageOptions.push(...getLanguageSelectorOptions())
 })
+
 </script>
 
 
@@ -80,6 +87,11 @@ onMounted(() => {
   <div class="col-md-8 offset-md-2">
 
 
+        <div class="mb-4 ">
+          <ImageEditor :modelValue="modelValue"
+                       @update:modelValue="handleImageUpdate" />
+        </div>
+
     <FormKit type="form"
              :actions="false"
              :disabled="isLoading"
@@ -87,11 +99,6 @@ onMounted(() => {
              @submit="handleSubmit">
 
       <fieldset :disabled="!modelValue.isActive || isLoading">
-
-        <div class="mb-4 ">
-          <ImageEditor :modelValue="formData"
-                       @update:modelValue="val => Object.assign(formData, val)" />
-        </div>
 
         <div class="mb-4">
           <FormKit type="text"
@@ -196,7 +203,7 @@ onMounted(() => {
                wrapper-class="d-grid gap-2 mb-3"
                input-class="btn-primary btn-lg"
                label="Save"
-               :disabled="!valid || props.isLoading" />
+               :disabled="!valid || !haveImages || props.isLoading" />
 
     </FormKit>
   </div>

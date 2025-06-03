@@ -9,6 +9,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AuthIdComponent: typeof import('./src/components/auth/AuthIdComponent.vue')['default']
+    BBadge: typeof import('bootstrap-vue-next/components/BBadge')['BBadge']
     BCarousel: typeof import('bootstrap-vue-next/components/BCarousel')['BCarousel']
     BCarouselSlide: typeof import('bootstrap-vue-next/components/BCarousel')['BCarouselSlide']
     BModal: typeof import('bootstrap-vue-next/components/BModal')['BModal']
@@ -17,6 +18,7 @@ declare module 'vue' {
     DatingFilter: typeof import('./src/components/profiles/DatingFilter.vue')['default']
     DatingProfileForm: typeof import('./src/components/profiles/DatingProfileForm.vue')['default']
     ErrorComponent: typeof import('./src/components/ErrorComponent.vue')['default']
+    GenderSymbol: typeof import('./src/components/profiles/GenderSymbol.vue')['default']
     IconCommunity: typeof import('./src/components/icons/IconCommunity.vue')['default']
     IconDocumentation: typeof import('./src/components/icons/IconDocumentation.vue')['default']
     IconEcosystem: typeof import('./src/components/icons/IconEcosystem.vue')['default']

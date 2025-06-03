@@ -135,7 +135,6 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       const updated = await fastify.prisma.$transaction(async (tx) => {
 
         const updatedProfile = await profileService.updateProfile(tx, req.user.userId, data)
-        // is this correctly handled here - will updateProfile be returning meaningful result from tx.profile.update() ?
         // if (!updatedProfile) return sendError(reply, 404, 'Profile not found')
 
         // Mark user as onboarded

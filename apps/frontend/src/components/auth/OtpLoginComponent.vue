@@ -3,6 +3,10 @@ import { ref } from 'vue'
 import { type OwnerUser } from '@zod/user.schema'
 import { otpRegex } from '@/lib/utils';
 
+import { IconMail } from '@/components/icons/DoodleIcons'
+import { IconMessage } from '@/components/icons/DoodleIcons'
+
+
 const props = defineProps<{
   user: OwnerUser
   isLoading: boolean
@@ -35,9 +39,27 @@ function validateOtp(node: any) {
 
 <template>
   <div class="otp-form">
-    <h2>Check your email</h2>
-    <p>We have sent you a login link. Please check your inbox.</p>
-    <p>If you don't see it, please check your spam folder.</p>
+    <div class="fs-4 mb-3">
+      <span class="text-muted opacity-50">
+        <span v-if="user.phonenumber">
+          <IconMessage class="svg-icon" />
+        </span>
+        <span v-else>
+          <IconMail class="svg-icon" />
+        </span>
+      </span>
+      Check your messages
+    </div>
+    <div class="mb-3 form-text mb-3">
+      <div v-if="user.phonenumber">
+        We have sent you a little code to your phone number,
+        please enter it below.
+      </div>
+      <div v-else>
+        We have sent you a login link, check your inbox.
+        If you don't see it, please check your spam folder.
+      </div>
+    </div>
 
     <FormKit type="form"
              id="otpForm"
@@ -50,7 +72,6 @@ function validateOtp(node: any) {
         <FormKit type="text"
                  v-model="otpInput"
                  label="Login code..."
-                 help="Please enter the code in the message"
                  id="otp"
                  :floating-label="true"
                  input-class="form-control-lg"

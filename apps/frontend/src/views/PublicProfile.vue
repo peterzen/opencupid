@@ -43,6 +43,27 @@ const languages = computed(() => {
   return getLanguageList(profile.languages)
 });
 
+const hasKidsLabel = computed(() => {
+  if (!profile.hasKids || profile.hasKids === 'unspecified') return ''
+  if (profile.hasKids === 'yes') return 'Has kids'
+  return 'No kids'
+})
+
+const relationshipStatusLabels = {
+  single: 'Single',
+  in_relationship: 'In a relationship',
+  married: 'Married',
+  divorced: 'Divorced',
+  widowed: 'Widowed',
+  other: "Other (it's complicated)",
+  unspecified: '',
+}
+
+const relationshipStatusLabel = computed(() => {
+  if (!profile.relationship) return ''
+  return relationshipStatusLabels[profile.relationship] || ''
+})
+
 onMounted(async () => {
   state.isLoading = true
   const profileId = props.slug
@@ -95,7 +116,7 @@ onMounted(async () => {
                 :key="tag.slug"
                 class="me-2">
               <BBadge variant="warning">{{ tag.name }}</BBadge>
-              </li>
+            </li>
           </ul>
         </div>
 
@@ -109,22 +130,29 @@ onMounted(async () => {
             <li v-for="lang in languages"
                 :key="lang.value"
                 class="me-2">
-              <BBadge variant="info">{{ lang.label }}</BBadge>
+              <BBadge variant="secondary">{{ lang.label }}</BBadge>
             </li>
           </ul>
         </div>
 
         <DatingFilter :profile="profile">
-          <div class="dating-basics">
+          <div class="dating-basics mb-3">
+            <div class="introDating mb-3">
+              {{ profile.introDating }}
+            </div>
 
-          </div>
-
-          <div class="introDating mb-3">
-            {{ profile.introDating }}
+            <ul class="list-unstyled mb-2 d-flex flex-wrap align-items-center">
+              <li v-if="profile.relationship"
+                  class="me-2">
+                <BBadge variant="info">{{ relationshipStatusLabel }}</BBadge>
+              </li>
+              <li v-if="profile.hasKids"
+                  class="me-2">
+                <BBadge variant="info">{{ hasKidsLabel }}</BBadge>
+              </li>
+            </ul>
           </div>
         </DatingFilter>
-
-
       </div>
     </div>
   </div>

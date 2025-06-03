@@ -1,30 +1,33 @@
-
 <script lang="ts" setup>
 import { GenderType } from '@zod/generated';
 import { genderIcons } from './genderIcons';
-
 
 const props = defineProps<{
   gender: GenderType
 }>()
 
 const IconComponent = genderIcons[props.gender]
-
-
-
-
 </script>
 
 <template>
-
-  <component :is="IconComponent" class="gender-icon" />
-
+  <span class="icon-wrapper">
+    <component :is="IconComponent"
+               v-if="gender && gender !== 'unspecified'"
+               class="svg-icon gender-icon" />
+  </span>
 </template>
 
 <style scoped>
+.icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+}
 .gender-icon {
-  width: 2rem;
-  height: 2rem;
+  height: 0.75em;
+  opacity: 0.5;
   fill: currentColor;
 }
 </style>

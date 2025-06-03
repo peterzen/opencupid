@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import type { SendOtpPayload } from '@zod/user.schema'
 import { emailRegex, phoneRegex } from '@/lib/utils';
 import CaptchaWidget from './CaptchaWidget.vue';
+import { IconMail, IconPhone, IconTick } from '@/components/icons/DoodleIcons';
 
 const props = defineProps<{
   isLoading: boolean
@@ -90,16 +90,16 @@ const authIdInputRef = ref<InstanceType<any> | null>(null)
                  validation-visibility="live">
           <template #suffixIcon>
             <div class="suffix-icon">
-
-              <FontAwesomeIcon icon="check"
-                               v-if="valid"
-                               class="text-success" />
+              <span class="text-success"
+                    v-if="valid">
+                <IconTick class="svg-icon" />
+              </span>
               <span class="text-muted"
                     v-else>
-                <FontAwesomeIcon icon="envelope"
-                                 v-if="authIdInput.includes('@')" />
-                <FontAwesomeIcon icon="phone"
-                                 v-else-if="authIdInput.startsWith('+')" />
+                <IconMail class="svg-icon"
+                          v-if="authIdInput.includes('@')" />
+                <IconPhone class="svg-icon"
+                           v-else-if="authIdInput.startsWith('+')" />
               </span>
             </div>
           </template>
@@ -129,11 +129,15 @@ const authIdInputRef = ref<InstanceType<any> | null>(null)
 
 .suffix-icon {
   position: absolute;
-  top: 0.75em;
+  top: 0.5em;
   right: 1em;
 }
 
 .formkit-input {
   padding-right: 3.5rem;
+}
+
+.svg-icon {
+  fill: currentColor;
 }
 </style>

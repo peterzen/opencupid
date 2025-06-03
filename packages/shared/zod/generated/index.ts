@@ -60,7 +60,7 @@ export const PreferenceGenderSchema = z.enum(['male','female','non_binary','any'
 
 export type PreferenceGenderType = `${z.infer<typeof PreferenceGenderSchema>}`
 
-export const RelationshipStatusSchema = z.enum(['single','in_relationship','married','other','unspecified']);
+export const RelationshipStatusSchema = z.enum(['single','in_relationship','married','divorced','widowed','other','unspecified']);
 
 export type RelationshipStatusType = `${z.infer<typeof RelationshipStatusSchema>}`
 

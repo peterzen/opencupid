@@ -8,17 +8,24 @@ import OtpLoginComponent from '@/components/auth/OtpLoginComponent.vue'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import LoginConfirmComponent from '@/components/auth/LoginConfirmComponent.vue'
 
+import ChevronLeftIcon from '@/assets/icons/arrows/arrow-single-left.svg'
+import MailIcon from '@/assets/icons/interface/mail.svg'
+import MessageIcon from '@/assets/icons/interface/message.svg'
+
+
 // Reactive variables
 const error = ref('' as string)
 const isLoading = ref(false)
+const showModal = ref(true)
 
-// Supply every field required by `OwnerUser`, letting TS validate it.
 const user = reactive<OwnerUser>({
   id: '',
   email: '',
   phonenumber: '',
   language: '',
   isRegistrationConfirmed: false,
+  isOnboarded: false,
+  hasActiveProfile: false,
 })
 
 // form state
@@ -118,24 +125,30 @@ function handleBackButton() {
 
 
 <template>
-  <div class="container mt-5">
-
-    <div class="row justify-content-center">
-      <div class="col-md-6">
+  <div class="login-container">
+   
+    <BModal v-model="showModal"
+            title="Login"
+            size="md"
+            :backdrop="'static'"
+            centered
+            button-size="sm"
+            :focus="false"
+            :no-close-on-backdrop="true"
+            :no-footer="true"
+            :no-header="true"
+            cancel-title="Nevermind"
+            initial-animation
+            :keyboard="false">
+      <div class="py-4 px-3">
         <div v-if="showOtpForm">
-          <button class="btn btn-link btn-secondary"
-                  @click="handleBackButton">
-            <FontAwesomeIcon icon="fa-solid fa-arrow-left" />
-            Back
-
-          </button>
+          <div class="back-button">
+            <a class="btn btn-secondary-outline"
+               @click="handleBackButton">
+              <ChevronLeftIcon class="svg-icon" />
+            </a>
+          </div>
         </div>
-      </div>
-    </div>
-
-    <div class="row justify-content-center">
-      <div class="col-md-6 mb-3">
-
         <ErrorComponent :error="error" />
 
         <AuthIdComponent :isLoading="isLoading"
@@ -150,9 +163,15 @@ function handleBackButton() {
 
         <LoginConfirmComponent v-if="showConfirmScreen" />
       </div>
-    </div>
+    </BModal>
   </div>
 </template>
 
 
-<style lang="scss"></style>
+<style scoped>
+.back-button {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+</style>

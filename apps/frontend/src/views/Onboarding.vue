@@ -7,7 +7,7 @@ import type {
   ProfileFormSubmit,
   UpdateProfilePayload
 } from '@zod/profile.schema'
-import { OwnerProfileSchema, } from '@zod/profile.schema'
+import { OwnerProfileSchema, UpdatedProfileFragmentSchema, } from '@zod/profile.schema'
 import { type ConnectionTypeType } from '@zod/generated'
 
 import ConnectionTypeSelector from '@/components/ConnectionTypeSelector.vue'
@@ -50,9 +50,7 @@ async function handleProfileFormSubmit(formData: ProfileFormSubmit) {
     console.log('onboarding Saving profile', payload)
     const updated = await profileStore.updateProfile(payload)
     if (updated) {
-      // Validate the updated profile against the schema
-      const validatedProfile = OwnerProfileSchema.parse(updated)
-      Object.assign(profile, validatedProfile)
+      Object.assign(profile, updated)
       state.error = ''
     } else {
       state.error = 'Failed to update profile.'

@@ -24,10 +24,10 @@ const props = defineProps({
 <style scoped>
 
 
-img {
+/* img {
   object-fit: cover;
   filter: grayscale(100%) blur(5px);
   opacity: 0.25;
-}
+} */
 </style>
 

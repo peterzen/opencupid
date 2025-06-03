@@ -45,3 +45,10 @@ body.modal-open #app {
   -ms-filter: blur(5px);
   filter: blur(5px);
 }
+
+// SVG icon styles
+.svg-icon {
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+}
