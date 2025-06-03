@@ -7,9 +7,10 @@ import { showToast } from '@/lib/toastify';
 
 import Login from '@/views/Login.vue';
 import UserHome from '@/views/UserHome.vue';
-import PublicProfile from '@/views/PublicProfile.vue';
+import MyProfile from '@/views/MyProfile.vue';
 import Messaging from '@/views/Messaging.vue';
 import Onboarding from '@/views/Onboarding.vue';
+import PublicProfile from '@/views/PublicProfile.vue';
 import BrowseProfiles from '@/views/BrowseProfiles.vue';
 
 const routes: Array<RouteRecordRaw> = [
@@ -24,6 +25,12 @@ const routes: Array<RouteRecordRaw> = [
     name: 'PublicProfile',
     component: PublicProfile,
     props: true,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/me',
+    name: 'MyProfile',
+    component: MyProfile,
     meta: { requiresAuth: true }
   },
   {

@@ -19,17 +19,21 @@
         <ul class="navbar-nav mb-2 mb-lg-0 d-flex">
           <li class="nav-item me-auto">
             <RouterLink to="/onboarding"
-                        :class="{ 'active': currentRoute === '/onboarding' }"
                         class="nav-link ">{{ t('nav.onboarding') }}</RouterLink>
           </li>
           <li class="nav-item me-auto">
+            <RouterLink to="/me"
+                        active-class="active"
+                        class="nav-link ">{{ t('nav.profile') }}</RouterLink>
+          </li>
+          <li class="nav-item me-auto">
             <RouterLink to="/browse"
-                        :class="{ 'active': currentRoute === '/browse' }"
+                        active-class="active"
                         class="nav-link ">{{ t('nav.browse') }}</RouterLink>
           </li>
           <li class="nav-item me-auto">
             <RouterLink to="/inbox"
-                        :class="{ 'active': currentRoute === '/inbox' }"
+                        active-class="active"
                         class="nav-link ">{{ t('nav.inbox') }}</RouterLink>
           </li>
           <li class="nav-item dropdown">
@@ -89,9 +93,9 @@ const router = useRouter()
 <script lang="ts">
 import { Dropdown } from 'bootstrap'
 import { defineComponent } from 'vue'
-import LogoutButton from './LogoutButton.vue';
 import { useAuthStore } from '@/store/authStore';
 
+import LogoutButton from './LogoutButton.vue';
 
 export default defineComponent({
   name: 'Navbar',
