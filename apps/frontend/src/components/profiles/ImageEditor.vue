@@ -12,7 +12,8 @@ import ImageUpload from '@/components/profiles/ImageUpload.vue'
 import LoadingComponent from '@/components/LoadingComponent.vue'
 import ProfileImageComponent from '@/components/profiles/ProfileImageComponent.vue'
 
-
+import {IconArrowLeft} from '@/components/icons/DoodleIcons'
+import HelpScribble from './HelpScribble.vue'
 const profileStore = useProfileStore()
 
 const isLoading = ref(false)
@@ -90,11 +91,14 @@ function checkMove(evt: any) {
 
     <div v-else>
       <div class="row">
-        <div class="col-sm-6"
+        <div class="col-sm-6 mb-3"
              v-if="formData.profileImages && formData.profileImages.length">
           <ProfileImageComponent :image="formData.profileImages[0]" />
         </div>
         <div class="col-sm-6">
+           <div v-if="!formData.profileImages || formData.profileImages.length === 0" class="position-absolute end-0 me-5">
+            <HelpScribble text="Your photo here"/>
+          </div>
           <VueDraggableNext class="row row-cols-3 row-cols-sm-3 row-cols-md-3 g-4 sortable-grid"
                             v-model="formData.profileImages"
                             ghost-class="ghost"
@@ -198,4 +202,6 @@ img {
 .fade-move {
   transition: transform 0.3s ease;
 }
+
+
 </style>

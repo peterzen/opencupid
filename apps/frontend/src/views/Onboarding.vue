@@ -80,7 +80,7 @@ onMounted(async () => {
 
 <template>
 
-  <div class="container">
+  <div class="container mb-5 mt-3">
     <div class="row justify-content-center">
 
       <ConnectionTypeSelector :isDatingActive="!!profile.isDatingActive"
@@ -92,10 +92,11 @@ onMounted(async () => {
       <div class="tab-content p-3 border border-top-0">
         <div v-if="activeTab === 'dating'"
              class="tab-pane active">
-          <div class="mt-4">
+          <div class="mt-2">
             <DatingProfileForm :isLoading="isLoading"
                                :modelValue="profile"
                                @update:modelValue="val => Object.assign(profile, val)"
+                               @update:isDatingActive="(val: boolean) => profile.isDatingActive = val"
                                @submit="handleProfileFormSubmit" />
           </div>
         </div>

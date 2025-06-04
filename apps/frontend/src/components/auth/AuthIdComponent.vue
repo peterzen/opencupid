@@ -3,7 +3,8 @@ import { ref, computed } from 'vue'
 import type { SendOtpPayload } from '@zod/user.schema'
 import { emailRegex, phoneRegex } from '@/lib/utils';
 import CaptchaWidget from './CaptchaWidget.vue';
-import { IconMail, IconPhone, IconTick } from '@/components/icons/DoodleIcons';
+import { IconMail, IconPhone, IconTick, IconLogin } from '@/components/icons/DoodleIcons';
+import Logo from '@/assets/icons/app/logo.svg'
 
 const props = defineProps<{
   isLoading: boolean
@@ -56,15 +57,17 @@ function handleCaptchaUpdatePayload(payload: string) {
 
 const authIdInputRef = ref<InstanceType<any> | null>(null)
 
-// onMounted(() => {
-//   const node: FormKitNode | undefined = authIdInputRef.value?.node
-//   console.log('AuthIdComponent mounted', node)
-// })
 </script>
 
 
 <template>
   <div class="auth-id-component">
+
+    <div class="d-flex justify-content-center align-items-center flex-column h-100 mb-4">
+      <div class="icon-inner text-success animate__animated animate__fadeIn">
+        <Logo class="svg-icon logo" />
+      </div>
+    </div>
 
     <FormKit type="form"
              id="userIdForm"
@@ -76,7 +79,7 @@ const authIdInputRef = ref<InstanceType<any> | null>(null)
       <div class="mb-3">
         <FormKit type="text"
                  v-model="authIdInput"
-                 label="Your email address or phone number..."
+                 label="Email or phone number"
                  id="authIdInput"
                  ref="authIdInputRef"
                  autofocus
@@ -114,8 +117,9 @@ const authIdInputRef = ref<InstanceType<any> | null>(null)
       <FormKit type="submit"
                wrapper-class="d-grid gap-2 mb-3"
                input-class="btn-primary btn-lg w-100"
-               label="Continue"
-               :disabled="!valid || props.isLoading" />
+               :disabled="!valid || props.isLoading">
+        <IconLogin class="svg-icon" /> Continue
+      </FormKit>
 
     </FormKit>
   </div>
@@ -139,5 +143,12 @@ const authIdInputRef = ref<InstanceType<any> | null>(null)
 
 .svg-icon {
   fill: currentColor;
+}
+
+
+.logo {
+  width: 7.5rem;
+  height: 7.5rem;
+  color: currentColor;
 }
 </style>

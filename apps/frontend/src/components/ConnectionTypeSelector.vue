@@ -4,6 +4,9 @@ import ToggleSwitch from '@/components/ToggleSwitch.vue'
 import { useI18n } from 'vue-i18n';
 import { type ConnectionTypeType } from '@zod/generated';
 
+import IconDate from '@/assets/icons/app/cupid.svg'
+import IconSocialize from '@/assets/icons/app/socialize.svg'
+
 const { t } = useI18n()
 
 // Props
@@ -28,24 +31,30 @@ const emit = defineEmits<{
       <span class="nav-link text-start"
             :class="{ active: activeTab === 'friend' }">
 
-      
+
         <a class="tab-switch"
            @click="$emit('update:selectTab', 'friend')">
-          {{ t('general.connectiontypes.socializing') }}
+            <span class="d-flex align-items-center">
+            <IconSocialize class="svg-icon-lg w-100" />
+          </span>
+        <!-- {{ t('general.connectiontypes.socializing') }} -->
         </a>
       </span>
     </li>
     <li class="nav-item">
       <span class="nav-link text-start"
             :class="{ active: activeTab === 'dating' }">
-        <ToggleSwitch value="dating"
+        <!-- <ToggleSwitch value="dating"
                       :disabled="false"
                       label=""
                       @update:modelValue="val => $emit('update:isDatingActive', val)"
-                      :modelValue="isDatingActive" />
+                      :modelValue="isDatingActive" /> -->
         <a class="tab-switch"
            @click="$emit('update:selectTab', 'dating')">
-          {{ t('general.connectiontypes.dating') }}
+          <span class="d-flex align-items-center">
+            <IconDate class="svg-icon-lg w-100" />
+          </span>
+          <!-- {{ t('general.connectiontypes.dating') }} -->
         </a>
       </span>
 
@@ -77,5 +86,12 @@ const emit = defineEmits<{
   &:hover {
     cursor: pointer;
   }
+}
+
+.svg-icon-lg {
+  width: 4rem;
+  height: 4rem;
+  fill: #fff;
+  // stroke: white;
 }
 </style>

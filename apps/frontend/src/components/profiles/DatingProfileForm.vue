@@ -4,7 +4,8 @@ import { useI18n } from 'vue-i18n'
 import { getHasKidsOptionsOptions, getRelationshipStatusOptions } from '@/lib/i18n'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import { type OwnerProfile } from '@zod/profile.schema'
-import GenderPickerComponent from './GenderPickerComponent.vue'
+import GenderPickerComponent, { type GenderPickerModel } from './GenderPickerComponent.vue'
+import ToggleSwitch from '@/components/ToggleSwitch.vue'
 
 const state = reactive({
   error: ''
@@ -17,6 +18,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
+  (e: 'update:isDatingActive', val: boolean): void
   (e: 'update:modelValue', value: OwnerProfile): void
   (e: 'submit', value: OwnerProfile): void
 }>()
@@ -55,7 +57,7 @@ const birthYearMax = computed(() => {
 const relationshipStatusOptions = getRelationshipStatusOptions(t)
 const haveKidsRadioOptions = getHasKidsOptionsOptions(t)
 
-function handleGenderUpdate(value: OwnerProfile) {
+function handleGenderUpdate(value: GenderPickerModel) {
   const changed = { ...formData, ...value }
   emit('update:modelValue', changed)
 }
@@ -73,29 +75,20 @@ function handleSubmit() {
 <template>
   <div class="col-md-8 offset-md-2">
 
-
     <FormKit type="form"
              :actions="false"
              :disabled="isLoading"
              #default="{ state: { valid } }"
              @submit="handleSubmit">
 
-      <fieldset :disabled="!modelValue.isActive || isLoading">
-
-        <!-- <div class="mb-4">
-          <FormKit type="text"
-                   v-model="formData.publicName"
-                   label="My name is..."
-                   input-class="form-control-lg"
-                   :validation="[['required'], ['matches', /^[\p{L}]+(?:['-][\p{L}]+)*(?:\s+[\p{L}]+(?:['-][\p{L}]+)*)*$/u]]"
-                   validation-visibility="blur"
-                   :validation-messages="{
-                    matches: 'No real names policy here but please only put your name here.',
-                    required: 'Please enter your name',
-                    min: 'Name must be at least 2 characters long',
-                    max: 'Name must be less than 50 characters long'
-                  }" />
-        </div> -->
+      <div class="mb-3">
+        <ToggleSwitch value="dating"
+                      :disabled="false"
+                      label="Enable dating profile"
+                      @update:modelValue="val => $emit('update:isDatingActive', val)"
+                      :modelValue="!!formData.isDatingActive" />
+      </div>
+      <fieldset :disabled="!formData.isDatingActive || isLoading">
 
         <div class="mb-4">
           <FormKit type="number"
@@ -117,28 +110,8 @@ function handleSubmit() {
         </div>
 
         <div class="mb-3">
-          <GenderPickerComponent :modelValue="modelValue" @changed="handleGenderUpdate"/>
-
-          <!-- <Multiselect v-model="gender"
-                     :options="genderOptions"
-                     :close-on-select="true"
-                     :clear-on-select="false"
-                     :show-labels="false"
-                     :searchable="false"
-                     open-direction="bottom"
-                     id="gender"
-                     label="label"
-                     track-by="label"
-                     placeholder="I identify as...">
-          <template v-slot:noResult></template>
-<!-- <template #singleLabel="props">
-            {{ t(props.option.label) }}
-          </template>
-
-          <template #option="props">
-            {{ t(props.option.label) }}
-          </template> 
-        </Multiselect> -->
+          <GenderPickerComponent :modelValue="modelValue"
+                                 @changed="handleGenderUpdate" />
         </div>
 
         <div class="mb-3">

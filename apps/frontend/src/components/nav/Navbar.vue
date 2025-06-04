@@ -25,7 +25,7 @@ function handleLogoutClick() {
 
 <template>
   <BNavbar 
-           variant="primary"
+           variant="secondary"
            fixed="bottom"
            class="mt-4"
            v-if="isLoggedIn">

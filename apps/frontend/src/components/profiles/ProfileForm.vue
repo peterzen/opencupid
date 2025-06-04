@@ -160,26 +160,28 @@ onMounted(() => {
         </div>
 
         <div class="mb-4">
-          <Multiselect v-model="languages"
-                       :options="languageOptions"
-                       :close-on-select="false"
-                       :clear-on-select="false"
-                       :multiple="true"
-                       :searchable="true"
-                       open-direction="bottom"
-                       id="languages"
-                       label="label"
-                       track-by="label"
-                       placeholder="I speak...">
-            <template v-slot:noResult></template>
-            <template #singleLabel="props">
-              {{ t(props.option.label) }}
-            </template>
+          <div class="languages-multiselect">
+            <Multiselect v-model="languages"
+                         :options="languageOptions"
+                         :close-on-select="false"
+                         :clear-on-select="false"
+                         :multiple="true"
+                         :searchable="true"
+                         open-direction="bottom"
+                         id="languages"
+                         label="label"
+                         track-by="label"
+                         placeholder="I speak...">
+              <template v-slot:noResult></template>
+              <template #singleLabel="props">
+                {{ t(props.option.label) }}
+              </template>
 
-            <template #option="props">
-              {{ t(props.option.label) }}
-            </template>
-          </Multiselect>
+              <template #option="props">
+                {{ t(props.option.label) }}
+              </template>
+            </Multiselect>
+          </div>
         </div>
 
       </fieldset>
@@ -194,3 +196,17 @@ onMounted(() => {
     </FormKit>
   </div>
 </template>
+
+
+<style scoped lang="scss">
+:deep(.languages-multiselect) {
+  .multiselect__tag {
+    background-color: var(--bs-info);
+    color: var(--bs-body-bg);
+
+    i:after {
+      color: var(--bs-text-secondary);
+    }
+  }
+}
+</style>

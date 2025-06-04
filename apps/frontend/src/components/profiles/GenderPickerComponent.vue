@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { getGenderOptions, getPronounsOptions } from '@/lib/i18n';
-import { MultiselectOption } from '@/lib/languages';
-import { GenderType, PronounsType } from '@zod/generated';
+import { type MultiselectOption } from '@/lib/languages';
+import type { GenderType, PronounsType } from '@zod/generated';
 import { computed, reactive, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { partition } from 'remeda'
-import { OwnerProfile } from '@zod/profile.schema';
-import { ref } from 'process';
+import { type OwnerProfile } from '@zod/profile.schema';
 
 const { t } = useI18n()
 
-type MyModel ={
+export type GenderPickerModel = {
 	gender: GenderType | null
 	pronouns: PronounsType | null
 }
@@ -20,7 +19,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-	(e: 'changed', value: MyModel): void
+	(e: 'changed', value: GenderPickerModel): void
 }>()
 
 const formData = reactive<OwnerProfile>({ ...props.modelValue })
@@ -58,7 +57,7 @@ const pronouns = computed({
 function splitGenders(
 	options: MultiselectOption[]
 ): [binary: MultiselectOption[], other: MultiselectOption[]] {
-	const partitions = gender.value  ? [gender.value] : ['male', 'female']
+	const partitions = gender.value ? [gender.value] : ['male', 'female']
 	return partition(options, o => partitions.includes(o.value as GenderType))
 }
 const genderOptions = getGenderOptions(t) as MultiselectOption[]

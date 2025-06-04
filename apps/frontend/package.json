@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@cospired/i18n-iso-languages": "^4.2.0",
+    "@fontsource/caveat": "^5.2.5",
     "@fontsource/fredoka-one": "^5.2.5",
     "@fontsource/nunito": "^5.2.5",
     "@fontsource/rubik": "^5.2.5",

@@ -124,6 +124,7 @@ async function handleRemovePreview() {
           :no-footer="true"
           cancel-title="Nevermind"
           initial-animation
+          fullscreen="md"
           title="Add a photo">
     <div v-if="preview"
          class="preview-container">

@@ -3,7 +3,7 @@ import { IconSetting2 } from '@/components/icons/DoodleIcons';
 import LoadingComponent from '@/components/LoadingComponent.vue';
 import LogoutButton from '@/components/nav/LogoutButton.vue';
 import { useAuthStore } from '@/store/authStore';
-import { LoginUser } from '@zod/user.schema';
+import { type LoginUser } from '@zod/user.schema';
 import { onMounted, reactive, ref } from 'vue';
 const authStore = useAuthStore()
 

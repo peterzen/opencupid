@@ -78,7 +78,7 @@ async function addTag(name: string) {
 
 
 <template>
-  <div class="tags-multiselect">
+  <div class="interests-multiselect">
     <Multiselect v-model="selected"
                  :options="tags"
                  :multiple="true"
@@ -99,10 +99,15 @@ async function addTag(name: string) {
 
 
 
-<style lang="scss" scoped>
-.tags-multiselect {
-  .multiselect {
-    width: 100%;
+<style lang="scss">
+.interests-multiselect {
+  .multiselect__tag {
+    background-color: var(--bs-warning);
+    color: var(--bs-body-bg);
+
+    i:after {
+      color: var(--bs-text-secondary);
+    }
   }
 }
 </style>

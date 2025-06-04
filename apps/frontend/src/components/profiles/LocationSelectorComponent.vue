@@ -55,7 +55,7 @@ const cityName = computed({
 <template>
 
 	<div class="row ">
-		<div class="col-6">
+		<div class="col-12 col-sm-6 mb-4 mb-sm-0">
 			<Multiselect v-model="country"
 									 :options="countrySelectOptions"
 									 :close-on-select="true"
@@ -66,7 +66,7 @@ const cityName = computed({
 									 label="label"
 									 track-by="label" />
 		</div>
-		<div class="col-6">
+		<div class="col-12 col-sm-6">
 
 			<FormKit type="text"
 							 v-model="cityName"

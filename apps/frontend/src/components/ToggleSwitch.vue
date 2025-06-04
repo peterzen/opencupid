@@ -1,3 +1,34 @@
+
+<script lang="ts" setup>
+
+const props = defineProps({
+  label: {
+    type: String,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  modelValue: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+// Emits
+const emit = defineEmits<{
+  (e: 'update:modelValue', val: boolean): void
+}>()
+
+
+function toggleHandler(event: Event) {
+  const target = event.target as HTMLInputElement;
+  emit('update:modelValue', target.checked);
+}
+
+</script>
+
+
 <template>
   <label class="toggleswitch__outer"
          :class="{ disabled: disabled }">
@@ -7,45 +38,16 @@
            :disabled="disabled"
            @change="toggleHandler" />
     <span class="switch"></span>
-    <span class="label">{{ label }}</span>
+    <span class="label">{{ props.label }}</span>
   </label>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
 
-export default defineComponent({
-  name: "ToggleSwitch",
-  props: {
-    label: {
-      type: String,
-      required: true,
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    modelValue: {
-      type: Boolean,
-      required: true,
-    },
-  },
-  emits: ['update:modelValue'],
-  methods: {
-    toggleHandler(event: Event) {
-      const target = event.target as HTMLInputElement;
-      this.$emit('update:modelValue', target.checked);
-    },
-  }
-})
-</script>
 
 <style lang="scss" scoped>
 @import "bootstrap/scss/functions";
 @import "bootstrap/scss/variables";
 
-// @import "bootstrap/scss/mixins";
-// @import "bootstrap/scss/nav";
 .toggleswitch__outer {
   --switch-container-width: 50px;
   cursor: pointer;
@@ -55,9 +57,9 @@ export default defineComponent({
 }
 
 .label {
-  margin-left: 12px;
+  margin-left: 0.5em;
   color: var(--bs-secondary-color);
-  overflow: hidden;
+  // overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

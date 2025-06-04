@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import GenderSymbol from '@/components/profiles/GenderSymbol.vue';
 import { getLanguageList } from '@/lib/languages';
-import { PublicProfile } from '@zod/profile.schema';
+import { type PublicProfile } from '@zod/profile.schema';
 import { computed } from 'vue';
 import { countryCodeToName } from '@/lib/countries';
 import { getPronounsOptions, getRelationshipStatusOptions } from '@/lib/i18n';

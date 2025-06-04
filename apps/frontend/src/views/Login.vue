@@ -9,9 +9,6 @@ import ErrorComponent from '@/components/ErrorComponent.vue'
 import LoginConfirmComponent from '@/components/auth/LoginConfirmComponent.vue'
 
 import ChevronLeftIcon from '@/assets/icons/arrows/arrow-single-left.svg'
-import MailIcon from '@/assets/icons/interface/mail.svg'
-import MessageIcon from '@/assets/icons/interface/message.svg'
-
 
 // Reactive variables
 const error = ref('' as string)
@@ -140,9 +137,9 @@ function handleBackButton() {
             cancel-title="Nevermind"
             initial-animation
             fullscreen="md"
-            body-class="d-flex flex-row align-items-center justify-content-center"
+            body-class="d-flex flex-row align-items-center justify-content-center overflow-hidden"
             :keyboard="false">
-      <div class="py-4 px-3 ">
+      <div class="w-100">
         <div v-if="showOtpForm">
           <div class="back-button">
             <a class="btn btn-secondary-outline"
