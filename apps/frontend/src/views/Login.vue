@@ -3,7 +3,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useAuthStore } from '@/store/authStore'
 import { useRoute, useRouter } from 'vue-router'
 import AuthIdComponent from '@/components/auth/AuthIdComponent.vue'
-import type { OwnerUser, SendOtpPayload } from '@zod/user.schema'
+import type { LoginUser, SendOtpPayload } from '@zod/user.schema'
 import OtpLoginComponent from '@/components/auth/OtpLoginComponent.vue'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import LoginConfirmComponent from '@/components/auth/LoginConfirmComponent.vue'
@@ -18,7 +18,7 @@ const error = ref('' as string)
 const isLoading = ref(false)
 const showModal = ref(true)
 
-const user = reactive<OwnerUser>({
+const user = reactive<LoginUser>({
   id: '',
   email: '',
   phonenumber: '',
@@ -139,8 +139,10 @@ function handleBackButton() {
             :no-header="true"
             cancel-title="Nevermind"
             initial-animation
+            fullscreen="md"
+            body-class="d-flex flex-row align-items-center justify-content-center"
             :keyboard="false">
-      <div class="py-4 px-3">
+      <div class="py-4 px-3 ">
         <div v-if="showOtpForm">
           <div class="back-button">
             <a class="btn btn-secondary-outline"
@@ -173,5 +175,8 @@ function handleBackButton() {
   position: absolute;
   top: 0;
   left: 0;
+}
+:deep(.modal-body) {
+  display: flex;
 }
 </style>

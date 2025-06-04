@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { type OwnerUser } from '@zod/user.schema'
+import { type LoginUser } from '@zod/user.schema'
 import { otpRegex } from '@/lib/utils';
 
 import { IconMail } from '@/components/icons/DoodleIcons'
@@ -8,7 +8,7 @@ import { IconMessage } from '@/components/icons/DoodleIcons'
 
 
 const props = defineProps<{
-  user: OwnerUser
+  user: LoginUser
   isLoading: boolean
 }>()
 

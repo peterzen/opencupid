@@ -31,7 +31,7 @@ export const SessionDataSchema = z.object({
 
 export type SessionData = z.infer<typeof SessionDataSchema>
 
-export const OwnerUserSchema = UserSchema.pick({
+export const LoginUserSchema = UserSchema.pick({
   id: true,
   email: true,
   phonenumber: true,
@@ -40,7 +40,18 @@ export const OwnerUserSchema = UserSchema.pick({
   hasActiveProfile: true,
   isRegistrationConfirmed: true,
 })
-export type OwnerUser = z.infer<typeof OwnerUserSchema>
+export type LoginUser = z.infer<typeof LoginUserSchema>
+
+
+
+export const SettingsUserSchema = UserSchema.pick({
+  email: true,
+  phonenumber: true,
+  language: true,
+})
+export type SettingsUser = z.infer<typeof SettingsUserSchema>
+
+
 
 
 export const OtpSendReturnSchema = UserSchema.pick({

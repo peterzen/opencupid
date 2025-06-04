@@ -117,14 +117,14 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
     const user = await userService.getUserById(req.user.userId, {
       select: {
         email: true,
+        phonenumber: true,
         language: true,
-        roles: true,
       }
     })
 
     if (!user) return sendUnauthorizedError(reply)
 
-    return reply.status(200).send({ success: true, data: user })
+    return reply.status(200).send({ success: true, user })
   })
 }
 

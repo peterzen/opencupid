@@ -7,6 +7,7 @@ import { showToast } from '@/lib/toastify';
 
 import Login from '@/views/Login.vue';
 import UserHome from '@/views/UserHome.vue';
+import Settings from '@/views/Settings.vue';
 import MyProfile from '@/views/MyProfile.vue';
 import Messaging from '@/views/Messaging.vue';
 import Onboarding from '@/views/Onboarding.vue';
@@ -43,6 +44,12 @@ const routes: Array<RouteRecordRaw> = [
     path: '/onboarding',
     name: 'Onboarding',
     component: Onboarding,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: Settings,
     meta: { requiresAuth: true }
   },
   {

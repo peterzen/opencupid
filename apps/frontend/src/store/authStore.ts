@@ -1,7 +1,13 @@
 import { defineStore } from 'pinia'
 import { api } from '@/lib/api'
-import { UserSchema, type UserRoleType } from '@zod/generated'
-import { OtpSendReturnSchema, OwnerUserSchema, type AuthIdentifier, type SessionData } from '@zod/user.schema'
+import { type UserRoleType } from '@zod/generated'
+import {
+  LoginUserSchema,
+  OtpSendReturnSchema,
+  SettingsUserSchema,
+  type AuthIdentifier,
+  type SessionData
+} from '@zod/user.schema'
 
 
 interface JwtPayload {
@@ -103,8 +109,7 @@ export const useAuthStore = defineStore('auth', {
     async fetchUser() {
       try {
         const res = await api.get('/users/me')
-        const user = OwnerUserSchema.parse(res.data.user)
-        // Return the status flag for the frontend to handle
+        const user = SettingsUserSchema.parse(res.data.user)
         return { success: true, user, error: null };
       } catch (error: any) {
         console.error('Could not fetch user:', error)
