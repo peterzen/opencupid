@@ -117,7 +117,7 @@ function handleSubmit() {
         </div>
 
         <div class="mb-3">
-          <GenderPickerComponent :modelValue="modelValue" @update:modelValue="handleGenderUpdate"/>
+          <GenderPickerComponent :modelValue="modelValue" @changed="handleGenderUpdate"/>
 
           <!-- <Multiselect v-model="gender"
                      :options="genderOptions"

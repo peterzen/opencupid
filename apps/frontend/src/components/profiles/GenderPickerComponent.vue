@@ -1,25 +1,29 @@
 <script setup lang="ts">
 import { getGenderOptions, getPronounsOptions } from '@/lib/i18n';
 import { MultiselectOption } from '@/lib/languages';
-import { GenderType } from '@zod/generated';
+import { GenderType, PronounsType } from '@zod/generated';
 import { computed, reactive, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { partition } from 'remeda'
 import { OwnerProfile } from '@zod/profile.schema';
+import { ref } from 'process';
 
 const { t } = useI18n()
 
+type MyModel ={
+	gender: GenderType | null
+	pronouns: PronounsType | null
+}
 
 const props = defineProps<{
 	modelValue: OwnerProfile
 }>()
 
 const emit = defineEmits<{
-	(e: 'update:modelValue', value: OwnerProfile): void
+	(e: 'changed', value: MyModel): void
 }>()
 
 const formData = reactive<OwnerProfile>({ ...props.modelValue })
-
 
 // Sync prop changes into formData
 watch(
@@ -33,10 +37,10 @@ const gender = computed({
 	get: () => formData.gender,
 	set: (val) => {
 		const changed = {
-			...formData,
+			pronouns: formData.pronouns,
 			gender: val,
 		}
-		emit('update:modelValue', changed)
+		emit('changed', changed)
 	}
 })
 
@@ -44,10 +48,10 @@ const pronouns = computed({
 	get: () => formData.pronouns,
 	set: (val) => {
 		const changed = {
-			...formData,
 			pronouns: val,
+			gender: formData.gender,
 		}
-		emit('update:modelValue', changed)
+		emit('changed', changed)
 	}
 })
 
