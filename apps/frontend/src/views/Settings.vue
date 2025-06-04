@@ -5,13 +5,32 @@ import LogoutButton from '@/components/nav/LogoutButton.vue';
 import { useAuthStore } from '@/store/authStore';
 import { type LoginUser } from '@zod/user.schema';
 import { onMounted, reactive, ref } from 'vue';
+import { useColorMode } from 'bootstrap-vue-next'
+import { useLocalStore } from '@/store/localStore';
+
+
 const authStore = useAuthStore()
 
 const user = reactive({} as LoginUser)
 const isLoading = ref(true)
 
-onMounted(async () => {
+const mode = useColorMode({
+  selector: 'html',
+  attribute: 'data-bs-theme',
+  storageKey: 'theme',
+  modes: {
+    light: 'light',
+    dark: 'dark',
+  },
+})
+console.log('mode', mode.value)
 
+const changeColor = () => {
+  mode.value = mode.value === 'dark' ? 'light' : 'dark'
+}
+
+
+onMounted(async () => {
   isLoading.value = true;
   const { success, user: fetched, error } = await authStore.fetchUser()
 
@@ -26,10 +45,7 @@ onMounted(async () => {
 
 <template>
 
-
-  <div class="container pt-3">
-
-
+  <div class="container mt-4">
     <h3 class="mb-4">
       <IconSetting2 class="svg-icon" />
       Settings
@@ -37,10 +53,23 @@ onMounted(async () => {
 
     <LoadingComponent v-if="isLoading" />
 
-    <p v-if="user.email">Email: {{  user.email }}</p>
-    <p v-if="user.phonenumber">Phone number: {{  user.phonenumber }}</p>
+    <div class="mb-3">
+      <p v-if="user.email">Email: {{ user.email }}</p>
+      <p v-if="user.phonenumber">Phone number: {{ user.phonenumber }}</p>
+    </div>
 
-    <LogoutButton />
+    <div class="mb-3">
+      <LogoutButton />
+    </div>
 
+    <div class="mb-3">
+
+
+      <button class="btn btn-secondary"
+              @click="changeColor">
+              
+        Toggle night or day
+      </button>
+    </div>
   </div>
 </template>

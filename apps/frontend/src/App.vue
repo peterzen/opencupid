@@ -11,10 +11,5 @@
 
 <script lang="ts" setup>
 import Navbar from '@/components/nav/Navbar.vue';
-import { applySystemTheme } from './lib/utils';
-import { onMounted } from 'vue';
 
-onMounted(() => {
-  applySystemTheme()
-});
 </script>
