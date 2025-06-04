@@ -15,7 +15,16 @@ declare module 'vue' {
     BCarousel: typeof import('bootstrap-vue-next/components/BCarousel')['BCarousel']
     BCarouselSlide: typeof import('bootstrap-vue-next/components/BCarousel')['BCarouselSlide']
     BCollapse: typeof import('bootstrap-vue-next/components/BCollapse')['BCollapse']
+    BDropdownItem: typeof import('bootstrap-vue-next/components/BDropdown')['BDropdownItem']
+    BFormInput: typeof import('bootstrap-vue-next/components/BFormInput')['BFormInput']
     BModal: typeof import('bootstrap-vue-next/components/BModal')['BModal']
+    BNavbar: typeof import('bootstrap-vue-next/components/BNavbar')['BNavbar']
+    BNavbarBrand: typeof import('bootstrap-vue-next/components/BNavbar')['BNavbarBrand']
+    BNavbarNav: typeof import('bootstrap-vue-next/components/BNavbar')['BNavbarNav']
+    BNavbarToggle: typeof import('bootstrap-vue-next/components/BNavbar')['BNavbarToggle']
+    BNavForm: typeof import('bootstrap-vue-next/components/BNav')['BNavForm']
+    BNavItem: typeof import('bootstrap-vue-next/components/BNav')['BNavItem']
+    BNavItemDropdown: typeof import('bootstrap-vue-next/components/BNav')['BNavItemDropdown']
     CaptchaWidget: typeof import('./src/components/auth/CaptchaWidget.vue')['default']
     ConnectionTypeSelector: typeof import('./src/components/ConnectionTypeSelector.vue')['default']
     DatingFilter: typeof import('./src/components/profiles/DatingFilter.vue')['default']
@@ -50,6 +59,7 @@ declare module 'vue' {
     ToggleSwitch: typeof import('./src/components/ToggleSwitch.vue')['default']
   }
   export interface ComponentCustomProperties {
+    vBColorMode: typeof import('bootstrap-vue-next/directives/BColorMode')['vBColorMode']
     vBToggle: typeof import('bootstrap-vue-next/directives/BToggle')['vBToggle']
   }
 }

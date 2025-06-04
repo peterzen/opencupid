@@ -54,7 +54,8 @@
     "onboarding": "Onboarding",
     "profile": "Profile",
     "browse": "Browse",
-    "inbox": "Inbox"
+    "inbox": "Inbox",
+    "settings": "Settings"
   },
   "authentication": {
     "login": "Login",

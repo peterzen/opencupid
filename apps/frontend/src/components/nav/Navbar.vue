@@ -1,132 +1,79 @@
+<script setup lang="ts">
+import { useRouter } from 'vue-router'
+import { useI18n } from "vue-i18n";
+import { IconMessage, IconPen, IconSearch, IconSetting2,IconUser } from '@/components/icons/DoodleIcons';
+
+import { useAuthStore } from '@/store/authStore';
+
+import { computed } from 'vue'
+
+
+const authStore = useAuthStore()
+
+const { t } = useI18n();
+const router = useRouter()
+
+const isLoggedIn = computed(() => authStore.isLoggedIn)
+
+function handleLogoutClick() {
+  authStore.logout(); // Clear the authentication state
+  router.push({ name: 'Login' }); // Redirect to the login page
+}
+
+</script>
+
+
 <template>
-  <nav v-if="isLoggedIn"
-       class="navbar sticky-top navbar-expand-md  mb-lg-4"
-       id="navbar">
-    <div class="container-fluid">
-      <a class="navbar-brand"
-         href="#">oc</a>
-      <button class="navbar-toggler"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#navbarSupportedContent"
-              aria-controls="navbarSupportedContent"
-              aria-expanded="false"
-              aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse"
-           id="navbar">
-        <ul class="navbar-nav mb-2 mb-lg-0 d-flex">
-          <li class="nav-item me-auto">
-            <RouterLink to="/onboarding"
-                        class="nav-link ">{{ t('nav.onboarding') }}</RouterLink>
-          </li>
-          <li class="nav-item me-auto">
-            <RouterLink to="/me"
-                        active-class="active"
-                        class="nav-link ">{{ t('nav.profile') }}</RouterLink>
-          </li>
-          <li class="nav-item me-auto">
-            <RouterLink to="/browse"
-                        active-class="active"
-                        class="nav-link ">{{ t('nav.browse') }}</RouterLink>
-          </li>
-          <li class="nav-item me-auto">
-            <RouterLink to="/inbox"
-                        active-class="active"
-                        class="nav-link ">{{ t('nav.inbox') }}</RouterLink>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle"
-               href="#"
-               ref="navbarDropdown"
-               role="button"
-               data-bs-toggle="dropdown"
-               aria-expanded="false"
-               aria-haspopup="true">
-              <FontAwesomeIcon icon="fa-bars" />
-            </a>
-            <ul class="dropdown-menu dropdown-dark dropdown-menu-end"
-                aria-labelledby="navbarDropdown">
-              <li><span class="dropdown-item">{{ email }}</span></li>
-              <li>
-                <LogoutButton />
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
+  <BNavbar 
+           variant="primary"
+           fixed="bottom"
+           class="mt-4"
+           v-if="isLoggedIn">
+
+    <BNavbarNav class="d-flex justify-content-between w-100">
+
+      <BNavItem to="/onboarding"
+                active-class="active">
+        <IconPen class="svg-icon" />
+        <span class="d-none d-sm-inline">{{ t('nav.onboarding') }}</span>
+      </BNavItem>
+
+      <BNavItem to="/me"
+                active-class="active">
+        <IconUser class="svg-icon" />
+        <span class="d-none d-sm-inline">{{ t('nav.profile') }}</span>
+      </BNavItem>
+
+      <BNavItem to="/browse"
+                active-class="active">
+        <IconSearch class="svg-icon" />
+        <span class="d-none d-sm-inline">{{ t('nav.browse') }}</span>
+      </BNavItem>
+
+      <BNavItem to="/inbox"
+                active-class="active">
+        <IconMessage class="svg-icon" />
+        <span class="d-none d-sm-inline"> {{ t('nav.inbox') }}</span>
+      </BNavItem>
+
+      <BNavItem to="/settings"
+                active-class="active">
+        <IconSetting2 class="svg-icon" />
+        <span class="d-none d-sm-inline"> {{ t('nav.settings') }}</span>
+      </BNavItem>
+
+    </BNavbarNav>
+  </BNavbar>
+
 </template>
 
 
 
 <style scoped>
-.navbar {
-  background-color: var(--bs-dark-bg-subtle);
-}
-
-.navbar-nav {
-  width: 100%;
-  justify-content: space-between;
-}
-
-.dropdown-toggle::after {
-  display: none;
-}
-
-/* required for the .stetched-link to work correctly inside LightSwitch */
-.lightswitch {
-  position: relative;
+.svg-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: 0.5rem;
+  padding: 0rem;
 }
 </style>
-
-
-<script setup lang="ts">
-import { RouterLink, useRouter } from 'vue-router'
-import { useI18n } from "vue-i18n";
-const { t } = useI18n();
-const router = useRouter()
-</script>
-
-<script lang="ts">
-import { Dropdown } from 'bootstrap'
-import { defineComponent } from 'vue'
-import { useAuthStore } from '@/store/authStore';
-
-import LogoutButton from './LogoutButton.vue';
-
-export default defineComponent({
-  name: 'Navbar',
-  components: {
-    LogoutButton,
-  },
-  data() {
-    return {
-      authStore: useAuthStore(),
-    }
-  },
-
-  computed: {
-    isLoggedIn(): boolean {
-      return this.authStore.isLoggedIn
-    },
-    email(): string {
-      return this.authStore.getEmail ?? ''
-    },
-    currentRoute(): string {
-      return this.$route.path
-    },
-  },
-
-  mounted() {
-    const dropdownRef = this.$refs.navbarDropdown as HTMLElement
-    if (dropdownRef) {
-      new Dropdown(dropdownRef)
-    }
-  },
-
-})
-
-</script>

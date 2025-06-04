@@ -1,13 +1,16 @@
 <template>
   <a @click="handleClick"
      href="#"
-     class="dropdown-item">Logout</a>
+     class="btn btn-secondary">
+     <IconLogout class=svg-icon />
+     Logout</a>
 </template>
 
 
 <script lang="ts" setup>
 import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'vue-router';
+import {IconLogout} from '@/components/icons/DoodleIcons';
 
 const auth = useAuthStore();
 const router = useRouter();
