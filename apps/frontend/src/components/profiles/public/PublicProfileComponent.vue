@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import GenderSymbol from '@/components/profiles/GenderSymbol.vue';
+import { countryCodeToName } from '@/lib/countries';
 import { getLanguageList } from '@/lib/languages';
 import { type PublicProfile } from '@zod/profile.schema';
 import { computed } from 'vue';
-import { countryCodeToName } from '@/lib/countries';
-import { getPronounsOptions, getRelationshipStatusOptions } from '@/lib/i18n';
 import { useI18n } from 'vue-i18n';
+import { useEnumOptions } from '../composables/useEnumOptions';
 
 const { t } = useI18n()
 
@@ -38,39 +38,27 @@ const languages = computed(() => {
   return getLanguageList(props.profile.languages)
 });
 
+const { relationshipStatusLabels, pronounsLabels,hasKidsLabels } = useEnumOptions(t)
+
+
 const hasKidsLabel = computed(() => {
   if (!props.profile.isDatingActive) return ''
-
-  if (!props.profile.hasKids || props.profile.hasKids === 'unspecified') return ''
-  if (props.profile.hasKids === 'yes') return 'Has kids'
-  return 'No kids'
+  return hasKidsLabels()[props.profile.hasKids!] || props.profile.hasKids
 })
-
-const relationshipStatusLabels = getRelationshipStatusOptions(t)
 
 
 const relationshipStatusLabel = computed(() => {
   if (!props.profile.isDatingActive) return ''
-  if (!props.profile.relationship || props.profile.relationship==='unspecified') return ''
+  if (!props.profile.relationship || props.profile.relationship === 'unspecified') return ''
 
-  const rel = props.profile.relationship
-  if (!rel) return ''
-  const r = relationshipStatusLabels.find((v) => v.value === rel) || ''
-  if (!r) return ''
-  return r.label || ''
+  return relationshipStatusLabels()[props.profile.relationship] || props.profile.relationship
 })
-
-const pronounsOptions = getPronounsOptions(t)
 
 const pronounsLabel = computed(() => {
   if (!props.profile.isDatingActive) return ''
-  if (!props.profile.pronouns || props.profile.pronouns==='unspecified') return ''
+  if (!props.profile.pronouns || props.profile.pronouns === 'unspecified') return ''
 
-  const rel = props.profile.pronouns
-  if (!rel) return ''
-  const r = pronounsOptions.find((v) => v.value === rel) || ''
-  if (!r) return ''
-  return r.label || ''
+  return pronounsLabels()[props.profile.pronouns] || props.profile.pronouns
 })
 
 
@@ -99,9 +87,9 @@ const pronounsLabel = computed(() => {
               ({{ age }}
               <GenderSymbol v-if="props.profile.gender"
                             :gender="props.profile.gender" />
-                            
-                            <span v-if="props.profile.pronouns && pronounsLabel"
-                                  class="ms-2">{{  pronounsLabel }}</span>)
+
+              <span v-if="props.profile.pronouns && pronounsLabel"
+                    class="ms-2">{{ pronounsLabel }}</span>)
             </span>
           </span>
         </div>

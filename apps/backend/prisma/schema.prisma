@@ -62,13 +62,6 @@ enum HasKids {
   unspecified
 }
 
-enum PreferenceGender {
-  male
-  female
-  non_binary
-  any
-}
-
 enum RelationshipStatus {
   single
   in_relationship
@@ -134,19 +127,6 @@ model ProfileTag {
   profile   Profile? @relation(fields: [profileId], references: [id])
 
   @@unique([profileId, tagId])
-}
-
-model DatingPreference {
-  userId     String @id
-  prefAgeMin Int?
-  prefAgeMax Int?
-
-  latitude   Float?
-  longitude  Float?
-  prefRadius Int?             @default(50) // in km
-  prefGender PreferenceGender @default(any)
-
-  isLocationActive Boolean @default(false)
 }
 
 model ConnectionRequest {
@@ -215,9 +195,19 @@ model Profile {
   relationship RelationshipStatus?
   hasKids      HasKids?
 
-  tags ProfileTag[]
-
+  tags          ProfileTag[]
   profileImages ProfileImage[] @relation("ProfileImages")
+
+  // Dating preferences
+  prefAgeMin Int?
+  prefAgeMax Int?
+  prefGender Gender[]  @default([])
+  prefKids   HasKids[] @default([])
+
+  // latitude         Float?
+  // longitude        Float?
+  // prefRadius       Int?    @default(50) // in km
+  // isLocationActive Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -6,7 +6,7 @@ import router from '@/router';
 import { type PublicProfile } from '@zod/profile.schema';
 
 import LoadingComponent from '@/components/LoadingComponent.vue';
-import ProfileCardComponent from '@/components/profiles/ProfileCardComponent.vue';
+import ProfileCardComponent from '@/components/profiles/public/ProfileCardComponent.vue';
 import NoProfileInfoCTAComponent from '@/components/profiles/NoProfileInfoCTAComponent.vue';
 
 

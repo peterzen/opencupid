@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 import type { PublicProfile } from '@zod/profile.schema';
 import ProfileImageComponent from '@/components/profiles/ProfileImageComponent.vue';
-import DatingFilter from './DatingFilter.vue';
 
 // Props & Emits
 const props = defineProps<{

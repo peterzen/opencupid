@@ -49,7 +49,7 @@ export class ProfileService {
     })
   }
 
-  getProfileBySlug(slug: string): Promise<ProfileComplete | null> {
+  async getProfileBySlug(slug: string): Promise<ProfileComplete | null> {
     // console.log(`Fetching profile with ID: ${slug}`)
     return prisma.profile.findUnique({
       where: { slug },

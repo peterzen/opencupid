@@ -29,11 +29,35 @@
     "other": "Other",
     "unspecified": "I'd rather not say"
   },
+  "gender_preferences": {
+    "male": "Male",
+    "female": "Female",
+    "agender": "Agender",
+    "androgynous": "Androgynous",
+    "bigender": "Bigender",
+    "cis_man": "Cisgender man",
+    "cis_woman": "Cisgender woman",
+    "genderfluid": "Genderfluid",
+    "genderqueer": "Genderqueer",
+    "gender_nonconforming": "Gender non-conforming",
+    "hijra": "Hijra",
+    "intersex": "Intersex",
+    "pangender": "Pangender",
+    "transfeminine": "Transfeminine",
+    "trans_man": "Trans man",
+    "transmasculine": "Transmasculine",
+    "transsexual": "Transsexual",
+    "trans_woman": "Trans woman",
+    "two_spirit": "Two-spirit",
+    "non_binary": "Non-binary",
+    "other": "Other",
+    "unspecified": "Any"
+  },
   "pronouns": {
     "he_him": "He/him",
     "she_her": "She/her",
     "they_them": "They/them",
-    "unspecified": "The default is fine"
+    "unspecified": "they wish"
   },
   "relationship": {
     "single": "Single",
@@ -48,6 +72,16 @@
     "yes": "Yes",
     "no": "No",
     "unspecified": "I'd rather not say"
+  },
+  "haskids_label": {
+    "yes": "Has kids",
+    "no": "No kids",
+    "unspecified": ""
+  },
+  "haskids_preference": {
+    "yes": "Has kids",
+    "no": "No kids",
+    "unspecified": "Any"
   },
   "nav": {
     "home": "Home",

@@ -13,8 +13,10 @@ async function main() {
     lon: c.loc.coordinates[0],
   }))
 
+  const recordsToInsert = 10//toUpsert.length
+
   // Upsert all in batches
-  for (let i = 0; i < toUpsert.length; i += 1000) {
+  for (let i = 0; i < recordsToInsert; i += 1000) {
     const batch = toUpsert.slice(i, i + 1000)
     await Promise.all(batch.map(city =>
       prisma.city.upsert({
@@ -24,7 +26,7 @@ async function main() {
       })
     ))
   }
-  console.log(`Seeded ${toUpsert.length} cities!`)
+  console.log(`Seeded ${recordsToInsert} cities!`)
 }
 
 main()

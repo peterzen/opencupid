@@ -35,6 +35,14 @@ const publicDatingProfileFields = {
   pronouns: true,
 } as const;
 
+const privateDatingPreferencesFields = {
+  prefAgeMin: true,
+  prefAgeMax: true,
+  prefGender: true,
+  prefKids: true,
+} as const;
+
+
 export const PublicScalarsSchema = ProfileSchema.pick({
   ...baseFields,
 }).extend({
@@ -80,6 +88,7 @@ export type PublicDatingProfile = z.infer<typeof PublicDatingProfileSchema>;
 export const OwnerScalarSchema = ProfileSchema.pick({
   ...baseFields,
   ...publicDatingProfileFields,
+  ...privateDatingPreferencesFields,
   id: true,
   isActive: true,
 });
@@ -89,6 +98,10 @@ export const OwnerProfileSchema = OwnerScalarSchema.extend({
   tags: z.array(PublicTagSchema).default([]),
 });
 export type OwnerProfile = z.infer<typeof OwnerProfileSchema>;
+
+// export const PartialOwnerScalarSchema = OwnerScalarSchema
+//   .partial()
+// export type PartialOwnerScalar = z.infer<typeof PartialOwnerScalarSchema>;
 
 export const ProfileFormSubmitSchema = OwnerScalarSchema
   .partial()
@@ -132,6 +145,10 @@ export const UpdatedProfileImageFragmentSchema = ProfileSchema
   });
 export type UpdatedProfileImageFragment = z.infer<typeof UpdatedProfileImageFragmentSchema>;
 
+export const OwnerDatingPreferencesSchema = ProfileSchema.pick({
+  ...privateDatingPreferencesFields,
+}).partial()
+export type OwnerDatingPreferences = z.infer<typeof OwnerDatingPreferencesSchema>;
 
 // Route params for ID lookups
 export const IdLookupParamsSchema = z.object({

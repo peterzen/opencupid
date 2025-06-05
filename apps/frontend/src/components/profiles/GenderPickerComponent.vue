@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { getGenderOptions, getPronounsOptions } from '@/lib/i18n';
 import { type MultiselectOption } from '@/lib/languages';
 import type { GenderType, PronounsType } from '@zod/generated';
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { partition } from 'remeda'
+import { filter } from 'remeda'
 import { type OwnerProfile } from '@zod/profile.schema';
+import { useEnumOptions } from './composables/useEnumOptions';
 
 const { t } = useI18n()
 
@@ -39,6 +39,7 @@ const gender = computed({
 			pronouns: formData.pronouns,
 			gender: val,
 		}
+		otherGendersVisible.value = false
 		emit('changed', changed)
 	}
 })
@@ -54,18 +55,23 @@ const pronouns = computed({
 	}
 })
 
-function splitGenders(
-	options: MultiselectOption[]
-): [binary: MultiselectOption[], other: MultiselectOption[]] {
+const {
+  genderOptions,
+	pronounsOptions
+} = useEnumOptions(t)
+
+
+const otherGendersVisible = ref(false)
+
+const genders = genderOptions() as MultiselectOption[]
+
+const binaryGenders = computed(() => {
 	const partitions = gender.value ? [gender.value] : ['male', 'female']
-	return partition(options, o => partitions.includes(o.value as GenderType))
-}
-const genderOptions = getGenderOptions(t) as MultiselectOption[]
+	return filter(genders, o => partitions.includes(o.value as GenderType))
+})
 
+const pronounsChoices = pronounsOptions() as MultiselectOption[]
 
-const [binaryGenders, otherGenders] = splitGenders(genderOptions)
-
-const pronounsOptions = getPronounsOptions(t) as MultiselectOption[]
 </script>
 
 <template>
@@ -83,11 +89,12 @@ const pronounsOptions = getPronounsOptions(t) as MultiselectOption[]
 								 class="m-0 p-0">Other...
 				</BButton>
 
-				<BCollapse id="collapse-1">
+				<BCollapse id="collapse-1"
+									 v-model="otherGendersVisible">
 					<FormKit v-model="gender!"
 									 type="radio"
 									 label=""
-									 :options="otherGenders"
+									 :options="genders"
 									 help="" />
 				</BCollapse>
 			</div>
@@ -95,8 +102,8 @@ const pronounsOptions = getPronounsOptions(t) as MultiselectOption[]
 				<FormKit v-model="pronouns!"
 								 type="radio"
 								 label=""
-								 :options="pronounsOptions"
-								 help="Pronouns" />
+								 :options="pronounsChoices"
+								 help="They refer to me as..." />
 
 			</div>
 		</div>
