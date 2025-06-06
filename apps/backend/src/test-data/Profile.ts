@@ -10,20 +10,22 @@ import { User, GenderType, UserRoleType } from '@zod/generated'
 import { HasKids, Pronouns, RelationshipStatus } from '@prisma/client';
 
 import { ImageGalleryService } from '../services/image.service'
-import path, { dirname } from 'path';
+import path, { basename, dirname } from 'path';
 import {
   makeImageLocation
 } from '@/lib/media';
 import { ProfileService } from '@/services/profile.service';
 import type { OwnerProfile, ProfileComplete } from '@zod/profile.schema';
 import cuid from 'cuid';
+import { appConfig } from '@shared/config/appconfig';
 
 const imageService = ImageGalleryService.getInstance()
 const profileService = ProfileService.getInstance()
 
-const howMany = 5
+const howMany = 1
 const languages = ['en', 'de', 'it', 'fr', 'es', 'pt', 'hu', 'nl']
 
+const testImagesDir = path.join(appConfig.MEDIA_UPLOAD_DIR, '/test-images')
 // faker.seed(123);
 
 export function createRandomUser() {
@@ -94,7 +96,7 @@ let tags = [] as any[]
 // const uploadDir = path.join(uploadBaseDir, storagePrefix)
 // createStorageDir(uploadDir);
 
-const imageDir = './test-data/images'
+// const imageDir = './test-data/images'
 
 
 async function main() {
@@ -161,31 +163,20 @@ async function main() {
 
     let i = 0
     imageUrls.forEach(async (img) => {
-      const tmpDir = path.join(process.cwd(), imageDir, img.cat)
+      const tmpDir = path.join(testImagesDir, img.cat)
       const tmpFile = await downloadImage(img.url, tmpDir)
-      const imageLocation = await makeImageLocation(tmpFile)
 
       console.log(`Downloaded image ${tmpFile} `)
 
-      await fs.promises.mkdir(dirname(imageLocation.absPath), { recursive: true })
-      await fs.promises.copyFile(tmpFile, imageLocation.absPath)
+      const f = basename(tmpFile)
+      const savedDir = path.join(tmpDir, 'saved')
+      await fs.promises.mkdir(savedDir, { recursive: true })
+      await fs.promises.copyFile(tmpFile, path.join(savedDir, f))
 
-      const mimetype = mime.lookup(tmpFile) || 'application/octet-stream'
+      const profileImage = await imageService.storeImage(createdUser.id, tmpFile, faker.lorem.sentence({ min: 1, max: 2 }))
 
-      const imgData = {
-        userId: createdUser.id,
-        mimeType: mimetype,
-        altText: faker.lorem.sentences({ min: 1, max: 3 }),
-        storagePath: imageLocation.relPath,
-        isModerated: false,
-        contentHash: '',
-        position: i++,
-      }
       try {
-        const profileImage = await prisma.profileImage.create({
-          data: imgData
-        });
-
+    
         console.log(`Added image ${profileImage.id} `, profileImage)
 
         profileService.addProfileImage(createdProfile as ProfileComplete, profileImage.id)

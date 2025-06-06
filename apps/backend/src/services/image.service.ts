@@ -1,6 +1,7 @@
 import cuid from 'cuid';
 import path, { dirname } from 'path';
 import fs from 'fs';
+import mime from 'mime-types';
 import { SavedMultipartFile } from '@fastify/multipart';
 
 import { prisma } from '../lib/prisma'
@@ -57,13 +58,13 @@ export class ImageGalleryService {
    * @param captionText - Optional caption or alt text for the image
    * Returns the created ProfileImage record
    */
-  async storeImage(userId: string, fileUpload: SavedMultipartFile, captionText: string): Promise<ProfileImage> {
+  async storeImage(userId: string, tmpImagePath: string, captionText: string): Promise<ProfileImage> {
 
     let imageLocation
 
     try {
-      imageLocation = await makeImageLocation(fileUpload.filename)
-      await fs.promises.rename(fileUpload.filepath, imageLocation.absPath);
+      imageLocation = await makeImageLocation(tmpImagePath)
+      await fs.promises.rename(tmpImagePath, imageLocation.absPath);
     } catch (err: any) {
       console.error('Failed to move upload', err);
       throw new Error('Failed to move uploaded file');
@@ -73,12 +74,13 @@ export class ImageGalleryService {
     const contentHash = await generateContentHash(imageLocation.absPath);
     // set position to be the last position
     const position = await prisma.profileImage.count({ where: { userId } })
+    const mimetype = mime.lookup(imageLocation.absPath) || 'application/octet-stream'
 
     // Create a new ProfileImage record
     return await prisma.profileImage.create({
       data: {
         userId: userId,
-        mimeType: fileUpload.mimetype,
+        mimeType: mimetype,
         altText: captionText,
         storagePath: imageLocation.relPath,
         isModerated: false,

@@ -217,7 +217,7 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     try {
-      const stored = await imageService.storeImage(req.user.userId, fileUpload, captionText)
+      const stored = await imageService.storeImage(req.user.userId, fileUpload.filepath, captionText)
       if (!stored) {
         return sendError(reply, 500, 'Failed to store image')
       }
