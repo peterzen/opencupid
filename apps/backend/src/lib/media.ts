@@ -7,7 +7,7 @@ import cuid from 'cuid';
 import { appConfig } from '@shared/config/appconfig';
 
 export function uploadTmpDir() {
-  return path.join(appConfig.MEDIA_UPLOAD_DIR, 'uploads')
+  return path.join(appConfig.MEDIA_UPLOAD_DIR, 'tmp')
 }
 
 export function generateStorageDirPrefix(): string {
@@ -48,22 +48,24 @@ export function checkImageRoot(): boolean {
 }
 
 type ImageLocation = {
+  base: string
   relPath: string
   absPath: string
 }
 
-export async function makeImageLocation(tmpFile: string): Promise<ImageLocation> {
+export async function makeImageLocation(): Promise<ImageLocation> {
   // Generate a CUID for the ProfileImage
-  const dstFilename = cuid.slug() + path.extname(tmpFile)
+  const base = cuid.slug()
 
   const imageRoot = getImageRoot();
   const storagePrefix = generateStorageDirPrefix();
-  const relPath = path.posix.join(storagePrefix, dstFilename);
-  const dstPath = path.join(imageRoot, relPath)
-  await fs.promises.mkdir(dirname(dstPath), { recursive: true })
-  
+  const relPath = path.posix.join(storagePrefix);
+  const absPath = path.join(imageRoot, relPath)
+  await fs.promises.mkdir(dirname(absPath), { recursive: true })
+
   return {
-    relPath: relPath,
-    absPath: dstPath
+    base,
+    relPath,
+    absPath
   }
 }

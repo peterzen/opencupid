@@ -41,6 +41,8 @@ export const CreateProfileImageSchema = z.object({
   storagePath: z.string(),
   contentHash: z.string(),
   position: z.number().int().optional(),
+  width: z.number().int().optional(),
+  height: z.number().int().optional(),
 })
 export type CreateProfileImageInput = z.infer<typeof CreateProfileImageSchema>
 

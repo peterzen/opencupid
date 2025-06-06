@@ -14,8 +14,13 @@ import {
 
 import { generateContentHash } from '@/utils/hash';
 import { ProfileImagePosition } from '@zod/profileimage.schema';
+import sharp from 'sharp';
 
-
+const sizes = [
+  { name: 'thumb', width: 150, height: 150, fit: sharp.fit.cover },   // square crop
+  { name: 'card', width: 480 },                                // keep aspect ratio
+  { name: 'full', width: 1280 }                                // max width
+]
 export class ImageGalleryService {
   private static instance: ImageGalleryService;
 
@@ -62,32 +67,103 @@ export class ImageGalleryService {
 
     let imageLocation
 
+    // create image subdir, generate basename
     try {
-      imageLocation = await makeImageLocation(tmpImagePath)
-      await fs.promises.rename(tmpImagePath, imageLocation.absPath);
+      imageLocation = await makeImageLocation()
     } catch (err: any) {
-      console.error('Failed to move upload', err);
-      throw new Error('Failed to move uploaded file');
+      console.error('Failed to create dest dir', err);
+      throw new Error('Failed to create dest dir');
     }
 
-    // compute the content hash of the file
-    const contentHash = await generateContentHash(imageLocation.absPath);
-    // set position to be the last position
-    const position = await prisma.profileImage.count({ where: { userId } })
-    const mimetype = mime.lookup(imageLocation.absPath) || 'application/octet-stream'
+    console.log(`Storing image for user ${userId}`, imageLocation);
 
-    // Create a new ProfileImage record
-    return await prisma.profileImage.create({
-      data: {
-        userId: userId,
-        mimeType: mimetype,
-        altText: captionText,
-        storagePath: imageLocation.relPath,
-        isModerated: false,
-        contentHash: contentHash,
-        position: position,
+    try {
+      // Process the image and save resized variants
+      const processed = await this.processImage(
+        tmpImagePath,
+        imageLocation.absPath,
+        imageLocation.base
+      );
+      console.log('Image processed successfully', processed);
+
+      // compute the content hash of the original
+      const contentHash = await generateContentHash(processed.variants.original);
+      // set position to be the last position
+      const position = await prisma.profileImage.count({ where: { userId } })
+
+      // Create a new ProfileImage record
+      return await prisma.profileImage.create({
+        data: {
+          userId: userId,
+          mimeType: processed.mime,
+          altText: captionText,
+          storagePath: path.join(imageLocation.relPath,imageLocation.base),
+          isModerated: false,
+          contentHash: contentHash,
+          position: position,
+        }
+      });
+
+    } catch (err: any) {
+      console.error('Failed to process image', err);
+      throw new Error(`Failed to process image ${tmpImagePath}: ${err.message}`);
+    } finally {
+      // Ensure the temporary file is deleted regardless of success or failure
+      try {
+        await fs.promises.unlink(tmpImagePath);
+      } catch (unlinkErr) {
+        // console.error('Failed to delete temporary file after processing', unlinkErr);
       }
-    });
+    }
+  }
+
+  /**
+   * Process an uploaded image file, resizing and saving variants
+   * @param filePath - Path to the uploaded image file
+   * @param outputDir - Directory to save processed images
+   * @param baseName - Base name for the output files
+   * Returns an object with metadata and paths to resized images
+   */
+  async processImage(filePath: string, outputDir: string, baseName: string) {
+    await fs.promises.mkdir(outputDir, { recursive: true })
+
+    const original = sharp(filePath).rotate()
+
+    const metadata = await original.metadata()
+    const format = metadata.format ?? 'jpeg'
+
+    const outputPaths: Record<string, string> = {}
+
+    for (const size of sizes) {
+      const resized = original.clone().resize({
+        width: size.width,
+        height: size.height,
+        fit: size.fit ?? sharp.fit.inside
+        ,
+      })
+
+      const outputWebP = path.join(outputDir, `${baseName}-${size.name}.webp`)
+      await resized
+        .webp({ quality: 85 })
+        .toFile(outputWebP)
+
+      outputPaths[size.name] = outputWebP
+    }
+
+    // Optionally save cleaned original as JPEG
+    const originalCleaned = path.join(outputDir, `${baseName}-original.jpg`)
+    await original
+      .jpeg({ quality: 90 })
+      .toFile(originalCleaned)
+
+    outputPaths.original = originalCleaned
+
+    return {
+      width: metadata.width,
+      height: metadata.height,
+      mime: `image/${format}`,
+      variants: outputPaths,
+    }
   }
 
   /**

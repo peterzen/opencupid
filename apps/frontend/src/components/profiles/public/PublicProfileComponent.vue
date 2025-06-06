@@ -6,6 +6,7 @@ import { type PublicProfile } from '@zod/profile.schema';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useEnumOptions } from '../composables/useEnumOptions';
+import ProfileImageComponent from '../ProfileImageComponent.vue';
 
 const { t } = useI18n()
 
@@ -75,8 +76,12 @@ const pronounsLabel = computed(() => {
           <div class="ratio ratio-4x3">
             <BCarousel controls>
               <BCarouselSlide v-for="img in props.profile.profileImages"
-                              :key="img.id"
-                              :img-src="img.url!" />
+                              :key="img.id">
+                <template #img>
+                  <ProfileImageComponent :image="img"
+                                         className="img-fluid" />
+                </template>
+              </BCarouselSlide>
             </BCarousel>
           </div>
         </div>
