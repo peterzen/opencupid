@@ -38,11 +38,11 @@ const languages = computed(() => {
   return getLanguageList(props.profile.languages)
 });
 
-const { relationshipStatusLabels, pronounsLabels,hasKidsLabels } = useEnumOptions(t)
+const { relationshipStatusLabels, pronounsLabels, hasKidsLabels } = useEnumOptions(t)
 
 
 const hasKidsLabel = computed(() => {
-  if (!props.profile.isDatingActive) return ''
+  if (!props.profile.isDatingActive || props.profile.hasKids === 'unspecified') return ''
   return hasKidsLabels()[props.profile.hasKids!] || props.profile.hasKids
 })
 
