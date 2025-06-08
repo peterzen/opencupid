@@ -47,6 +47,9 @@ app.register(import('./plugins/gallery-service'))
 app.register(import('./plugins/tag-service'))
 app.register(import('./api'), { prefix: '/api' })
 
+const wsRoutes = import('./api/routes/message-ws.route')
+app.register(wsRoutes, { prefix: '/ws' })
+
 const ok = checkImageRoot()
 if (!ok) {
   app.log.error("Media upload directory cannot be created or is not writable")
