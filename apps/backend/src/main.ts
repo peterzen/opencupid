@@ -1,4 +1,5 @@
 import Fastify from 'fastify'
+import websocket from '@fastify/websocket'
 import cors from '@fastify/cors'
 import { appConfig } from '@shared/config/appconfig'
 
@@ -38,6 +39,10 @@ app.register(cors, {
   methods: ['GET', 'PUT', 'POST', 'DELETE', 'PATCH']
 })
 
+
+
+
+
 app.register(import('./plugins/prisma'))
 // app.register(import('./plugins/auth'))
 app.register(import('./plugins/session-auth'))
@@ -49,6 +54,7 @@ app.register(import('./api'), { prefix: '/api' })
 
 const wsRoutes = import('./api/routes/message-ws.route')
 app.register(wsRoutes, { prefix: '/ws' })
+
 
 const ok = checkImageRoot()
 if (!ok) {

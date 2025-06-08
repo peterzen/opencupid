@@ -8,7 +8,7 @@ const TokenQuerySchema = z.object({
 export function verifyWsToken(req: FastifyRequest, jwt: any): { userId: string } {
 
   const parsed = TokenQuerySchema.safeParse(req.query)
-  console.log('Parsed token query:', parsed)
+  // console.log('Parsed token query:', parsed)
   if (!parsed.success) {
     throw new Error('Missing or malformed token')
   }

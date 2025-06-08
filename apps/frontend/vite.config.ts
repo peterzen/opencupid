@@ -35,7 +35,7 @@ export default defineConfig(({ mode }) => {
         },
         '/ws': {
           target: 'ws://localhost:3000',
-          changeOrigin: true,
+          rewriteWsOrigin: true,
           ws: true,
           secure: false, // accept self-signed TLS
         },
