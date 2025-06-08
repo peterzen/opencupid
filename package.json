@@ -7,6 +7,8 @@
   ],
   "devDependencies": {
     "@modelcontextprotocol/server-filesystem": "^2025.3.28",
+    "dotenv-expand": "^12.0.2",
+    "find-up": "^7.0.0",
     "turbo": "^1.10.12"
   },
   "scripts": {
@@ -15,7 +17,7 @@
     "lint": "turbo run lint",
     "generate": "turbo run generate",
     "migrate": "turbo run migrate",
-    "gen-certs":"openssl req -x509 -nodes -days 365   -newkey rsa:2048   -keyout certs/localhost-key.pem   -out certs/localhost-cert.pem   -subj \"/C=US/ST=Dev/L=Local/O=Dev/CN=localhost\"",
+    "gen-certs": "openssl req -x509 -nodes -days 365   -newkey rsa:2048   -keyout certs/localhost-key.pem   -out certs/localhost-cert.pem   -subj \"/C=US/ST=Dev/L=Local/O=Dev/CN=localhost\"",
     "mcp-server": "npx -y supergateway --stdio \"npx -y @modelcontextprotocol/server-filesystem $(pwd)\" --port 9999"
   },
   "dependencies": {

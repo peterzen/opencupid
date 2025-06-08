@@ -5,6 +5,7 @@
     "outDir": "./dist",
     "strict": true,
     "strictNullChecks": true,
+    "sourceMap": true,
     "typeRoots": [
       "./types",
       "./node_modules/@types"
@@ -22,6 +23,7 @@
     }
   },
   "include": [
-    "src"
+    "src",
+    "types"
   ]
 }

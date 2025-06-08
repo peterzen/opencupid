@@ -19,6 +19,7 @@ export default defineConfig(({ mode }) => {
     define: {
       __APP_CONFIG__: JSON.stringify({
         API_BASE_URL: rootEnv.API_BASE_URL,
+        WS_BASE_URL: rootEnv.WS_BASE_URL,
         IMAGE_URL_BASE: rootEnv.IMAGE_URL_BASE,
         FRONTEND_URL: rootEnv.FRONTEND_URL,
         NODE_ENV: rootEnv.NODE_ENV,
@@ -30,6 +31,12 @@ export default defineConfig(({ mode }) => {
         '/api': {
           target: 'http://localhost:3000', // or https://localhost:3000 if backend runs TLS
           changeOrigin: true,
+          secure: false, // accept self-signed TLS
+        },
+        '/ws': {
+          target: 'ws://localhost:3000',
+          changeOrigin: true,
+          ws: true,
           secure: false, // accept self-signed TLS
         },
       },

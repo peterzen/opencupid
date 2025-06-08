@@ -8,7 +8,8 @@ export const configSchema = z.object({
 
   FRONTEND_URL: z.string(),
   API_BASE_URL: z.string(),
-
+  WS_BASE_URL: z.string(),
+  
   JWT_SECRET: z.string().min(10),
 
   DATABASE_URL: z.string().url(),
