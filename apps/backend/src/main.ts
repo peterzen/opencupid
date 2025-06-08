@@ -45,6 +45,8 @@ app.register(import('./plugins/user-service'))
 app.register(import('./plugins/profile-service'))
 app.register(import('./plugins/gallery-service'))
 app.register(import('./plugins/tag-service'))
+app.register(import('./plugins/message-service'))
+app.register(import('./plugins/websocket'))
 app.register(import('./api'), { prefix: '/api' })
 
 const ok = checkImageRoot()

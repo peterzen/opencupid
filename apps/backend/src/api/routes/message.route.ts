@@ -1,8 +1,11 @@
 import { FastifyPluginAsync } from 'fastify'
 
 const messageRoutes: FastifyPluginAsync = async (fastify) => {
-  fastify.get('/', async () => {
-    return { messages: [] }
+  fastify.get('/:userId', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    const { userId } = req.params as { userId: string }
+    const current = req.user!.userId
+    const messages = await fastify.messageService.getConversation(current, userId)
+    reply.send({ messages })
   })
 }
 
