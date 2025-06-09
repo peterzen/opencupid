@@ -1,11 +1,26 @@
 import { z } from 'zod'
 import { UserRoleSchema, UserSchema } from '@zod/generated'
 
+const JwtPayloadSchema = z.object({
+  userId: z.string().cuid(), 
+  profileId: z.string().cuid(), 
+})
+
+export type JwtPayload = z.infer<typeof JwtPayloadSchema>
+
+// JWT payload verified and set on request.user
+// const RequestUserSchema = z.object({
+//   userId: z.string().cuid(),
+//   profileId: z.string().cuid(),
+// })
+// export type RequestUser = z.infer<typeof RequestUserSchema>
+
 
 export const AuthIdSchema = z.object({
   email: z.string().optional(),
   phonenumber: z.string().optional(),
 })
+
 export type AuthIdentifier = z.infer<typeof AuthIdSchema>
 
 export const SendOtpSchema = AuthIdSchema
@@ -23,6 +38,7 @@ export type SendOtpPayload = z.infer<typeof SendOtpSchema>
 
 export const SessionDataSchema = z.object({
   userId: z.string(),
+  profileId: z.string(),
   lang: z.string(),
   roles: z.array(UserRoleSchema),
   isOnboarded: z.boolean().default(false),

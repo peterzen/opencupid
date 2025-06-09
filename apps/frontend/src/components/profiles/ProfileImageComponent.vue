@@ -16,7 +16,7 @@ const props = defineProps({
 
 
 <template>
-  <picture class="profile-image"
+  <picture class="profile-image overflow-hidden"
            v-if="props.image">
     <!-- WebP responsive -->
     <source :srcset="`

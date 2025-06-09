@@ -4,7 +4,7 @@ import profileRoutes from './routes/profile.route'
 import tagsRoutes from './routes/tags.route'
 import citiesRoutes from './routes/city.route'
 import captchaRoutes from './routes/captcha.route'
-import messageRoutes from './routes/message.route'
+import messageRoutes from './routes/messaging.route'
 
 
 const api: FastifyPluginAsync = async (fastify) => {

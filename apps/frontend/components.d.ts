@@ -49,6 +49,7 @@ declare module 'vue' {
     PublicProfileComponent: typeof import('./src/components/profiles/public/PublicProfileComponent.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SendMessageDialog: typeof import('./src/components/messaging/SendMessageDialog.vue')['default']
     SubmitButtonComponent: typeof import('./src/components/SubmitButtonComponent.vue')['default']
     TagSelectComponent: typeof import('./src/components/profiles/TagSelectComponent.vue')['default']
     ToggleSwitch: typeof import('./src/components/ToggleSwitch.vue')['default']

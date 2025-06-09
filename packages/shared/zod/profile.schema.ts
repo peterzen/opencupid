@@ -15,7 +15,7 @@ import type {
 
 
 const baseFields = {
-  slug: true,
+  id: true,
   languages: true,
   publicName: true,
   introSocial: true,
@@ -162,3 +162,22 @@ export const SlugLookupParamsSchema = z.object({
   slug: z.string().min(1)
 })
 export type SlugLookupParams = z.infer<typeof SlugLookupParamsSchema>
+
+
+
+
+export const ProfileImageSchema = z.object({
+  storagePath: z.string()
+})
+
+export const ProfileSummarySchema = z.object({
+  id: z.string(),
+  publicName: z.string(),
+  profileImages: z.array(PublicProfileImageSchema)
+})
+
+export type ProfileSummary = z.infer<typeof ProfileSummarySchema>;
+
+export interface ProfileImages {
+  profileImages: { url: string | null }[];
+}

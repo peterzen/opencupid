@@ -4,8 +4,9 @@ import {
   OwnerProfile,
   ProfileUnionSchema,
   ProfileComplete,
+  ProfileSummary,
 } from "@zod/profile.schema";
-import { OwnerProfileImage, OwnerProfileImageSchema, PublicProfileImage, PublicProfileImageSchema } from "@zod/profileimage.schema";
+import { OwnerProfileImage, OwnerProfileImageSchema, PublicProfileImage, PublicProfileImageSchema, PublicProfileImageWithUrl } from "@zod/profileimage.schema";
 import { ProfileTagJoinSchema, PublicTag, PublicTagSchema } from "@zod/tag.schema";
 import type { ProfileImage, UserRole } from "@prisma/client";
 import { ProfileTag } from "@zod/generated";
@@ -60,10 +61,26 @@ export function mapProfileImagesToPublic(images: ProfileImage[]): PublicProfileI
   return images.map((img: ProfileImage) => toPublicProfileImage(img))
 }
 
+export function mapProfileSummary(profile: {
+  id: string
+  publicName: string
+  profileImages: ProfileImage[]
+}): ProfileSummary {
+  return {
+    id: profile.id,
+    publicName: profile.publicName,
+    profileImages: profile?.profileImages.map(toPublicProfileImage)
+  }
+}
+
+export interface MinimalProfileImage {
+  storagePath: string
+}
+
 /**
  * Constructs the public URL for the image
  */
-function getImageUrl(image: ProfileImage): string {
+function getImageUrl(image: MinimalProfileImage): string {
   const urlBase = appConfig.IMAGE_URL_BASE
   return `${urlBase}/${image.storagePath}`;
 }

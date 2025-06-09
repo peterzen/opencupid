@@ -5,7 +5,7 @@ import Redis from 'ioredis'
 
 import { type SessionData } from '@zod/user.schema'
 
-import { UserService } from 'src/services/user.service'
+import { UserService, type UserWithProfileId } from 'src/services/user.service'
 import { SessionService } from '../services/session.service'
 import { sendUnauthorizedError } from 'src/api/helpers'
 import { appConfig } from '@shared/config/appconfig'
@@ -43,7 +43,7 @@ export default fp(async (fastify: FastifyInstance) => {
     try {
       await req.jwtVerify()
     } catch (err) {
-      sendUnauthorizedError(reply)
+      return sendUnauthorizedError(reply)
     }
 
     const auth = req.headers.authorization
@@ -55,7 +55,7 @@ export default fp(async (fastify: FastifyInstance) => {
       return sendUnauthorizedError(reply, 'Invalid Authorization format')
     }
 
-    // Try to fetch an existing session
+    // Try to fetch an existing session from Redis
     let sess = await sessionService.get(sessionId)
     if (!sess) {
 
@@ -67,10 +67,14 @@ export default fp(async (fastify: FastifyInstance) => {
       let user
 
       try {
-        user = await UserService.getInstance().getUserById(userId)
-        if (!user) {
-          return sendUnauthorizedError(reply, 'User not found')
-        }
+        user = await UserService.getInstance().getUserById(userId, {
+          include: {
+            profile: {
+              select: { id: true }
+            }
+          },
+        }) as UserWithProfileId
+        if (!user) return sendUnauthorizedError(reply, 'User not found')
       } catch (error) {
         fastify.log.error('Error fetching user for session refresh:', error)
         return sendUnauthorizedError(reply, 'Session refresh failed')
@@ -80,10 +84,12 @@ export default fp(async (fastify: FastifyInstance) => {
         lang: user.language || 'en', // Default to 'en' if no language is set
         roles: user.roles,
         userId: user.id,
+        profileId: user.profile?.id || '',
         isOnboarded: user.isOnboarded || false,
         hasActiveProfile: user.hasActiveProfile || false,
       }
       sess = await sessionService.getOrCreate(sessionId, sessionData)
+      // console.log(`Created new session for user ${user.id} with session ID ${sessionId}`)
     } else {
       // Refresh TTL on simple reads
       await sessionService.refreshTtl(sessionId)

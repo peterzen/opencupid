@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from 'fastify'
-import { SendOtpSchema, OtpLoginSchema, OtpSendReturn } from '@zod/user.schema'
+import { SendOtpSchema, OtpLoginSchema, OtpSendReturn, JwtPayload } from '@zod/user.schema'
 import { validateBody } from '../../utils/zodValidate'
 import { emailQueue } from '../../queues/emailQueue'
 import { UserService } from 'src/services/user.service'
@@ -25,6 +25,8 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.status(200).send({ success: false, status: 'invalid_token' })
       }
 
+      let profileId = null
+
       // new user
       if (isNewUser) {
         // 2) enqueue the welcome email
@@ -34,10 +36,14 @@ const userRoutes: FastifyPluginAsync = async (fastify) => {
           { attempts: 3, backoff: { type: 'exponential', delay: 5000 } }
         )
         // If the user is new, initialize their profiles
-        await profileService.initializeProfiles(user.id)
+        const newProfile = await profileService.initializeProfiles(user.id)
+        profileId = newProfile.id
+      } else {
+        profileId = user.profile?.id
       }
 
-      const payload = { userId: user.id, tokenVersion: user.tokenVersion ?? 0 }
+      const payload: JwtPayload = { userId: user.id, profileId: profileId! }
+      console.info('jwt payload', payload)
       const jwt = fastify.jwt.sign(payload)
       reply.send({ success: true, token: jwt })
     } catch (error) {

@@ -76,7 +76,7 @@ const pronounsLabel = computed(() => {
           <div class="ratio ratio-4x3">
             <BCarousel controls>
               <BCarouselSlide v-for="img in props.profile.profileImages"
-                              :key="img.id">
+                              :key="img.url!">
                 <template #img>
                   <ProfileImageComponent :image="img"
                                          className="img-fluid" />

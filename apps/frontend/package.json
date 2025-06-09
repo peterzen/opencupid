@@ -30,6 +30,7 @@
     "bootstrap-vue-next": "^0.29.3",
     "bootswatch": "^5.3.6",
     "i18n-iso-countries": "^7.14.0",
+    "mitt": "^3.0.1",
     "pinia": "^3.0.1",
     "remeda": "^2.22.5",
     "vue": "^3.5.13",

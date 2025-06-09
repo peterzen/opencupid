@@ -4,13 +4,20 @@ import { AuthIdentifier, LoginUser } from '@zod/user.schema';
 import otpGenerator from 'otp-generator'
 
 // Define types for service return values
-export type UserWithProfile = User & { profile: Profile | null }
-
+export type UserWithProfileId = User & { profile: { id: string } | null }
 
 function getTokenExpiration() {
   return new Date(Date.now() + 1000 * 60 * 60 * 240)
 }
 
+
+const userSelectInclude = {
+  profile: {
+    select: {
+      id: true,
+    },
+  },
+}
 
 export class UserService {
   private static instance: UserService
@@ -27,15 +34,16 @@ export class UserService {
   }
 
   async otpLogin(userId: string, otp: string): Promise<{
-    user: User | null,
+    user: UserWithProfileId | null,
     isNewUser: boolean
   }> {
 
     const user = await prisma.user.findUnique({
       where: {
         id: userId,
-        loginToken: otp
-      }
+        loginToken: otp,
+      },
+      include: userSelectInclude,
     })
     if (!user) {
       return { user: null, isNewUser: false }
@@ -46,6 +54,7 @@ export class UserService {
     // Update the user's email confirmation status
     const userUpdated = await prisma.user.update({
       where: { id: user.id },
+      include: userSelectInclude,
       data: {
         isRegistrationConfirmed: true,
         loginToken: null, // Clear the reset token
@@ -94,7 +103,7 @@ export class UserService {
     return { user, isNewUser }
   }
 
-  async getUserById(userId: string, args?: object): Promise<User | null> {
+  async getUserById(userId: string, args?: object): Promise<User | UserWithProfileId | null> {
     return prisma.user.findUnique({
       where: { id: userId },
       ...args

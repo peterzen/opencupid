@@ -30,6 +30,7 @@ export class SessionService {
       .hset(
         hkey,
         'userId', data.userId,
+        'profileId', data.profileId,
         'lang', data.lang,
         'isOnboarded', data.isOnboarded ? 'true' : 'false',
         'hasActiveProfile', data.hasActiveProfile ? 'true' : 'false'
@@ -61,6 +62,7 @@ export class SessionService {
 
     return {
       userId: hash.userId,
+      profileId: hash.profileId,
       lang: hash.lang || 'en',
       roles: roles as UserRole[],
       isOnboarded: hash.isOnboarded === 'true',

@@ -1,3 +1,4 @@
+import { JwtPayload } from '@zod/user.schema'
 import { FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
@@ -5,7 +6,7 @@ const TokenQuerySchema = z.object({
   token: z.string().min(1)
 })
 
-export function verifyWsToken(req: FastifyRequest, jwt: any): { userId: string } {
+export function verifyWsToken(req: FastifyRequest, jwt: any): JwtPayload {
 
   const parsed = TokenQuerySchema.safeParse(req.query)
   // console.log('Parsed token query:', parsed)

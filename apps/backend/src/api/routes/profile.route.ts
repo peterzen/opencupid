@@ -68,16 +68,16 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
    * Get a profile by slug
    * @param {string} slug - The slug of the profile to retrieve
    */
-  fastify.get('/:slug', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+  fastify.get('/:id', { onRequest: [fastify.authenticate] }, async (req, reply) => {
 
     if (!req.user.userId) return sendUnauthorizedError(reply)
 
     const roles = getUserRoles(req)
 
-    const { slug } = SlugLookupParamsSchema.parse(req.params)
+    const { id } = IdLookupParamsSchema.parse(req.params)
 
     try {
-      const raw = await profileService.getProfileBySlug(slug)
+      const raw = await profileService.getProfileById(id)
       if (!raw) return sendError(reply, 404, 'Profile not found')
 
       if (raw.userId !== req.user.userId && !req.session.hasActiveProfile) {

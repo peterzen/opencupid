@@ -1,9 +1,8 @@
 import type WebSocket from 'ws'
 import { FastifyPluginAsync } from 'fastify'
-import websocket from '@fastify/websocket'
 
 import { verifyWsToken } from '@/lib/verifyWsToken'
-import { MessageService } from '@/services/message.service'
+import { MessageService } from '@/services/messaging.service'
 
 interface WsMessage {
   to: string // recipient userId
@@ -12,27 +11,34 @@ interface WsMessage {
 
 const messageWsRoutes: FastifyPluginAsync = async (fastify) => {
 
-  await fastify.register(websocket)
-  const messageService = MessageService.getInstance()
-
-  fastify.decorate('connections', {} as Record<string, WebSocket>)
 
   fastify.get('/message', { websocket: true }, (socket: WebSocket, req) => {
 
-    const { userId } = verifyWsToken(req, fastify.jwt) // fix req.reuqest typing
+    const { profileId } = verifyWsToken(req, fastify.jwt)
 
-    if (!userId) {
+    if (!profileId) {
       fastify.log.warn('WebSocket connection without userId, closing')
       socket.close()
       return
     }
 
-    fastify.log.info(`WebSocket connection established for user ${userId}`)
-    fastify.connections[userId] = socket
+    fastify.log.info(`WebSocket connection established for user ${profileId}`)
+    // fastify.connections.set(profileId, socket)
+    // Add socket to profile's set
+    let sockets = fastify.connections.get(profileId)
+    if (!sockets) {
+      sockets = new Set<WebSocket>()
+      fastify.connections.set(profileId, sockets)
+    }
+    sockets.add(socket)
+
 
     socket.on('close', () => {
-      fastify.log.info(`WebSocket connection closed for user ${userId}`)
-      delete fastify.connections[userId]
+      fastify.log.info(`WebSocket connection closed for profile ${profileId}`)
+      sockets!.delete(socket)
+      if (sockets!.size === 0) {
+        fastify.connections.delete(profileId)
+      }
     })
 
     socket.on('error', (err: any) => {
@@ -48,25 +54,42 @@ const messageWsRoutes: FastifyPluginAsync = async (fastify) => {
     })
 
     socket.on('message', async (raw: any) => {
-      fastify.log.info(`Received message from user ${userId}: ${raw.toString()}`)
+      fastify.log.info(`Received message from user ${profileId}: ${raw.toString()}`)
+
+      let data: WsMessage
+
       try {
-        const data = JSON.parse(raw.toString()) as WsMessage
-        if (!data.to || !data.content) return
-        const msg = await messageService.sendMessage(userId, data.to, data.content)
-        const receiver = fastify.connections[data.to]
-        if (receiver && receiver.readyState === receiver.OPEN) {
-          receiver.send(JSON.stringify({
-            id: msg.id,
-            from: userId,
-            content: msg.content,
-            createdAt: msg.createdAt
-          }))
-        }
+        data = JSON.parse(raw.toString()) as WsMessage
       } catch (err) {
-        // TODO FIXME more fine grained catch to handle JSON.parse, messageService.sendMessage errors and do more meaningful logging.
-        console.error('Error processing WS message', err)
-        fastify.log.error('Invalid WS message', err)
+        fastify.log.warn('Malformed JSON received on WebSocket', err)
+        return
       }
+
+      // Ignore heartbeat messages from client
+      if ((data as any).type === 'ping') {
+        socket.send(JSON.stringify({ type: 'pong' }))
+        return
+      }
+
+      if (!data.to || !data.content) {
+        fastify.log.warn('WS message missing required fields', data)
+        return
+      }
+
+      // try {
+      //   const msg = await messageService.sendMessage(userId, data.to, data.content)
+      //   const receiver = fastify.connections.get(data.to)
+      //   if (receiver && receiver.readyState === receiver.OPEN) {
+      //     receiver.send(JSON.stringify({
+      //       id: msg.id,
+      //       from: userId,
+      //       content: msg.content,
+      //       createdAt: msg.createdAt
+      //     }))
+      //   }
+      // } catch (err) {
+      //   fastify.log.error('Failed to persist or forward WS message', err)
+      // }
     })
   })
 

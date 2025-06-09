@@ -10,7 +10,7 @@ const profileStore = useProfileStore()
 
 // Props
 const props = defineProps<{
-  slug: string
+  id: string
 }>()
 
 // Local state
@@ -19,7 +19,7 @@ const profile = reactive<PublicProfile>({} as PublicProfile)
 
 onMounted(async () => {
   isLoading.value = true
-  const profileId = props.slug
+  const profileId = props.id
   const fetched = await profileStore.getPublicProfile(profileId)
   Object.assign(profile, fetched)
   isLoading.value = false
@@ -31,7 +31,7 @@ onMounted(async () => {
 
 
 <template>
-  <div class="container">
+  <div class="container mb-5 mt-3">
     <LoadingComponent v-if="isLoading" />
     <PublicProfileComponent :profile
                             :isLoading />

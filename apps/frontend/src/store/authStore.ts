@@ -1,18 +1,16 @@
 import { defineStore } from 'pinia'
 import { api } from '@/lib/api'
+import { bus } from '@/lib/bus'
 import { type UserRoleType } from '@zod/generated'
+
 import {
-  LoginUserSchema,
+  type JwtPayload,
   OtpSendReturnSchema,
   SettingsUserSchema,
   type AuthIdentifier,
   type SessionData
 } from '@zod/user.schema'
 
-
-interface JwtPayload {
-  userId: string
-}
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -41,6 +39,9 @@ export const useAuthStore = defineStore('auth', {
       try {
         const payload = JSON.parse(atob(token.split('.')[1])) as JwtPayload
         this.userId = payload.userId
+        // Notify messageStore
+        bus.emit('auth:login', { token: this.jwt })
+
       } catch (e) {
         console.warn('Failed to parse JWT payload:', e)
         this.userId = null
@@ -48,9 +49,9 @@ export const useAuthStore = defineStore('auth', {
     },
 
     initializeFromStorage() {
-      const storedToken = localStorage.getItem('token')
-      if (storedToken) {
-        this.setAuthState(storedToken)
+      const token = localStorage.getItem('token')
+      if (token) {
+        this.setAuthState(token)
       }
       this.isInitialized = true
     },
@@ -140,6 +141,7 @@ export const useAuthStore = defineStore('auth', {
       this.jwt = ''
       localStorage.removeItem('token')
       delete api.defaults.headers.common['Authorization']
+      bus.emit('auth:logout')
     },
 
   },

@@ -166,9 +166,6 @@ model User {
 
   requestsSent     ConnectionRequest[] @relation("RequestsSent")
   requestsReceived ConnectionRequest[] @relation("RequestsReceived")
-
-  messagesSent  Message[] @relation("SentMessages")
-  messagesRecvd Message[] @relation("ReceivedMessages")
 }
 
 model Profile {
@@ -214,6 +211,12 @@ model Profile {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  ConversationParticipant ConversationParticipant[]
+  // Only present to satisfy Prisma; use ConversationParticipant instead
+  conversationAsA         Conversation[]            @relation("ProfileA")
+  conversationAsB         Conversation[]            @relation("ProfileB")
+  Message                 Message[]
 }
 
 model ProfileImage {
@@ -241,17 +244,44 @@ model ProfileImage {
   @@index([userId])
 }
 
+model Conversation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profileA   Profile @relation("ProfileA", fields: [profileAId], references: [id])
+  profileAId String
+
+  profileB   Profile @relation("ProfileB", fields: [profileBId], references: [id])
+  profileBId String
+
+  participants ConversationParticipant[]
+  messages     Message[]
+
+  @@unique([profileAId, profileBId], name: "profileAId_profileBId")
+}
+
+model ConversationParticipant {
+  id        String  @id @default(cuid())
+  profile   Profile @relation(fields: [profileId], references: [id])
+  profileId String
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId String
+
+  lastReadAt DateTime?
+  isMuted    Boolean   @default(false)
+  isArchived Boolean   @default(false)
+
+  @@unique([profileId, conversationId])
+}
+
 model Message {
-  id         String   @id @default(cuid())
-  senderId   String
-  receiverId String
-  content    String
-  createdAt  DateTime @default(now())
-
-  sender   User @relation("SentMessages", fields: [senderId], references: [id])
-  receiver User @relation("ReceivedMessages", fields: [receiverId], references: [id])
-
-  @@index([receiverId])
-  @@index([senderId])
-  @@map("messages")
+  id             String       @id @default(cuid())
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId String
+  sender         Profile      @relation(fields: [senderId], references: [id])
+  senderId       String
+  content        String
+  createdAt      DateTime     @default(now())
 }

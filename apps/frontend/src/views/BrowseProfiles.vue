@@ -37,7 +37,7 @@ onMounted(async () => {
 
 const handleCardClick = (profile: PublicProfile) => {
   console.log('Card clicked:', profile);
-  router.push({ name: 'PublicProfile', params: { slug: profile.slug } });
+  router.push({ name: 'PublicProfile', params: { id: profile.id } });
 };
 
 </script>
@@ -55,7 +55,7 @@ const handleCardClick = (profile: PublicProfile) => {
           <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
 
             <div v-for="profile in state.profiles"
-                 :key="profile.slug"
+                 :key="profile.id"
                  class="col">
               <ProfileCardComponent :profile="profile"
                                     @click="handleCardClick(profile)" />

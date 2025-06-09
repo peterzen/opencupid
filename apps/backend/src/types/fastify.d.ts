@@ -1,8 +1,11 @@
 import 'fastify'
-import { PrismaClient } from '@prisma/client'
-import type { MessageService } from '../services/message.service'
-import type { SocketStream } from '@fastify/websocket'
 import '@fastify/jwt'
+
+import { PrismaClient } from '@prisma/client'
+import type { SocketStream } from '@fastify/websocket'
+import type { JwtPayload, RequestUser } from '@zod/user.schema'
+
+import type { MessageService } from '../services/messaging.service'
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -15,7 +18,7 @@ declare module 'fastify' {
 
 declare module '@fastify/jwt' {
   interface FastifyJWT {
-    payload: { userId: string; tokenVersion: number }
-    user: { userId: string }
+    payload: JwtPayload
+    user: JwtPayload 
   }
 }
