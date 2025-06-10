@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest'
 import { vi, describe, it, expect } from 'vitest'
 import { mapProfileImagesToOwner } from '../../api/mappers'
 vi.mock('@shared/config/appconfig', () => ({ appConfig: { IMAGE_URL_BASE: 'http://img' } }))
