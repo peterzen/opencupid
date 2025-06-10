@@ -10,7 +10,7 @@ import { type OwnerProfileImage } from '@zod/profileimage.schema'
 
 import ImageUpload from '@/components/profiles/ImageUpload.vue'
 import LoadingComponent from '@/components/LoadingComponent.vue'
-import ProfileImageComponent from '@/components/profiles/ProfileImageComponent.vue'
+import ProfileImageComponent from '@/components/profiles/image/ImageTag.vue'
 
 import { IconArrowLeft } from '@/components/icons/DoodleIcons'
 import HelpScribble from './HelpScribble.vue'

@@ -4,6 +4,7 @@ import { useProfileStore } from '@/store/profileStore'
 import type { ProfileImages, PublicProfile } from '@zod/profile.schema'
 import { useMessageStore } from '@/store/messageStore'
 import type { ConversationSummary } from '@zod/messaging.schema'
+import ProfileImage from '@/components/profiles/image/ProfileImage.vue'
 
 const profileStore = useProfileStore()
 const messageStore = useMessageStore()
@@ -65,7 +66,7 @@ async function handleSelectConvo(convo: ConversationSummary) {
           >
             <span class="publicname">{{ convo.partnerProfile.publicName }}</span>
             <div class="thumbnail">
-              <ProfileImageComponent :image="profileImage(convo.partnerProfile)" />
+              <ProfileImage :profile="convo.partnerProfile" />
             </div>
           </li>
         </ul>
@@ -100,7 +101,7 @@ async function handleSelectConvo(convo: ConversationSummary) {
             >
               <span class="publicname">{{ profile.publicName }}</span>
               <div class="thumbnail">
-                <ProfileImageComponent :image="profileImage(profile)" />
+                <ProfileImage :profile="profile" />
               </div>
             </li>
           </ul>

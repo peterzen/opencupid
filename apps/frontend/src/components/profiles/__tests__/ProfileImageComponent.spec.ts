@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { describe, it, expect } from 'vitest'
-import ProfileImageComponent from '../ProfileImageComponent.vue'
+import ProfileImageComponent from '../image/ImageTag.vue'
 
 describe('ProfileImageComponent', () => {
   it('renders picture sources', () => {

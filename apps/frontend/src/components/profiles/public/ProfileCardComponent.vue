@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 import type { PublicProfile } from '@zod/profile.schema'
-import ProfileImageComponent from '@/components/profiles/ProfileImageComponent.vue'
+import ProfileImage from '@/components/profiles/image/ProfileImage.vue'
 
 // Props & Emits
 const props = defineProps<{
@@ -15,17 +14,13 @@ const emit = defineEmits<{
   // (e: 'submit', value: OwnerProfile): void
 }>()
 
-const profileImage = computed(() => {
-  return (profile: PublicProfile) => {
-    return profile.profileImages.length > 0 ? profile.profileImages[0] : undefined
-  }
-})
+
 </script>
 
 <template>
   <div class="card h-100 profile-card">
     <div class="ratio ratio-1x1">
-      <ProfileImageComponent :image="profileImage(profile)" />
+      <ProfileImage :profile="profile" />
     </div>
     <div class="card-body d-flex flex-column">
       <div class="card-title">{{ profile.publicName }}</div>
@@ -47,6 +42,7 @@ const profileImage = computed(() => {
   top: 0.5rem;
   right: 0.5rem;
 }
+
 .card {
   cursor: pointer;
 
@@ -54,6 +50,7 @@ const profileImage = computed(() => {
     border-color: var(--bs-primary);
   }
 }
+
 .card-body {
   background-color: var(--bs-tertiary);
 }
