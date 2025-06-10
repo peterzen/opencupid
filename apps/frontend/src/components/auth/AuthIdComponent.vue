@@ -5,6 +5,9 @@ import { emailRegex, phoneRegex } from '@/lib/utils';
 import CaptchaWidget from './CaptchaWidget.vue';
 import { IconMail, IconPhone, IconTick, IconLogin } from '@/components/icons/DoodleIcons';
 import Logo from '@/assets/icons/app/logo.svg'
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n()
 
 const props = defineProps<{
   isLoading: boolean
@@ -31,7 +34,7 @@ const authIdentifier = computed(() => {
 // Method to handle sending login link
 async function handleSendLoginLink() {
   if (!authIdInput.value) {
-    error.value = 'Please enter your email address or phone number.'
+    error.value = t('auth.auth_id_input_empty')  // "Please enter your email or phone number."
     return
   }
   emit('otp:send', authIdentifier.value)
@@ -79,14 +82,14 @@ const authIdInputRef = ref<InstanceType<any> | null>(null)
       <div class="mb-3">
         <FormKit type="text"
                  v-model="authIdInput"
-                 label="Email or phone number"
+                 :label="t('auth.auth_id_input_label')"  
                  id="authIdInput"
                  ref="authIdInputRef"
                  autofocus
                  :floating-label="true"
                  input-class="form-control-lg"
                  validation="+validateAuthIdInput"
-                 placeholder="+43... or your@email.com"
+                 :placeholder="t('auth.auth_id_input_placeholder')"
                  :validation-rules="{
                   validateAuthIdInput,
                 }"
@@ -118,7 +121,7 @@ const authIdInputRef = ref<InstanceType<any> | null>(null)
                wrapper-class="d-grid gap-2 mb-3"
                input-class="btn-primary btn-lg w-100"
                :disabled="!valid || props.isLoading">
-        <IconLogin class="svg-icon" /> Continue
+        <IconLogin class="svg-icon" /> {{ t('auth.login') }}
       </FormKit>
 
     </FormKit>

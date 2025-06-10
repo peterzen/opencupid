@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue';
 import 'altcha';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n()
 
 const challengeUrl = __APP_CONFIG__.API_BASE_URL + '/captcha/challenge'
 
@@ -53,24 +56,21 @@ onUnmounted(() => {
 
 <template>
   <!-- https://github.com/altcha-org/altcha#configuration -->
-  <altcha-widget
-    ref="altchaWidget"
-    style="--altcha-max-width:100%"
-    debug
-    :challengeurl="challengeurl"
-    disableautofocus
-    hidefooter
-    hidelogo
-    :strings="JSON.stringify({
-      label: 'I am a human being',
-    })"
-  ></altcha-widget>
+  <altcha-widget ref="altchaWidget"
+                 style="--altcha-max-width:100%"
+                 debug
+                 :challengeurl="challengeurl"
+                 disableautofocus
+                 hidefooter
+                 hidelogo
+                 :strings="JSON.stringify({
+                  label: t('auth.captcha_input_label'),
+                })"></altcha-widget>
 </template>
 
 <style scoped>
 :deep(.altcha) {
-  border:none;
+  border: none;
   color: var(--bs-secondary);
 }
-
 </style>
