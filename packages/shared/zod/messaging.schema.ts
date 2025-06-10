@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client'
 import { z } from 'zod'
 import { ProfileSummarySchema } from './profile.schema'
-import { ConversationParticipantSchema, MessageSchema } from './generated'
+import { ConversationParticipantSchema, Message, MessageSchema } from './generated'
 
 export const ConversationSchema = z.object({
   id: z.string(),
@@ -19,6 +19,27 @@ const conversationParticipantFields = {
   isArchived: true,
 } as const
 
+export const MessageInConversationSchema = MessageSchema.pick({
+  id: true,
+  conversationId: true,
+  senderId: true,
+  content: true,
+  createdAt: true,
+}).extend({
+  isMine: z.boolean().optional(),
+})
+
+export type MessageInConversation = z.infer<typeof MessageInConversationSchema>
+
+export const MessageInConversationSummarySchema = MessageSchema.pick({
+  content: true,
+  createdAt: true,
+}).extend({
+  isMine: z.boolean().optional(),
+})
+export type MessageInConversationSummary = z.infer<typeof MessageInConversationSummarySchema>
+
+
 export const ConversationSummarySchema = ConversationParticipantSchema.pick({
   id: true,
   profileId: true,
@@ -34,21 +55,11 @@ export const ConversationSummarySchema = ConversationParticipantSchema.pick({
   }),
   partnerProfile: ProfileSummarySchema,
   unreadCount: z.number(),
+  lastMessage: MessageInConversationSummarySchema.nullable(),
 })
 
 export type ConversationSummary = z.infer<typeof ConversationSummarySchema>
 
-export const MessageInConversationSchema = MessageSchema.pick({
-  id: true,
-  conversationId: true,
-  senderId: true,
-  content: true,
-  createdAt: true,
-}).extend({
-  isMine: z.boolean().optional(),
-})
-
-export type MessageInConversation = z.infer<typeof MessageInConversationSchema>
 
 export type ConversationParticipantWithConversationSummary =
   Prisma.ConversationParticipantGetPayload<{
@@ -65,6 +76,12 @@ export type ConversationParticipantWithConversationSummary =
                 }
               }
             }
+          },
+          messages: {
+            take: 1,
+            orderBy: {
+              createdAt: 'desc'
+            }
           }
         }
       }
@@ -72,5 +89,5 @@ export type ConversationParticipantWithConversationSummary =
   }>
 
 export type ConversationParticipantWithExtras = ConversationParticipantWithConversationSummary & {
-  unreadCount: number
+  unreadCount: number,
 }

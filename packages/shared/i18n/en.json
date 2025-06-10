@@ -104,6 +104,11 @@
     "login": "Login",
     "logout": "Logout"
   },
+  "messaging":{
+    "send_message_button":"Send",
+    "message_input_placeholder": "Type your message here..."
+
+  },
   "uicomponents": {
     "submitbutton": {
       "working": "Working...",

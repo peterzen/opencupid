@@ -10,7 +10,7 @@ export const useMessageStore = defineStore('message', {
   state: () => ({
     conversations: [] as ConversationSummary[],
     messages: [] as MessageInConversation[],
-    activeConversationId: null as string | null,
+    activeConversation: null as ConversationSummary | null,
     unreadCount: 0,
     socket: null as any, // TODO find out why UseWebSocketReturn<any> gives TS errors
   }),
@@ -50,19 +50,25 @@ export const useMessageStore = defineStore('message', {
 
     messageHandler(event: MessageEvent) {
       const data = JSON.parse(event.data)
+      console.log('WebSocket message received:', data)
       if (data.type === 'new_message') {
         const message: MessageInConversation = data.payload
-
         // Update conversation summary (and bump it to top)
-        const convoIndex = this.conversations.findIndex(c => c.id === message.conversationId)
+        const convoIndex = this.conversations.findIndex(c => c.conversationId === message.conversationId)
+
         if (convoIndex !== -1) {
           const [convo] = this.conversations.splice(convoIndex, 1)
-          this.conversations.splice(convoIndex, 1)
-          this.conversations.unshift(convo)
+          // Update last message and unread count
+          const updatedConvo: ConversationSummary = {
+            ...convo,
+            lastMessage: message,
+            unreadCount: convo.unreadCount + 1, // Increment unread count
+          }
+          this.conversations.unshift(updatedConvo)
         }
 
         // If this is the active conversation, append to visible messages
-        if (this.activeConversationId === message.conversationId) {
+        if (this.activeConversation?.conversationId === message.conversationId) {
           this.messages.push(message)
         } else {
           this.unreadCount++
@@ -100,17 +106,17 @@ export const useMessageStore = defineStore('message', {
       return this.conversations
     },
 
-    async fetchUnreadCount() {
-      const res = await api.get('/messages/conversations/unread-count')
-      if (res.data.success) {
-        this.unreadCount = res.data.count
-      }
-    },
+    // async fetchUnreadCount() {
+    //   const res = await api.get('/messages/conversations/unread-count')
+    //   if (res.data.success) {
+    //     this.unreadCount = res.data.count
+    //   }
+    // },
 
-    async markAsRead(convoId: string) {
-      await api.post(`/messages/conversations/${convoId}/mark-read`)
-      await this.fetchUnreadCount()
-    },
+    // async markAsRead(convoId: string) {
+    //   await api.post(`/messages/conversations/${convoId}/mark-read`)
+    //   await this.fetchUnreadCount()
+    // },
 
     async sendMessage(
       recipientProfileId: string,
@@ -126,7 +132,7 @@ export const useMessageStore = defineStore('message', {
             conversation,
             ...this.conversations.filter(c => c.conversationId !== conversation.conversationId),
           ]
-          if (this.activeConversationId === conversation.conversationId) {
+          if (this.activeConversation === conversation.conversationId) {
             this.messages.push(message)
           }
           return res.data.conversation
@@ -136,9 +142,10 @@ export const useMessageStore = defineStore('message', {
       }
       return null
     },
-    async setActiveConversation(convoId: string) {
-      this.activeConversationId = convoId
-      await this.fetchMessagesForConversation(convoId)
+
+    async setActiveConversation(convo: ConversationSummary | null) {
+      this.activeConversation = convo
+      if (this.activeConversation) await this.fetchMessagesForConversation(this.activeConversation.conversationId)
     },
   },
 })

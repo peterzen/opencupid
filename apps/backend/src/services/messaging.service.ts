@@ -18,13 +18,19 @@ const conversationSummaryInclude = {
           },
         },
       },
+      messages: {
+        take: 1,
+        orderBy: {
+          createdAt: 'desc' as const, // Ensure correct type for orderBy
+        },
+      },
     },
   },
 }
 export class MessageService {
   private static instance: MessageService
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): MessageService {
     if (!MessageService.instance) {
@@ -139,7 +145,16 @@ export class MessageService {
           },
         })
 
-        if (!conversation) {
+        if (conversation) {
+          // existing conversation, update lastMessageAt
+          await tx.conversation.update({
+            where: {
+              profileAId_profileBId: { profileAId, profileBId },
+            },
+            data: { updatedAt: new Date() },
+          })
+
+        } else {
           conversation = await tx.conversation.create({
             data: {
               profileAId,
@@ -158,6 +173,7 @@ export class MessageService {
             content,
           },
         })
+
 
         return { conversationId: conversation.id, message }
       }

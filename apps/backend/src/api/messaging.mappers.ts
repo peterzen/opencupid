@@ -25,6 +25,8 @@ export function mapConversationParticipantToSummary(
 
   if (!partner) throw new Error('Partner profile not found in conversation')
 
+  const lastMessage = p.conversation.messages[0] ?? null
+
   return {
     id: p.id,
     profileId: p.profileId,
@@ -33,6 +35,11 @@ export function mapConversationParticipantToSummary(
     isMuted: p.isMuted,
     isArchived: p.isArchived,
     unreadCount: p.unreadCount,
+    lastMessage: lastMessage ? {
+      content: lastMessage.content,
+      createdAt: lastMessage.createdAt,
+      isMine: lastMessage.senderId === currentProfileId,
+    } : null,
     conversation: mapConversationMeta(p.conversation),
     partnerProfile: mapProfileSummary(partner.profile),
   }

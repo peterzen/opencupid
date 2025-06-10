@@ -1,24 +1,33 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
-import type { ProfileImages, PublicProfile } from '@zod/profile.schema'
+import { ProfileSummary, type PublicProfile } from '@zod/profile.schema'
 import { useMessageStore } from '@/store/messageStore'
 import type { ConversationSummary } from '@zod/messaging.schema'
+import ConversationSummaries from '@/components/messaging/ConversationSummaries.vue'
+import SendMessage from '@/components/messaging/SendMessage.vue'
+import MessageList from '@/components/messaging/MessageList.vue'
+import { IconArrowSingleLeft, IconMenu } from '@/components/icons/DoodleIcons'
 import ProfileImage from '@/components/profiles/image/ProfileImage.vue'
 
 const profileStore = useProfileStore()
 const messageStore = useMessageStore()
 
 const profiles = ref<PublicProfile[]>([])
-const recipient = ref('')
-const content = ref('')
+// const recipient = ref<ProfileSummary | null>(null)
 const isLoading = ref(false)
+const showModal = ref(false)
 
-async function sendMessage() {
-  if (!recipient.value || !content.value) return
-  await messageStore.sendMessage(recipient.value, content.value)
-  console.log('Message sent:', conversations)
+async function sendMessage(content: string) {
+  if (!recipient.value || !content) return
+  isLoading.value = true
+  await messageStore.sendMessage(recipient.value.id, content)
+  isLoading.value = false
 }
+
+const recipient = computed(() => {
+  return messageStore.activeConversation?.partnerProfile || null
+})
 
 onMounted(async () => {
   isLoading.value = true
@@ -34,70 +43,95 @@ onMounted(async () => {
   isLoading.value = false
 })
 
-const conversations = computed(() => messageStore.conversations)
-const messages = computed(() => messageStore.messages)
-
-// TODO refactor into ProfileImageComponent
-const profileImage = computed(() => {
-  return (profile: ProfileImages) => {
-    return profile.profileImages.length > 0 ? profile.profileImages[0] : undefined
-  }
-})
-
 async function handleSelectConvo(convo: ConversationSummary) {
-  recipient.value = convo.partnerProfile.id
-  await messageStore.setActiveConversation(convo.conversationId)
+  // recipient.value = convo.partnerProfile
+  await messageStore.setActiveConversation(convo)
+}
+
+async function handleDeselectConvo() {
+  await messageStore.setActiveConversation(null)
 }
 </script>
 
 <template>
-  <div class="container mt-3">
-    <h2 class="mb-3">Messaging</h2>
-    <!-- TODO implement left sidebar with user list. user items should be clickable  -->
-    <div class="row">
-      <div class="col-md-3">
-        <h6>Convos</h6>
-        <ul class="list-group mb-3">
-          <li
-            v-for="convo in conversations"
-            :key="convo.conversationId"
-            class="list-group-item d-flex justify-content-between align-items-center"
-            @click="handleSelectConvo(convo)"
-          >
-            <span class="publicname">{{ convo.partnerProfile.publicName }}</span>
-            <div class="thumbnail">
-              <ProfileImage :profile="convo.partnerProfile" />
-            </div>
-          </li>
-        </ul>
+  <div class="flex-grow-1 d-flex flex-row overflow-hidden">
+    <div
+      class="col-12 col-md-3 d-md-block"
+      :class="{ 'd-none': recipient }"
+      id="conversations-list"
+    >
+      <div class="mt-3 mx-3">
+        <ConversationSummaries
+          :conversations="messageStore.conversations"
+          :activeConversation="messageStore.activeConversation"
+          @convo:select="handleSelectConvo"
+        />
       </div>
-      <div class="col-md-9">
-        <div class="mb-2">
-          <input v-model="recipient" class="form-control mb-2" placeholder="Recipient user id" />
-          <div class="border p-2 mb-2" style="height: 200px; overflow-y: auto">
-            <div v-for="msg in messages" :key="msg.id" class="mb-1">
-              {{ msg.content }}
-            </div>
+    </div>
+    <div
+      class="col-md-9 flex-grow-1 d-flex flex-column overflow-hidden"
+      v-if="recipient"
+      id="message-view"
+    >
+      <div class="d-flex align-items-center justify-content-between p-2">
+        <div class="back-button">
+          <a class="btn btn-secondary-outline" @click="handleDeselectConvo">
+            <IconArrowSingleLeft class="svg-icon fs-4" />
+          </a>
+        </div>
+
+        <div class="d-flex flex-column align-items-center">
+          <div class="thumbnail me-2">
+            <ProfileImage :profile="recipient" />
           </div>
-          <div class="input-group">
-            <input
-              v-model="content"
-              class="form-control"
-              placeholder="Type a message"
-              @keyup.enter="sendMessage"
-            />
-            <button class="btn btn-primary" @click="sendMessage">Send</button>
+          <div class="">
+            <span class="d-block text-truncate fs-6">{{ recipient.publicName }}</span>
           </div>
         </div>
 
-        <div class="mb-4">
+        <div class="action-button">
+          <IconMenu class="svg-icon fs-4" @click="showModal = true" />
+        </div>
+      </div>
+
+      <div class="flex-grow-1 overflow-hidden d-flex flex-column">
+        <MessageList :messages="messageStore.messages" />
+      </div>
+      <div class="d-flex align-items-center w-100 mb-5 py-2 px-2">
+        <SendMessage @message:send="sendMessage" :recipientProfile="recipient" v-if="recipient" />
+      </div>
+    </div>
+
+    <BModal
+      v-model="showModal"
+      title=""
+      size="md"
+      :backdrop="'static'"
+      centered
+      button-size="sm"
+      :focus="false"
+      :no-close-on-backdrop="true"
+      :no-header="true"
+      :ok-title="`Block ${recipient ? recipient.publicName : ''}`"
+      cancel-title="Nevermind"
+      initial-animation
+      body-class="d-flex flex-row align-items-center justify-content-center overflow-hidden"
+      :keyboard="false"
+    >
+      <div class="w-100">
+        <h4>Block/report/unmatch</h4>
+      </div>
+    </BModal>
+  </div>
+
+  <!-- <div class="mb-4">
           <h4>Users</h4>
           <ul class="list-group">
             <li
               v-for="profile in profiles"
               :key="profile.id"
               class="list-group-item d-flex justify-content-between align-items-center"
-              @click="recipient = profile.id"
+              @click="recipient = profile"
             >
               <span class="publicname">{{ profile.publicName }}</span>
               <div class="thumbnail">
@@ -105,14 +139,10 @@ async function handleSelectConvo(convo: ConversationSummary) {
               </div>
             </li>
           </ul>
-        </div>
-      </div>
-    </div>
-  </div>
+        </div> -->
 </template>
-
 <style scoped>
-.thumbnail {
+:deep(.thumbnail) {
   width: 40px;
   height: 40px;
   overflow: hidden;

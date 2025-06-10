@@ -27,7 +27,7 @@ function handleLogoutClick() {
 </script>
 
 <template>
-  <BNavbar variant="secondary" fixed="bottom" class="mt-4" v-if="isLoggedIn">
+  <BNavbar variant="secondary" fixed="bottom" v-if="isLoggedIn">
     <BNavbarNav class="d-flex justify-content-between w-100">
       <BNavItem to="/onboarding" active-class="active">
         <IconPen class="svg-icon" />
