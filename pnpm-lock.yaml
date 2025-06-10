@@ -160,6 +160,12 @@ importers:
       typescript-eslint:
         specifier: ^8.34.0
         version: 8.34.0(eslint@9.26.0(jiti@2.4.2))(typescript@5.8.3)
+      vite-tsconfig-paths:
+        specifier: ^4.2.0
+        version: 4.3.2(typescript@5.8.3)(vite@6.3.5(@types/node@18.19.100)(jiti@2.4.2)(lightningcss@1.30.1)(sass-embedded@1.88.0)(sass@1.89.0)(yaml@2.8.0))
+      vitest:
+        specifier: ^3.1.1
+        version: 3.1.3(@types/node@18.19.100)(jiti@2.4.2)(jsdom@26.1.0)(lightningcss@1.30.1)(sass-embedded@1.88.0)(sass@1.89.0)(yaml@2.8.0)
       wscat:
         specifier: ^6.1.0
         version: 6.1.0
@@ -3079,6 +3085,9 @@ packages:
     resolution: {integrity: sha512-jhIXaOzy1sb8IyocaruWSn1TjmnBVs8Ayhcy83rmxNJ8q2uWKCAj3CnJY+KpGSXCueAPc0i05kVvVKtP1t9S3g==}
     engines: {node: '>=10'}
 
+  globrex@0.1.2:
+    resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
+
   gopd@1.2.0:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
     engines: {node: '>= 0.4'}
@@ -5053,6 +5062,16 @@ packages:
     peerDependencies:
       typescript: '*'
 
+  tsconfck@3.1.6:
+    resolution: {integrity: sha512-ks6Vjr/jEw0P1gmOVwutM3B7fWxoWBL2KRDb1JfqGVawBmO5UsvmWOQFGHBPl5yxYz4eERr19E6L7NMv+Fej4w==}
+    engines: {node: ^18 || >=20}
+    hasBin: true
+    peerDependencies:
+      typescript: ^5.0.0
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   tsconfig-paths@4.2.0:
     resolution: {integrity: sha512-NoZ4roiN7LnbKn9QqE1amc9DJfzvZXxF4xDavcOWt1BPkdx+m+0gJuPM+S0vCe7zTJMYUP0R8pO2XMr+Y8oLIg==}
     engines: {node: '>=6'}
@@ -5291,6 +5310,14 @@ packages:
     resolution: {integrity: sha512-M/wqwtOEjgb956/+m5ZrYT/Iq6Hax0OakWbokj8+9PXOnB7b/4AxESHieEtnNEy7ZpjsjYW1/5nK8fATQMmRxw==}
     peerDependencies:
       vue: '>=3.2.13'
+
+  vite-tsconfig-paths@4.3.2:
+    resolution: {integrity: sha512-0Vd/a6po6Q+86rPlntHye7F31zA2URZMbH8M3saAZ/xR9QoGN/L21bxEGfXdWmFdNkqPpRdxFT7nmNe12e9/uA==}
+    peerDependencies:
+      vite: '*'
+    peerDependenciesMeta:
+      vite:
+        optional: true
 
   vite@6.3.5:
     resolution: {integrity: sha512-cZn6NDFE7wdTpINgs++ZJ4N49W2vRp8LCKrn3Ob1kYNtOo21vfDoaV5GzBfLU4MovSAB8uNRm4jgzVQZ+mBzPQ==}
@@ -6940,6 +6967,14 @@ snapshots:
       chai: 5.2.0
       tinyrainbow: 2.0.0
 
+  '@vitest/mocker@3.1.3(vite@6.3.5(@types/node@18.19.100)(jiti@2.4.2)(lightningcss@1.30.1)(sass-embedded@1.88.0)(sass@1.89.0)(yaml@2.8.0))':
+    dependencies:
+      '@vitest/spy': 3.1.3
+      estree-walker: 3.0.3
+      magic-string: 0.30.17
+    optionalDependencies:
+      vite: 6.3.5(@types/node@18.19.100)(jiti@2.4.2)(lightningcss@1.30.1)(sass-embedded@1.88.0)(sass@1.89.0)(yaml@2.8.0)
+
   '@vitest/mocker@3.1.3(vite@6.3.5(@types/node@22.15.17)(jiti@2.4.2)(lightningcss@1.30.1)(sass-embedded@1.88.0)(sass@1.89.0)(yaml@2.8.0))':
     dependencies:
       '@vitest/spy': 3.1.3
@@ -8563,6 +8598,8 @@ snapshots:
       ignore: 5.3.2
       merge2: 1.4.1
       slash: 3.0.0
+
+  globrex@0.1.2: {}
 
   gopd@1.2.0: {}
 
@@ -10492,6 +10529,10 @@ snapshots:
       string-argv: 0.3.2
       typescript: 5.8.3
 
+  tsconfck@3.1.6(typescript@5.8.3):
+    optionalDependencies:
+      typescript: 5.8.3
+
   tsconfig-paths@4.2.0:
     dependencies:
       json5: 2.2.3
@@ -10677,6 +10718,27 @@ snapshots:
     dependencies:
       vite: 6.3.5(@types/node@22.15.17)(jiti@2.4.2)(lightningcss@1.30.1)(sass-embedded@1.88.0)(sass@1.89.0)(yaml@2.8.0)
 
+  vite-node@3.1.3(@types/node@18.19.100)(jiti@2.4.2)(lightningcss@1.30.1)(sass-embedded@1.88.0)(sass@1.89.0)(yaml@2.8.0):
+    dependencies:
+      cac: 6.7.14
+      debug: 4.4.1
+      es-module-lexer: 1.7.0
+      pathe: 2.0.3
+      vite: 6.3.5(@types/node@18.19.100)(jiti@2.4.2)(lightningcss@1.30.1)(sass-embedded@1.88.0)(sass@1.89.0)(yaml@2.8.0)
+    transitivePeerDependencies:
+      - '@types/node'
+      - jiti
+      - less
+      - lightningcss
+      - sass
+      - sass-embedded
+      - stylus
+      - sugarss
+      - supports-color
+      - terser
+      - tsx
+      - yaml
+
   vite-node@3.1.3(@types/node@22.15.17)(jiti@2.4.2)(lightningcss@1.30.1)(sass-embedded@1.88.0)(sass@1.89.0)(yaml@2.8.0):
     dependencies:
       cac: 6.7.14
@@ -10750,6 +10812,34 @@ snapshots:
       svgo: 3.3.2
       vue: 3.5.13(typescript@5.8.3)
 
+  vite-tsconfig-paths@4.3.2(typescript@5.8.3)(vite@6.3.5(@types/node@18.19.100)(jiti@2.4.2)(lightningcss@1.30.1)(sass-embedded@1.88.0)(sass@1.89.0)(yaml@2.8.0)):
+    dependencies:
+      debug: 4.4.1
+      globrex: 0.1.2
+      tsconfck: 3.1.6(typescript@5.8.3)
+    optionalDependencies:
+      vite: 6.3.5(@types/node@18.19.100)(jiti@2.4.2)(lightningcss@1.30.1)(sass-embedded@1.88.0)(sass@1.89.0)(yaml@2.8.0)
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
+
+  vite@6.3.5(@types/node@18.19.100)(jiti@2.4.2)(lightningcss@1.30.1)(sass-embedded@1.88.0)(sass@1.89.0)(yaml@2.8.0):
+    dependencies:
+      esbuild: 0.25.4
+      fdir: 6.4.4(picomatch@4.0.2)
+      picomatch: 4.0.2
+      postcss: 8.5.3
+      rollup: 4.40.2
+      tinyglobby: 0.2.13
+    optionalDependencies:
+      '@types/node': 18.19.100
+      fsevents: 2.3.3
+      jiti: 2.4.2
+      lightningcss: 1.30.1
+      sass: 1.89.0
+      sass-embedded: 1.88.0
+      yaml: 2.8.0
+
   vite@6.3.5(@types/node@22.15.17)(jiti@2.4.2)(lightningcss@1.30.1)(sass-embedded@1.88.0)(sass@1.89.0)(yaml@2.8.0):
     dependencies:
       esbuild: 0.25.4
@@ -10766,6 +10856,46 @@ snapshots:
       sass: 1.89.0
       sass-embedded: 1.88.0
       yaml: 2.8.0
+
+  vitest@3.1.3(@types/node@18.19.100)(jiti@2.4.2)(jsdom@26.1.0)(lightningcss@1.30.1)(sass-embedded@1.88.0)(sass@1.89.0)(yaml@2.8.0):
+    dependencies:
+      '@vitest/expect': 3.1.3
+      '@vitest/mocker': 3.1.3(vite@6.3.5(@types/node@18.19.100)(jiti@2.4.2)(lightningcss@1.30.1)(sass-embedded@1.88.0)(sass@1.89.0)(yaml@2.8.0))
+      '@vitest/pretty-format': 3.1.3
+      '@vitest/runner': 3.1.3
+      '@vitest/snapshot': 3.1.3
+      '@vitest/spy': 3.1.3
+      '@vitest/utils': 3.1.3
+      chai: 5.2.0
+      debug: 4.4.0
+      expect-type: 1.2.1
+      magic-string: 0.30.17
+      pathe: 2.0.3
+      std-env: 3.9.0
+      tinybench: 2.9.0
+      tinyexec: 0.3.2
+      tinyglobby: 0.2.13
+      tinypool: 1.0.2
+      tinyrainbow: 2.0.0
+      vite: 6.3.5(@types/node@18.19.100)(jiti@2.4.2)(lightningcss@1.30.1)(sass-embedded@1.88.0)(sass@1.89.0)(yaml@2.8.0)
+      vite-node: 3.1.3(@types/node@18.19.100)(jiti@2.4.2)(lightningcss@1.30.1)(sass-embedded@1.88.0)(sass@1.89.0)(yaml@2.8.0)
+      why-is-node-running: 2.3.0
+    optionalDependencies:
+      '@types/node': 18.19.100
+      jsdom: 26.1.0
+    transitivePeerDependencies:
+      - jiti
+      - less
+      - lightningcss
+      - msw
+      - sass
+      - sass-embedded
+      - stylus
+      - sugarss
+      - supports-color
+      - terser
+      - tsx
+      - yaml
 
   vitest@3.1.3(@types/node@22.15.17)(jiti@2.4.2)(jsdom@26.1.0)(lightningcss@1.30.1)(sass-embedded@1.88.0)(sass@1.89.0)(yaml@2.8.0):
     dependencies:
