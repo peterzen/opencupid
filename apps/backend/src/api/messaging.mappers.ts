@@ -1,9 +1,13 @@
-
 import { z } from 'zod'
 import type { Prisma } from '@prisma/client'
-import { ConversationParticipantWithExtras, ConversationSummary, ConversationSummarySchema, MessageInConversation, MessageInConversationSchema } from '@zod/messaging.schema'
-import { mapProfileSummary } from './mappers';
-
+import {
+  ConversationParticipantWithExtras,
+  ConversationSummary,
+  ConversationSummarySchema,
+  MessageInConversation,
+  MessageInConversationSchema,
+} from '@zod/messaging.schema'
+import { mapProfileSummary } from './mappers'
 
 function mapConversationMeta(c: { id: string; updatedAt: Date; createdAt: Date }) {
   return {
@@ -30,11 +34,9 @@ export function mapConversationParticipantToSummary(
     isArchived: p.isArchived,
     unreadCount: p.unreadCount,
     conversation: mapConversationMeta(p.conversation),
-    partnerProfile: mapProfileSummary(partner.profile)
+    partnerProfile: mapProfileSummary(partner.profile),
   }
 }
-
-
 
 export function mapMessageToMessageInConversation(
   m: Prisma.MessageGetPayload<{}>,
@@ -46,6 +48,6 @@ export function mapMessageToMessageInConversation(
     senderId: m.senderId,
     content: m.content,
     createdAt: m.createdAt,
-    isMine: m.senderId === currentProfileId
+    isMine: m.senderId === currentProfileId,
   }
 }

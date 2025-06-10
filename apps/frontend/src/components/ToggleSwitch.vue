@@ -1,6 +1,4 @@
-
 <script lang="ts" setup>
-
 const props = defineProps({
   label: {
     type: String,
@@ -20,33 +18,29 @@ const emit = defineEmits<{
   (e: 'update:modelValue', val: boolean): void
 }>()
 
-
 function toggleHandler(event: Event) {
-  const target = event.target as HTMLInputElement;
-  emit('update:modelValue', target.checked);
+  const target = event.target as HTMLInputElement
+  emit('update:modelValue', target.checked)
 }
-
 </script>
 
-
 <template>
-  <label class="toggleswitch__outer"
-         :class="{ disabled: disabled }">
-    <input class="input"
-           type="checkbox"
-           :checked="modelValue"
-           :disabled="disabled"
-           @change="toggleHandler" />
+  <label class="toggleswitch__outer" :class="{ disabled: disabled }">
+    <input
+      class="input"
+      type="checkbox"
+      :checked="modelValue"
+      :disabled="disabled"
+      @change="toggleHandler"
+    />
     <span class="switch"></span>
     <span class="label">{{ props.label }}</span>
   </label>
 </template>
 
-
-
 <style lang="scss" scoped>
-@import "bootstrap/scss/functions";
-@import "bootstrap/scss/variables";
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
 
 .toggleswitch__outer {
   --switch-container-width: 50px;
@@ -105,7 +99,7 @@ label {
 }
 
 .switch::before {
-  content: "";
+  content: '';
   position: absolute;
   left: 1px;
   height: calc(var(--switch-size) - 4px);
@@ -113,35 +107,37 @@ label {
   border-radius: 9999px;
   background-color: #fff;
   border: 2px solid var(--switch-border-default);
-  transition: transform 0.375s ease-in-out, border-color 0.25s;
+  transition:
+    transform 0.375s ease-in-out,
+    border-color 0.25s;
 }
 
-.input:checked+.switch {
+.input:checked + .switch {
   background-color: var(--switch-bg-checked);
 }
 
-.input:checked+.switch::before {
+.input:checked + .switch::before {
   border-color: var(--switch-border-focus-checked);
   transform: translateX(calc(var(--switch-container-width) - var(--switch-size)));
 }
 
-.input:focus+.switch::before {
+.input:focus + .switch::before {
   border-color: var(--switch-border-focus);
 }
 
-.input:focus:checked+.switch::before {
+.input:focus:checked + .switch::before {
   border-color: var(--switch-border-focus-checked);
 }
 
-.input:disabled+.switch {
+.input:disabled + .switch {
   background-color: var(--switch-bg-disabled);
 }
 
-.input:disabled:checked+.switch {
+.input:disabled:checked + .switch {
   background-color: $success-bg-subtle-dark;
 }
 
-.input:disabled+.switch::before {
+.input:disabled + .switch::before {
   background-color: var(--bs-gray-500);
   border-color: var(--switch-border-disabled);
 }

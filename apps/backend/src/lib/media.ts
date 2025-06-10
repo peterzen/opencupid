@@ -1,10 +1,10 @@
-import path, { dirname } from 'path';
+import path, { dirname } from 'path'
 import { randomUUID } from 'crypto'
 import { createHash } from 'crypto'
 import fs from 'fs'
 
-import cuid from 'cuid';
-import { appConfig } from '@shared/config/appconfig';
+import cuid from 'cuid'
+import { appConfig } from '@shared/config/appconfig'
 
 export function uploadTmpDir() {
   return path.join(appConfig.MEDIA_UPLOAD_DIR, 'tmp')
@@ -57,15 +57,15 @@ export async function makeImageLocation(): Promise<ImageLocation> {
   // Generate a CUID for the ProfileImage
   const base = cuid.slug()
 
-  const imageRoot = getImageRoot();
-  const storagePrefix = generateStorageDirPrefix();
-  const relPath = path.posix.join(storagePrefix);
+  const imageRoot = getImageRoot()
+  const storagePrefix = generateStorageDirPrefix()
+  const relPath = path.posix.join(storagePrefix)
   const absPath = path.join(imageRoot, relPath)
   await fs.promises.mkdir(dirname(absPath), { recursive: true })
 
   return {
     base,
     relPath,
-    absPath
+    absPath,
   }
 }

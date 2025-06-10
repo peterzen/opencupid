@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import ToggleSwitch from '@/components/ToggleSwitch.vue'
-import { useI18n } from 'vue-i18n';
-import { type ConnectionTypeType } from '@zod/generated';
+import { useI18n } from 'vue-i18n'
+import { type ConnectionTypeType } from '@zod/generated'
 
 import IconDate from '@/assets/icons/app/cupid.svg'
 import IconSocialize from '@/assets/icons/app/socialize.svg'
@@ -20,44 +20,34 @@ const emit = defineEmits<{
   (e: 'update:isDatingActive', val: boolean): void
   (e: 'update:selectTab', tab: ConnectionTypeType): void
 }>()
-
-
 </script>
-
 
 <template>
   <ul class="nav nav-tabs nav-fill">
     <li class="nav-item">
-      <span class="nav-link text-start"
-            :class="{ active: activeTab === 'friend' }">
-
-
-        <a class="tab-switch"
-           @click="$emit('update:selectTab', 'friend')">
-            <span class="d-flex align-items-center">
+      <span class="nav-link text-start" :class="{ active: activeTab === 'friend' }">
+        <a class="tab-switch" @click="$emit('update:selectTab', 'friend')">
+          <span class="d-flex align-items-center">
             <IconSocialize class="svg-icon-lg w-100" />
           </span>
-        <!-- {{ t('general.connectiontypes.socializing') }} -->
+          <!-- {{ t('general.connectiontypes.socializing') }} -->
         </a>
       </span>
     </li>
     <li class="nav-item">
-      <span class="nav-link text-start"
-            :class="{ active: activeTab === 'dating' }">
+      <span class="nav-link text-start" :class="{ active: activeTab === 'dating' }">
         <!-- <ToggleSwitch value="dating"
                       :disabled="false"
                       label=""
                       @update:modelValue="val => $emit('update:isDatingActive', val)"
                       :modelValue="isDatingActive" /> -->
-        <a class="tab-switch"
-           @click="$emit('update:selectTab', 'dating')">
+        <a class="tab-switch" @click="$emit('update:selectTab', 'dating')">
           <span class="d-flex align-items-center">
             <IconDate class="svg-icon-lg w-100" />
           </span>
           <!-- {{ t('general.connectiontypes.dating') }} -->
         </a>
       </span>
-
     </li>
   </ul>
 </template>

@@ -1,10 +1,4 @@
-
-
-export function broadcastToProfile(
-  fastify: any,
-  profileId: string,
-  payload: Record<string, any>
-) {
+export function broadcastToProfile(fastify: any, profileId: string, payload: Record<string, any>) {
   const sockets = fastify.connections?.get(profileId)
   if (!sockets) return
 

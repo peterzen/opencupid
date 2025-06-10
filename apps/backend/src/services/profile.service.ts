@@ -1,20 +1,14 @@
 import { prisma } from '@/lib/prisma'
-import {
-  Prisma
-} from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import {
   ProfileComplete,
   ProfileWithTags,
   UpdatedProfileFragment,
   UpdatedProfileFragmentSchema,
-  UpdateProfilePayload
+  UpdateProfilePayload,
 } from '@zod/profile.schema'
 
-import {
-  Profile,
-  ProfileImage,
-  ProfileTag,
-} from '@zod/generated'
+import { Profile, ProfileImage, ProfileTag } from '@zod/generated'
 import cuid from 'cuid'
 
 const profileCompleteInclude = {
@@ -25,7 +19,6 @@ const profileCompleteInclude = {
     include: { tag: true },
   },
 } satisfies Prisma.ProfileInclude
-
 
 export class ProfileService {
   private static instance: ProfileService
@@ -64,9 +57,13 @@ export class ProfileService {
     })
   }
 
-  async updateProfile(tx: Prisma.TransactionClient, userId: string, data: UpdateProfilePayload): Promise<ProfileWithTags> {
+  async updateProfile(
+    tx: Prisma.TransactionClient,
+    userId: string,
+    data: UpdateProfilePayload
+  ): Promise<ProfileWithTags> {
     // 1) pull out the tags array
-    const { tags, ...rest } = data;
+    const { tags, ...rest } = data
 
     const current = await tx.profile.findUnique({
       select: { id: true },
@@ -77,19 +74,19 @@ export class ProfileService {
       throw new Error(`Profile not found for userId: ${userId}`)
     }
 
-    const profileId = current.id;
+    const profileId = current.id
 
     // 2) Delete _all_ existing tag links for this profile
     await tx.profileTag.deleteMany({
       where: { profileId },
-    });
+    })
 
     // 3) Re-create only the tags the user sent
     if (tags && tags.length > 0) {
       await tx.profileTag.createMany({
-        data: tags.map((tagId) => ({ profileId, tagId })),
+        data: tags.map(tagId => ({ profileId, tagId })),
         skipDuplicates: true,
-      });
+      })
     }
 
     // 1) Update all scalar fields
@@ -104,39 +101,39 @@ export class ProfileService {
           include: { tag: true },
         },
       },
-    });
+    })
     return updated
   }
 
-
-  public async addProfileImage(profile: ProfileComplete, imageId: string): Promise<{
-    profileImages: ProfileImage[];
+  public async addProfileImage(
+    profile: ProfileComplete,
+    imageId: string
+  ): Promise<{
+    profileImages: ProfileImage[]
   }> {
     return prisma.profile.update({
       where: {
-        id: profile.id
+        id: profile.id,
       },
       data: {
         profileImages: { connect: { id: imageId } },
       },
       select: {
         profileImages: true,
-      }
+      },
     })
   }
-
-
 
   async addProfileTag(profileId: string, tagId: string): Promise<ProfileTag> {
     return prisma.profileTag.create({
       data: {
         profile: {
-          connect: { id: profileId }
+          connect: { id: profileId },
         },
         tag: {
-          connect: { id: tagId }
-        }
-      }
+          connect: { id: tagId },
+        },
+      },
     })
   }
 
@@ -144,8 +141,8 @@ export class ProfileService {
     await prisma.profileTag.deleteMany({
       where: {
         profileId,
-        tagId
-      }
+        tagId,
+      },
     })
   }
 
@@ -169,10 +166,10 @@ export class ProfileService {
   // }
 
   async searchProfiles(searchOptions: {
-    query?: string,
-    tags?: string[],
-    active?: boolean,
-    limit?: number,
+    query?: string
+    tags?: string[]
+    active?: boolean
+    limit?: number
     offset?: number
   }): Promise<ProfileComplete[]> {
     const { query, tags, active, limit, offset } = searchOptions
@@ -187,15 +184,15 @@ export class ProfileService {
     if (query) {
       where.OR = [
         { publicName: { contains: query, mode: 'insensitive' } },
-        { cityName: { contains: query, mode: 'insensitive' } }
+        { cityName: { contains: query, mode: 'insensitive' } },
       ]
     }
 
     if (tags && tags.length > 0) {
       where.tags = {
         some: {
-          tagId: { in: tags }
-        }
+          tagId: { in: tags },
+        },
       }
     }
 
@@ -205,22 +202,22 @@ export class ProfileService {
         profileImages: true,
         tags: {
           include: {
-            tag: true
-          }
-        }
+            tag: true,
+          },
+        },
       },
       take: limit,
-      skip: offset
+      skip: offset,
     })
   }
 
   /**
-    * Attach a tag to a profile.
-    */
+   * Attach a tag to a profile.
+   */
   public async addTagToProfile(profileId: string, tagId: string): Promise<ProfileTag> {
     return prisma.profileTag.create({
       data: { profileId, tagId },
-    });
+    })
   }
 
   /**
@@ -229,12 +226,12 @@ export class ProfileService {
   public async removeTagFromProfile(profileId: string, tagId: string): Promise<ProfileTag> {
     return prisma.profileTag.delete({
       where: { profileId_tagId: { profileId, tagId } },
-    });
+    })
   }
 
   async initializeProfiles(userId: string): Promise<Profile> {
     const profile = await prisma.profile.findUnique({
-      where: { userId }
+      where: { userId },
     })
 
     if (profile) {
@@ -249,7 +246,7 @@ export class ProfileService {
         slug,
         publicName: '',
         introSocial: '',
-      }
+      },
     })
   }
 
@@ -258,8 +255,8 @@ export class ProfileService {
       where: {
         isActive: true,
         userId: {
-          not: userId
-        }
+          not: userId,
+        },
       },
       include: {
         profileImages: {
@@ -268,14 +265,9 @@ export class ProfileService {
         tags: {
           include: {
             tag: true,
-          }
-        }
-      }
+          },
+        },
+      },
     })
   }
-
-
-
-
-
 }

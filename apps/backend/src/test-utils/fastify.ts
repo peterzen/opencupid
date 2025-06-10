@@ -3,7 +3,7 @@ export type RouteHandler = (req: any, reply: any) => any
 export class MockFastify {
   public routes: Record<string, RouteHandler> = {}
   public jwt = {
-    sign: (payload: any) => JSON.stringify(payload)
+    sign: (payload: any) => JSON.stringify(payload),
   }
   public prisma: any = {}
   public log = { error: () => {}, warn: () => {}, info: () => {} }

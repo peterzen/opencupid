@@ -1,45 +1,47 @@
 import { FastifyPluginAsync } from 'fastify'
-import multipart, { MultipartValue } from '@fastify/multipart';
+import multipart, { MultipartValue } from '@fastify/multipart'
 
 import {
   IdLookupParamsSchema,
   OwnerProfileSchema,
   SlugLookupParamsSchema,
   UpdatedProfileFragmentSchema,
-  UpdateProfilePayloadSchema
+  UpdateProfilePayloadSchema,
 } from '@zod/profile.schema'
 
 import { ProfileService } from 'src/services/profile.service'
 import { ImageGalleryService } from 'src/services/image.service'
 import { validateBody } from '@/utils/zodValidate'
-import { uploadTmpDir } from '@/lib/media';
-import { getUserRoles, sendError, sendForbiddenError, sendUnauthorizedError } from '../helpers';
-import { mapProfileImagesToOwner, mapProfileTags, mapProfileToOwner, mapProfileToPublic } from 'src/api/mappers';
-import { ReorderProfileImagesPayloadSchema } from '@zod/profileimage.schema';
-import { UserService } from 'src/services/user.service';
-import { appConfig } from '@shared/config/appconfig';
-import { Prisma } from '@prisma/client';
+import { uploadTmpDir } from '@/lib/media'
+import { getUserRoles, sendError, sendForbiddenError, sendUnauthorizedError } from '../helpers'
+import {
+  mapProfileImagesToOwner,
+  mapProfileTags,
+  mapProfileToOwner,
+  mapProfileToPublic,
+} from 'src/api/mappers'
+import { ReorderProfileImagesPayloadSchema } from '@zod/profileimage.schema'
+import { UserService } from 'src/services/user.service'
+import { appConfig } from '@shared/config/appconfig'
+import { Prisma } from '@prisma/client'
 
-
-
-const profileRoutes: FastifyPluginAsync = async (fastify) => {
-
+const profileRoutes: FastifyPluginAsync = async fastify => {
   await fastify.register(multipart, {
     limits: {
       fieldNameSize: 100, // Max field name size in bytes
-      fieldSize: 100,     // Max field value size in bytes
-      fields: 10,         // Max number of non-file fields
+      fieldSize: 100, // Max field value size in bytes
+      fields: 10, // Max number of non-file fields
       fileSize: appConfig.IMAGE_MAX_SIZE, // Max file size in bytes
-      files: 1,           // Max number of file fields
-      headerPairs: 2000,  // Max number of header key=>value pairs
-      parts: 1000         // For multipart forms, the max number of parts (fields + files)
+      files: 1, // Max number of file fields
+      headerPairs: 2000, // Max number of header key=>value pairs
+      parts: 1000, // For multipart forms, the max number of parts (fields + files)
     },
     attachFieldsToBody: false,
-  });
+  })
 
   // instantiate services
   const profileService = ProfileService.getInstance()
-  const imageService = ImageGalleryService.getInstance();
+  const imageService = ImageGalleryService.getInstance()
   const userService = UserService.getInstance()
 
   /**
@@ -47,7 +49,6 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
    * @description This route retrieves the current user's social and dating profiles.
    */
   fastify.get('/me', { onRequest: [fastify.authenticate] }, async (req, reply) => {
-
     if (!req.user.userId) return sendUnauthorizedError(reply)
 
     try {
@@ -56,20 +57,17 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
 
       const profile = mapProfileToOwner(fetched)
       return reply.code(200).send({ success: true, profile })
-
     } catch (err) {
       fastify.log.error(err)
       return sendError(reply, 500, 'Failed to load profile')
     }
   })
 
-
   /**
    * Get a profile by slug
    * @param {string} slug - The slug of the profile to retrieve
    */
   fastify.get('/:id', { onRequest: [fastify.authenticate] }, async (req, reply) => {
-
     if (!req.user.userId) return sendUnauthorizedError(reply)
 
     const roles = getUserRoles(req)
@@ -94,7 +92,6 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
   })
 
   fastify.get('/', { onRequest: [fastify.authenticate] }, async (req, reply) => {
-
     if (!req.user.userId) return sendUnauthorizedError(reply)
 
     console.log('session', req.session)
@@ -114,7 +111,6 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
    * Update the current user's profile
    */
   fastify.patch('/profile', { onRequest: [fastify.authenticate] }, async (req, reply) => {
-
     if (!req.user.userId) return sendUnauthorizedError(reply)
 
     const data = await validateBody(UpdateProfilePayloadSchema, req, reply)
@@ -132,8 +128,7 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     user.hasActiveProfile = data.isActive || false
 
     try {
-      const updated = await fastify.prisma.$transaction(async (tx) => {
-
+      const updated = await fastify.prisma.$transaction(async tx => {
         const updatedProfile = await profileService.updateProfile(tx, req.user.userId, data)
         // if (!updatedProfile) return sendError(reply, 404, 'Profile not found')
 
@@ -148,7 +143,7 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
 
       const profile = UpdatedProfileFragmentSchema.parse({
         tags: mapProfileTags(updated.tags),
-        ...rest
+        ...rest,
       })
 
       // Clear session to force re-fetch on next request, we need the roles updated
@@ -156,7 +151,7 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.code(200).send({ success: true, profile })
     } catch (err) {
       fastify.log.error(err)
-      // profileService.updateProfile() returned null, which means the profile was not found 
+      // profileService.updateProfile() returned null, which means the profile was not found
       if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
         return sendError(reply, 404, 'Profile not found')
       }
@@ -164,77 +159,82 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
     }
   })
 
-
   /**
    * Upload an image to the user's profile
    */
-  fastify.post('/image', {
-    onRequest: [fastify.authenticate]
-  }, async (req, reply) => {
+  fastify.post(
+    '/image',
+    {
+      onRequest: [fastify.authenticate],
+    },
+    async (req, reply) => {
+      if (!req.user.userId) return sendUnauthorizedError(reply)
 
-    if (!req.user.userId) return sendUnauthorizedError(reply)
+      let files
 
-    let files
+      try {
+        files = await req.saveRequestFiles({
+          tmpdir: uploadTmpDir(),
+          limits: {
+            fileSize: appConfig.IMAGE_MAX_SIZE,
+            files: 1,
+            fields: 1,
+          },
+        })
+      } catch (err: any) {
+        fastify.log.warn('Upload error:', err, err.code)
+        const maxSizeMiB = appConfig.IMAGE_MAX_SIZE / (1024 * 1024) // Convert bytes to MB
 
-    try {
-      files = await req.saveRequestFiles({
-        tmpdir: uploadTmpDir(),
-        limits: {
-          fileSize: appConfig.IMAGE_MAX_SIZE,
-          files: 1,
-          fields: 1,
-        },
-      })
-    } catch (err: any) {
-      fastify.log.warn('Upload error:', err, err.code)
-      const maxSizeMiB = appConfig.IMAGE_MAX_SIZE / (1024 * 1024) // Convert bytes to MB
+        const reason =
+          err.code === 'FST_ERR_MULTIPART_FILE_TOO_LARGE'
+            ? `The uploaded image is too large. Maximum size is ${maxSizeMiB}MB.`
+            : 'Failed to upload image.'
 
-      const reason =
-        err.code === 'FST_ERR_MULTIPART_FILE_TOO_LARGE'
-          ? `The uploaded image is too large. Maximum size is ${maxSizeMiB}MB.`
-          : 'Failed to upload image.'
+        return sendError(reply, 400, reason)
+      }
 
-      return sendError(reply, 400, reason)
-    }
+      if (files.length === 0) return sendError(reply, 400, 'No file uploaded')
 
-    if (files.length === 0) return sendError(reply, 400, 'No file uploaded')
+      const fileUpload = files[0]
+      // Validate file type
+      if (!fileUpload.mimetype.startsWith('image/')) {
+        return sendError(reply, 400, 'Uploaded file must be an image')
+      }
 
-    const fileUpload = files[0]
-    // Validate file type
-    if (!fileUpload.mimetype.startsWith('image/')) {
-      return sendError(reply, 400, 'Uploaded file must be an image')
-    }
-
-    const captionText = (
-      ((Array.isArray(fileUpload.fields.captionText)
-        ? fileUpload.fields.captionText[0]
-        : fileUpload.fields.captionText) as MultipartValue
+      const captionText = ((
+        (Array.isArray(fileUpload.fields.captionText)
+          ? fileUpload.fields.captionText[0]
+          : fileUpload.fields.captionText) as MultipartValue
       ).value ?? '') as string
 
-    const profile = await profileService.getProfileByUserId(req.user.userId)
-    if (!profile) {
-      return sendError(reply, 404, 'No user profile to link the image to')
-    }
+      const profile = await profileService.getProfileByUserId(req.user.userId)
+      if (!profile) {
+        return sendError(reply, 404, 'No user profile to link the image to')
+      }
 
-    try {
-      const stored = await imageService.storeImage(req.user.userId, fileUpload.filepath, captionText)
-      if (!stored) {
+      try {
+        const stored = await imageService.storeImage(
+          req.user.userId,
+          fileUpload.filepath,
+          captionText
+        )
+        if (!stored) {
+          return sendError(reply, 500, 'Failed to store image')
+        }
+        const updated = await profileService.addProfileImage(profile, stored.id)
+        const profileImages = mapProfileImagesToOwner(updated.profileImages)
+        return reply.code(200).send({ success: true, profile: { profileImages } })
+      } catch (err) {
+        fastify.log.error('Error storing image:', err)
         return sendError(reply, 500, 'Failed to store image')
       }
-      const updated = await profileService.addProfileImage(profile, stored.id)
-      const profileImages = mapProfileImagesToOwner(updated.profileImages)
-      return reply.code(200).send({ success: true, profile: { profileImages } })
-    } catch (err) {
-      fastify.log.error('Error storing image:', err)
-      return sendError(reply, 500, 'Failed to store image')
     }
-  })
+  )
 
   /**
    * Delete a profile image
    */
   fastify.delete('/image/:id', { onRequest: [fastify.authenticate] }, async (req, reply) => {
-
     if (!req.user.userId) return sendUnauthorizedError(reply)
 
     const { id: profileImageId } = IdLookupParamsSchema.parse(req.params)
@@ -260,7 +260,6 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
    * Reorder profile images
    */
   fastify.patch('/image/order', { onRequest: [fastify.authenticate] }, async (req, reply) => {
-
     if (!req.user.userId) return sendUnauthorizedError(reply)
 
     const { images } = ReorderProfileImagesPayloadSchema.parse(req.body)
@@ -274,7 +273,6 @@ const profileRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.code(500).send({ success: false })
     }
   })
-
 }
 
 export default profileRoutes

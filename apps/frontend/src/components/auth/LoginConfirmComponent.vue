@@ -1,5 +1,4 @@
 <template>
-
   <div class="login-success-component">
     <div class="d-flex justify-content-center align-items-center flex-column h-100">
       <div class="icon-inner text-success animate__animated animate__fadeIn">
@@ -8,12 +7,11 @@
       <div class="text-success fs-3 animate__animated animate__fadeIn">Welcome!</div>
     </div>
   </div>
-
 </template>
 
 <script lang="ts" setup>
 import 'animate.css'
-import { IconSun } from '@/components/icons/DoodleIcons';
+import { IconSun } from '@/components/icons/DoodleIcons'
 </script>
 
 <style scoped>

@@ -7,7 +7,7 @@ const msg: any = {
   conversationId: 'c1',
   senderId: 'p1',
   content: 'hi',
-  createdAt: new Date()
+  createdAt: new Date(),
 }
 
 describe('messaging mappers', () => {

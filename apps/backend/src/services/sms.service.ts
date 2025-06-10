@@ -44,7 +44,7 @@ export class SmsService {
         console.error('OTP send failed:', response.data)
         return {
           success: false,
-          error: response.data
+          error: response.data,
         }
       }
     } catch (error) {

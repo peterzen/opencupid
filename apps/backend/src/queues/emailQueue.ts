@@ -7,7 +7,7 @@ if (!redisUrl) {
   throw new Error('REDIS_URL environment variable is not defined')
 }
 const connection = new IORedis(redisUrl, {
-  maxRetriesPerRequest: null
+  maxRetriesPerRequest: null,
 })
 
 export const emailQueue = new Queue('emails', { connection })

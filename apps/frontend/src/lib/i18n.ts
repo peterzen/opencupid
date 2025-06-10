@@ -2,7 +2,7 @@ import { createI18n } from 'vue-i18n'
 
 declare global {
   interface Window {
-    __APP_I18N__?: ReturnType<typeof createI18n>;
+    __APP_I18N__?: ReturnType<typeof createI18n>
   }
 }
 
@@ -34,18 +34,18 @@ export function setLocale(locale: string) {
   changeLocale(locale)
 }
 
-
 export function appUseI18n(app: any) {
-  const i18n = window.__APP_I18N__ || createI18n({
-    legacy: false,
-    locale: getLocale(),
-    fallbackLocale: 'en',
-    messages: { en, hu, de, fr },
-    missingWarn: false,
-    fallbackWarn: false
-  })
+  const i18n =
+    window.__APP_I18N__ ||
+    createI18n({
+      legacy: false,
+      locale: getLocale(),
+      fallbackLocale: 'en',
+      messages: { en, hu, de, fr },
+      missingWarn: false,
+      fallbackWarn: false,
+    })
   window.__APP_I18N__ = i18n
   app.use(i18n)
   // app.provide('$i18n', i18n)
 }
-

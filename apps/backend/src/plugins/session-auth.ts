@@ -27,9 +27,8 @@ if (!redisUrl) {
 }
 
 export default fp(async (fastify: FastifyInstance) => {
-
   fastify.register(fastifyJwt, {
-    secret: appConfig.JWT_SECRET
+    secret: appConfig.JWT_SECRET,
   })
 
   // Initialize Redis client
@@ -39,7 +38,6 @@ export default fp(async (fastify: FastifyInstance) => {
 
   // Auth hook reads Bearer token as session ID
   fastify.decorate('authenticate', async (req: FastifyRequest, reply: FastifyReply) => {
-
     try {
       await req.jwtVerify()
     } catch (err) {
@@ -58,7 +56,6 @@ export default fp(async (fastify: FastifyInstance) => {
     // Try to fetch an existing session from Redis
     let sess = await sessionService.get(sessionId)
     if (!sess) {
-
       const userId = req.user?.userId
       if (!userId) {
         return sendUnauthorizedError(reply, 'Invalid session')
@@ -67,13 +64,13 @@ export default fp(async (fastify: FastifyInstance) => {
       let user
 
       try {
-        user = await UserService.getInstance().getUserById(userId, {
+        user = (await UserService.getInstance().getUserById(userId, {
           include: {
             profile: {
-              select: { id: true }
-            }
+              select: { id: true },
+            },
           },
-        }) as UserWithProfileId
+        })) as UserWithProfileId
         if (!user) return sendUnauthorizedError(reply, 'User not found')
       } catch (error) {
         fastify.log.error('Error fetching user for session refresh:', error)

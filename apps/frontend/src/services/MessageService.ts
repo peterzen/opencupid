@@ -12,7 +12,10 @@ export class MessageService {
   private onMessageHandlers: ((msg: Message) => void)[] = []
   private userId: string
 
-  constructor(private url: string, token: string) {
+  constructor(
+    private url: string,
+    token: string
+  ) {
     this.userId = ''
     this.connect(token)
   }
@@ -24,12 +27,12 @@ export class MessageService {
       console.log('WebSocket connected')
     }
 
-    this.socket.onmessage = (event) => {
+    this.socket.onmessage = event => {
       const data: Message = JSON.parse(event.data)
-      this.onMessageHandlers.forEach((cb) => cb(data))
+      this.onMessageHandlers.forEach(cb => cb(data))
     }
 
-    this.socket.onerror = (e) => {
+    this.socket.onerror = e => {
       console.error('WebSocket error', e)
     }
 

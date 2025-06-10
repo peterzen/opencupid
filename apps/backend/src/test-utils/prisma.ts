@@ -4,7 +4,7 @@ export function createMockPrisma() {
       findUnique: vi.fn(),
       update: vi.fn(),
       create: vi.fn(),
-      count: vi.fn()
+      count: vi.fn(),
     },
     profile: {
       findUnique: vi.fn(),
@@ -43,6 +43,6 @@ export function createMockPrisma() {
       findMany: vi.fn(),
       create: vi.fn(),
     },
-    $transaction: vi.fn(fn => fn(this))
+    $transaction: vi.fn(fn => fn(this)),
   }
 }

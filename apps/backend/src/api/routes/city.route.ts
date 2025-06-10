@@ -4,8 +4,7 @@ import { CityQuerySchema, CitySchema } from '@zod/city.schema'
 
 const prisma = new PrismaClient()
 
-const cityRoutes: FastifyPluginAsync = async (fastify) => {
-
+const cityRoutes: FastifyPluginAsync = async fastify => {
   fastify.get('/find', { onRequest: [fastify.authenticate] }, async (req, reply) => {
     // Validate and parse query parameters
     const query = CityQuerySchema.parse(req.query)
@@ -22,7 +21,7 @@ const cityRoutes: FastifyPluginAsync = async (fastify) => {
       select: { id: true, name: true, country: true, lat: true, lon: true },
       take: limit,
       skip: offset,
-      orderBy: { name: 'asc' }
+      orderBy: { name: 'asc' },
     })
 
     // Validate output and send

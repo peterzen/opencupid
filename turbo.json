@@ -20,6 +20,9 @@
     },
     "migrate": {
       "outputs": []
+    },
+    "format": {
+      "outputs": []
     }
   }
 }

@@ -1,11 +1,9 @@
-import { FastifyPluginAsync } from "fastify";
+import { FastifyPluginAsync } from 'fastify'
 import { createChallenge } from 'altcha-lib'
-import { sendError } from "../helpers";
-import {appConfig} from "@shared/config/appconfig";
+import { sendError } from '../helpers'
+import { appConfig } from '@shared/config/appconfig'
 
-
-const captchaRoutes: FastifyPluginAsync = async (fastify) => {
-
+const captchaRoutes: FastifyPluginAsync = async fastify => {
   fastify.get('/challenge', async (request, reply) => {
     try {
       const challenge = await createChallenge({
@@ -93,8 +91,6 @@ const captchaRoutes: FastifyPluginAsync = async (fastify) => {
   //     })
   //   }
   // })
-
-
 }
 
 export default captchaRoutes

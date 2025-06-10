@@ -5,13 +5,18 @@ import {
   ProfileUnionSchema,
   ProfileComplete,
   ProfileSummary,
-} from "@zod/profile.schema";
-import { OwnerProfileImage, OwnerProfileImageSchema, PublicProfileImage, PublicProfileImageSchema, PublicProfileImageWithUrl } from "@zod/profileimage.schema";
-import { ProfileTagJoinSchema, PublicTag, PublicTagSchema } from "@zod/tag.schema";
-import type { ProfileImage, UserRole } from "@prisma/client";
-import { ProfileTag } from "@zod/generated";
-import { appConfig } from "@shared/config/appconfig";
-
+} from '@zod/profile.schema'
+import {
+  OwnerProfileImage,
+  OwnerProfileImageSchema,
+  PublicProfileImage,
+  PublicProfileImageSchema,
+  PublicProfileImageWithUrl,
+} from '@zod/profileimage.schema'
+import { ProfileTagJoinSchema, PublicTag, PublicTagSchema } from '@zod/tag.schema'
+import type { ProfileImage, UserRole } from '@prisma/client'
+import { ProfileTag } from '@zod/generated'
+import { appConfig } from '@shared/config/appconfig'
 
 export function mapProfileToOwner(profile: ProfileComplete): OwnerProfile {
   const safe = OwnerScalarSchema.parse(profile)
@@ -20,7 +25,7 @@ export function mapProfileToOwner(profile: ProfileComplete): OwnerProfile {
   const ownerImages = profile.profileImages ? mapProfileImagesToOwner(profile.profileImages) : []
 
   const publicTags: PublicTag[] = profile.tags
-    .map((pt: ProfileTag) => ProfileTagJoinSchema.parse(pt))   // yields Tag
+    .map((pt: ProfileTag) => ProfileTagJoinSchema.parse(pt)) // yields Tag
     .map((tag: PublicTag) => PublicTagSchema.parse(tag))
 
   return {
@@ -33,7 +38,7 @@ export function mapProfileToOwner(profile: ProfileComplete): OwnerProfile {
 export function mapProfileTags(profileTags: ProfileTag[]): PublicTag[] {
   return profileTags
     .map((pt: ProfileTag) => ProfileTagJoinSchema.parse(pt))
-    .map((tag: PublicTag) => PublicTagSchema.parse(tag));
+    .map((tag: PublicTag) => PublicTagSchema.parse(tag))
 }
 
 export function mapProfileToPublic(profile: ProfileComplete, roles: UserRole[]): PublicProfile {
@@ -54,7 +59,7 @@ export function mapProfileToPublic(profile: ProfileComplete, roles: UserRole[]):
 }
 
 export function mapProfileImagesToOwner(images: ProfileImage[]): OwnerProfileImage[] {
-  return images.map((img) => toOwnerProfileImage(img));
+  return images.map(img => toOwnerProfileImage(img))
 }
 
 export function mapProfileImagesToPublic(images: ProfileImage[]): PublicProfileImage[] {
@@ -69,7 +74,7 @@ export function mapProfileSummary(profile: {
   return {
     id: profile.id,
     publicName: profile.publicName,
-    profileImages: profile?.profileImages.map(toPublicProfileImage)
+    profileImages: profile?.profileImages.map(toPublicProfileImage),
   }
 }
 
@@ -82,7 +87,7 @@ export interface MinimalProfileImage {
  */
 function getImageUrl(image: MinimalProfileImage): string {
   const urlBase = appConfig.IMAGE_URL_BASE
-  return `${urlBase}/${image.storagePath}`;
+  return `${urlBase}/${image.storagePath}`
 }
 
 /**
@@ -90,8 +95,8 @@ function getImageUrl(image: MinimalProfileImage): string {
  * by removing any non-public fields
  */
 export function toPublicProfileImage(image: ProfileImage): PublicProfileImage {
-  const withUrl = { ...image, url: getImageUrl(image) };
-  return PublicProfileImageSchema.parse(withUrl);
+  const withUrl = { ...image, url: getImageUrl(image) }
+  return PublicProfileImageSchema.parse(withUrl)
 }
 
 /**
@@ -99,6 +104,6 @@ export function toPublicProfileImage(image: ProfileImage): PublicProfileImage {
  * by removing fields that are not accessible to the owner
  */
 export function toOwnerProfileImage(image: ProfileImage): OwnerProfileImage {
-  image.url = getImageUrl(image);
+  image.url = getImageUrl(image)
   return OwnerProfileImageSchema.parse(image)
 }

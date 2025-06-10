@@ -10,9 +10,9 @@ interface ImportMeta {
 
 /// <reference types="vite/client" />
 
-declare module "*.json" {
-  const value: any;
-  export default value;
+declare module '*.json' {
+  const value: any
+  export default value
 }
 
 declare const __APP_CONFIG__: {

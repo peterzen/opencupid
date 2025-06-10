@@ -34,7 +34,6 @@ const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 
-
 // // On mounted lifecycle hook
 onMounted(async () => {
   const queryOtp = (route.query.otp as string) || ''
@@ -91,7 +90,8 @@ async function doOtpLogin(otp: string) {
       console.log('OTP login failed:', res)
       // Handle different status flags
       if (res.status === 'storage_error') {
-        error.value = 'Something is off with this browser. Please try again in a different one (or try clearing your browser storage.)'
+        error.value =
+          'Something is off with this browser. Please try again in a different one (or try clearing your browser storage.)'
       }
       if (res.status === 'missing_userid') {
         error.value = 'Something went wrong here with the code.  Try again?'
@@ -117,55 +117,52 @@ function handleBackButton() {
   showOtpForm.value = false
   error.value = ''
   isLoading.value = false
-} 
+}
 </script>
-
 
 <template>
   <div class="login-container">
-   
-    <BModal v-model="showModal"
-            title="Login"
-            size="md"
-            :backdrop="'static'"
-            centered
-            button-size="sm"
-            :focus="false"
-            :no-close-on-backdrop="true"
-            :no-footer="true"
-            :no-header="true"
-            cancel-title="Nevermind"
-            initial-animation
-            fullscreen="md"
-            body-class="d-flex flex-row align-items-center justify-content-center overflow-hidden"
-            :keyboard="false">
+    <BModal
+      v-model="showModal"
+      title="Login"
+      size="md"
+      :backdrop="'static'"
+      centered
+      button-size="sm"
+      :focus="false"
+      :no-close-on-backdrop="true"
+      :no-footer="true"
+      :no-header="true"
+      cancel-title="Nevermind"
+      initial-animation
+      fullscreen="md"
+      body-class="d-flex flex-row align-items-center justify-content-center overflow-hidden"
+      :keyboard="false"
+    >
       <div class="w-100">
         <div v-if="showOtpForm">
           <div class="back-button">
-            <a class="btn btn-secondary-outline"
-               @click="handleBackButton">
+            <a class="btn btn-secondary-outline" @click="handleBackButton">
               <ChevronLeftIcon class="svg-icon" />
             </a>
           </div>
         </div>
         <ErrorComponent :error="error" />
 
-        <AuthIdComponent :isLoading="isLoading"
-                         @otp:send="handleSendOtp"
-                         v-if="showUserIdForm" />
+        <AuthIdComponent :isLoading="isLoading" @otp:send="handleSendOtp" v-if="showUserIdForm" />
 
-
-        <OtpLoginComponent :isLoading="isLoading"
-                           :user="user"
-                           @otp:submit="handleOTPSubmitted"
-                           v-if="showOtpForm" />
+        <OtpLoginComponent
+          :isLoading="isLoading"
+          :user="user"
+          @otp:submit="handleOTPSubmitted"
+          v-if="showOtpForm"
+        />
 
         <LoginConfirmComponent v-if="showConfirmScreen" />
       </div>
     </BModal>
   </div>
 </template>
-
 
 <style scoped>
 .back-button {

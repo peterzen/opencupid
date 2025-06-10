@@ -15,7 +15,7 @@ fieldset[disabled] .multiselect {
 .multiselect__spinner::before,
 .multiselect__spinner::after {
   position: absolute;
-  content: "";
+  content: '';
   top: 50%;
   left: 50%;
   margin: -8px 0 0 -8px;
@@ -126,11 +126,10 @@ fieldset[disabled] .multiselect {
 .multiselect__placeholder {
   font-size: 0.75em;
   color: var(--bs-body-color) !important;
-
 }
 
-.multiselect__tag~.multiselect__input,
-.multiselect__tag~.multiselect__single {
+.multiselect__tag ~ .multiselect__input,
+.multiselect__tag ~ .multiselect__single {
   width: auto;
 }
 
@@ -198,7 +197,7 @@ fieldset[disabled] .multiselect {
 }
 
 .multiselect__tag-icon::after {
-  content: "×";
+  content: '×';
   color: var(--bs-secondary-color);
   font-size: 14px;
 }
@@ -255,7 +254,7 @@ fieldset[disabled] .multiselect {
   border-style: solid;
   border-width: 5px 5px 0 5px;
   border-color: var(--bs-border-color) transparent transparent transparent;
-  content: "";
+  content: '';
 }
 
 .multiselect__placeholder {
@@ -428,34 +427,34 @@ fieldset[disabled] .multiselect {
   vertical-align: top;
 }
 
-*[dir="rtl"] .multiselect {
+*[dir='rtl'] .multiselect {
   text-align: right;
 }
 
-*[dir="rtl"] .multiselect__select {
+*[dir='rtl'] .multiselect__select {
   right: auto;
   left: 1px;
 }
 
-*[dir="rtl"] .multiselect__tags {
+*[dir='rtl'] .multiselect__tags {
   padding: 8px 8px 0 40px;
 }
 
-*[dir="rtl"] .multiselect__content {
+*[dir='rtl'] .multiselect__content {
   text-align: right;
 }
 
-*[dir="rtl"] .multiselect__option::after {
+*[dir='rtl'] .multiselect__option::after {
   right: auto;
   left: 0;
 }
 
-*[dir="rtl"] .multiselect__clear {
+*[dir='rtl'] .multiselect__clear {
   right: auto;
   left: 12px;
 }
 
-*[dir="rtl"] .multiselect__spinner {
+*[dir='rtl'] .multiselect__spinner {
   right: auto;
   left: 1px;
 }

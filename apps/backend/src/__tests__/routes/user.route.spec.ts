@@ -8,16 +8,27 @@ let mockUserService: any
 let mockProfileService: any
 
 vi.mock('../../services/user.service', () => ({
-  UserService: { getInstance: () => mockUserService }
+  UserService: { getInstance: () => mockUserService },
 }))
 vi.mock('../../services/profile.service', () => ({
-  ProfileService: { getInstance: () => mockProfileService }
+  ProfileService: { getInstance: () => mockProfileService },
 }))
 vi.mock('../../services/captcha.service', () => ({
-  CaptchaService: class { validate() { return true } }
+  CaptchaService: class {
+    validate() {
+      return true
+    }
+  },
 }))
 vi.mock('../../queues/emailQueue', () => ({ emailQueue: { add: vi.fn() } }))
-vi.mock('@shared/config/appconfig', () => ({ appConfig: { ALTCHA_HMAC_KEY: 'x', SMS_API_KEY: 'k', IMAGE_MAX_SIZE: 1000, FRONTEND_URL: 'http://test' } }))
+vi.mock('@shared/config/appconfig', () => ({
+  appConfig: {
+    ALTCHA_HMAC_KEY: 'x',
+    SMS_API_KEY: 'k',
+    IMAGE_MAX_SIZE: 1000,
+    FRONTEND_URL: 'http://test',
+  },
+}))
 
 beforeEach(async () => {
   fastify = new MockFastify()
@@ -26,7 +37,7 @@ beforeEach(async () => {
     otpLogin: vi.fn(),
     setUserOTP: vi.fn(),
     generateOTP: vi.fn().mockReturnValue('123456'),
-    getUserById: vi.fn()
+    getUserById: vi.fn(),
   }
   mockProfileService = { initializeProfiles: vi.fn() }
   await userRoutes(fastify as any)

@@ -1,6 +1,6 @@
 import { prisma } from '../lib/prisma'
 import { User, Profile, UserRole, Prisma } from '@prisma/client'
-import { AuthIdentifier, LoginUser } from '@zod/user.schema';
+import { AuthIdentifier, LoginUser } from '@zod/user.schema'
 import otpGenerator from 'otp-generator'
 
 // Define types for service return values
@@ -9,7 +9,6 @@ export type UserWithProfileId = User & { profile: { id: string } | null }
 function getTokenExpiration() {
   return new Date(Date.now() + 1000 * 60 * 60 * 240)
 }
-
 
 const userSelectInclude = {
   profile: {
@@ -33,11 +32,13 @@ export class UserService {
     return UserService.instance
   }
 
-  async otpLogin(userId: string, otp: string): Promise<{
-    user: UserWithProfileId | null,
+  async otpLogin(
+    userId: string,
+    otp: string
+  ): Promise<{
+    user: UserWithProfileId | null
     isNewUser: boolean
   }> {
-
     const user = await prisma.user.findUnique({
       where: {
         id: userId,
@@ -66,11 +67,14 @@ export class UserService {
     return { user: userUpdated, isNewUser }
   }
 
-  async setUserOTP(authId: AuthIdentifier, otp: string, language: string): Promise<{
-    user: User,
+  async setUserOTP(
+    authId: AuthIdentifier,
+    otp: string,
+    language: string
+  ): Promise<{
+    user: User
     isNewUser: boolean
   }> {
-
     const authIdField = authId.email ? { email: authId.email } : { phonenumber: authId.phonenumber }
     const userExists = await prisma.user.findUnique({ where: { ...authIdField } })
     // const emailConfirmationToken = generateOTP() // enerate email confirmation token
@@ -98,7 +102,7 @@ export class UserService {
         loginToken: otp,
         loginTokenExp: tokenExpiration,
         language,
-      }
+      },
     })
     return { user, isNewUser }
   }
@@ -106,7 +110,7 @@ export class UserService {
   async getUserById(userId: string, args?: object): Promise<User | UserWithProfileId | null> {
     return prisma.user.findUnique({
       where: { id: userId },
-      ...args
+      ...args,
     })
   }
 
@@ -129,8 +133,8 @@ export class UserService {
     return tx.user.update({
       where: { id: user.id },
       data: {
-        ...user
-      }
+        ...user,
+      },
     })
   }
 
@@ -140,8 +144,7 @@ export class UserService {
       digits: true,
       specialChars: false,
       upperCaseAlphabets: false,
-      lowerCaseAlphabets: false
-    });
+      lowerCaseAlphabets: false,
+    })
   }
-
 }

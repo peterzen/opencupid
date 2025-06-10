@@ -1,49 +1,45 @@
-import cuid from 'cuid';
-import path, { dirname } from 'path';
-import fs from 'fs';
-import mime from 'mime-types';
-import { SavedMultipartFile } from '@fastify/multipart';
+import cuid from 'cuid'
+import path, { dirname } from 'path'
+import fs from 'fs'
+import mime from 'mime-types'
+import { SavedMultipartFile } from '@fastify/multipart'
 
 import { prisma } from '../lib/prisma'
-import { ProfileImage } from '@prisma/client';
-import {
-  generateStorageDirPrefix,
-  getImageRoot,
-  makeImageLocation
-} from 'src/lib/media';
+import { ProfileImage } from '@prisma/client'
+import { generateStorageDirPrefix, getImageRoot, makeImageLocation } from 'src/lib/media'
 
-import { generateContentHash } from '@/utils/hash';
-import { ProfileImagePosition } from '@zod/profileimage.schema';
-import sharp from 'sharp';
+import { generateContentHash } from '@/utils/hash'
+import { ProfileImagePosition } from '@zod/profileimage.schema'
+import sharp from 'sharp'
 
 const sizes = [
-  { name: 'thumb', width: 150, height: 150, fit: sharp.fit.cover },   // square crop
-  { name: 'card', width: 480 },                                // keep aspect ratio
-  { name: 'full', width: 1280 }                                // max width
+  { name: 'thumb', width: 150, height: 150, fit: sharp.fit.cover }, // square crop
+  { name: 'card', width: 480 }, // keep aspect ratio
+  { name: 'full', width: 1280 }, // max width
 ]
 export class ImageGalleryService {
-  private static instance: ImageGalleryService;
+  private static instance: ImageGalleryService
 
   /**
    * Private constructor to prevent direct instantiation
    */
-  private constructor() { }
+  private constructor() {}
 
   /**
    * Get singleton instance
    */
   public static getInstance(): ImageGalleryService {
     if (!ImageGalleryService.instance) {
-      ImageGalleryService.instance = new ImageGalleryService();
+      ImageGalleryService.instance = new ImageGalleryService()
     }
-    return ImageGalleryService.instance;
+    return ImageGalleryService.instance
   }
 
   /**
    * Get a single image by ID for the authenticated user
    */
   async getImage(id: string, userId: string): Promise<ProfileImage | null> {
-    return prisma.profileImage.findFirst({ where: { id, userId } });
+    return prisma.profileImage.findFirst({ where: { id, userId } })
   }
 
   /**
@@ -53,7 +49,7 @@ export class ImageGalleryService {
     return prisma.profileImage.findMany({
       where: { userId },
       orderBy: { createdAt: 'asc' },
-    });
+    })
   }
 
   /**
@@ -63,19 +59,22 @@ export class ImageGalleryService {
    * @param captionText - Optional caption or alt text for the image
    * Returns the created ProfileImage record
    */
-  async storeImage(userId: string, tmpImagePath: string, captionText: string): Promise<ProfileImage> {
-
+  async storeImage(
+    userId: string,
+    tmpImagePath: string,
+    captionText: string
+  ): Promise<ProfileImage> {
     let imageLocation
 
     // create image subdir, generate basename
     try {
       imageLocation = await makeImageLocation()
     } catch (err: any) {
-      console.error('Failed to create dest dir', err);
-      throw new Error('Failed to create dest dir');
+      console.error('Failed to create dest dir', err)
+      throw new Error('Failed to create dest dir')
     }
 
-    console.log(`Storing image for user ${userId}`, imageLocation);
+    console.log(`Storing image for user ${userId}`, imageLocation)
 
     try {
       // Process the image and save resized variants
@@ -83,11 +82,11 @@ export class ImageGalleryService {
         tmpImagePath,
         imageLocation.absPath,
         imageLocation.base
-      );
-      console.log('Image processed successfully', processed);
+      )
+      console.log('Image processed successfully', processed)
 
       // compute the content hash of the original
-      const contentHash = await generateContentHash(processed.variants.original);
+      const contentHash = await generateContentHash(processed.variants.original)
       // set position to be the last position
       const position = await prisma.profileImage.count({ where: { userId } })
 
@@ -97,20 +96,19 @@ export class ImageGalleryService {
           userId: userId,
           mimeType: processed.mime,
           altText: captionText,
-          storagePath: path.join(imageLocation.relPath,imageLocation.base),
+          storagePath: path.join(imageLocation.relPath, imageLocation.base),
           isModerated: false,
           contentHash: contentHash,
           position: position,
-        }
-      });
-
+        },
+      })
     } catch (err: any) {
-      console.error('Failed to process image', err);
-      throw new Error(`Failed to process image ${tmpImagePath}: ${err.message}`);
+      console.error('Failed to process image', err)
+      throw new Error(`Failed to process image ${tmpImagePath}: ${err.message}`)
     } finally {
       // Ensure the temporary file is deleted regardless of success or failure
       try {
-        await fs.promises.unlink(tmpImagePath);
+        await fs.promises.unlink(tmpImagePath)
       } catch (unlinkErr) {
         // console.error('Failed to delete temporary file after processing', unlinkErr);
       }
@@ -138,23 +136,18 @@ export class ImageGalleryService {
       const resized = original.clone().resize({
         width: size.width,
         height: size.height,
-        fit: size.fit ?? sharp.fit.inside
-        ,
+        fit: size.fit ?? sharp.fit.inside,
       })
 
       const outputWebP = path.join(outputDir, `${baseName}-${size.name}.webp`)
-      await resized
-        .webp({ quality: 85 })
-        .toFile(outputWebP)
+      await resized.webp({ quality: 85 }).toFile(outputWebP)
 
       outputPaths[size.name] = outputWebP
     }
 
     // Optionally save cleaned original as JPEG
     const originalCleaned = path.join(outputDir, `${baseName}-original.jpg`)
-    await original
-      .jpeg({ quality: 90 })
-      .toFile(originalCleaned)
+    await original.jpeg({ quality: 90 }).toFile(originalCleaned)
 
     outputPaths.original = originalCleaned
 
@@ -176,8 +169,8 @@ export class ImageGalleryService {
       where: { id: image.id },
       data: {
         altText: image.altText,
-      }
-    });
+      },
+    })
   }
 
   /**
@@ -187,30 +180,29 @@ export class ImageGalleryService {
    * Returns true if successful, false if not
    */
   async deleteImage(userId: string, imageId: string): Promise<boolean> {
-
     const image = await prisma.profileImage.findUnique({
       where: { id: imageId, userId },
-    });
+    })
     if (!image) {
-      console.error('Image not found or does not belong to user');
-      return false;
+      console.error('Image not found or does not belong to user')
+      return false
     }
     try {
       await prisma.profileImage.delete({
         where: { id: image.id },
-      });
+      })
     } catch (err) {
-      console.error('Error deleting image from database:', err);
-      return false;
+      console.error('Error deleting image from database:', err)
+      return false
     }
 
     // Delete the file from the filesystem
-    const file = path.join(getImageRoot(), image.storagePath);
+    const file = path.join(getImageRoot(), image.storagePath)
 
     try {
-      await fs.promises.unlink(file);
+      await fs.promises.unlink(file)
     } catch (err) {
-      console.error('Error deleting file:', err);
+      console.error('Error deleting file:', err)
     }
     return true
   }
@@ -222,19 +214,18 @@ export class ImageGalleryService {
    * Returns the updated images sorted by position
    */
   async reorderImages(userId: string, items: ProfileImagePosition[]) {
-
     const valid = await prisma.profileImage.findMany({
-      where: { userId, id: { in: items.map((i) => i.id) } },
+      where: { userId, id: { in: items.map(i => i.id) } },
       select: { id: true },
     })
 
-    const validIds = new Set(valid.map((v) => v.id))
-    if (items.some((i) => !validIds.has(i.id))) {
+    const validIds = new Set(valid.map(v => v.id))
+    if (items.some(i => !validIds.has(i.id))) {
       throw new Error('Invalid image ID')
     }
 
     // Bulk‐update positions in a single transaction
-    const ops = items.map((item) =>
+    const ops = items.map(item =>
       prisma.profileImage.update({
         where: { id: item.id },
         data: { position: item.position },

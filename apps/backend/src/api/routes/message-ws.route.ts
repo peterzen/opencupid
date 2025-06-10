@@ -9,11 +9,8 @@ interface WsMessage {
   content: string // message content
 }
 
-const messageWsRoutes: FastifyPluginAsync = async (fastify) => {
-
-
+const messageWsRoutes: FastifyPluginAsync = async fastify => {
   fastify.get('/message', { websocket: true }, (socket: WebSocket, req) => {
-
     const { profileId } = verifyWsToken(req, fastify.jwt)
 
     if (!profileId) {
@@ -31,7 +28,6 @@ const messageWsRoutes: FastifyPluginAsync = async (fastify) => {
       fastify.connections.set(profileId, sockets)
     }
     sockets.add(socket)
-
 
     socket.on('close', () => {
       fastify.log.info(`WebSocket connection closed for profile ${profileId}`)
@@ -92,7 +88,6 @@ const messageWsRoutes: FastifyPluginAsync = async (fastify) => {
       // }
     })
   })
-
 }
 
 export default messageWsRoutes

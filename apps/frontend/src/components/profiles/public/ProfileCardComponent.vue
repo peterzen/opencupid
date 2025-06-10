@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { computed } from 'vue'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-import type { PublicProfile } from '@zod/profile.schema';
-import ProfileImageComponent from '@/components/profiles/ProfileImageComponent.vue';
+import type { PublicProfile } from '@zod/profile.schema'
+import ProfileImageComponent from '@/components/profiles/ProfileImageComponent.vue'
 
 // Props & Emits
 const props = defineProps<{
@@ -17,12 +17,10 @@ const emit = defineEmits<{
 
 const profileImage = computed(() => {
   return (profile: PublicProfile) => {
-    return profile.profileImages.length > 0 ? profile.profileImages[0] : undefined;
-  };
-});
-
+    return profile.profileImages.length > 0 ? profile.profileImages[0] : undefined
+  }
+})
 </script>
-
 
 <template>
   <div class="card h-100 profile-card">

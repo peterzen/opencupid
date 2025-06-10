@@ -9,8 +9,6 @@ import { BootstrapVueNextResolver } from 'bootstrap-vue-next'
 import svgLoader from 'vite-svg-loader'
 import serveStatic from 'serve-static'
 
-
-
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const rootEnv = loadEnv(mode, '../../', '')
@@ -49,9 +47,9 @@ export default defineConfig(({ mode }) => {
       vue({
         template: {
           compilerOptions: {
-            isCustomElement: (tag) => tag === 'altcha-widget'
-          }
-        }
+            isCustomElement: (tag) => tag === 'altcha-widget',
+          },
+        },
       }),
       vueJsx(),
       vueDevTools(),
@@ -64,30 +62,25 @@ export default defineConfig(({ mode }) => {
         configureServer(server) {
           server.middlewares.use(
             '/images',
-            serveStatic(path.resolve(__dirname, rootEnv.MEDIA_UPLOAD_DIR))
+            serveStatic(path.resolve(__dirname, rootEnv.MEDIA_UPLOAD_DIR)),
           )
-        }
-      }
+        },
+      },
     ],
     css: {
       preprocessorOptions: {
         scss: {
-          silenceDeprecations: [
-            'import',
-            'mixed-decls',
-            'color-functions',
-            'global-builtin',
-          ],
+          silenceDeprecations: ['import', 'mixed-decls', 'color-functions', 'global-builtin'],
           includePaths: ['node_modules'],
           quietDeps: true,
         },
-      }
+      },
     },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
         '@shared': path.resolve(__dirname, '../../packages/shared'),
-        '@zod': path.resolve(__dirname, '../../packages/shared/zod')
+        '@zod': path.resolve(__dirname, '../../packages/shared/zod'),
       },
     },
   }

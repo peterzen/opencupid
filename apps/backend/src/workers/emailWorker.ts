@@ -11,7 +11,7 @@ if (!redisUrl) {
 }
 
 const connection = new IORedis(redisUrl, {
-  maxRetriesPerRequest: null
+  maxRetriesPerRequest: null,
 })
 
 const transporter = nodemailer.createTransport({
@@ -20,46 +20,49 @@ const transporter = nodemailer.createTransport({
   secure: false,
   auth: {
     user: appConfig.SMTP_USER,
-    pass: appConfig.SMTP_PASS
-  }
+    pass: appConfig.SMTP_PASS,
+  },
 })
 
-new Worker('emails', async job => {
-  if (job.name === 'sendLoginLinkEmail') {
-    const { userId } = job.data as { userId: string }
+new Worker(
+  'emails',
+  async job => {
+    if (job.name === 'sendLoginLinkEmail') {
+      const { userId } = job.data as { userId: string }
 
-    const user = await prisma.user.findUnique({ where: { id: userId } })
-    if (!user) throw new Error('User not found')
+      const user = await prisma.user.findUnique({ where: { id: userId } })
+      if (!user) throw new Error('User not found')
 
-    const otp = user.loginToken
-    if (!otp || !user.email) throw new Error('OTP or email not found for user')
+      const otp = user.loginToken
+      if (!otp || !user.email) throw new Error('OTP or email not found for user')
 
-    await transporter.sendMail({
-      from: appConfig.EMAIL_FROM,
-      to: user.email,
-      subject: 'Your login link',
-      html: `<p>Hey there, welcome aboard!</p>
+      await transporter.sendMail({
+        from: appConfig.EMAIL_FROM,
+        to: user.email,
+        subject: 'Your login link',
+        html: `<p>Hey there, welcome aboard!</p>
       <h1>${otp}</h1>
       <p>Please click this link to jump right in:       
-      <a href="${appConfig.FRONTEND_URL}/login?otp=${otp}">Confirm Email</a></p>`
-    })
-  }
+      <a href="${appConfig.FRONTEND_URL}/login?otp=${otp}">Confirm Email</a></p>`,
+      })
+    }
 
-  if (job.name === 'sendWelcomeEmail') {
-    const { userId } = job.data as { userId: string }
+    if (job.name === 'sendWelcomeEmail') {
+      const { userId } = job.data as { userId: string }
 
-    const user = await prisma.user.findUnique({ where: { id: userId } })
-    if (!user) throw new Error('User not found')
-    if (!user.email) throw new Error('Email not found for user')
+      const user = await prisma.user.findUnique({ where: { id: userId } })
+      if (!user) throw new Error('User not found')
+      if (!user.email) throw new Error('Email not found for user')
 
-    await transporter.sendMail({
-      from: appConfig.EMAIL_FROM,
-      to: user.email,
-      subject: 'Welcome to OpenCupid!',
-      html: `<p>Hey there, welcome aboard!</p>
+      await transporter.sendMail({
+        from: appConfig.EMAIL_FROM,
+        to: user.email,
+        subject: 'Welcome to OpenCupid!',
+        html: `<p>Hey there, welcome aboard!</p>
       <a href="${appConfig.FRONTEND_URL}/me">Go connect with people</a></p>
-      `
-    })
-  }
-
-}, { connection })
+      `,
+      })
+    }
+  },
+  { connection }
+)

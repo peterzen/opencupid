@@ -14,10 +14,7 @@ import {
  * @returns An object containing methods to get options for different enums.
  */
 export function useEnumOptions(t: (key: string) => string) {
-  function enumOptions<T extends Record<string, string | number>>(
-    enumObj: T,
-    prefix: string
-  ) {
+  function enumOptions<T extends Record<string, string | number>>(enumObj: T, prefix: string) {
     return Object.values(enumObj).map(value => ({
       value,
       label: t(`${prefix}.${value}`),
@@ -46,25 +43,17 @@ export function useEnumOptions(t: (key: string) => string) {
   return {
     genderOptions: () => enumOptions(GenderSchema.enum, 'gender'),
     genderLabels: () => enumLabels(GenderSchema.enum, 'gender'),
-    genderPreferenceOptions: () =>
-      enumOptions(GenderSchema.enum, 'gender_preferences'),
-    
-    relationshipStatusOptions: () =>
-      enumOptions(RelationshipStatusSchema.enum, 'relationship'),
-    relationshipStatusLabels: () =>
-      enumLabels(RelationshipStatusSchema.enum, 'relationship'),
+    genderPreferenceOptions: () => enumOptions(GenderSchema.enum, 'gender_preferences'),
 
-    hasKidsOptions: () =>
-      enumOptions(HasKidsSchema.enum, 'haskids'),
-    hasKidsLabels: () =>
-      enumLabels(HasKidsSchema.enum, 'haskids_label'),
-    
-    hasKidsPreferenceOptions: () =>
-      enumOptions(HasKidsSchema.enum, 'haskids_preference'),
+    relationshipStatusOptions: () => enumOptions(RelationshipStatusSchema.enum, 'relationship'),
+    relationshipStatusLabels: () => enumLabels(RelationshipStatusSchema.enum, 'relationship'),
 
-    pronounsOptions: () =>
-      enumOptions(PronounsSchema.enum, 'pronouns'),
-    pronounsLabels: () =>
-      enumLabels(PronounsSchema.enum, 'pronouns'),
+    hasKidsOptions: () => enumOptions(HasKidsSchema.enum, 'haskids'),
+    hasKidsLabels: () => enumLabels(HasKidsSchema.enum, 'haskids_label'),
+
+    hasKidsPreferenceOptions: () => enumOptions(HasKidsSchema.enum, 'haskids_preference'),
+
+    pronounsOptions: () => enumOptions(PronounsSchema.enum, 'pronouns'),
+    pronounsLabels: () => enumLabels(PronounsSchema.enum, 'pronouns'),
   }
 }

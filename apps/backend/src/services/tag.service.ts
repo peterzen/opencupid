@@ -1,9 +1,7 @@
-import slugify from 'slugify';
+import slugify from 'slugify'
 import { prisma } from '../lib/prisma'
-import { Tag } from "@zod/generated";
-import { CreateTagInput } from '@zod/tag.schema';
-
-
+import { Tag } from '@zod/generated'
+import { CreateTagInput } from '@zod/tag.schema'
 
 export class TagService {
   private static instance: TagService
@@ -19,17 +17,14 @@ export class TagService {
     return TagService.instance
   }
 
-
-
   // Service functions
   public async findAll(): Promise<Tag[]> {
-    return prisma.tag.findMany({ where: { isDeleted: false } });
+    return prisma.tag.findMany({ where: { isDeleted: false } })
   }
 
   public async findById(id: string): Promise<Tag | null> {
-    return prisma.tag.findFirst({ where: { id, isDeleted: false } });
+    return prisma.tag.findFirst({ where: { id, isDeleted: false } })
   }
-
 
   /**
    * Find tags whose name contains the given substring (case-insensitive).
@@ -42,13 +37,13 @@ export class TagService {
         isApproved: true,
         isHidden: false,
       },
-      take: 20,          // limit results for performance
+      take: 20, // limit results for performance
       orderBy: { name: 'asc' },
-    });
+    })
   }
 
   public async create(data: CreateTagInput): Promise<Tag> {
-    const slug = slugify(data.name, { lower: true, strict: true });
+    const slug = slugify(data.name, { lower: true, strict: true })
     return prisma.tag.create({
       data: {
         name: data.name,
@@ -56,11 +51,11 @@ export class TagService {
         createdBy: data.createdBy,
         isApproved: true,
       },
-    });
+    })
   }
 
   public async createUserTag(data: CreateTagInput): Promise<Tag> {
-    const slug = slugify(data.name, { lower: true, strict: true });
+    const slug = slugify(data.name, { lower: true, strict: true })
     return prisma.tag.create({
       data: {
         name: data.name,
@@ -69,21 +64,21 @@ export class TagService {
         isUserCreated: true,
         isApproved: true, // User-created tags are automatically approved
       },
-    });
+    })
   }
 
   public async update(id: string, data: Tag): Promise<Tag> {
-    const updateData: Partial<Tag & { slug: string }> = { ...data };
+    const updateData: Partial<Tag & { slug: string }> = { ...data }
     if (data.name) {
       updateData.slug = slugify(data.name, {
         lower: true,
-        strict: true
-      });
+        strict: true,
+      })
     }
     return prisma.tag.update({
       where: { id },
       data: updateData,
-    });
+    })
   }
 
   public async remove(id: string): Promise<void> {
@@ -91,9 +86,8 @@ export class TagService {
     await prisma.tag.update({
       where: { id },
       data: {
-        isDeleted: true
-      }
-    });
+        isDeleted: true,
+      },
+    })
   }
-};
-
+}

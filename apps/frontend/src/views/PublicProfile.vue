@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { reactive, onMounted, ref } from 'vue';
+import { reactive, onMounted, ref } from 'vue'
 import type { PublicProfile } from '@zod/profile.schema'
-import { useProfileStore } from '@/store/profileStore';
+import { useProfileStore } from '@/store/profileStore'
 
-import LoadingComponent from '@/components/LoadingComponent.vue';
-import PublicProfileComponent from '@/components/profiles/public/PublicProfileComponent.vue';
+import LoadingComponent from '@/components/LoadingComponent.vue'
+import PublicProfileComponent from '@/components/profiles/public/PublicProfileComponent.vue'
 
 const profileStore = useProfileStore()
 
@@ -24,16 +24,11 @@ onMounted(async () => {
   Object.assign(profile, fetched)
   isLoading.value = false
 })
-
 </script>
-
-
-
 
 <template>
   <div class="container mb-5 mt-3">
     <LoadingComponent v-if="isLoading" />
-    <PublicProfileComponent :profile
-                            :isLoading />
+    <PublicProfileComponent :profile :isLoading />
   </div>
 </template>

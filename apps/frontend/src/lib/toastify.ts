@@ -1,6 +1,6 @@
-import { toast } from 'vue3-toastify';
-import { type ToastContainerOptions } from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css';
+import { toast } from 'vue3-toastify'
+import { type ToastContainerOptions } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
 const theme = document.documentElement.getAttribute('data-bs-theme')
 
@@ -11,9 +11,8 @@ export const defaultOptions = {
   closeOnClick: true,
   pauseOnHover: true,
   progress: undefined,
-  theme: theme
+  theme: theme,
 } as ToastContainerOptions
-
 
 export type ToastType = 'default' | 'info' | 'success' | 'warning' | 'error'
 

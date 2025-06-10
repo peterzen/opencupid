@@ -8,9 +8,8 @@ import {
   OtpSendReturnSchema,
   SettingsUserSchema,
   type AuthIdentifier,
-  type SessionData
+  type SessionData,
 } from '@zod/user.schema'
-
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -23,9 +22,9 @@ export const useAuthStore = defineStore('auth', {
   }),
 
   getters: {
-    isLoggedIn: (state) => state.jwt !== '',
-    getUserId: (state) => state.userId,
-    getEmail: (state) => state.email,
+    isLoggedIn: state => state.jwt !== '',
+    getUserId: state => state.userId,
+    getEmail: state => state.email,
   },
 
   actions: {
@@ -41,7 +40,6 @@ export const useAuthStore = defineStore('auth', {
         this.userId = payload.userId
         // Notify messageStore
         bus.emit('auth:login', { token: this.jwt })
-
       } catch (e) {
         console.warn('Failed to parse JWT payload:', e)
         this.userId = null
@@ -75,7 +73,7 @@ export const useAuthStore = defineStore('auth', {
       }
       try {
         const res = await api.get('/users/otp-login', {
-          params: { userId, otp }
+          params: { userId, otp },
         })
 
         if (res.data.success === true) {
@@ -84,12 +82,11 @@ export const useAuthStore = defineStore('auth', {
         } else {
           return { success: false, status: res.data.status }
         }
-
       } catch (error: any) {
         console.error('Login failed:', error)
         return { success: false, status: error.message }
       }
-      return { success: true, status: '' };
+      return { success: true, status: '' }
     },
 
     async sendLoginLink(authId: AuthIdentifier) {
@@ -100,7 +97,7 @@ export const useAuthStore = defineStore('auth', {
         // set userId in localStorage for the otplogin to pick up
         localStorage.setItem('uid', user.id)
         // Return the status flag for the frontend to handle
-        return { success: true, user, status: res.data.status };
+        return { success: true, user, status: res.data.status }
       } catch (error: any) {
         console.error('Sending login link failed:', error)
         return { success: false, status: error.message }
@@ -111,7 +108,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         const res = await api.get('/users/me')
         const user = SettingsUserSchema.parse(res.data.user)
-        return { success: true, user, error: null };
+        return { success: true, user, error: null }
       } catch (error: any) {
         console.error('Could not fetch user:', error)
         return { success: false, user: null, error: error.message }
@@ -119,7 +116,6 @@ export const useAuthStore = defineStore('auth', {
     },
 
     hasRole(role: UserRoleType) {
-
       // TODO implement me
       return true
     },
@@ -143,7 +139,5 @@ export const useAuthStore = defineStore('auth', {
       delete api.defaults.headers.common['Authorization']
       bus.emit('auth:logout')
     },
-
   },
 })
-

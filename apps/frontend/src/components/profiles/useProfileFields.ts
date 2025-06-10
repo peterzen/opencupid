@@ -1,11 +1,7 @@
 import { type OwnerProfile } from '@zod/profile.schema'
 import { computed } from 'vue'
 
-
-
-
 export function useProfileFields(profile: OwnerProfile) {
-
   const birthYearMax = computed(() => {
     return new Date().getFullYear() - 18
   })
@@ -26,4 +22,3 @@ export function useProfileFields(profile: OwnerProfile) {
     birthYearMax,
   }
 }
-

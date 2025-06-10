@@ -1,5 +1,5 @@
-import { UserRole } from "@prisma/client"
-import { FastifyPluginAsync, FastifyRequest } from "fastify"
+import { UserRole } from '@prisma/client'
+import { FastifyPluginAsync, FastifyRequest } from 'fastify'
 
 // --- Helper to send uniform error responses ---
 export function sendError(
@@ -26,7 +26,6 @@ export function sendForbiddenError(
 ) {
   return sendError(reply, 403, message)
 }
-
 
 export function getUserRoles(req: FastifyRequest): UserRole[] {
   return req.session?.roles || []

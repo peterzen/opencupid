@@ -22,7 +22,6 @@ const emit = defineEmits<{
   (e: 'image:uploaded', payload: OwnerProfile): void
   (e: 'image:deleted', payload: { id: string }): void
   (e: 'update:modelValue', value: OwnerProfile): void
-
 }>()
 
 /**
@@ -38,9 +37,7 @@ function handleFileChange(event: Event) {
   }
   const reader = new FileReader()
   reader.onload = () => {
-    preview.value = typeof reader.result === 'string'
-      ? reader.result
-      : null
+    preview.value = typeof reader.result === 'string' ? reader.result : null
   }
   reader.readAsDataURL(file)
   modalOpen.value = true
@@ -87,90 +84,97 @@ async function handleRemovePreview() {
 }
 </script>
 
-
 <template>
   <div class="image-upload">
-    <FormKit ref="fileInput"
-             type="file"
-             accept=".jpg,.jpeg,.png,.gif"
-             @change="handleFileChange"
-             help=""
-             id="image-upload-input"
-             capture="user"
-             floating-label="false"
-             :file-remove="false"
-             :file-remove-icon="false"
-             label="Add profile photo"
-             label-class="btn btn-primary"
-             inner-class="$reset d-none"
-             :multiple="false">
+    <FormKit
+      ref="fileInput"
+      type="file"
+      accept=".jpg,.jpeg,.png,.gif"
+      @change="handleFileChange"
+      help=""
+      id="image-upload-input"
+      capture="user"
+      floating-label="false"
+      :file-remove="false"
+      :file-remove-icon="false"
+      label="Add profile photo"
+      label-class="btn btn-primary"
+      inner-class="$reset d-none"
+      :multiple="false"
+    >
       <template #label>
-        <label class="formkit-label file-upload-label btn btn-secondary"
-               for="image-upload-input">
+        <label class="formkit-label file-upload-label btn btn-secondary" for="image-upload-input">
           <AvatarUploadIcon />
         </label>
       </template>
     </FormKit>
-    <div v-if="error"
-         class="text-danger mt-2">
+    <div v-if="error" class="text-danger mt-2">
       {{ error }}
     </div>
   </div>
-  <BModal v-model="modalOpen"
-          centered
-          button-size="sm"
-          :focus="false"
-          :no-close-on-backdrop="true"
-          :no-footer="true"
-          cancel-title="Nevermind"
-          initial-animation
-          fullscreen="md"
-          title="Add a photo">
-    <div v-if="preview"
-         class="preview-container">
+  <BModal
+    v-model="modalOpen"
+    centered
+    button-size="sm"
+    :focus="false"
+    :no-close-on-backdrop="true"
+    :no-footer="true"
+    cancel-title="Nevermind"
+    initial-animation
+    fullscreen="md"
+    title="Add a photo"
+  >
+    <div v-if="preview" class="preview-container">
       <div class="mb-3">
         <LoadingComponent v-if="isLoading" />
         <div class="ratio ratio-1x1">
-          <img :src="preview"
-               alt="Preview"
-               width="200"
-               :class="isLoading ? 'loading' : ''"
-               class="preview-image" />
+          <img
+            :src="preview"
+            alt="Preview"
+            width="200"
+            :class="isLoading ? 'loading' : ''"
+            class="preview-image"
+          />
         </div>
       </div>
       <div class="mb-3">
-        <FormKit type="textarea"
-                 input-class="form-control-sm"
-                 placeholder="Caption this..."
-                 v-model="captionText"
-                 label=""
-                 floating-label="false"
-                 auto-height
-                 :validation-messages="{
-                  required: 'Please write a sentence or two about yourself',
-                  min: 'Name must be at least 2 characters long',
-                  max: 'Name must be less than 50 characters long'
-                }" />
+        <FormKit
+          type="textarea"
+          input-class="form-control-sm"
+          placeholder="Caption this..."
+          v-model="captionText"
+          label=""
+          floating-label="false"
+          auto-height
+          :validation-messages="{
+            required: 'Please write a sentence or two about yourself',
+            min: 'Name must be at least 2 characters long',
+            max: 'Name must be less than 50 characters long',
+          }"
+        />
       </div>
       <ErrorComponent :error="error" />
-      <div class="mb-3  justify-content-end d-flex gap-2">
-        <FormKit type="button"
-                 wrapper-class=""
-                 input-class="btn btn-outline-secondary btn-sm"
-                 label="Nevermind"
-                 @click.prevent="handleRemovePreview" />
+      <div class="mb-3 justify-content-end d-flex gap-2">
+        <FormKit
+          type="button"
+          wrapper-class=""
+          input-class="btn btn-outline-secondary btn-sm"
+          label="Nevermind"
+          @click.prevent="handleRemovePreview"
+        />
 
-        <FormKit type="button"
-                 wrapper-class=""
-                 input-class="btn btn-primary btn-sm"
-                 label="Save"
-                 :disabled="isLoading"
-                 @click.prevent="handleUpload" />
+        <FormKit
+          type="button"
+          wrapper-class=""
+          input-class="btn btn-primary btn-sm"
+          label="Save"
+          :disabled="isLoading"
+          @click.prevent="handleUpload"
+        />
       </div>
     </div>
   </BModal>
 </template>
-
 
 <style lang="scss">
 .image-upload {

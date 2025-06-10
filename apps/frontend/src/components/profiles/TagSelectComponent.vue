@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import Multiselect from 'vue-multiselect';
-import { useTagsStore } from '@/store/tagStore';
+import { computed, ref } from 'vue'
+import Multiselect from 'vue-multiselect'
+import { useTagsStore } from '@/store/tagStore'
 
-import { type PublicTag } from '@zod/tag.schema';
+import { type PublicTag } from '@zod/tag.schema'
 
 // Instantiate Pinia store
-const tagStore = useTagsStore();
+const tagStore = useTagsStore()
 
 // Reactive state
-const tags = ref<PublicTag[]>([]);
-const isLoading = ref(false);
+const tags = ref<PublicTag[]>([])
+const isLoading = ref(false)
 
 // Props & Emits
 const props = withDefaults(
@@ -18,7 +18,7 @@ const props = withDefaults(
     modelValue?: PublicTag[]
   }>(),
   {
-    modelValue: () => [] as PublicTag[]
+    modelValue: () => [] as PublicTag[],
   }
 )
 const emit = defineEmits<{
@@ -31,16 +31,16 @@ const emit = defineEmits<{
  */
 async function asyncFind(query: string) {
   if (!query) {
-    tags.value = [];
-    return;
+    tags.value = []
+    return
   }
-  isLoading.value = true;
+  isLoading.value = true
   try {
-    tags.value = await tagStore.searchTags(query);
+    tags.value = await tagStore.searchTags(query)
   } catch (error) {
-    console.error('Failed to search tags:', error);
+    console.error('Failed to search tags:', error)
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
 }
 
@@ -52,52 +52,50 @@ const selected = computed<PublicTag[]>({
   set(val: PublicTag[]) {
     emit('update:modelValue', val)
     emit('tags:selected', val)
-  }
+  },
 })
 
 async function addTag(name: string) {
   const create = {
     name: name,
   }
-  isLoading.value = true;
+  isLoading.value = true
   try {
     const newTag = await tagStore.addUserTag(create)
-    console.log('Adding new tag:', newTag);
+    console.log('Adding new tag:', newTag)
     tags.value.push(newTag)
     selected.value.push(newTag) // Update the selected tags
     emit('update:modelValue', selected.value)
   } catch (error) {
-    console.error('Failed to add tag:', error);
-    return;
+    console.error('Failed to add tag:', error)
+    return
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
 }
-
 </script>
-
 
 <template>
   <div class="interests-multiselect">
-    <Multiselect v-model="selected"
-                 :options="tags"
-                 :multiple="true"
-                 :loading="isLoading"
-                 :searchable="true"
-                 :close-on-select="false"
-                 :clear-on-select="false"
-                 :internal-search="false"
-                 :taggable="true"
-                 tag-placeholder="Add this as new tag"
-                 @tag="addTag"
-                 label="name"
-                 track-by="id"
-                 placeholder="Search tags"
-                 @search-change="asyncFind" />
+    <Multiselect
+      v-model="selected"
+      :options="tags"
+      :multiple="true"
+      :loading="isLoading"
+      :searchable="true"
+      :close-on-select="false"
+      :clear-on-select="false"
+      :internal-search="false"
+      :taggable="true"
+      tag-placeholder="Add this as new tag"
+      @tag="addTag"
+      label="name"
+      track-by="id"
+      placeholder="Search tags"
+      @search-change="asyncFind"
+    />
   </div>
 </template>
-
-
 
 <style lang="scss">
 .interests-multiselect {

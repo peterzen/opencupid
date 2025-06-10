@@ -1,16 +1,14 @@
 import { Prisma } from '@prisma/client'
-import { z } from "zod"
-import { ProfileSummarySchema } from "./profile.schema"
-import { ConversationParticipantSchema, MessageSchema } from "./generated"
-
+import { z } from 'zod'
+import { ProfileSummarySchema } from './profile.schema'
+import { ConversationParticipantSchema, MessageSchema } from './generated'
 
 export const ConversationSchema = z.object({
   id: z.string(),
   startedById: z.string(),
   createdAt: z.date(),
-  updatedAt: z.date()
+  updatedAt: z.date(),
 })
-
 
 const conversationParticipantFields = {
   id: true,
@@ -20,7 +18,6 @@ const conversationParticipantFields = {
   isMuted: true,
   isArchived: true,
 } as const
-
 
 export const ConversationSummarySchema = ConversationParticipantSchema.pick({
   id: true,
@@ -46,7 +43,7 @@ export const MessageInConversationSchema = MessageSchema.pick({
   conversationId: true,
   senderId: true,
   content: true,
-  createdAt: true
+  createdAt: true,
 }).extend({
   isMine: z.boolean().optional(),
 })

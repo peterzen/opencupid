@@ -1,7 +1,6 @@
 import { type ToastMessage } from '@/lib/toastify'
 import { defineStore } from 'pinia'
 
-
 export const useLocalStore = defineStore('local', {
   state: () => ({
     flashMessage: null as ToastMessage | null,
@@ -17,7 +16,6 @@ export const useLocalStore = defineStore('local', {
       const message = this.flashMessage
       this.flashMessage = null
       return message
-    }
+    },
   },
 })
-

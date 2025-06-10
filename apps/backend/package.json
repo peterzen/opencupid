@@ -10,6 +10,7 @@
     "seed": "prisma db seed",
     "watch": "tsc-watch",
     "lint": "eslint . --ext .ts",
+    "format": "prettier --write src/",
     "test-data": "npx ts-node -r tsconfig-paths/register  src/test-data/Profile.ts",
     "test": "vitest"
   },

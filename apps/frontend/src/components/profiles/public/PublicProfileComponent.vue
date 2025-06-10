@@ -1,52 +1,48 @@
 <script lang="ts" setup>
-import GenderSymbol from '@/components/profiles/GenderSymbol.vue';
-import { countryCodeToName } from '@/lib/countries';
-import { getLanguageList } from '@/lib/languages';
-import { type PublicProfile } from '@zod/profile.schema';
-import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { useEnumOptions } from '../composables/useEnumOptions';
-import ProfileImageComponent from '../ProfileImageComponent.vue';
+import GenderSymbol from '@/components/profiles/GenderSymbol.vue'
+import { countryCodeToName } from '@/lib/countries'
+import { getLanguageList } from '@/lib/languages'
+import { type PublicProfile } from '@zod/profile.schema'
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useEnumOptions } from '../composables/useEnumOptions'
+import ProfileImageComponent from '../ProfileImageComponent.vue'
 
 const { t } = useI18n()
-
 
 const props = defineProps<{
   profile: PublicProfile
   isLoading: boolean
-}>();
-
+}>()
 
 const age = computed(() => {
   if (!props.profile.isDatingActive) return ''
-  if (!props.profile.birthday) return '';
+  if (!props.profile.birthday) return ''
 
-  const birthDate = new Date(props.profile.birthday);
-  const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const m = today.getMonth() - birthDate.getMonth();
+  const birthDate = new Date(props.profile.birthday)
+  const today = new Date()
+  let age = today.getFullYear() - birthDate.getFullYear()
+  const m = today.getMonth() - birthDate.getMonth()
   if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-    age--;
+    age--
   }
-  return age;
-});
+  return age
+})
 
 const countryName = computed(() => {
-  return props.profile.country ? countryCodeToName(props.profile.country) : '';
-});
+  return props.profile.country ? countryCodeToName(props.profile.country) : ''
+})
 
 const languages = computed(() => {
   return getLanguageList(props.profile.languages)
-});
+})
 
 const { relationshipStatusLabels, pronounsLabels, hasKidsLabels } = useEnumOptions(t)
-
 
 const hasKidsLabel = computed(() => {
   if (!props.profile.isDatingActive || props.profile.hasKids === 'unspecified') return ''
   return hasKidsLabels()[props.profile.hasKids!] || props.profile.hasKids
 })
-
 
 const relationshipStatusLabel = computed(() => {
   if (!props.profile.isDatingActive) return ''
@@ -61,25 +57,18 @@ const pronounsLabel = computed(() => {
 
   return pronounsLabels()[props.profile.pronouns] || props.profile.pronouns
 })
-
-
 </script>
 
-
 <template>
-
   <div>
-
     <div class="row justify-content-center">
       <div class="col-12 col-md-8 col-lg-6">
         <div class="profileImages overflow-hidden">
           <div class="ratio ratio-4x3">
             <BCarousel controls>
-              <BCarouselSlide v-for="img in props.profile.profileImages"
-                              :key="img.url!">
+              <BCarouselSlide v-for="img in props.profile.profileImages" :key="img.url!">
                 <template #img>
-                  <ProfileImageComponent :image="img"
-                                         className="img-fluid" />
+                  <ProfileImageComponent :image="img" className="img-fluid" />
                 </template>
               </BCarouselSlide>
             </BCarousel>
@@ -90,26 +79,23 @@ const pronounsLabel = computed(() => {
           <span v-if="props.profile.isDatingActive">
             <span class="text-muted fs-5">
               ({{ age }}
-              <GenderSymbol v-if="props.profile.gender"
-                            :gender="props.profile.gender" />
+              <GenderSymbol v-if="props.profile.gender" :gender="props.profile.gender" />
 
-              <span v-if="props.profile.pronouns && pronounsLabel"
-                    class="ms-2">{{ pronounsLabel }}</span>)
+              <span v-if="props.profile.pronouns && pronounsLabel" class="ms-2">{{
+                pronounsLabel
+              }}</span
+              >)
             </span>
           </span>
         </div>
         <div class="location fs-5">
-
           <span v-if="props.profile.cityName">{{ props.profile.cityName }}, </span>
           <span v-if="props.profile.country">{{ countryName }}</span>
         </div>
 
-        <div class="interests mb-2"
-             v-if="props.profile.tags && props.profile.tags.length">
+        <div class="interests mb-2" v-if="props.profile.tags && props.profile.tags.length">
           <ul class="tags list-unstyled mb-0 d-flex flex-wrap align-items-center">
-            <li v-for="tag in props.profile.tags"
-                :key="tag.slug"
-                class="me-2">
+            <li v-for="tag in props.profile.tags" :key="tag.slug" class="me-2">
               <BBadge variant="warning">{{ tag.name }}</BBadge>
             </li>
           </ul>
@@ -119,12 +105,9 @@ const pronounsLabel = computed(() => {
           {{ props.profile.introSocial }}
         </div>
 
-        <div class="interests mb-2"
-             v-if="languages && languages.length">
+        <div class="interests mb-2" v-if="languages && languages.length">
           <ul class="tags list-unstyled mb-0 d-flex flex-wrap align-items-center">
-            <li v-for="lang in languages"
-                :key="lang.value"
-                class="me-2">
+            <li v-for="lang in languages" :key="lang.value" class="me-2">
               <BBadge variant="secondary">{{ lang.label }}</BBadge>
             </li>
           </ul>
@@ -137,12 +120,10 @@ const pronounsLabel = computed(() => {
             </div>
 
             <ul class="list-unstyled mb-2 d-flex flex-wrap align-items-center">
-              <li v-if="props.profile.relationship"
-                  class="me-2">
+              <li v-if="props.profile.relationship" class="me-2">
                 <BBadge variant="info">{{ relationshipStatusLabel }}</BBadge>
               </li>
-              <li v-if="props.profile.hasKids"
-                  class="me-2">
+              <li v-if="props.profile.hasKids" class="me-2">
                 <BBadge variant="info">{{ hasKidsLabel }}</BBadge>
               </li>
             </ul>
@@ -151,9 +132,7 @@ const pronounsLabel = computed(() => {
       </div>
     </div>
   </div>
-
 </template>
-
 
 <style scoped>
 :deep(img) {

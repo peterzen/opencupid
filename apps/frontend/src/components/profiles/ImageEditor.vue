@@ -12,7 +12,7 @@ import ImageUpload from '@/components/profiles/ImageUpload.vue'
 import LoadingComponent from '@/components/LoadingComponent.vue'
 import ProfileImageComponent from '@/components/profiles/ProfileImageComponent.vue'
 
-import {IconArrowLeft} from '@/components/icons/DoodleIcons'
+import { IconArrowLeft } from '@/components/icons/DoodleIcons'
 import HelpScribble from './HelpScribble.vue'
 const profileStore = useProfileStore()
 
@@ -34,7 +34,7 @@ const formData = reactive<OwnerProfile>({ ...props.modelValue })
 // Sync prop changes into formData
 watch(
   () => props.modelValue,
-  async (newVal) => {
+  async newVal => {
     Object.assign(formData, newVal)
   },
   { deep: true }
@@ -63,27 +63,24 @@ async function handleUploaded(updatedProfile: OwnerProfile) {
 
 async function handleReorder(event: any) {
   const payload = event.moved
-  if (!payload) return;
+  if (!payload) return
   const newOrder = formData.profileImages.map((img, position) => ({
     id: img.id,
-    position
+    position,
   }))
   const res = await profileStore.reorderImages(newOrder)
   Object.assign(formData, res)
   emit('update:modelValue', formData)
 }
 
-
-
 /**
  * Prevent moving the upload button
  */
 function checkMove(evt: any) {
   const el = evt.draggedContext
-  return (el.futureIndex < formData.profileImages.length)
+  return el.futureIndex < formData.profileImages.length
 }
 </script>
-
 
 <template>
   <div class="image-editor">
@@ -91,43 +88,49 @@ function checkMove(evt: any) {
 
     <div v-else>
       <div class="row">
-        <div class="col-sm-6 mb-3"
-             v-if="formData.profileImages && formData.profileImages.length">
+        <div class="col-sm-6 mb-3" v-if="formData.profileImages && formData.profileImages.length">
           <ProfileImageComponent :image="formData.profileImages[0]" />
         </div>
         <div class="col-sm-6">
-           <div v-if="!formData.profileImages || formData.profileImages.length === 0" class="position-absolute end-0 me-5">
-            <HelpScribble text="Your photo here"/>
+          <div
+            v-if="!formData.profileImages || formData.profileImages.length === 0"
+            class="position-absolute end-0 me-5"
+          >
+            <HelpScribble text="Your photo here" />
           </div>
-          <VueDraggableNext class="row row-cols-3 row-cols-sm-3 row-cols-md-3 g-4 sortable-grid"
-                            v-model="formData.profileImages"
-                            ghost-class="ghost"
-                            :sort="true"
-                            filter="#upload-button"
-                            :dragoverBubble="true"
-                            :move="checkMove"
-                            @change="handleReorder">
+          <VueDraggableNext
+            class="row row-cols-3 row-cols-sm-3 row-cols-md-3 g-4 sortable-grid"
+            v-model="formData.profileImages"
+            ghost-class="ghost"
+            :sort="true"
+            filter="#upload-button"
+            :dragoverBubble="true"
+            :move="checkMove"
+            @change="handleReorder"
+          >
             <TransitionGroup name="fade">
-              <div v-for="img in formData.profileImages"
-                   :key="img.id"
-                   class="col thumbnail"
-                   :id="img.id">
+              <div
+                v-for="img in formData.profileImages"
+                :key="img.id"
+                class="col thumbnail"
+                :id="img.id"
+              >
                 <div class="actions">
-                  <button class="btn btn-sm rounded-circle"
-                          @click="handleDelete(img)"
-                          :disabled="isRemoving[img.id]">
+                  <button
+                    class="btn btn-sm rounded-circle"
+                    @click="handleDelete(img)"
+                    :disabled="isRemoving[img.id]"
+                  >
                     <FontAwesomeIcon icon="fa-solid fa-xmark" />
                   </button>
                 </div>
-                <div :class="{ 'removing': isRemoving[img.id] }">
+                <div :class="{ removing: isRemoving[img.id] }">
                   <div class="ratio ratio-1x1">
                     <ProfileImageComponent :image="img" />
                   </div>
                 </div>
               </div>
-              <div class="col"
-                   key="upload-button"
-                   id="upload-button">
+              <div class="col" key="upload-button" id="upload-button">
                 <ImageUpload @image:uploaded="handleUploaded" />
               </div>
             </TransitionGroup>
@@ -152,7 +155,7 @@ img {
 }
 
 .thumbnail {
-  position: relative
+  position: relative;
 }
 
 .actions {
@@ -175,7 +178,6 @@ img {
     // border-radius: 9999px;
   }
 }
-
 
 .sortable-chosen {
   opacity: 0.3;
@@ -202,6 +204,4 @@ img {
 .fade-move {
   transition: transform 0.3s ease;
 }
-
-
 </style>

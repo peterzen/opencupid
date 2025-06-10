@@ -25,5 +25,6 @@ describe('mappers', () => {
   it('adds url to profile images', () => {
     const res = mapProfileImagesToOwner([image])
     expect(res[0]).toHaveProperty('url')
+    expect(res[0].url).toMatch('http://img/path/to/img')
   })
 })

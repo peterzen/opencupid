@@ -1,9 +1,9 @@
-import languages from "@cospired/i18n-iso-languages"
-import { getAvailableLocales, getLocale } from "./i18n";
+import languages from '@cospired/i18n-iso-languages'
+import { getAvailableLocales, getLocale } from './i18n'
 
 // https://www.npmjs.com/package/@cospired/i18n-iso-languages
-import lang from "@cospired/i18n-iso-languages/langs/en.json"
-languages.registerLocale(lang);
+import lang from '@cospired/i18n-iso-languages/langs/en.json'
+languages.registerLocale(lang)
 
 // const localeModules = import.meta.glob<{ default: any }>(
 //   './src/node_modules/i18n-iso-languages/langs/*.json',
@@ -22,9 +22,9 @@ languages.registerLocale(lang);
 
 // await registerLocales();
 export type MultiselectOption = {
-  value: string;
-  label: string;
-};
+  value: string
+  label: string
+}
 
 export function getLanguageSelectorOptions(): MultiselectOption[] {
   const langs = languages.getNames(getLocale())
@@ -35,12 +35,12 @@ export function getLanguageSelectorOptions(): MultiselectOption[] {
   }))
 }
 
-export function getLanguageList(codes: string[]){
-  if(!codes){
+export function getLanguageList(codes: string[]) {
+  if (!codes) {
     return []
   }
   const langs = languages.getNames(getLocale())
-  return codes.map((code) => ({
+  return codes.map(code => ({
     value: code,
     label: langs[code] || code,
   }))

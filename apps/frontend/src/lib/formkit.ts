@@ -4,7 +4,11 @@ import { en } from '@formkit/i18n'
 // import '@/css/formkit-custom.scss'
 
 import { generateClasses } from '@formkit/themes'
-import { createAutoAnimatePlugin, createAutoHeightTextareaPlugin, createFloatingLabelsPlugin } from '@formkit/addons'
+import {
+  createAutoAnimatePlugin,
+  createAutoHeightTextareaPlugin,
+  createFloatingLabelsPlugin,
+} from '@formkit/addons'
 import '@formkit/addons/css/floatingLabels'
 
 const config = defaultConfig({
@@ -28,7 +32,7 @@ const config = defaultConfig({
         form: ['form'],
         repeater: ['items'],
       }
-    )
+    ),
   ],
   config: {
     locales: { en },
@@ -38,11 +42,11 @@ const config = defaultConfig({
         outer: '$reset',
         input: 'form-control',
         label: 'form-label',
-        help: 'form-text text-muted'
+        help: 'form-text text-muted',
       },
       form: {
-        form: "mx-auto d-flex flex-column flex-grow-1",
-        actions: "d-flex justify-content-end mt-auto"
+        form: 'mx-auto d-flex flex-column flex-grow-1',
+        actions: 'd-flex justify-content-end mt-auto',
       },
       range: {
         input: '$reset form-range',
@@ -50,25 +54,22 @@ const config = defaultConfig({
       checkbox: {
         input: '$reset form-check-input',
         outer: '$reset ps-0 form-check',
-        label: '$reset form-check-label'
+        label: '$reset form-check-label',
       },
       radio: {
         input: '$reset form-check-input',
         outer: '$reset ps-0 form-check',
-        label: '$reset form-check-label'
+        label: '$reset form-check-label',
       },
       submit: {
         outer: '$reset',
         wrapper: '$reset',
-        input: '$reset btn'
-      }
-    })
-  }
+        input: '$reset btn',
+      },
+    }),
+  },
 })
-
-
 
 export const useFormKit = (app: any) => {
   app.use(formKitPlugin, config)
 }
-

@@ -3,12 +3,11 @@ import Redis from 'ioredis'
 import { UserRole } from '@prisma/client'
 import { SessionData } from '@zod/user.schema'
 
-
 export class SessionService {
   constructor(
     private redis: Redis,
-    private ttlSec = 60 * 60 * 24 * 7  // 7 days
-  ) { }
+    private ttlSec = 60 * 60 * 24 * 7 // 7 days
+  ) {}
 
   private sessionKey(id: string) {
     return `session:${id}`
@@ -25,15 +24,21 @@ export class SessionService {
     const rkey = this.rolesKey(id)
 
     // Store hash fields (userId, lang) and overwrite roles set atomically
-    await this.redis.multi()
+    await this.redis
+      .multi()
       // Update hash
       .hset(
         hkey,
-        'userId', data.userId,
-        'profileId', data.profileId,
-        'lang', data.lang,
-        'isOnboarded', data.isOnboarded ? 'true' : 'false',
-        'hasActiveProfile', data.hasActiveProfile ? 'true' : 'false'
+        'userId',
+        data.userId,
+        'profileId',
+        data.profileId,
+        'lang',
+        data.lang,
+        'isOnboarded',
+        data.isOnboarded ? 'true' : 'false',
+        'hasActiveProfile',
+        data.hasActiveProfile ? 'true' : 'false'
       )
       // Reset TTL on hash
       .expire(hkey, this.ttlSec)
@@ -54,10 +59,7 @@ export class SessionService {
     const hkey = this.sessionKey(id)
     const rkey = this.rolesKey(id)
 
-    const [hash, roles] = await Promise.all([
-      this.redis.hgetall(hkey),
-      this.redis.smembers(rkey),
-    ])
+    const [hash, roles] = await Promise.all([this.redis.hgetall(hkey), this.redis.smembers(rkey)])
     if (!hash.userId) return null
 
     return {
@@ -76,10 +78,7 @@ export class SessionService {
   async refreshTtl(id: string): Promise<void> {
     const hkey = this.sessionKey(id)
     const rkey = this.rolesKey(id)
-    await this.redis.multi()
-      .expire(hkey, this.ttlSec)
-      .expire(rkey, this.ttlSec)
-      .exec()
+    await this.redis.multi().expire(hkey, this.ttlSec).expire(rkey, this.ttlSec).exec()
   }
 
   /**
@@ -88,9 +87,6 @@ export class SessionService {
   async delete(id: string): Promise<void> {
     const hkey = this.sessionKey(id)
     const rkey = this.rolesKey(id)
-    await this.redis.multi()
-      .del(hkey)
-      .del(rkey)
-      .exec()
+    await this.redis.multi().del(hkey).del(rkey).exec()
   }
 }

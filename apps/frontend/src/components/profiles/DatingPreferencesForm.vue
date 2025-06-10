@@ -1,14 +1,12 @@
 <script lang="ts" setup>
-
-import type { OwnerDatingPreferences, OwnerProfile } from '@zod/profile.schema';
-import { computed, reactive, ref, watch, watchEffect } from 'vue';
-import { useI18n } from 'vue-i18n';
-import VueSlider from "vue-3-slider-component";
-import { type MultiselectOption } from '@/lib/languages';
-import { useEnumOptions } from './composables/useEnumOptions';
-import { useProfileFields } from './useProfileFields';
+import type { OwnerDatingPreferences, OwnerProfile } from '@zod/profile.schema'
+import { computed, reactive, ref, watch, watchEffect } from 'vue'
+import { useI18n } from 'vue-i18n'
+import VueSlider from 'vue-3-slider-component'
+import { type MultiselectOption } from '@/lib/languages'
+import { useEnumOptions } from './composables/useEnumOptions'
+import { useProfileFields } from './useProfileFields'
 // https://github.com/s-sasaki-0529/vue-slider-component
-
 
 const props = defineProps<{
   modelValue: OwnerProfile
@@ -22,9 +20,7 @@ const formData = reactive<OwnerProfile>({
   ...props.modelValue,
 })
 
-const {
-  age,
-} = useProfileFields(props.modelValue)
+const { age } = useProfileFields(props.modelValue)
 
 // Apply computed defaults after age becomes available
 watchEffect(() => {
@@ -39,16 +35,13 @@ watchEffect(() => {
 // Sync prop changes into formData
 watch(
   () => props.modelValue,
-  (newVal) => Object.assign(formData, newVal),
+  newVal => Object.assign(formData, newVal),
   { deep: true, immediate: true }
 )
 
 const { t } = useI18n()
 
-const {
-  hasKidsPreferenceOptions,
-  genderPreferenceOptions
-} = useEnumOptions(t)
+const { hasKidsPreferenceOptions, genderPreferenceOptions } = useEnumOptions(t)
 
 const genders = genderPreferenceOptions() as MultiselectOption[]
 const hasKidsChoices = hasKidsPreferenceOptions() as MultiselectOption[]
@@ -64,10 +57,7 @@ const prefAge = computed({
     const fallbackMin = age.value != null ? age.value - 10 : 18
     const fallbackMax = age.value != null ? age.value + 10 : 100
 
-    return [
-      hasCustomMin ? min : fallbackMin,
-      hasCustomMax ? max : fallbackMax
-    ]
+    return [hasCustomMin ? min : fallbackMin, hasCustomMax ? max : fallbackMax]
   },
   set: ([min, max]: [number, number]) => {
     formData.prefAgeMin = min
@@ -76,9 +66,9 @@ const prefAge = computed({
       prefAgeMin: min,
       prefAgeMax: max,
       prefGender: formData.prefGender,
-      prefKids: formData.prefKids
+      prefKids: formData.prefKids,
     })
-  }
+  },
 })
 
 const ageMaxMin = computed(() => {
@@ -86,12 +76,12 @@ const ageMaxMin = computed(() => {
   if (myAge) {
     return {
       min: Math.max(18, myAge - 25),
-      max: myAge + 25
+      max: myAge + 25,
     }
   } else {
     return {
       min: 18,
-      max: 100
+      max: 100,
     }
   }
 })
@@ -101,14 +91,11 @@ function handleGenderPrefsUpdate() {
     prefGender: formData.prefGender,
     prefKids: formData.prefKids,
     prefAgeMax: formData.prefAgeMax,
-    prefAgeMin: formData.prefAgeMin
+    prefAgeMin: formData.prefAgeMin,
   }
   emit('changed', changed)
 }
-
-
 </script>
-
 
 <template>
   <fieldset>
@@ -116,43 +103,45 @@ function handleGenderPrefsUpdate() {
 
     <div class="mb-3">
       <div v-if="age">
-        <label for="ageRange"
-               class="form-text text-muted">Age range</label>
+        <label for="ageRange" class="form-text text-muted">Age range</label>
         <div class="d-flex flex-row align-items-center">
-          <div class="fs-2 me-2 px-4">
-            {{ prefAge[0] }} - {{ prefAge[1] }}
-          </div>
+          <div class="fs-2 me-2 px-4">{{ prefAge[0] }} - {{ prefAge[1] }}</div>
           <div class="flex-grow-1 px-3">
-            <vue-slider v-model="prefAge"
-                        id="ageRange"
-                        :dotSize="20"
-                        :contained="true"
-                        :tooltip="'none'"
-                        :enable-cross="false"
-                        :min="ageMaxMin.min"
-                        :max="ageMaxMin.max"></vue-slider>
+            <vue-slider
+              v-model="prefAge"
+              id="ageRange"
+              :dotSize="20"
+              :contained="true"
+              :tooltip="'none'"
+              :enable-cross="false"
+              :min="ageMaxMin.min"
+              :max="ageMaxMin.max"
+            ></vue-slider>
           </div>
         </div>
       </div>
     </div>
 
     <div class="mb-3">
-      <FormKit v-model="formData.prefGender!"
-               type="checkbox"
-               label=""
-               :options="genders"
-               help=""
-               @update:modelValue="handleGenderPrefsUpdate" />
+      <FormKit
+        v-model="formData.prefGender!"
+        type="checkbox"
+        label=""
+        :options="genders"
+        help=""
+        @update:modelValue="handleGenderPrefsUpdate"
+      />
     </div>
 
     <div class="mb-3">
-      <FormKit v-model="formData.prefKids!"
-               type="checkbox"
-               label=""
-               :options="hasKidsChoices"
-               help=""
-               @update:modelValue="handleGenderPrefsUpdate" />
+      <FormKit
+        v-model="formData.prefKids!"
+        type="checkbox"
+        label=""
+        :options="hasKidsChoices"
+        help=""
+        @update:modelValue="handleGenderPrefsUpdate"
+      />
     </div>
-
   </fieldset>
 </template>

@@ -1,16 +1,16 @@
-import { defineStore } from 'pinia';
-import {api,axios} from '@/lib/api';
+import { defineStore } from 'pinia'
+import { api, axios } from '@/lib/api'
 
-import type { PublicTag, CreateTagInput } from '@zod/tag.schema';
-import type { Tag } from '@zod/generated';
+import type { PublicTag, CreateTagInput } from '@zod/tag.schema'
+import type { Tag } from '@zod/generated'
 
 interface ServiceError {
-  success: false;
-  message: string;
-  fieldErrors?: Record<string, string[]>;
+  success: false
+  message: string
+  fieldErrors?: Record<string, string[]>
 }
 
-type ServiceResponse<T> = { success: true; data: T } | ServiceError;
+type ServiceResponse<T> = { success: true; data: T } | ServiceError
 
 export const useTagsStore = defineStore('tags', {
   state: () => ({
@@ -25,12 +25,12 @@ export const useTagsStore = defineStore('tags', {
      */
     async fetchAll(): Promise<PublicTag[]> {
       try {
-        const res = await api.get<{ success: true; tags: PublicTag[] }>('/tags');
-        this.tags = res.data.tags;
-        return this.tags;
+        const res = await api.get<{ success: true; tags: PublicTag[] }>('/tags')
+        this.tags = res.data.tags
+        return this.tags
       } catch (error: any) {
-        console.error('Failed to fetch tags:', error);
-        throw error.response?.data?.message || 'Failed to fetch tags';
+        console.error('Failed to fetch tags:', error)
+        throw error.response?.data?.message || 'Failed to fetch tags'
       }
     },
 
@@ -41,12 +41,12 @@ export const useTagsStore = defineStore('tags', {
       try {
         const res = await api.get<{ success: true; tags: PublicTag[] }>('/tags/search', {
           params: { q },
-        });
-        this.searchResults = res.data.tags;
-        return this.searchResults;
+        })
+        this.searchResults = res.data.tags
+        return this.searchResults
       } catch (error: any) {
-        console.error('Failed to search tags:', error);
-        throw error.response?.data?.message || 'Failed to search tags';
+        console.error('Failed to search tags:', error)
+        throw error.response?.data?.message || 'Failed to search tags'
       }
     },
 
@@ -55,12 +55,12 @@ export const useTagsStore = defineStore('tags', {
      */
     async getTag(id: string): Promise<PublicTag> {
       try {
-        const res = await api.get<{ success: true; tag: PublicTag }>(`/tags/${id}`);
-        this.currentTag = res.data.tag;
-        return this.currentTag;
+        const res = await api.get<{ success: true; tag: PublicTag }>(`/tags/${id}`)
+        this.currentTag = res.data.tag
+        return this.currentTag
       } catch (error: any) {
-        console.error(`Failed to fetch tag ${id}:`, error);
-        throw error.response?.data?.message || 'Failed to fetch tag';
+        console.error(`Failed to fetch tag ${id}:`, error)
+        throw error.response?.data?.message || 'Failed to fetch tag'
       }
     },
 
@@ -69,16 +69,16 @@ export const useTagsStore = defineStore('tags', {
      */
     async createTag(input: CreateTagInput): Promise<PublicTag> {
       try {
-        const res = await api.post<{ success: true; tag: PublicTag }>('/tags', input);
-        this.tags.push(res.data.tag);
-        return res.data.tag;
+        const res = await api.post<{ success: true; tag: PublicTag }>('/tags', input)
+        this.tags.push(res.data.tag)
+        return res.data.tag
       } catch (error: any) {
-        console.error('Failed to create tag:', error);
+        console.error('Failed to create tag:', error)
         if (axios.isAxiosError(error) && error.response) {
-          const errData = error.response.data as ServiceError;
-          throw errData.message;
+          const errData = error.response.data as ServiceError
+          throw errData.message
         }
-        throw 'Failed to create tag';
+        throw 'Failed to create tag'
       }
     },
 
@@ -87,13 +87,13 @@ export const useTagsStore = defineStore('tags', {
      */
     async updateTag(id: string, input: Partial<Tag>): Promise<PublicTag> {
       try {
-        const res = await api.patch<{ success: true; tag: PublicTag }>(`/tags/${id}`, input);
-        const idx = this.tags.findIndex(t => t.id === id);
-        if (idx !== -1) this.tags.splice(idx, 1, res.data.tag);
-        return res.data.tag;
+        const res = await api.patch<{ success: true; tag: PublicTag }>(`/tags/${id}`, input)
+        const idx = this.tags.findIndex(t => t.id === id)
+        if (idx !== -1) this.tags.splice(idx, 1, res.data.tag)
+        return res.data.tag
       } catch (error: any) {
-        console.error(`Failed to update tag ${id}:`, error);
-        throw error.response?.data?.message || 'Failed to update tag';
+        console.error(`Failed to update tag ${id}:`, error)
+        throw error.response?.data?.message || 'Failed to update tag'
       }
     },
 
@@ -102,11 +102,11 @@ export const useTagsStore = defineStore('tags', {
      */
     async deleteTag(id: string): Promise<void> {
       try {
-        await api.delete(`/tags/${id}`);
-        this.tags = this.tags.filter(t => t.id !== id);
+        await api.delete(`/tags/${id}`)
+        this.tags = this.tags.filter(t => t.id !== id)
       } catch (error: any) {
-        console.error(`Failed to delete tag ${id}:`, error);
-        throw error.response?.data?.message || 'Failed to delete tag';
+        console.error(`Failed to delete tag ${id}:`, error)
+        throw error.response?.data?.message || 'Failed to delete tag'
       }
     },
 
@@ -115,16 +115,16 @@ export const useTagsStore = defineStore('tags', {
      */
     async addUserTag(input: CreateTagInput): Promise<PublicTag> {
       try {
-        const res = await api.post<{ success: true; tag: PublicTag }>('/tags/user', input);
-        return res.data.tag;
+        const res = await api.post<{ success: true; tag: PublicTag }>('/tags/user', input)
+        return res.data.tag
       } catch (error: any) {
-        console.error('Failed to add user tag:', error);
+        console.error('Failed to add user tag:', error)
         if (axios.isAxiosError(error) && error.response) {
-          const errData = error.response.data as ServiceError;
-          throw errData.message;
+          const errData = error.response.data as ServiceError
+          throw errData.message
         }
-        throw 'Failed to add user tag';
+        throw 'Failed to add user tag'
       }
-    }
+    },
   },
-});
+})

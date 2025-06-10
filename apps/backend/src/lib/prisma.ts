@@ -2,9 +2,10 @@ import { Prisma, PrismaClient } from '@prisma/client'
 import { appConfig } from '@shared/config/appconfig'
 
 // Define process-wide log level
-const logLevels: Prisma.LogLevel[] = appConfig.NODE_ENV === 'production'
-  ? ['error'] // In production, log only errors
-  : ['query', 'error', 'warn']
+const logLevels: Prisma.LogLevel[] =
+  appConfig.NODE_ENV === 'production'
+    ? ['error'] // In production, log only errors
+    : ['query', 'error', 'warn']
 
 // In development, use global to prevent multiple instances during hot reloading
 declare global {
@@ -15,7 +16,7 @@ declare global {
 // Create the PrismaClient instance
 const prismaClientSingleton = () => {
   return new PrismaClient({
-    log: logLevels
+    log: logLevels,
     // configure connection pooling settings here
     // datasources: {
     //   db: {

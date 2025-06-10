@@ -10,10 +10,9 @@ import {
   OwnerProfileSchema,
   PublicProfileSchema,
   UpdatedProfileFragmentSchema,
-  UpdateProfilePayloadSchema
+  UpdateProfilePayloadSchema,
 } from '@zod/profile.schema'
 import { type OwnerProfileImage, type ProfileImagePosition } from '@zod/profileimage.schema'
-
 
 // Success / Error response shapes
 interface UploadSuccess {
@@ -21,13 +20,11 @@ interface UploadSuccess {
   profile: OwnerProfile
 }
 
-
 interface UploadError {
   success: false
   message: string
   fieldErrors?: Record<string, string[]>
 }
-
 
 type UploadResponse = UploadSuccess | UploadError
 
@@ -63,10 +60,7 @@ export const useProfileStore = defineStore('profile', {
       }
     },
 
-    async uploadProfileImage(
-      file: File,
-      captionText: string
-    ): Promise<UploadResponse> {
+    async uploadProfileImage(file: File, captionText: string): Promise<UploadResponse> {
       const formData = new FormData()
       formData.append('file', file)
       formData.append('captionText', captionText)
@@ -76,9 +70,9 @@ export const useProfileStore = defineStore('profile', {
         // data.success is guaranteed true here
         return data
       } catch (err: unknown) {
-        let out: UploadError = {
+        const out: UploadError = {
           success: false,
-          message: 'An unexpected error occurred'
+          message: 'An unexpected error occurred',
         }
 
         if (axios.isAxiosError(err) && err.response) {
@@ -100,7 +94,7 @@ export const useProfileStore = defineStore('profile', {
       } catch (error: any) {
         const out: UploadError = {
           success: false,
-          message: 'An unexpected error occurred'
+          message: 'An unexpected error occurred',
         }
         return out
       }
@@ -113,7 +107,7 @@ export const useProfileStore = defineStore('profile', {
       } catch (error: any) {
         const out: UploadError = {
           success: false,
-          message: 'An unexpected error occurred'
+          message: 'An unexpected error occurred',
         }
         return out
       }
@@ -158,6 +152,6 @@ export const useProfileStore = defineStore('profile', {
         }
       }
       return null
-    }
+    },
   },
 })

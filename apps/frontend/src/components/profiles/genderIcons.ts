@@ -1,4 +1,3 @@
-
 import Male from '@/assets/icons/gender/male.svg'
 import Female from '@/assets/icons/gender/female.svg'
 import Agender from '@/assets/icons/gender/genderless.svg'

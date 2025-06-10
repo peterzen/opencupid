@@ -10,6 +10,5 @@
 </template>
 
 <script lang="ts" setup>
-import Navbar from '@/components/nav/Navbar.vue';
-
+import Navbar from '@/components/nav/Navbar.vue'
 </script>

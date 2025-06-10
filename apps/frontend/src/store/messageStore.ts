@@ -6,14 +6,13 @@ import { bus } from '@/lib/bus'
 
 import type { ConversationSummary, MessageInConversation } from '@zod/messaging.schema'
 
-
 export const useMessageStore = defineStore('message', {
   state: () => ({
     conversations: [] as ConversationSummary[],
     messages: [] as MessageInConversation[],
     activeConversationId: null as string | null,
     unreadCount: 0,
-    socket: null as any  // TODO find out why UseWebSocketReturn<any> gives TS errors
+    socket: null as any, // TODO find out why UseWebSocketReturn<any> gives TS errors
   }),
 
   actions: {
@@ -33,13 +32,12 @@ export const useMessageStore = defineStore('message', {
 
       socket.ws.value?.addEventListener('message', this.messageHandler)
 
-      socket.ws.value?.addEventListener('close', (event) => {
+      socket.ws.value?.addEventListener('close', event => {
         console.warn('WS closed. Reconnecting in 5s...')
         setTimeout(() => this.connectWebSocket(token), 5000)
       })
 
       console.log('WebSocket connected:', socket.ws.value)
-
     },
 
     disconnectWebSocket() {
@@ -95,7 +93,6 @@ export const useMessageStore = defineStore('message', {
         if (res.data.success) {
           this.conversations = res.data.conversations
         }
-
       } catch (error: any) {
         console.error('Failed to fetch conversations:', error)
         this.conversations = []
@@ -115,17 +112,19 @@ export const useMessageStore = defineStore('message', {
       await this.fetchUnreadCount()
     },
 
-    async sendMessage(recipientProfileId: string, content: string): Promise<ConversationSummary | null> {
+    async sendMessage(
+      recipientProfileId: string,
+      content: string
+    ): Promise<ConversationSummary | null> {
       try {
         const res = await api.post(`/messages/conversations/${recipientProfileId}`, { content })
 
         if (res.data.success) {
-
           const { conversation, message } = res.data
           // Move conversation to top, remove any old instance
           this.conversations = [
             conversation,
-            ...this.conversations.filter(c => c.conversationId !== conversation.conversationId)
+            ...this.conversations.filter(c => c.conversationId !== conversation.conversationId),
           ]
           if (this.activeConversationId === conversation.conversationId) {
             this.messages.push(message)
@@ -140,10 +139,9 @@ export const useMessageStore = defineStore('message', {
     async setActiveConversation(convoId: string) {
       this.activeConversationId = convoId
       await this.fetchMessagesForConversation(convoId)
-    }
-  }
+    },
+  },
 })
-
 
 bus.on('auth:login', ({ token }) => {
   useMessageStore().connectWebSocket(token)

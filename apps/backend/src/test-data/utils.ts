@@ -4,8 +4,6 @@ import cuid from 'cuid'
 import fs, { createReadStream } from 'fs'
 import path from 'path'
 
-
-
 /**
  * Returns true with the given probability.
  * @param probability number between 0 and 1
@@ -14,16 +12,11 @@ export function randomBoolean(probability: number): boolean {
   return Math.random() < probability
 }
 
-
-
 /**
  * Downloads an image from `url` and saves it in `outputDir` with the next available numeric filename.
  * Creates the directory if missing. Returns the full path of the saved file.
  */
-export async function downloadImage(
-  url: string,
-  outputDir: string,
-): Promise<string> {
+export async function downloadImage(url: string, outputDir: string): Promise<string> {
   // 1. Ensure the target directory exists
 
   await fs.promises.mkdir(outputDir, { recursive: true })
@@ -50,5 +43,3 @@ export async function downloadImage(
 
   return outputPath
 }
-
-

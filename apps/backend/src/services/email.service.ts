@@ -1,8 +1,8 @@
-import { appConfig } from '@shared/config/appconfig';
-import nodemailer from 'nodemailer';
+import { appConfig } from '@shared/config/appconfig'
+import nodemailer from 'nodemailer'
 
 export class EmailService {
-  private transporter: nodemailer.Transporter;
+  private transporter: nodemailer.Transporter
 
   constructor() {
     this.transporter = nodemailer.createTransport({
@@ -13,7 +13,7 @@ export class EmailService {
         user: appConfig.SMTP_USER,
         pass: appConfig.SMTP_PASS,
       },
-    });
+    })
   }
 
   async sendMail(to: string, subject: string, html: string, from?: string) {
@@ -22,28 +22,28 @@ export class EmailService {
       to,
       subject,
       html,
-    };
+    }
 
-    return this.transporter.sendMail(mailOptions);
+    return this.transporter.sendMail(mailOptions)
   }
 
   async sendConfirmationEmail(to: string, token: string) {
-    const confirmUrl = `${appConfig.FRONTEND_URL}/confirm-email?token=${token}`;
+    const confirmUrl = `${appConfig.FRONTEND_URL}/confirm-email?token=${token}`
     const html = `
       <p>Thank you for registering! Please confirm your email by clicking the link below:</p>
       <a href="${confirmUrl}">${confirmUrl}</a>
-    `;
-    return this.sendMail(to, 'Confirm your email address', html);
+    `
+    return this.sendMail(to, 'Confirm your email address', html)
   }
 
   async sendPasswordRecoveryEmail(to: string, token: string) {
-    const confirmUrl = `${appConfig.FRONTEND_URL}/confirm-email?token=${token}`;
+    const confirmUrl = `${appConfig.FRONTEND_URL}/confirm-email?token=${token}`
     const html = `
       <p>Thank you for registering! Please confirm your email by clicking the link below:</p>
       <a href="${confirmUrl}">${confirmUrl}</a>
-    `;
-    return this.sendMail(to, 'Confirm your email address', html);
+    `
+    return this.sendMail(to, 'Confirm your email address', html)
   }
 }
 
-export const emailService = new EmailService();
+export const emailService = new EmailService()

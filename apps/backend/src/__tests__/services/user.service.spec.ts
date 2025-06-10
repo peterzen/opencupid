@@ -4,7 +4,9 @@ import { createMockPrisma } from '../../test-utils/prisma'
 
 let mockPrisma: any = {}
 vi.mock('../../lib/prisma', () => ({
-  get prisma() { return mockPrisma }
+  get prisma() {
+    return mockPrisma
+  },
 }))
 
 let service: UserService
@@ -43,9 +45,20 @@ describe('UserService.otpLogin', () => {
   })
 
   it('updates user and returns result', async () => {
-    const user = { id: 'u1', loginToken: 'otp', isRegistrationConfirmed: false, roles: [], profile: { id: 'p1' } }
+    const user = {
+      id: 'u1',
+      loginToken: 'otp',
+      isRegistrationConfirmed: false,
+      roles: [],
+      profile: { id: 'p1' },
+    }
     mockPrisma.user.findUnique.mockResolvedValue(user)
-    mockPrisma.user.update.mockResolvedValue({ ...user, isRegistrationConfirmed: true, loginToken: null, loginTokenExp: null })
+    mockPrisma.user.update.mockResolvedValue({
+      ...user,
+      isRegistrationConfirmed: true,
+      loginToken: null,
+      loginTokenExp: null,
+    })
     const res = await service.otpLogin('u1', 'otp')
     expect(res.isNewUser).toBe(true)
     expect(mockPrisma.user.update).toHaveBeenCalled()

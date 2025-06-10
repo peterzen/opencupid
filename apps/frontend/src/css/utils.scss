@@ -23,7 +23,6 @@
   opacity: 0.5;
 }
 
-
 .form-check-label {
   &:hover {
     cursor: pointer;
@@ -31,7 +30,7 @@
   user-select: none;
 }
 
-fieldset:disabled{
+fieldset:disabled {
   opacity: 0.3;
   .form-control {
     background-color: inherit;

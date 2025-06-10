@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import type { SendOtpPayload } from '@zod/user.schema'
-import { emailRegex, phoneRegex } from '@/lib/utils';
-import CaptchaWidget from './CaptchaWidget.vue';
-import { IconMail, IconPhone, IconTick, IconLogin } from '@/components/icons/DoodleIcons';
+import { emailRegex, phoneRegex } from '@/lib/utils'
+import CaptchaWidget from './CaptchaWidget.vue'
+import { IconMail, IconPhone, IconTick, IconLogin } from '@/components/icons/DoodleIcons'
 import Logo from '@/assets/icons/app/logo.svg'
-import { useI18n } from 'vue-i18n';
+import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
@@ -34,12 +34,11 @@ const authIdentifier = computed(() => {
 // Method to handle sending login link
 async function handleSendLoginLink() {
   if (!authIdInput.value) {
-    error.value = t('auth.auth_id_input_empty')  // "Please enter your email or phone number."
+    error.value = t('auth.auth_id_input_empty') // "Please enter your email or phone number."
     return
   }
   emit('otp:send', authIdentifier.value)
 }
-
 
 const validateAuthIdInput = (node: any) => {
   const value = node.value as string
@@ -59,53 +58,49 @@ function handleCaptchaUpdatePayload(payload: string) {
 }
 
 const authIdInputRef = ref<InstanceType<any> | null>(null)
-
 </script>
-
 
 <template>
   <div class="auth-id-component">
-
     <div class="d-flex justify-content-center align-items-center flex-column h-100 mb-4">
       <div class="icon-inner text-success animate__animated animate__fadeIn">
         <Logo class="svg-icon logo" />
       </div>
     </div>
 
-    <FormKit type="form"
-             id="userIdForm"
-             :actions="false"
-             :disabled="props.isLoading"
-             #default="{ state: { valid } }"
-             @submit="handleSendLoginLink">
-
+    <FormKit
+      type="form"
+      id="userIdForm"
+      :actions="false"
+      :disabled="props.isLoading"
+      #default="{ state: { valid } }"
+      @submit="handleSendLoginLink"
+    >
       <div class="mb-3">
-        <FormKit type="text"
-                 v-model="authIdInput"
-                 :label="t('auth.auth_id_input_label')"  
-                 id="authIdInput"
-                 ref="authIdInputRef"
-                 autofocus
-                 :floating-label="true"
-                 input-class="form-control-lg"
-                 validation="+validateAuthIdInput"
-                 :placeholder="t('auth.auth_id_input_placeholder')"
-                 :validation-rules="{
-                  validateAuthIdInput,
-                }"
-                 validation-visibility="live">
+        <FormKit
+          type="text"
+          v-model="authIdInput"
+          :label="t('auth.auth_id_input_label')"
+          id="authIdInput"
+          ref="authIdInputRef"
+          autofocus
+          :floating-label="true"
+          input-class="form-control-lg"
+          validation="+validateAuthIdInput"
+          :placeholder="t('auth.auth_id_input_placeholder')"
+          :validation-rules="{
+            validateAuthIdInput,
+          }"
+          validation-visibility="live"
+        >
           <template #suffixIcon>
             <div class="suffix-icon">
-              <span class="text-success"
-                    v-if="valid">
+              <span class="text-success" v-if="valid">
                 <IconTick class="svg-icon" />
               </span>
-              <span class="text-muted"
-                    v-else>
-                <IconMail class="svg-icon"
-                          v-if="authIdInput.includes('@')" />
-                <IconPhone class="svg-icon"
-                           v-else-if="authIdInput.startsWith('+')" />
+              <span class="text-muted" v-else>
+                <IconMail class="svg-icon" v-if="authIdInput.includes('@')" />
+                <IconPhone class="svg-icon" v-else-if="authIdInput.startsWith('+')" />
               </span>
             </div>
           </template>
@@ -113,21 +108,20 @@ const authIdInputRef = ref<InstanceType<any> | null>(null)
       </div>
 
       <div class="mb-3">
-        <CaptchaWidget v-if="!props.isLoading"
-                       @update:payload="handleCaptchaUpdatePayload" />
+        <CaptchaWidget v-if="!props.isLoading" @update:payload="handleCaptchaUpdatePayload" />
       </div>
 
-      <FormKit type="submit"
-               wrapper-class="d-grid gap-2 mb-3"
-               input-class="btn-primary btn-lg w-100"
-               :disabled="!valid || props.isLoading">
+      <FormKit
+        type="submit"
+        wrapper-class="d-grid gap-2 mb-3"
+        input-class="btn-primary btn-lg w-100"
+        :disabled="!valid || props.isLoading"
+      >
         <IconLogin class="svg-icon" /> {{ t('auth.login') }}
       </FormKit>
-
     </FormKit>
   </div>
 </template>
-
 
 <style scoped>
 :deep(ul.formkit-messages) {
@@ -147,7 +141,6 @@ const authIdInputRef = ref<InstanceType<any> | null>(null)
 .svg-icon {
   fill: currentColor;
 }
-
 
 .logo {
   width: 7.5rem;

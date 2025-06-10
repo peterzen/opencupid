@@ -21,7 +21,7 @@ import { useIcons } from './lib/icons'
 useIcons(app)
 
 // toastify
-import Vue3Toastify from 'vue3-toastify';
+import Vue3Toastify from 'vue3-toastify'
 import { defaultOptions } from './lib/toastify'
 app.use(Vue3Toastify, defaultOptions)
 
