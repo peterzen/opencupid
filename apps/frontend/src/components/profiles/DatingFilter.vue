@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type PublicProfile } from '@zod/dto/profile.schema'
+import { type PublicProfile } from '@zod/profile/profile.dto'
 
 // Props & Emits
 const props = defineProps<{

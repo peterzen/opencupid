@@ -1,15 +1,9 @@
 // TODO: review usage; copied for both db and dto layers
 import { Prisma } from '@prisma/client'
 import { z } from 'zod'
-import { ProfileSummarySchema } from './profile.schema'
-import { ConversationParticipantSchema, MessageSchema } from '../generated'
+import { ProfileSummarySchema } from '../profile/profile.dto'
+import { ConversationParticipantSchema, ConversationSchema, MessageSchema } from '../generated'
 
-export const ConversationSchema = z.object({
-  id: z.string(),
-  startedById: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-})
 
 const conversationParticipantFields = {
   id: true,
@@ -20,7 +14,7 @@ const conversationParticipantFields = {
   isArchived: true,
 } as const
 
-export const MessageInConversationSchema = MessageSchema.pick({
+const MessageInConversationSchema = MessageSchema.pick({
   id: true,
   conversationId: true,
   senderId: true,
@@ -32,16 +26,15 @@ export const MessageInConversationSchema = MessageSchema.pick({
 
 export type MessageInConversation = z.infer<typeof MessageInConversationSchema>
 
-export const MessageInConversationSummarySchema = MessageSchema.pick({
+const MessageInConversationSummarySchema = MessageSchema.pick({
   content: true,
   createdAt: true,
 }).extend({
   isMine: z.boolean().optional(),
 })
-export type MessageInConversationSummary = z.infer<typeof MessageInConversationSummarySchema>
 
 
-export const ConversationSummarySchema = ConversationParticipantSchema.pick({
+ const ConversationSummarySchema = ConversationParticipantSchema.pick({
   id: true,
   profileId: true,
   conversationId: true,

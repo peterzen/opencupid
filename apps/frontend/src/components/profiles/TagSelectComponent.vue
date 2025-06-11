@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import Multiselect from 'vue-multiselect'
 import { useTagsStore } from '@/store/tagStore'
 
-import { type PublicTag } from '@zod/dto/tag.schema'
+import { type PublicTag } from '@zod/dto/tag.dto'
 
 // Instantiate Pinia store
 const tagStore = useTagsStore()

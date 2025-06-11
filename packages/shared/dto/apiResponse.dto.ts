@@ -13,11 +13,11 @@ import type {
   PublicProfile,
   UpdatedProfileFragment,
   UpdatedProfileImageFragment,
-} from '@zod/dto/profile.schema'
-import type { PublicTag } from '@zod/dto/tag.schema'
-import type { ConversationSummary, MessageInConversation } from '@zod/dto/messaging.schema'
+} from '@zod/profile/profile.dto'
+import type { PublicTag } from '@zod/dto/tag.dto'
+import type { ConversationSummary, MessageInConversation } from '@zod/dto/messaging.dto'
 import type { SettingsUser, OtpSendReturn } from '@zod/user/user.dto'
-import type { City } from '@zod/dto/city.schema'
+import type { City } from '@zod/city/city.schema'
 
 export type GetMyProfileResponse = ApiSuccess<{ profile: OwnerProfile }>
 export type GetPublicProfileResponse = ApiSuccess<{ profile: PublicProfile }>

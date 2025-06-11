@@ -1,15 +1,13 @@
+import cuid from 'cuid'
 import { prisma } from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
 import {
   ProfileComplete,
   ProfileWithTags,
-  UpdatedProfileFragment,
-  UpdatedProfileFragmentSchema,
-  UpdateProfilePayload,
-} from '@zod/db/profile.schema'
+} from '@zod/profile/profile.types'
 
 import { Profile, ProfileImage, ProfileTag } from '@zod/generated'
-import cuid from 'cuid'
+import { type UpdateProfilePayload } from '@zod/profile/profile.dto'
 
 const profileCompleteInclude = {
   profileImages: {

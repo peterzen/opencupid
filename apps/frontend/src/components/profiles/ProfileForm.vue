@@ -4,8 +4,8 @@ import { useI18n } from 'vue-i18n'
 
 import { getLanguageSelectorOptions, type MultiselectOption } from '@/lib/languages'
 
-import type { OwnerProfile } from '@zod/dto/profile.schema'
-import type { PublicTag } from '@zod/dto/tag.schema'
+import type { OwnerProfile } from '@zod/profile/profile.dto'
+import type { PublicTag } from '@zod/dto/tag.dto'
 
 import Multiselect from 'vue-multiselect'
 import ErrorComponent from '@/components/ErrorComponent.vue'

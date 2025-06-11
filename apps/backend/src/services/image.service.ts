@@ -1,15 +1,12 @@
-import cuid from 'cuid'
-import path, { dirname } from 'path'
+import path from 'path'
 import fs from 'fs'
-import mime from 'mime-types'
-import { SavedMultipartFile } from '@fastify/multipart'
 
 import { prisma } from '../lib/prisma'
 import { ProfileImage } from '@prisma/client'
-import { generateStorageDirPrefix, getImageRoot, makeImageLocation } from 'src/lib/media'
+import { getImageRoot, makeImageLocation } from 'src/lib/media'
 
 import { generateContentHash } from '@/utils/hash'
-import { ProfileImagePosition } from '@zod/db/profileimage.schema'
+import { ProfileImagePosition } from '@zod/profile/profileimage.dto'
 import sharp from 'sharp'
 
 const sizes = [
@@ -23,7 +20,7 @@ export class ImageGalleryService {
   /**
    * Private constructor to prevent direct instantiation
    */
-  private constructor() {}
+  private constructor() { }
 
   /**
    * Get singleton instance

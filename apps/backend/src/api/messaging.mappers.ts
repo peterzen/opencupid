@@ -1,13 +1,9 @@
-import { z } from 'zod'
-import type { Prisma } from '@prisma/client'
+import type { Prisma } from '@prisma/client';
 import {
   ConversationParticipantWithExtras,
-  ConversationSummary,
-  ConversationSummarySchema,
-  MessageInConversation,
-  MessageInConversationSchema,
-} from '@zod/dto/messaging.schema'
-import { mapProfileSummary } from './mappers'
+  ConversationSummary, MessageInConversation
+} from '@zod/dto/messaging.dto';
+import { mapProfileSummary } from './mappers';
 
 function mapConversationMeta(c: { id: string; updatedAt: Date; createdAt: Date }) {
   return {

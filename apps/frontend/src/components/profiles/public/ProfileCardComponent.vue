@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-import type { PublicProfile } from '@zod/dto/profile.schema'
+import type { PublicProfile } from '@zod/profile/profile.dto'
 import ProfileImage from '@/components/profiles/image/ProfileImage.vue'
 
 // Props & Emits

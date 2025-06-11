@@ -2,9 +2,9 @@ import { FastifyPluginAsync } from 'fastify'
 import multipart, { MultipartValue } from '@fastify/multipart'
 
 import {
-  IdLookupParamsSchema, UpdatedProfileFragmentSchema,
+  UpdatedProfileFragmentSchema,
   UpdateProfilePayloadSchema
-} from '@zod/dto/profile.schema'
+} from '@zod/profile/profile.dto'
 
 import { ProfileService } from 'src/services/profile.service'
 import { ImageGalleryService } from 'src/services/image.service'
@@ -17,7 +17,7 @@ import {
   mapProfileToOwner,
   mapProfileToPublic,
 } from 'src/api/mappers'
-import { ReorderProfileImagesPayloadSchema } from '@zod/dto/profileimage.schema'
+import { ReorderProfileImagesPayloadSchema } from '@zod/profile/profileimage.dto'
 import { UserService } from 'src/services/user.service'
 import { appConfig } from '@shared/config/appconfig'
 import { Prisma } from '@prisma/client'
@@ -28,6 +28,19 @@ import type {
   UpdateProfileResponse,
   ProfileImagesResponse,
 } from '@shared/dto/apiResponse.dto'
+import { z } from 'zod'
+
+
+
+
+// Route params for ID lookups
+const IdLookupParamsSchema = z.object({
+  id: z.string().cuid(),
+})
+
+
+
+
 
 const profileRoutes: FastifyPluginAsync = async fastify => {
   await fastify.register(multipart, {
@@ -60,7 +73,7 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
       if (!fetched) return sendError(reply, 404, 'Social profile not found')
 
       const profile = mapProfileToOwner(fetched)
-      const response: GetMyProfileResponse = { success: true, profile}
+      const response: GetMyProfileResponse = { success: true, profile }
       return reply.code(200).send(response)
     } catch (err) {
       fastify.log.error(err)
@@ -89,7 +102,7 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
 
       const profile = mapProfileToPublic(raw, roles)
       // const profile = publicProfileSchema.parse(raw)
-      const response : GetPublicProfileResponse = { success: true, profile }
+      const response: GetPublicProfileResponse = { success: true, profile }
       return reply.code(200).send(response)
     } catch (err) {
       fastify.log.error(err)

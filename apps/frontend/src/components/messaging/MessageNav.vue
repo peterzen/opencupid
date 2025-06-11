@@ -2,7 +2,7 @@
 import { IconArrowSingleLeft, IconMenu } from '@/components/icons/DoodleIcons'
 import { BNavbarNav } from 'bootstrap-vue-next'
 import ProfileImage from '@/components/profiles/image/ProfileImage.vue'
-import { type ProfileSummary } from '@zod/dto/profile.schema'
+import { type ProfileSummary } from '@zod/profile/profile.dto'
 
 const props = defineProps<{
   recipient: ProfileSummary

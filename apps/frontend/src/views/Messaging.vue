@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
-import { type PublicProfile } from '@zod/dto/profile.schema'
+import { type PublicProfile } from '@zod/profile/profile.dto'
 import { useMessageStore } from '@/store/messageStore'
-import type { ConversationSummary } from '@zod/dto/messaging.schema'
+import type { ConversationSummary } from '@zod/dto/messaging.dto'
 import ConversationSummaries from '@/components/messaging/ConversationSummaries.vue'
 import SendMessage from '@/components/messaging/SendMessage.vue'
 import MessageList from '@/components/messaging/MessageList.vue'

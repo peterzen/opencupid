@@ -4,7 +4,7 @@ import {
   SearchQuerySchema,
   TagParamsSchema,
   UpdateTagPayloadSchema,
-} from '@zod/dto/tag.schema'
+} from '@zod/dto/tag.dto'
 import { FastifyPluginAsync } from 'fastify'
 import { sendError } from '../helpers'
 import { TagService } from 'src/services/tag.service'

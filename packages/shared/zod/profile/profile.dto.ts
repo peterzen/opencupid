@@ -1,19 +1,10 @@
-// TODO: review usage; copied for both db and dto layers
 import { z } from "zod";
 import { ProfileSchema } from "../generated";
-import { PublicTagSchema } from "./tag.schema";
+import { PublicTagSchema } from "../dto/tag.dto";
 import {
   OwnerProfileImageSchema,
   PublicProfileImageSchema
-} from "./profileimage.schema";
-
-import type {
-  Profile,
-  ProfileImage,
-  ProfileTag,
-  Tag
-} from "../generated";
-
+} from "./profileimage.dto";
 
 const baseFields = {
   id: true,
@@ -126,17 +117,6 @@ export const UpdatedProfileFragmentSchema = OwnerScalarSchema.extend({
 export type UpdatedProfileFragment = z.infer<typeof UpdatedProfileFragmentSchema>;
 
 
-// Define types for service return values
-export type ProfileWithImages = Profile & {
-  profileImages: ProfileImage[]
-}
-
-export type ProfileWithTags = Profile & {
-  tags: (ProfileTag & { tag: Tag })[]
-}
-
-export type ProfileComplete = ProfileWithImages & ProfileWithTags
-
 
 // Fragment for updated profile images
 export const UpdatedProfileImageFragmentSchema = ProfileSchema
@@ -151,25 +131,6 @@ export const OwnerDatingPreferencesSchema = ProfileSchema.pick({
 }).partial()
 export type OwnerDatingPreferences = z.infer<typeof OwnerDatingPreferencesSchema>;
 
-// Route params for ID lookups
-export const IdLookupParamsSchema = z.object({
-  id: z.string().cuid(),
-})
-export type IdLookupParams = z.infer<typeof IdLookupParamsSchema>
-
-
-// Route params for ID lookups
-export const SlugLookupParamsSchema = z.object({
-  slug: z.string().min(1)
-})
-export type SlugLookupParams = z.infer<typeof SlugLookupParamsSchema>
-
-
-
-
-export const ProfileImageSchema = z.object({
-  storagePath: z.string()
-})
 
 export const ProfileSummarySchema = z.object({
   id: z.string(),
@@ -179,6 +140,3 @@ export const ProfileSummarySchema = z.object({
 
 export type ProfileSummary = z.infer<typeof ProfileSummarySchema>;
 
-export interface ProfileImages {
-  profileImages: { url: string | null }[];
-}

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getCountryOptions } from '@/lib/countries'
-import { type OwnerProfile } from '@zod/dto/profile.schema'
+import { type OwnerProfile } from '@zod/profile/profile.dto'
 import { reactive, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Multiselect from 'vue-multiselect'

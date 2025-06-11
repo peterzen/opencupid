@@ -3,20 +3,19 @@ import {
   PublicProfile,
   OwnerProfile,
   ProfileUnionSchema,
-  ProfileComplete,
   ProfileSummary,
-} from '@zod/dto/profile.schema'
+} from '@zod/profile/profile.dto'
 import {
   OwnerProfileImage,
   OwnerProfileImageSchema,
   PublicProfileImage,
   PublicProfileImageSchema,
-  PublicProfileImageWithUrl,
-} from '@zod/dto/profileimage.schema'
-import { ProfileTagJoinSchema, PublicTag, PublicTagSchema } from '@zod/dto/tag.schema'
+} from '@zod/profile/profileimage.dto'
+import { ProfileTagJoinSchema, PublicTag, PublicTagSchema } from '@zod/dto/tag.dto'
 import type { ProfileImage, UserRole } from '@prisma/client'
 import { ProfileTag } from '@zod/generated'
 import { appConfig } from '@shared/config/appconfig'
+import { ProfileComplete } from '@zod/profile/profile.types'
 
 export function mapProfileToOwner(profile: ProfileComplete): OwnerProfile {
   const safe = OwnerScalarSchema.parse(profile)

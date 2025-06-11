@@ -2,7 +2,7 @@
 import { reactive, computed, watch, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ErrorComponent from '@/components/ErrorComponent.vue'
-import type { OwnerDatingPreferences, OwnerProfile } from '@zod/dto/profile.schema'
+import type { OwnerDatingPreferences, OwnerProfile } from '@zod/profile/profile.dto'
 import GenderPickerComponent, { type GenderPickerModel } from './GenderPickerComponent.vue'
 import ToggleSwitch from '@/components/ToggleSwitch.vue'
 import DatingPreferencesForm from './DatingPreferencesForm.vue'
