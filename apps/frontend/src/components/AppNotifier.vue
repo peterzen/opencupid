@@ -20,3 +20,6 @@ bus.on('message:received', ({ message }) => {
   })
 })
 </script>
+<template>
+  <div ></div>
+</template>

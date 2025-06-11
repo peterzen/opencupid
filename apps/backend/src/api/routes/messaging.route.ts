@@ -7,6 +7,12 @@ import {
   mapConversationParticipantToSummary,
   mapMessageToMessageInConversation,
 } from '../messaging.mappers'
+import type {
+  MessagesResponse,
+  ConversationsResponse,
+  ConversationResponse,
+  SendMessageResponse,
+} from '@shared/dto/apiResponse.dto'
 
 // Route params for ID lookups
 const IdLookupParamsSchema = z.object({
@@ -50,7 +56,8 @@ const messageRoutes: FastifyPluginAsync = async fastify => {
       // await messageService.markConversationRead(profileId, conversationId)
 
       const messages = raw.map(m => mapMessageToMessageInConversation(m, profileId))
-      return reply.code(200).send({ success: true, messages })
+      const response: MessagesResponse = { success: true, messages }
+      return reply.code(200).send(response)
 
     } catch (error) {
       fastify.log.error(error)
@@ -65,7 +72,8 @@ const messageRoutes: FastifyPluginAsync = async fastify => {
     try {
       const raw = await messageService.listConversationsForProfile(profileId)
       const conversations = raw.map(p => mapConversationParticipantToSummary(p, profileId))
-      return reply.code(200).send({ success: true, conversations })
+      const response: ConversationsResponse = { success: true, conversations }
+      return reply.code(200).send(response)
     } catch (error) {
       fastify.log.error(error)
       return sendError(reply, 500, 'Failed to fetch conversations')
@@ -86,8 +94,12 @@ const messageRoutes: FastifyPluginAsync = async fastify => {
       await messageService.markConversationRead(conversationId, profileId)
       const updated = await messageService.getConversationSummary(conversationId, profileId)
       if (!updated) return sendError(reply, 404, 'Conversation not found')
-        
-      return reply.code(200).send({ success: true, conversation: mapConversationParticipantToSummary(updated,profileId) })
+
+      const response: ConversationResponse = {
+        success: true,
+        conversation: mapConversationParticipantToSummary(updated, profileId),
+      }
+      return reply.code(200).send(response)
 
     } catch (error) {
       fastify.log.error(error)
@@ -120,11 +132,13 @@ const messageRoutes: FastifyPluginAsync = async fastify => {
     if (!updatedConvo)
       return sendError(reply, 404, 'Conversation not found or could not be created')
 
-    reply.code(200).send({
+    const response: SendMessageResponse = {
       success: true,
       conversation: mapConversationParticipantToSummary(updatedConvo, senderProfileId),
       message: mapMessageToMessageInConversation(message, senderProfileId),
-    })
+    }
+
+    reply.code(200).send(response)
 
     // Broadcast the new message to the recipient's WebSocket connections
     broadcastToProfile(fastify, recipientProfileId, {

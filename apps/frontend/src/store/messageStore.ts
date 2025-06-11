@@ -5,6 +5,12 @@ import { api } from '@/lib/api'
 import { bus } from '@/lib/bus'
 
 import type { ConversationSummary, MessageInConversation } from '@zod/messaging.schema'
+import type {
+  MessagesResponse,
+  ConversationsResponse,
+  ConversationResponse,
+  SendMessageResponse,
+} from '@shared/dto/apiResponse.dto'
 
 
 
@@ -102,7 +108,7 @@ export const useMessageStore = defineStore('message', {
     async fetchMessagesForConversation(conversationId: string): Promise<MessageInConversation[]> {
       try {
         console.log('Fetching messages for conversation:', conversationId)
-        const res = await api.get(`/messages/${conversationId}`)
+        const res = await api.get<MessagesResponse>(`/messages/${conversationId}`)
         console.log('Fetched messages:', res.data)
         if (res.data.success) {
           this.messages = res.data.messages
@@ -117,7 +123,7 @@ export const useMessageStore = defineStore('message', {
 
     async fetchConversations(): Promise<ConversationSummary[]> {
       try {
-        const res = await api.get('/messages/conversations')
+        const res = await api.get<ConversationsResponse>('/messages/conversations')
         if (res.data.success) {
           this.conversations = res.data.conversations
           this.updateUnreadFlag()
@@ -138,7 +144,7 @@ export const useMessageStore = defineStore('message', {
 
     async markAsRead(convoId: string) {
       try {
-        const updateConvo = await api.post(`/messages/conversations/${convoId}/mark-read`)
+        const updateConvo = await api.post<ConversationResponse>(`/messages/conversations/${convoId}/mark-read`)
         if (updateConvo.data.success) {
           const updatedConvo: ConversationSummary = updateConvo.data.conversation
           this.updateConvo(updatedConvo)
@@ -155,7 +161,7 @@ export const useMessageStore = defineStore('message', {
       content: string
     ): Promise<ConversationSummary | null> {
       try {
-        const res = await api.post(`/messages/conversations/${recipientProfileId}`, { content })
+        const res = await api.post<SendMessageResponse>(`/messages/conversations/${recipientProfileId}`, { content })
 
         if (res.data.success) {
           const { conversation, message } = res.data
@@ -164,7 +170,7 @@ export const useMessageStore = defineStore('message', {
             conversation,
             ...this.conversations.filter(c => c.conversationId !== conversation.conversationId),
           ]
-          if (this.activeConversation === conversation.conversationId) {
+          if (this.activeConversation?.conversationId === conversation.conversationId) {
             this.messages.push(message)
           }
           return res.data.conversation

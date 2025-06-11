@@ -1,6 +1,7 @@
 import { FastifyPluginAsync } from 'fastify'
 import { PrismaClient } from '@prisma/client'
 import { CityQuerySchema, CitySchema } from '@zod/city.schema'
+import type { CitySearchResponse } from '@shared/dto/apiResponse.dto'
 
 const prisma = new PrismaClient()
 
@@ -26,7 +27,8 @@ const cityRoutes: FastifyPluginAsync = async fastify => {
 
     // Validate output and send
     const valid = CitySchema.array().parse(cities)
-    return reply.send(valid)
+    const response: CitySearchResponse = valid
+    return reply.code(200).send(response) 
   })
 }
 

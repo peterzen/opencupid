@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
 
 import AvatarUploadIcon from '@/assets/icons/files/avatar-upload.svg'
-import { type OwnerProfile } from '@zod/profile.schema'
+import type { UpdatedProfileImageFragment, OwnerProfile } from '@zod/profile.schema'
 import LoadingComponent from '@/components/LoadingComponent.vue'
 
 const profileStore = useProfileStore()
@@ -19,7 +19,7 @@ const captionText = ref<string>('')
 
 // Emitters
 const emit = defineEmits<{
-  (e: 'image:uploaded', payload: OwnerProfile): void
+  (e: 'image:uploaded', payload: UpdatedProfileImageFragment): void
   (e: 'image:deleted', payload: { id: string }): void
   (e: 'update:modelValue', value: OwnerProfile): void
 }>()

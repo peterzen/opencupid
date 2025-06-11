@@ -1,6 +1,7 @@
 export * from './dto/user.dto'
 export * from './dto/profile.dto'
 export * from './dto/message.dto'
+export * from './dto/apiResponse.dto'
 export * from './zod/user.schema'
 export * from './zod/profile.schema'
 export * from './zod/profileimage.schema'

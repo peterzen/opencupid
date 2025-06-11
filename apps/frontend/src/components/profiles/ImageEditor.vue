@@ -5,14 +5,13 @@ import { VueDraggableNext } from 'vue-draggable-next'
 
 import { useProfileStore } from '@/store/profileStore'
 
-import { type OwnerProfile } from '@zod/profile.schema'
+import type { UpdatedProfileImageFragment, OwnerProfile } from '@zod/profile.schema'
 import { type OwnerProfileImage } from '@zod/profileimage.schema'
 
 import ImageUpload from '@/components/profiles/ImageUpload.vue'
 import LoadingComponent from '@/components/LoadingComponent.vue'
 import ProfileImageComponent from '@/components/profiles/image/ImageTag.vue'
 
-import { IconArrowLeft } from '@/components/icons/DoodleIcons'
 import HelpScribble from './HelpScribble.vue'
 const profileStore = useProfileStore()
 
@@ -56,9 +55,12 @@ async function handleDelete(image: OwnerProfileImage) {
   emit('update:modelValue', formData)
 }
 
-async function handleUploaded(updatedProfile: OwnerProfile) {
-  Object.assign(formData, updatedProfile)
-  emit('update:modelValue', formData)
+async function handleUploaded(updatedProfile: UpdatedProfileImageFragment) {
+  const update = {
+    ...formData,
+    ...updatedProfile,
+  }
+  emit('update:modelValue', update)
 }
 
 async function handleReorder(event: any) {

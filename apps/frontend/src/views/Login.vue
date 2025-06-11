@@ -99,6 +99,8 @@ async function doOtpLogin(otp: string) {
       if (res.status === 'missing_otp' || res.status === 'invalid_token') {
         error.value = 'Oops, this code has probably expired. Try again?'
       }
+      // TODO we need to give the user another chance to enter the OTP
+      // before bouncing them back to the user ID form
       showUserIdForm.value = true
       showOtpForm.value = false
       return false

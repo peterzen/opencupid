@@ -2,6 +2,7 @@ import { FastifyPluginAsync } from 'fastify'
 import { createChallenge } from 'altcha-lib'
 import { sendError } from '../helpers'
 import { appConfig } from '@shared/config/appconfig'
+import type { CaptchaChallengeResponse } from '@shared/dto/apiResponse.dto'
 
 const captchaRoutes: FastifyPluginAsync = async fastify => {
   fastify.get('/challenge', async (request, reply) => {
@@ -10,7 +11,8 @@ const captchaRoutes: FastifyPluginAsync = async fastify => {
         hmacKey: appConfig.ALTCHA_HMAC_KEY,
         maxNumber: 50_000,
       })
-      return reply.send(challenge)
+      const response: CaptchaChallengeResponse = challenge
+      return reply.code(200).send(response)
     } catch (error: any) {
       return sendError(reply, 500, 'Failed to create challenge')
     }
