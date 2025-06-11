@@ -5,8 +5,8 @@ import { VueDraggableNext } from 'vue-draggable-next'
 
 import { useProfileStore } from '@/store/profileStore'
 
-import type { UpdatedProfileImageFragment, OwnerProfile } from '@zod/profile.schema'
-import { type OwnerProfileImage } from '@zod/profileimage.schema'
+import type { UpdatedProfileImageFragment, OwnerProfile } from '@zod/dto/profile.schema'
+import { type OwnerProfileImage } from '@zod/dto/profileimage.schema'
 
 import ImageUpload from '@/components/profiles/ImageUpload.vue'
 import LoadingComponent from '@/components/LoadingComponent.vue'

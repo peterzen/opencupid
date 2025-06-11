@@ -13,7 +13,7 @@ import { ImageGalleryService } from '../services/image.service'
 import path, { basename, dirname } from 'path'
 import { makeImageLocation } from '@/lib/media'
 import { ProfileService } from '@/services/profile.service'
-import type { OwnerProfile, ProfileComplete } from '@zod/profile.schema'
+import type { OwnerProfile, ProfileComplete } from '@zod/db/profile.schema'
 import cuid from 'cuid'
 import { appConfig } from '@shared/config/appconfig'
 

@@ -2,7 +2,7 @@
 import { bus } from '@/lib/bus'
 
 import { showToast } from '@/lib/toastify'
-import type { MessageInConversation } from '@zod/messaging.schema'
+import type { MessageInConversation } from '@zod/dto/messaging.schema'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()

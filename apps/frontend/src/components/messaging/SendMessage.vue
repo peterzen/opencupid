@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { IconSend } from '../icons/DoodleIcons'
-import { type ProfileSummary } from '@zod/profile.schema'
+import { type ProfileSummary } from '@zod/dto/profile.schema'
 import ProfileImage from '@/components/profiles/image/ProfileImage.vue'
 
 defineProps<{

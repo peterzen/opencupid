@@ -15,8 +15,14 @@
       "@prisma/client": [
         "apps/backend/node_modules/@prisma/client"
       ],
-      "@zod/*": [
-        "packages/shared/zod/*"
+      "@zod/db/*": [
+        "packages/shared/zod/db/*"
+      ],
+      "@zod/dto/*": [
+        "packages/shared/zod/dto/*"
+      ],
+      "@zod/generated": [
+        "packages/shared/zod/db/generated"
       ],
     },
     "typeRoots": [

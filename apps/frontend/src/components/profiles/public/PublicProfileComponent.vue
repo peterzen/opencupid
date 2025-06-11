@@ -2,7 +2,7 @@
 import GenderSymbol from '@/components/profiles/GenderSymbol.vue'
 import { countryCodeToName } from '@/lib/countries'
 import { getLanguageList } from '@/lib/languages'
-import { type PublicProfile } from '@zod/profile.schema'
+import { type PublicProfile } from '@zod/dto/profile.schema'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEnumOptions } from '../composables/useEnumOptions'

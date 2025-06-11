@@ -1,4 +1,4 @@
-import { type MessageInConversation } from '@zod/messaging.schema'
+import { type MessageInConversation } from '@zod/dto/messaging.schema'
 import mitt from 'mitt'
 
 type Events = {

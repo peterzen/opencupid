@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { api, axios } from '@/lib/api'
 
-import type { PublicTag, CreateTagInput } from '@zod/tag.schema'
+import type { PublicTag, CreateTagInput } from '@zod/dto/tag.schema'
 import type { Tag } from '@zod/generated'
 import type { TagResponse, TagsResponse, ApiError } from '@shared/dto/apiResponse.dto'
 

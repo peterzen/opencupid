@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type ConversationSummary } from '@zod/messaging.schema'
+import { type ConversationSummary } from '@zod/dto/messaging.schema'
 import ProfileImage from '@/components/profiles/image/ProfileImage.vue'
 
 defineProps<{

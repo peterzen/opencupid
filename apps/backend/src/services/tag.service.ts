@@ -1,7 +1,7 @@
 import slugify from 'slugify'
 import { prisma } from '../lib/prisma'
 import { Tag } from '@zod/generated'
-import { CreateTagInput } from '@zod/tag.schema'
+import { CreateTagInput } from '@zod/db/tag.schema'
 
 export class TagService {
   private static instance: TagService

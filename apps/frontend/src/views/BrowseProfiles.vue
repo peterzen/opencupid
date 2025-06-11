@@ -3,7 +3,7 @@ import { reactive, onMounted, computed } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
 import router from '@/router'
 
-import { type PublicProfile } from '@zod/profile.schema'
+import { type PublicProfile } from '@zod/dto/profile.schema'
 
 import LoadingComponent from '@/components/LoadingComponent.vue'
 import ProfileCardComponent from '@/components/profiles/public/ProfileCardComponent.vue'

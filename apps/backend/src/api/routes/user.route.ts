@@ -1,6 +1,6 @@
 import cuid from 'cuid'
 import { FastifyPluginAsync } from 'fastify'
-import { SendOtpSchema, OtpLoginSchema, OtpSendReturn, JwtPayload } from '@zod/user.schema'
+import { SendOtpSchema, OtpLoginSchema, OtpSendReturn, JwtPayload } from '@zod/dto/user.schema'
 import type { OtpLoginResponse, SendLoginLinkResponse, UserMeResponse } from '@shared/dto/apiResponse.dto'
 import { validateBody } from '../../utils/zodValidate'
 import { emailQueue } from '../../queues/emailQueue'

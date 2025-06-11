@@ -6,7 +6,7 @@ import {
   UpdatedProfileFragment,
   UpdatedProfileFragmentSchema,
   UpdateProfilePayload,
-} from '@zod/profile.schema'
+} from '@zod/db/profile.schema'
 
 import { Profile, ProfileImage, ProfileTag } from '@zod/generated'
 import cuid from 'cuid'

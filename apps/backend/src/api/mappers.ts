@@ -5,15 +5,15 @@ import {
   ProfileUnionSchema,
   ProfileComplete,
   ProfileSummary,
-} from '@zod/profile.schema'
+} from '@zod/dto/profile.schema'
 import {
   OwnerProfileImage,
   OwnerProfileImageSchema,
   PublicProfileImage,
   PublicProfileImageSchema,
   PublicProfileImageWithUrl,
-} from '@zod/profileimage.schema'
-import { ProfileTagJoinSchema, PublicTag, PublicTagSchema } from '@zod/tag.schema'
+} from '@zod/dto/profileimage.schema'
+import { ProfileTagJoinSchema, PublicTag, PublicTagSchema } from '@zod/dto/tag.schema'
 import type { ProfileImage, UserRole } from '@prisma/client'
 import { ProfileTag } from '@zod/generated'
 import { appConfig } from '@shared/config/appconfig'

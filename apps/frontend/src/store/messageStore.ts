@@ -4,7 +4,7 @@ import { useWebSocket } from '@vueuse/core'
 import { api } from '@/lib/api'
 import { bus } from '@/lib/bus'
 
-import type { ConversationSummary, MessageInConversation } from '@zod/messaging.schema'
+import type { ConversationSummary, MessageInConversation } from '@zod/dto/messaging.schema'
 import type {
   MessagesResponse,
   ConversationsResponse,

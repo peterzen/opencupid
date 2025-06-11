@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 import type {
   ConversationParticipantWithExtras,
   MessageInConversation,
-} from '@zod/messaging.schema'
+} from '@zod/db/messaging.schema'
 import { Message } from '@zod/generated'
 
 const conversationSummaryInclude = {

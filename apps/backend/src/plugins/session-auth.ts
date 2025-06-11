@@ -3,7 +3,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import fastifyJwt from '@fastify/jwt'
 import Redis from 'ioredis'
 
-import { type SessionData } from '@zod/user.schema'
+import { type SessionData } from '@zod/db/user.schema'
 
 import { UserService, type UserWithProfileId } from 'src/services/user.service'
 import { SessionService } from '../services/session.service'

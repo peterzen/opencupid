@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import type { ProfileImages } from '@zod/profile.schema'
+import type { ProfileImages } from '@zod/dto/profile.schema'
 import ImageTag from '@/components/profiles/image/ImageTag.vue'
 
 // Props & Emits

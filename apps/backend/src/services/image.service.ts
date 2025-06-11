@@ -9,7 +9,7 @@ import { ProfileImage } from '@prisma/client'
 import { generateStorageDirPrefix, getImageRoot, makeImageLocation } from 'src/lib/media'
 
 import { generateContentHash } from '@/utils/hash'
-import { ProfileImagePosition } from '@zod/profileimage.schema'
+import { ProfileImagePosition } from '@zod/db/profileimage.schema'
 import sharp from 'sharp'
 
 const sizes = [

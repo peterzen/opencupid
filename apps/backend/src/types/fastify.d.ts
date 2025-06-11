@@ -3,7 +3,7 @@ import '@fastify/jwt'
 
 import { PrismaClient } from '@prisma/client'
 import type { SocketStream } from '@fastify/websocket'
-import type { JwtPayload, RequestUser } from '@zod/user.schema'
+import type { JwtPayload, RequestUser } from '@zod/db/user.schema'
 
 import type { MessageService } from '../services/messaging.service'
 

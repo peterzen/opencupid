@@ -6,7 +6,7 @@ import {
   ConversationSummarySchema,
   MessageInConversation,
   MessageInConversationSchema,
-} from '@zod/messaging.schema'
+} from '@zod/dto/messaging.schema'
 import { mapProfileSummary } from './mappers'
 
 function mapConversationMeta(c: { id: string; updatedAt: Date; createdAt: Date }) {

@@ -9,7 +9,7 @@ import {
   SettingsUserSchema,
   type AuthIdentifier,
   type SessionData,
-} from '@zod/user.schema'
+} from '@zod/dto/user.schema'
 import type { OtpLoginResponse, SendLoginLinkResponse, UserMeResponse } from '@shared/dto/apiResponse.dto'
 
 export const useAuthStore = defineStore('auth', {

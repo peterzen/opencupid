@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, onMounted, ref } from 'vue'
-import type { PublicProfile } from '@zod/profile.schema'
+import type { PublicProfile } from '@zod/dto/profile.schema'
 import { useProfileStore } from '@/store/profileStore'
 
 import LoadingComponent from '@/components/LoadingComponent.vue'

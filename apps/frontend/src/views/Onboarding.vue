@@ -2,8 +2,8 @@
 import { onMounted, reactive, toRefs } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
 
-import type { OwnerProfile, ProfileFormSubmit, UpdateProfilePayload } from '@zod/profile.schema'
-import { OwnerProfileSchema, UpdatedProfileFragmentSchema } from '@zod/profile.schema'
+import type { OwnerProfile, ProfileFormSubmit, UpdateProfilePayload } from '@zod/dto/profile.schema'
+import { OwnerProfileSchema, UpdatedProfileFragmentSchema } from '@zod/dto/profile.schema'
 import { type ConnectionTypeType } from '@zod/generated'
 
 import ConnectionTypeSelector from '@/components/ConnectionTypeSelector.vue'

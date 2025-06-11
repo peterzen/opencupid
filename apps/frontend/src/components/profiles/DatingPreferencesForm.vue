@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { OwnerDatingPreferences, OwnerProfile } from '@zod/profile.schema'
+import type { OwnerDatingPreferences, OwnerProfile } from '@zod/dto/profile.schema'
 import { computed, reactive, ref, watch, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import VueSlider from 'vue-3-slider-component'

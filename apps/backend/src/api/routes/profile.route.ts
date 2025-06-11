@@ -4,7 +4,7 @@ import multipart, { MultipartValue } from '@fastify/multipart'
 import {
   IdLookupParamsSchema, UpdatedProfileFragmentSchema,
   UpdateProfilePayloadSchema
-} from '@zod/profile.schema'
+} from '@zod/dto/profile.schema'
 
 import { ProfileService } from 'src/services/profile.service'
 import { ImageGalleryService } from 'src/services/image.service'
@@ -17,7 +17,7 @@ import {
   mapProfileToOwner,
   mapProfileToPublic,
 } from 'src/api/mappers'
-import { ReorderProfileImagesPayloadSchema } from '@zod/profileimage.schema'
+import { ReorderProfileImagesPayloadSchema } from '@zod/dto/profileimage.schema'
 import { UserService } from 'src/services/user.service'
 import { appConfig } from '@shared/config/appconfig'
 import { Prisma } from '@prisma/client'

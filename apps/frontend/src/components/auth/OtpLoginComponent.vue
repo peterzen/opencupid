@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { type LoginUser } from '@zod/user.schema'
+import { type LoginUser } from '@zod/dto/user.schema'
 import { otpRegex } from '@/lib/utils'
 
 import { IconMail } from '@/components/icons/DoodleIcons'

@@ -1,6 +1,6 @@
 import { FastifyPluginAsync } from 'fastify'
 import { PrismaClient } from '@prisma/client'
-import { CityQuerySchema, CitySchema } from '@zod/city.schema'
+import { CityQuerySchema, CitySchema } from '@zod/dto/city.schema'
 import type { CitySearchResponse } from '@shared/dto/apiResponse.dto'
 
 const prisma = new PrismaClient()

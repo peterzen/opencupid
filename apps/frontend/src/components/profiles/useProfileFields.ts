@@ -1,4 +1,4 @@
-import { type OwnerProfile } from '@zod/profile.schema'
+import { type OwnerProfile } from '@zod/dto/profile.schema'
 import { computed } from 'vue'
 
 export function useProfileFields(profile: OwnerProfile) {

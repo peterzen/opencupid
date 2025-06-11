@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import type { SendOtpPayload } from '@zod/user.schema'
+import type { SendOtpPayload } from '@zod/dto/user.schema'
 import { emailRegex, phoneRegex } from '@/lib/utils'
 import CaptchaWidget from './CaptchaWidget.vue'
 import { IconMail, IconPhone, IconTick, IconLogin } from '@/components/icons/DoodleIcons'

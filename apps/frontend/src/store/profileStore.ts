@@ -5,14 +5,14 @@ import type {
   PublicProfile,
   UpdatedProfileFragment,
   UpdateProfilePayload,
-} from '@zod/profile.schema'
+} from '@zod/dto/profile.schema'
 import {
   OwnerProfileSchema,
   PublicProfileSchema,
   UpdatedProfileFragmentSchema,
   UpdateProfilePayloadSchema,
-} from '@zod/profile.schema'
-import { type OwnerProfileImage, type ProfileImagePosition } from '@zod/profileimage.schema'
+} from '@zod/dto/profile.schema'
+import { type OwnerProfileImage, type ProfileImagePosition } from '@zod/dto/profileimage.schema'
 import type {
   GetMyProfileResponse,
   GetPublicProfileResponse,

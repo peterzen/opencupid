@@ -4,7 +4,7 @@ import type { GenderType, PronounsType } from '@zod/generated'
 import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { filter } from 'remeda'
-import { type OwnerProfile } from '@zod/profile.schema'
+import { type OwnerProfile } from '@zod/dto/profile.schema'
 import { useEnumOptions } from './composables/useEnumOptions'
 
 const { t } = useI18n()

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { OwnerProfileImage, PublicProfileImage } from '@zod/profileimage.schema'
+import type { OwnerProfileImage, PublicProfileImage } from '@zod/dto/profileimage.schema'
 import { type PropType } from 'vue'
 
 const props = defineProps({
