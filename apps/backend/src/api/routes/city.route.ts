@@ -27,7 +27,8 @@ const cityRoutes: FastifyPluginAsync = async fastify => {
 
     // Validate output and send
     const valid = CitySchema.array().parse(cities)
-    return reply.send<CitySearchResponse>(valid)
+    const response: CitySearchResponse = valid
+    return reply.code(200).send(response) 
   })
 }
 

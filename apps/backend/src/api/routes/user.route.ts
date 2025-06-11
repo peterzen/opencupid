@@ -1,3 +1,4 @@
+import cuid from 'cuid'
 import { FastifyPluginAsync } from 'fastify'
 import { SendOtpSchema, OtpLoginSchema, OtpSendReturn, JwtPayload } from '@zod/user.schema'
 import type { OtpLoginResponse, SendLoginLinkResponse, UserMeResponse } from '@shared/dto/apiResponse.dto'
@@ -8,7 +9,6 @@ import { ProfileService } from 'src/services/profile.service'
 import { sendError, sendUnauthorizedError } from '../helpers'
 import { SmsService } from '@/services/sms.service'
 import { CaptchaService } from '@/services/captcha.service'
-import cuid from 'cuid'
 import { appConfig } from '@shared/config/appconfig'
 
 const userRoutes: FastifyPluginAsync = async fastify => {
@@ -21,7 +21,8 @@ const userRoutes: FastifyPluginAsync = async fastify => {
       const { userId, otp } = OtpLoginSchema.parse(req.query)
       const { user, isNewUser } = await userService.otpLogin(userId, otp)
       if (!user) {
-        return reply.status(200).send<OtpLoginResponse>({ success: false, status: 'invalid_token' })
+        const response: OtpLoginResponse = { success: false, status: 'invalid_token' }
+        return reply.status(200).send(response)
       }
 
       let profileId = null
@@ -45,7 +46,8 @@ const userRoutes: FastifyPluginAsync = async fastify => {
       const payload: JwtPayload = { userId: user.id, profileId: profileId! }
       console.info('jwt payload', payload)
       const jwt = fastify.jwt.sign(payload)
-      reply.send<OtpLoginResponse>({ success: true, token: jwt })
+      const response: OtpLoginResponse = { success: true, token: jwt }
+      reply.code(200).send(response)
     } catch (error) {
       return sendError(reply, 400, 'Invalid query parameters')
     }
@@ -104,7 +106,8 @@ const userRoutes: FastifyPluginAsync = async fastify => {
           { attempts: 3, backoff: { type: 'exponential', delay: 5000 } }
         )
 
-      return reply.status(200).send<SendLoginLinkResponse>({ success: true, user: userReturned, status: 'register' })
+      const response: SendLoginLinkResponse = { success: true, user: userReturned, status: 'register' }
+      return reply.status(200).send(response)
     }
 
     //  existing user
@@ -114,7 +117,8 @@ const userRoutes: FastifyPluginAsync = async fastify => {
         { userId: user.id },
         { attempts: 3, backoff: { type: 'exponential', delay: 5000 } }
       )
-    return reply.status(200).send<SendLoginLinkResponse>({ success: true, user: userReturned, status: 'login' })
+    const response: SendLoginLinkResponse = { success: true, user: userReturned, status: 'login' }
+    return reply.code(200).send(response)
   })
 
   fastify.get(
@@ -135,7 +139,8 @@ const userRoutes: FastifyPluginAsync = async fastify => {
 
       if (!user) return sendUnauthorizedError(reply)
 
-      return reply.status(200).send<UserMeResponse>({ success: true, user })
+      const response: UserMeResponse = { success: true, user }
+      return reply.code(200).send(response)
     }
   )
 }

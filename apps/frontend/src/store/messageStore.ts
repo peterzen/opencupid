@@ -170,7 +170,7 @@ export const useMessageStore = defineStore('message', {
             conversation,
             ...this.conversations.filter(c => c.conversationId !== conversation.conversationId),
           ]
-          if (this.activeConversation === conversation.conversationId) {
+          if (this.activeConversation?.conversationId === conversation.conversationId) {
             this.messages.push(message)
           }
           return res.data.conversation

@@ -2,11 +2,8 @@ import { FastifyPluginAsync } from 'fastify'
 import multipart, { MultipartValue } from '@fastify/multipart'
 
 import {
-  IdLookupParamsSchema,
-  OwnerProfileSchema,
-  SlugLookupParamsSchema,
-  UpdatedProfileFragmentSchema,
-  UpdateProfilePayloadSchema,
+  IdLookupParamsSchema, UpdatedProfileFragmentSchema,
+  UpdateProfilePayloadSchema
 } from '@zod/profile.schema'
 
 import { ProfileService } from 'src/services/profile.service'
@@ -63,7 +60,8 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
       if (!fetched) return sendError(reply, 404, 'Social profile not found')
 
       const profile = mapProfileToOwner(fetched)
-      return reply.code(200).send<GetMyProfileResponse>({ success: true, profile })
+      const response: GetMyProfileResponse = { success: true, profile}
+      return reply.code(200).send(response)
     } catch (err) {
       fastify.log.error(err)
       return sendError(reply, 500, 'Failed to load profile')
@@ -91,7 +89,8 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
 
       const profile = mapProfileToPublic(raw, roles)
       // const profile = publicProfileSchema.parse(raw)
-      return reply.code(200).send<GetPublicProfileResponse>({ success: true, profile })
+      const response : GetPublicProfileResponse = { success: true, profile }
+      return reply.code(200).send(response)
     } catch (err) {
       fastify.log.error(err)
       return sendError(reply, 500, 'Failed to fetch profile')
@@ -107,7 +106,8 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
     try {
       const profiles = await profileService.findProfilesFor(req.user.userId)
       const mappedProfiles = profiles.map(p => mapProfileToPublic(p, getUserRoles(req)))
-      return reply.code(200).send<GetProfilesResponse>({ success: true, profiles: mappedProfiles })
+      const response: GetProfilesResponse = { success: true, profiles: mappedProfiles }
+      return reply.code(200).send(response)
     } catch (err) {
       fastify.log.error(err)
       return sendError(reply, 500, 'Failed to fetch profiles')
@@ -155,7 +155,8 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
 
       // Clear session to force re-fetch on next request, we need the roles updated
       await req.deleteSession()
-      return reply.code(200).send<UpdateProfileResponse>({ success: true, profile })
+      const response: UpdateProfileResponse = { success: true, profile }
+      return reply.code(200).send(response)
     } catch (err) {
       fastify.log.error(err)
       // profileService.updateProfile() returned null, which means the profile was not found
@@ -230,7 +231,8 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
         }
         const updated = await profileService.addProfileImage(profile, stored.id)
         const profileImages = mapProfileImagesToOwner(updated.profileImages)
-        return reply.code(200).send<ProfileImagesResponse>({ success: true, profile: { profileImages } })
+        const response: ProfileImagesResponse = { success: true, profile: { profileImages } }
+        return reply.code(200).send(response)
       } catch (err) {
         fastify.log.error('Error storing image:', err)
         return sendError(reply, 500, 'Failed to store image')
@@ -256,7 +258,8 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
         return sendError(reply, 400, 'No user profile found to update after image deletion')
       }
       const profileImages = mapProfileImagesToOwner(updated.profileImages)
-      return reply.code(200).send<ProfileImagesResponse>({ success: true, profile: { profileImages } })
+      const response: ProfileImagesResponse = { success: true, profile: { profileImages } }
+      return reply.code(200).send(response)
     } catch (err) {
       fastify.log.error(err)
       return sendError(reply, 500, 'Failed to delete image')
@@ -274,7 +277,8 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
     try {
       const updated = await imageService.reorderImages(req.user.userId, images)
       const profileImages = mapProfileImagesToOwner(updated)
-      return reply.code(200).send<ProfileImagesResponse>({ success: true, profile: { profileImages } })
+      const response: ProfileImagesResponse = { success: true, profile: { profileImages } }
+      return reply.code(200).send(response)
     } catch (err) {
       fastify.log.error(err)
       return reply.code(500).send({ success: false })

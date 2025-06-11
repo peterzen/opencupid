@@ -27,10 +27,12 @@ const tagsRoutes: FastifyPluginAsync = async fastify => {
       reply.header('Cache-Control', 'no-cache, no-store, must-revalidate')
       reply.header('X-Debounce', SEARCH_DEBOUNCE_MS.toString())
       if (!tags || tags.length === 0) {
-        return reply.code(200).send<TagsResponse>({ success: true, tags: [] })
+        const response: TagsResponse = { success: true, tags: [] }
+        return reply.code(200).send(response)
       }
       const publicTags = tags.map(tag => PublicTagSchema.parse(tag))
-      return reply.code(200).send<TagsResponse>({ success: true, tags: publicTags })
+      const response: TagsResponse = { success: true, tags: publicTags }
+      return reply.code(200).send(response)
     } catch (err) {
       fastify.log.error(err)
       return sendError(reply, 500, 'Failed to search tags')
@@ -60,7 +62,8 @@ const tagsRoutes: FastifyPluginAsync = async fastify => {
           isUserCreated: true, // Mark as user-created
         })
         const tag = PublicTagSchema.parse(created)
-        return reply.code(200).send<TagResponse>({ success: true, tag })
+        const response: TagResponse = { success: true, tag }
+        return reply.code(200).send(response)
       } catch (err: any) {
         fastify.log.error(err)
         if (err.code === 'P2025') {
