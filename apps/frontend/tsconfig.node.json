@@ -29,14 +29,8 @@
       "@/*": [
         "src/*"
       ],
-      "@zod/db/*": [
-        "../../packages/shared/zod/db/*"
-      ],
-      "@zod/dto/*": [
-        "../../packages/shared/zod/dto/*"
-      ],
-      "@zod/generated": [
-        "../../packages/shared/zod/db/generated"
+      "@zod/*": [
+        "../../packages/shared/zod/*"
       ],
       "@shared/*": [
         "../../packages/shared/*"
