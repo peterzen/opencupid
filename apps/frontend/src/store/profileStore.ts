@@ -13,20 +13,16 @@ import {
   UpdateProfilePayloadSchema,
 } from '@zod/profile.schema'
 import { type OwnerProfileImage, type ProfileImagePosition } from '@zod/profileimage.schema'
+import type {
+  GetMyProfileResponse,
+  GetPublicProfileResponse,
+  GetProfilesResponse,
+  UpdateProfileResponse,
+  ProfileImagesResponse,
+  ApiError,
+} from '@shared/dto/apiResponse.dto'
 
-// Success / Error response shapes
-interface UploadSuccess {
-  success: true
-  profile: OwnerProfile
-}
-
-interface UploadError {
-  success: false
-  message: string
-  fieldErrors?: Record<string, string[]>
-}
-
-type UploadResponse = UploadSuccess | UploadError
+type UploadResponse = ProfileImagesResponse | ApiError
 
 export const useProfileStore = defineStore('profile', {
   state: () => ({
@@ -38,7 +34,7 @@ export const useProfileStore = defineStore('profile', {
     // Fetch the current user's profile
     async getUserProfile(): Promise<OwnerProfile> {
       try {
-        const res = await api.get('/profiles/me')
+        const res = await api.get<GetMyProfileResponse>('/profiles/me')
         this.profile = OwnerProfileSchema.parse(res.data.profile)
         console.log('Fetched user profile:', this.profile)
         return this.profile
@@ -52,7 +48,7 @@ export const useProfileStore = defineStore('profile', {
     async updateProfile(profileData: UpdateProfilePayload): Promise<UpdatedProfileFragment> {
       try {
         const update = UpdateProfilePayloadSchema.parse(profileData)
-        const res = await api.patch('/profiles/profile', update)
+        const res = await api.patch<UpdateProfileResponse>('/profiles/profile', update)
         return UpdatedProfileFragmentSchema.parse(res.data.profile)
       } catch (error: any) {
         console.error('Store: cannot to update profile:', error)
@@ -66,17 +62,16 @@ export const useProfileStore = defineStore('profile', {
       formData.append('captionText', captionText)
 
       try {
-        const { data } = await api.post<UploadSuccess>('/profiles/image', formData)
-        // data.success is guaranteed true here
+        const { data } = await api.post<ProfileImagesResponse>('/profiles/image', formData)
         return data
       } catch (err: unknown) {
-        const out: UploadError = {
+        const out: ApiError = {
           success: false,
           message: 'An unexpected error occurred',
         }
 
         if (axios.isAxiosError(err) && err.response) {
-          const resp = err.response.data as Partial<UploadError>
+          const resp = err.response.data as Partial<ApiError>
           out.message = resp.message ?? out.message
           if (resp.fieldErrors) out.fieldErrors = resp.fieldErrors
         } else if (err instanceof Error) {
@@ -89,10 +84,10 @@ export const useProfileStore = defineStore('profile', {
 
     async deleteImage(image: OwnerProfileImage): Promise<UploadResponse> {
       try {
-        const { data } = await api.delete<UploadSuccess>(`/profiles/image/${image.id}`)
+        const { data } = await api.delete<ProfileImagesResponse>(`/profiles/image/${image.id}`)
         return data
       } catch (error: any) {
-        const out: UploadError = {
+        const out: ApiError = {
           success: false,
           message: 'An unexpected error occurred',
         }
@@ -102,10 +97,10 @@ export const useProfileStore = defineStore('profile', {
 
     async reorderImages(images: ProfileImagePosition[]): Promise<UploadResponse> {
       try {
-        const { data } = await api.patch<UploadSuccess>('/profiles/image/order', { images })
+        const { data } = await api.patch<ProfileImagesResponse>('/profiles/image/order', { images })
         return data
       } catch (error: any) {
-        const out: UploadError = {
+        const out: ApiError = {
           success: false,
           message: 'An unexpected error occurred',
         }
@@ -116,7 +111,7 @@ export const useProfileStore = defineStore('profile', {
     // Fetch a profile by ID
     async getPublicProfile(profileId: string): Promise<PublicProfile | null> {
       try {
-        const res = await api.get(`/profiles/${profileId}`)
+        const res = await api.get<GetPublicProfileResponse>(`/profiles/${profileId}`)
         return PublicProfileSchema.parse(res.data.profile)
         // return res.data.profile
       } catch (error: any) {
@@ -136,7 +131,7 @@ export const useProfileStore = defineStore('profile', {
 
     async findProfiles(): Promise<PublicProfile[] | null> {
       try {
-        const res = await api.get('/profiles')
+        const res = await api.get<GetProfilesResponse>('/profiles')
         const profiles = res.data.profiles.map((p: any) => PublicProfileSchema.parse(p))
         return profiles
       } catch (error: any) {

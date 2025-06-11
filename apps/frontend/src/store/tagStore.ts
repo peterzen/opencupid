@@ -3,6 +3,7 @@ import { api, axios } from '@/lib/api'
 
 import type { PublicTag, CreateTagInput } from '@zod/tag.schema'
 import type { Tag } from '@zod/generated'
+import type { TagResponse, TagsResponse, ApiError } from '@shared/dto/apiResponse.dto'
 
 interface ServiceError {
   success: false
@@ -25,7 +26,7 @@ export const useTagsStore = defineStore('tags', {
      */
     async fetchAll(): Promise<PublicTag[]> {
       try {
-        const res = await api.get<{ success: true; tags: PublicTag[] }>('/tags')
+        const res = await api.get<TagsResponse>('/tags')
         this.tags = res.data.tags
         return this.tags
       } catch (error: any) {
@@ -39,7 +40,7 @@ export const useTagsStore = defineStore('tags', {
      */
     async searchTags(q: string): Promise<PublicTag[]> {
       try {
-        const res = await api.get<{ success: true; tags: PublicTag[] }>('/tags/search', {
+        const res = await api.get<TagsResponse>('/tags/search', {
           params: { q },
         })
         this.searchResults = res.data.tags
@@ -55,7 +56,7 @@ export const useTagsStore = defineStore('tags', {
      */
     async getTag(id: string): Promise<PublicTag> {
       try {
-        const res = await api.get<{ success: true; tag: PublicTag }>(`/tags/${id}`)
+        const res = await api.get<TagResponse>(`/tags/${id}`)
         this.currentTag = res.data.tag
         return this.currentTag
       } catch (error: any) {
@@ -69,7 +70,7 @@ export const useTagsStore = defineStore('tags', {
      */
     async createTag(input: CreateTagInput): Promise<PublicTag> {
       try {
-        const res = await api.post<{ success: true; tag: PublicTag }>('/tags', input)
+        const res = await api.post<TagResponse>('/tags', input)
         this.tags.push(res.data.tag)
         return res.data.tag
       } catch (error: any) {
@@ -87,7 +88,7 @@ export const useTagsStore = defineStore('tags', {
      */
     async updateTag(id: string, input: Partial<Tag>): Promise<PublicTag> {
       try {
-        const res = await api.patch<{ success: true; tag: PublicTag }>(`/tags/${id}`, input)
+        const res = await api.patch<TagResponse>(`/tags/${id}`, input)
         const idx = this.tags.findIndex(t => t.id === id)
         if (idx !== -1) this.tags.splice(idx, 1, res.data.tag)
         return res.data.tag
@@ -115,7 +116,7 @@ export const useTagsStore = defineStore('tags', {
      */
     async addUserTag(input: CreateTagInput): Promise<PublicTag> {
       try {
-        const res = await api.post<{ success: true; tag: PublicTag }>('/tags/user', input)
+        const res = await api.post<TagResponse>('/tags/user', input)
         return res.data.tag
       } catch (error: any) {
         console.error('Failed to add user tag:', error)

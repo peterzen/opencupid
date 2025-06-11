@@ -1,5 +1,6 @@
 import { FastifyPluginAsync } from 'fastify'
 import { SendOtpSchema, OtpLoginSchema, OtpSendReturn, JwtPayload } from '@zod/user.schema'
+import type { OtpLoginResponse, SendLoginLinkResponse, UserMeResponse } from '@shared/dto/apiResponse.dto'
 import { validateBody } from '../../utils/zodValidate'
 import { emailQueue } from '../../queues/emailQueue'
 import { UserService } from 'src/services/user.service'
@@ -20,7 +21,7 @@ const userRoutes: FastifyPluginAsync = async fastify => {
       const { userId, otp } = OtpLoginSchema.parse(req.query)
       const { user, isNewUser } = await userService.otpLogin(userId, otp)
       if (!user) {
-        return reply.status(200).send({ success: false, status: 'invalid_token' })
+        return reply.status(200).send<OtpLoginResponse>({ success: false, status: 'invalid_token' })
       }
 
       let profileId = null
@@ -44,7 +45,7 @@ const userRoutes: FastifyPluginAsync = async fastify => {
       const payload: JwtPayload = { userId: user.id, profileId: profileId! }
       console.info('jwt payload', payload)
       const jwt = fastify.jwt.sign(payload)
-      reply.send({ success: true, token: jwt })
+      reply.send<OtpLoginResponse>({ success: true, token: jwt })
     } catch (error) {
       return sendError(reply, 400, 'Invalid query parameters')
     }
@@ -103,7 +104,7 @@ const userRoutes: FastifyPluginAsync = async fastify => {
           { attempts: 3, backoff: { type: 'exponential', delay: 5000 } }
         )
 
-      return reply.status(200).send({ success: true, user: userReturned, status: 'register' })
+      return reply.status(200).send<SendLoginLinkResponse>({ success: true, user: userReturned, status: 'register' })
     }
 
     //  existing user
@@ -113,7 +114,7 @@ const userRoutes: FastifyPluginAsync = async fastify => {
         { userId: user.id },
         { attempts: 3, backoff: { type: 'exponential', delay: 5000 } }
       )
-    return reply.status(200).send({ success: true, user: userReturned, status: 'login' })
+    return reply.status(200).send<SendLoginLinkResponse>({ success: true, user: userReturned, status: 'login' })
   })
 
   fastify.get(
@@ -134,7 +135,7 @@ const userRoutes: FastifyPluginAsync = async fastify => {
 
       if (!user) return sendUnauthorizedError(reply)
 
-      return reply.status(200).send({ success: true, user })
+      return reply.status(200).send<UserMeResponse>({ success: true, user })
     }
   )
 }

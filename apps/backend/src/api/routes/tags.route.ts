@@ -8,6 +8,7 @@ import {
 import { FastifyPluginAsync } from 'fastify'
 import { sendError } from '../helpers'
 import { TagService } from 'src/services/tag.service'
+import type { TagResponse, TagsResponse } from '@shared/dto/apiResponse.dto'
 
 // debounce duration in milliseconds
 const SEARCH_DEBOUNCE_MS = 300
@@ -26,10 +27,10 @@ const tagsRoutes: FastifyPluginAsync = async fastify => {
       reply.header('Cache-Control', 'no-cache, no-store, must-revalidate')
       reply.header('X-Debounce', SEARCH_DEBOUNCE_MS.toString())
       if (!tags || tags.length === 0) {
-        return reply.code(200).send({ success: true, tags: [] })
+        return reply.code(200).send<TagsResponse>({ success: true, tags: [] })
       }
       const publicTags = tags.map(tag => PublicTagSchema.parse(tag))
-      return reply.code(200).send({ success: true, tags: publicTags })
+      return reply.code(200).send<TagsResponse>({ success: true, tags: publicTags })
     } catch (err) {
       fastify.log.error(err)
       return sendError(reply, 500, 'Failed to search tags')
@@ -59,7 +60,7 @@ const tagsRoutes: FastifyPluginAsync = async fastify => {
           isUserCreated: true, // Mark as user-created
         })
         const tag = PublicTagSchema.parse(created)
-        return reply.code(200).send({ success: true, tag })
+        return reply.code(200).send<TagResponse>({ success: true, tag })
       } catch (err: any) {
         fastify.log.error(err)
         if (err.code === 'P2025') {

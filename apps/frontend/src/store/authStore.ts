@@ -10,6 +10,7 @@ import {
   type AuthIdentifier,
   type SessionData,
 } from '@zod/user.schema'
+import type { OtpLoginResponse, SendLoginLinkResponse, UserMeResponse } from '@shared/dto/apiResponse.dto'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -72,7 +73,7 @@ export const useAuthStore = defineStore('auth', {
         return { success: false, status: 'missing_otp' }
       }
       try {
-        const res = await api.get('/users/otp-login', {
+        const res = await api.get<OtpLoginResponse>('/users/otp-login', {
           params: { userId, otp },
         })
 
@@ -92,7 +93,7 @@ export const useAuthStore = defineStore('auth', {
     async sendLoginLink(authId: AuthIdentifier) {
       // console.log('Sending login link with data:', authId)
       try {
-        const res = await api.post('/users/send-login-link', authId)
+        const res = await api.post<SendLoginLinkResponse>('/users/send-login-link', authId)
         const user = OtpSendReturnSchema.parse(res.data.user)
         // set userId in localStorage for the otplogin to pick up
         localStorage.setItem('uid', user.id)
@@ -106,7 +107,7 @@ export const useAuthStore = defineStore('auth', {
 
     async fetchUser() {
       try {
-        const res = await api.get('/users/me')
+        const res = await api.get<UserMeResponse>('/users/me')
         const user = SettingsUserSchema.parse(res.data.user)
         return { success: true, user, error: null }
       } catch (error: any) {
