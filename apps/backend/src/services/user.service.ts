@@ -1,6 +1,6 @@
-import { prisma } from '../lib/prisma'
-import { User, Profile, UserRole, Prisma } from '@prisma/client'
-import { AuthIdentifier, LoginUser } from '@zod/db/user.schema'
+import { prisma } from '@/lib/prisma'
+import { User, UserRole, Prisma } from '@prisma/client'
+import { AuthIdentifier } from '@zod/user/user.types'
 import otpGenerator from 'otp-generator'
 
 // Define types for service return values

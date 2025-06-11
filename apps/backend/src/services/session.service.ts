@@ -1,7 +1,7 @@
 // src/services/session.service.ts
 import Redis from 'ioredis'
 import { UserRole } from '@prisma/client'
-import { SessionData } from '@zod/db/user.schema'
+import { SessionData } from '@zod/user/user.db'
 
 export class SessionService {
   constructor(

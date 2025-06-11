@@ -1,6 +1,6 @@
 // TODO: review usage; copied for both db and dto layers
 import { z } from "zod"
-import { ProfileImageSchema, ProfileSchema } from "./generated"
+import { ProfileImageSchema, ProfileSchema } from "../generated"
 
 // Fields exposed in the public API for profile images
 export const publicFields = {

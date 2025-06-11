@@ -1,7 +1,5 @@
 import cuid from 'cuid'
 import { FastifyPluginAsync } from 'fastify'
-import { SendOtpSchema, OtpLoginSchema, OtpSendReturn, JwtPayload } from '@zod/dto/user.schema'
-import type { OtpLoginResponse, SendLoginLinkResponse, UserMeResponse } from '@shared/dto/apiResponse.dto'
 import { validateBody } from '../../utils/zodValidate'
 import { emailQueue } from '../../queues/emailQueue'
 import { UserService } from 'src/services/user.service'
@@ -11,6 +9,11 @@ import { SmsService } from '@/services/sms.service'
 import { CaptchaService } from '@/services/captcha.service'
 import { appConfig } from '@shared/config/appconfig'
 
+import { AuthIdentifierCaptchaInputSchema, OtpLoginInputSchema, OtpSendReturn } from '@zod/user/user.dto'
+import type { OtpLoginResponse, SendLoginLinkResponse, UserMeResponse } from '@shared/dto/apiResponse.dto'
+import { JwtPayload } from '@zod/user/user.types'
+
+
 const userRoutes: FastifyPluginAsync = async fastify => {
   const userService = UserService.getInstance()
   const profileService = ProfileService.getInstance()
@@ -18,7 +21,7 @@ const userRoutes: FastifyPluginAsync = async fastify => {
 
   fastify.get('/otp-login', async (req, reply) => {
     try {
-      const { userId, otp } = OtpLoginSchema.parse(req.query)
+      const { userId, otp } = OtpLoginInputSchema.parse(req.query)
       const { user, isNewUser } = await userService.otpLogin(userId, otp)
       if (!user) {
         const response: OtpLoginResponse = { success: false, status: 'invalid_token' }
@@ -54,7 +57,7 @@ const userRoutes: FastifyPluginAsync = async fastify => {
   })
 
   fastify.post('/send-login-link', async (req, reply) => {
-    const data = validateBody(SendOtpSchema, req, reply)
+    const data = validateBody(AuthIdentifierCaptchaInputSchema, req, reply)
     if (!data) return
 
     try {

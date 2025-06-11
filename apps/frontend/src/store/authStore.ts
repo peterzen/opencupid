@@ -4,12 +4,12 @@ import { bus } from '@/lib/bus'
 import { type UserRoleType } from '@zod/generated'
 
 import {
-  type JwtPayload,
   OtpSendReturnSchema,
   SettingsUserSchema,
-  type AuthIdentifier,
-  type SessionData,
-} from '@zod/dto/user.schema'
+} from '@zod/user/user.dto'
+
+import type { AuthIdentifier, JwtPayload, SessionData } from '@zod/user/user.types'
+
 import type { OtpLoginResponse, SendLoginLinkResponse, UserMeResponse } from '@shared/dto/apiResponse.dto'
 
 export const useAuthStore = defineStore('auth', {

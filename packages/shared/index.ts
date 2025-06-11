@@ -1,5 +1,5 @@
 export * from './dto/apiResponse.dto'
-export * from './zod/dto/user.schema'
+export * from './zod/user/user.dto'
 export * from './zod/dto/profile.schema'
 export * from './zod/dto/profileimage.schema'
 export * from './zod/dto/searchPreference.schema'

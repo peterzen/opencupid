@@ -1,4 +1,4 @@
-import { JwtPayload } from '@zod/db/user.schema'
+import { JwtPayload } from '@zod/user/user.db'
 import { FastifyRequest } from 'fastify'
 import { z } from 'zod'
 

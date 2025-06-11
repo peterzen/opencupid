@@ -1,13 +1,12 @@
 // TODO: review usage; copied for both db and dto layers
 import { z } from 'zod'
-import { UserRoleSchema, UserSchema } from '@zod/generated'
+import { UserSchema } from '../generated'
 
-const JwtPayloadSchema = z.object({
-  userId: z.string().cuid(), 
-  profileId: z.string().cuid(), 
+export const JwtPayloadSchema = z.object({
+  userId: z.string().cuid(),
+  profileId: z.string().cuid(),
 })
 
-export type JwtPayload = z.infer<typeof JwtPayloadSchema>
 
 // JWT payload verified and set on request.user
 // const RequestUserSchema = z.object({
@@ -17,14 +16,16 @@ export type JwtPayload = z.infer<typeof JwtPayloadSchema>
 // export type RequestUser = z.infer<typeof RequestUserSchema>
 
 
-export const AuthIdSchema = z.object({
+
+
+export const AuthIdentifierSchema = z.object({
   email: z.string().optional(),
   phonenumber: z.string().optional(),
 })
 
-export type AuthIdentifier = z.infer<typeof AuthIdSchema>
 
-export const SendOtpSchema = AuthIdSchema
+
+export const AuthIdentifierCaptchaInputSchema = AuthIdentifierSchema
   .extend({
     captchaSolution: z.string().min(1, 'Captcha solution is required'),
   })
@@ -35,29 +36,18 @@ export const SendOtpSchema = AuthIdSchema
       path: ['email'], // mark the error on the email field (or 'phonenumber')
     }
   )
-export type SendOtpPayload = z.infer<typeof SendOtpSchema>
+export type AuthIdentifierCaptchaInput = z.infer<typeof AuthIdentifierCaptchaInputSchema>
 
-export const SessionDataSchema = z.object({
-  userId: z.string(),
-  profileId: z.string(),
-  lang: z.string(),
-  roles: z.array(UserRoleSchema),
-  isOnboarded: z.boolean().default(false),
-  hasActiveProfile: z.boolean().default(false),
-})
+// export const SessionDataSchema = z.object({
+//   userId: z.string(),
+//   profileId: z.string(),
+//   lang: z.string(),
+//   roles: z.array(UserRoleSchema),
+//   isOnboarded: z.boolean().default(false),
+//   hasActiveProfile: z.boolean().default(false),
+// })
 
-export type SessionData = z.infer<typeof SessionDataSchema>
-
-export const LoginUserSchema = UserSchema.pick({
-  id: true,
-  email: true,
-  phonenumber: true,
-  language: true,
-  isOnboarded: true,
-  hasActiveProfile: true,
-  isRegistrationConfirmed: true,
-})
-export type LoginUser = z.infer<typeof LoginUserSchema>
+// export type SessionData = z.infer<typeof SessionDataSchema>
 
 
 
@@ -80,8 +70,8 @@ export const OtpSendReturnSchema = UserSchema.pick({
 })
 export type OtpSendReturn = z.infer<typeof OtpSendReturnSchema>
 
-export const OtpLoginSchema = z.object({
+export const OtpLoginInputSchema = z.object({
   userId: z.string().cuid(),
   otp: z.string().min(6, 'OTP must be at least 6 characters long').max(6, 'OTP must be exactly 6 characters long'),
 })
-export type OtpLogin = z.infer<typeof OtpLoginSchema>
+export type OtpLogin = z.infer<typeof OtpLoginInputSchema>

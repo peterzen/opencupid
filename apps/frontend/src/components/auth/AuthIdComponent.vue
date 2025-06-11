@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import type { SendOtpPayload } from '@zod/dto/user.schema'
+import type { AuthIdentifierCaptchaInput } from '@zod/user/user.dto'
 import { emailRegex, phoneRegex } from '@/lib/utils'
 import CaptchaWidget from './CaptchaWidget.vue'
 import { IconMail, IconPhone, IconTick, IconLogin } from '@/components/icons/DoodleIcons'
@@ -14,7 +14,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'otp:send', identifier: SendOtpPayload): void
+  (e: 'otp:send', identifier: AuthIdentifierCaptchaInput): void
 }>()
 
 // State variables

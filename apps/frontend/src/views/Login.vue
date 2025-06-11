@@ -3,12 +3,13 @@ import { ref, reactive, onMounted } from 'vue'
 import { useAuthStore } from '@/store/authStore'
 import { useRoute, useRouter } from 'vue-router'
 import AuthIdComponent from '@/components/auth/AuthIdComponent.vue'
-import type { LoginUser, SendOtpPayload } from '@zod/dto/user.schema'
+import type {  AuthIdentifierCaptchaInput } from '@zod/user/user.dto'
 import OtpLoginComponent from '@/components/auth/OtpLoginComponent.vue'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import LoginConfirmComponent from '@/components/auth/LoginConfirmComponent.vue'
 
 import ChevronLeftIcon from '@/assets/icons/arrows/arrow-single-left.svg'
+import { type LoginUser } from '@zod/user/user.types'
 
 // Reactive variables
 const error = ref('' as string)
@@ -49,7 +50,7 @@ onMounted(async () => {
 })
 
 // Method to handle sending login link
-async function handleSendOtp(payload: SendOtpPayload) {
+async function handleSendOtp(payload: AuthIdentifierCaptchaInput) {
   try {
     error.value = ''
     isLoading.value = true
