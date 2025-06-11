@@ -8,24 +8,20 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AppNotifier: typeof import('./src/components/AppNotifier.vue')['default']
     AuthIdComponent: typeof import('./src/components/auth/AuthIdComponent.vue')['default']
     BBadge: typeof import('bootstrap-vue-next/components/BBadge')['BBadge']
     BButton: typeof import('bootstrap-vue-next/components/BButton')['BButton']
     BCarousel: typeof import('bootstrap-vue-next/components/BCarousel')['BCarousel']
     BCarouselSlide: typeof import('bootstrap-vue-next/components/BCarousel')['BCarouselSlide']
     BCollapse: typeof import('bootstrap-vue-next/components/BCollapse')['BCollapse']
-    BDropdownItem: typeof import('bootstrap-vue-next/components/BDropdown')['BDropdownItem']
     BForm: typeof import('bootstrap-vue-next/components/BForm')['BForm']
     BFormGroup: typeof import('bootstrap-vue-next/components/BFormGroup')['BFormGroup']
     BFormInput: typeof import('bootstrap-vue-next/components/BFormInput')['BFormInput']
     BModal: typeof import('bootstrap-vue-next/components/BModal')['BModal']
     BNavbar: typeof import('bootstrap-vue-next/components/BNavbar')['BNavbar']
-    BNavbarBrand: typeof import('bootstrap-vue-next/components/BNavbar')['BNavbarBrand']
     BNavbarNav: typeof import('bootstrap-vue-next/components/BNavbar')['BNavbarNav']
-    BNavbarToggle: typeof import('bootstrap-vue-next/components/BNavbar')['BNavbarToggle']
-    BNavForm: typeof import('bootstrap-vue-next/components/BNav')['BNavForm']
     BNavItem: typeof import('bootstrap-vue-next/components/BNav')['BNavItem']
-    BNavItemDropdown: typeof import('bootstrap-vue-next/components/BNav')['BNavItemDropdown']
     BOverlay: typeof import('bootstrap-vue-next/components/BOverlay')['BOverlay']
     CaptchaWidget: typeof import('./src/components/auth/CaptchaWidget.vue')['default']
     ConnectionTypeSelector: typeof import('./src/components/ConnectionTypeSelector.vue')['default']
@@ -58,7 +54,6 @@ declare module 'vue' {
     ProfileCardComponent: typeof import('./src/components/profiles/public/ProfileCardComponent.vue')['default']
     ProfileForm: typeof import('./src/components/profiles/ProfileForm.vue')['default']
     ProfileImage: typeof import('./src/components/profiles/image/ProfileImage.vue')['default']
-    ProfileImageComponent: typeof import('./src/components/profiles/image/ProfileImageComponent.vue')['default']
     PublicProfileComponent: typeof import('./src/components/profiles/public/PublicProfileComponent.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
@@ -69,7 +64,6 @@ declare module 'vue' {
     ToggleSwitch: typeof import('./src/components/ToggleSwitch.vue')['default']
   }
   export interface ComponentCustomProperties {
-    vBColorMode: typeof import('bootstrap-vue-next/directives/BColorMode')['vBColorMode']
     vBToggle: typeof import('bootstrap-vue-next/directives/BToggle')['vBToggle']
   }
 }

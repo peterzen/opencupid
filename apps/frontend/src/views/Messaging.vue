@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
-import { ProfileSummary, type PublicProfile } from '@zod/profile.schema'
+import { type PublicProfile } from '@zod/profile.schema'
 import { useMessageStore } from '@/store/messageStore'
 import type { ConversationSummary } from '@zod/messaging.schema'
 import ConversationSummaries from '@/components/messaging/ConversationSummaries.vue'
@@ -44,8 +44,10 @@ onMounted(async () => {
 })
 
 async function handleSelectConvo(convo: ConversationSummary) {
-  // recipient.value = convo.partnerProfile
   await messageStore.setActiveConversation(convo)
+  setTimeout(async () => {
+    await messageStore.markAsRead(convo.conversationId)
+  }, 2000)
 }
 
 async function handleDeselectConvo() {

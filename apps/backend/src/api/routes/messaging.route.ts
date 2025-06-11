@@ -43,12 +43,15 @@ const messageRoutes: FastifyPluginAsync = async fastify => {
 
     const id = IdLookupParamsSchema.safeParse(req.params)
     if (!id.success) return sendError(reply, 404, 'Conversation not found')
+    const conversationId = id.data.id
 
     try {
-      const raw = await messageService.listMessagesForConversation(id.data.id)
-      const messages = raw.map(m => mapMessageToMessageInConversation(m, profileId))
+      const raw = await messageService.listMessagesForConversation(conversationId)
+      // await messageService.markConversationRead(profileId, conversationId)
 
+      const messages = raw.map(m => mapMessageToMessageInConversation(m, profileId))
       return reply.code(200).send({ success: true, messages })
+
     } catch (error) {
       fastify.log.error(error)
       return sendError(reply, 500, 'Failed to fetch conversations')
@@ -69,20 +72,28 @@ const messageRoutes: FastifyPluginAsync = async fastify => {
     }
   })
 
-  fastify.post(
-    '/conversations/:id/mark-read',
-    { onRequest: [fastify.authenticate] },
-    async (req, res) => {
-      const profileId = req.session.profileId
-      if (!profileId) return sendError(res, 401, 'Profile not found.')
 
-      const id = IdLookupParamsSchema.safeParse(req.params)
-      if (!id.success) return sendError(res, 404, 'Conversation not found')
+  fastify.post('/conversations/:id/mark-read', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    const profileId = req.session.profileId
+    if (!profileId) return sendError(reply, 401, 'Profile not found.')
 
-      await messageService.markConversationRead(profileId, id.data.id)
-      res.send({ success: true })
+    const id = IdLookupParamsSchema.safeParse(req.params)
+    if (!id.success) return sendError(reply, 404, 'Conversation not found')
+    const conversationId = id.data.id
+
+    try {
+
+      await messageService.markConversationRead(conversationId, profileId)
+      const updated = await messageService.getConversationSummary(conversationId, profileId)
+      if (!updated) return sendError(reply, 404, 'Conversation not found')
+        
+      return reply.code(200).send({ success: true, conversation: mapConversationParticipantToSummary(updated,profileId) })
+
+    } catch (error) {
+      fastify.log.error(error)
+      return sendError(reply, 500, 'Failed to mark conversation as read')
     }
-  )
+  })
 
   /**
    * Send a message to a conversation.  If the conversation between the specified recipient, and

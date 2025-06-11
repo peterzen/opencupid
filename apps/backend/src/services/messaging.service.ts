@@ -39,10 +39,7 @@ export class MessageService {
     return MessageService.instance
   }
 
-  async getConversationSummary(
-    conversationId: string,
-    profileId: string
-  ): Promise<ConversationParticipantWithExtras | null> {
+  async getConversationSummary(conversationId: string, profileId: string): Promise<ConversationParticipantWithExtras | null> {
     const participant = await prisma.conversationParticipant.findFirst({
       where: {
         conversationId,
@@ -97,35 +94,51 @@ export class MessageService {
       where: {
         conversationId,
       },
+      include: {
+        sender: {
+          include: {
+            profileImages: {
+              where: { position: 0 }, // Get the first image (profile picture)
+              select: { url: true },
+            },
+          },
+        },
+      },
       orderBy: {
         createdAt: 'asc',
       },
     })
   }
 
-  async markConversationRead(profileId: string, conversationId: string) {
-    return prisma.conversationParticipant.updateMany({
-      where: { profileId, conversationId },
+  async markConversationRead(conversationId: string, profileId: string) {
+    return prisma.conversationParticipant.update({
+      where: {
+        profileId_conversationId: {
+          profileId, conversationId
+        }
+      },
       data: { lastReadAt: new Date() },
     })
   }
 
-  async sendMessage(profileId: string, conversationId: string, content: string) {
-    const message = await prisma.message.create({
-      data: {
-        senderId: profileId,
-        conversationId,
-        content,
-      },
-    })
 
-    await prisma.conversation.update({
-      where: { id: conversationId },
-      data: { updatedAt: new Date() },
-    })
 
-    return message
-  }
+  // async sendMessage(profileId: string, conversationId: string, content: string) {
+  //   const message = await prisma.message.create({
+  //     data: {
+  //       senderId: profileId,
+  //       conversationId,
+  //       content,
+  //     },
+  //   })
+
+  //   await prisma.conversation.update({
+  //     where: { id: conversationId },
+  //     data: { updatedAt: new Date() },
+  //   })
+
+  //   return message
+  // }
 
   async sendOrStartConversation(
     senderProfileId: string,

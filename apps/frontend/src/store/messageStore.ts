@@ -1,16 +1,19 @@
 import { defineStore } from 'pinia'
-import { useWebSocket, type UseWebSocketReturn } from '@vueuse/core'
+import { useWebSocket } from '@vueuse/core'
 
 import { api } from '@/lib/api'
 import { bus } from '@/lib/bus'
 
 import type { ConversationSummary, MessageInConversation } from '@zod/messaging.schema'
 
+
+
 export const useMessageStore = defineStore('message', {
   state: () => ({
     conversations: [] as ConversationSummary[],
     messages: [] as MessageInConversation[],
     activeConversation: null as ConversationSummary | null,
+    hasUnreadMessages: false,
     unreadCount: 0,
     socket: null as any, // TODO find out why UseWebSocketReturn<any> gives TS errors
   }),
@@ -30,7 +33,7 @@ export const useMessageStore = defineStore('message', {
       })
       this.socket = socket
 
-      socket.ws.value?.addEventListener('message', this.messageHandler)
+      socket.ws.value?.addEventListener('message', this.wsMessageHandler)
 
       socket.ws.value?.addEventListener('close', event => {
         console.warn('WS closed. Reconnecting in 5s...')
@@ -48,9 +51,27 @@ export const useMessageStore = defineStore('message', {
       }
     },
 
-    messageHandler(event: MessageEvent) {
+    // Update a conversation in the list
+    updateConvo(convo: ConversationSummary) {
+      const index = this.conversations.findIndex(c => c.conversationId === convo.conversationId)
+      if (index !== -1) {
+        this.conversations[index] = convo
+      } else {
+        this.conversations.unshift(convo)
+      }
+    },
+
+    // Check last read timestamp against last message and update unread flag
+    updateUnreadFlag() {
+      this.hasUnreadMessages = this.conversations.some(c => {
+        const lastMessage = c.lastMessage?.createdAt || new Date(0) // Fallback to epoch if no last message
+        return c.lastReadAt ? c.lastReadAt < lastMessage : true
+      })
+    },
+
+    wsMessageHandler(event: MessageEvent) {
       const data = JSON.parse(event.data)
-      console.log('WebSocket message received:', data)
+      // console.log('WebSocket message received:', data)
       if (data.type === 'new_message') {
         const message: MessageInConversation = data.payload
         // Update conversation summary (and bump it to top)
@@ -66,13 +87,14 @@ export const useMessageStore = defineStore('message', {
           }
           this.conversations.unshift(updatedConvo)
         }
+        this.updateUnreadFlag()
 
         // If this is the active conversation, append to visible messages
         if (this.activeConversation?.conversationId === message.conversationId) {
           this.messages.push(message)
         } else {
           this.unreadCount++
-          bus.emit('message:received', { message, unreadCount: this.unreadCount })
+          bus.emit('message:received', { message })
         }
       }
     },
@@ -98,6 +120,7 @@ export const useMessageStore = defineStore('message', {
         const res = await api.get('/messages/conversations')
         if (res.data.success) {
           this.conversations = res.data.conversations
+          this.updateUnreadFlag()
         }
       } catch (error: any) {
         console.error('Failed to fetch conversations:', error)
@@ -113,10 +136,19 @@ export const useMessageStore = defineStore('message', {
     //   }
     // },
 
-    // async markAsRead(convoId: string) {
-    //   await api.post(`/messages/conversations/${convoId}/mark-read`)
-    //   await this.fetchUnreadCount()
-    // },
+    async markAsRead(convoId: string) {
+      try {
+        const updateConvo = await api.post(`/messages/conversations/${convoId}/mark-read`)
+        if (updateConvo.data.success) {
+          const updatedConvo: ConversationSummary = updateConvo.data.conversation
+          this.updateConvo(updatedConvo)
+          this.updateUnreadFlag()
+        }
+      } catch (error: any) {
+        console.error('Failed to mark conversation as read:', error)
+      }
+      // await this.fetchUnreadCount()
+    },
 
     async sendMessage(
       recipientProfileId: string,
@@ -145,7 +177,9 @@ export const useMessageStore = defineStore('message', {
 
     async setActiveConversation(convo: ConversationSummary | null) {
       this.activeConversation = convo
-      if (this.activeConversation) await this.fetchMessagesForConversation(this.activeConversation.conversationId)
+      if (this.activeConversation) {
+        await this.fetchMessagesForConversation(this.activeConversation.conversationId)
+      }
     },
   },
 })

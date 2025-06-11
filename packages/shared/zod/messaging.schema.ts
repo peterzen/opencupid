@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client'
 import { z } from 'zod'
 import { ProfileSummarySchema } from './profile.schema'
-import { ConversationParticipantSchema, Message, MessageSchema } from './generated'
+import { ConversationParticipantSchema, MessageSchema } from './generated'
 
 export const ConversationSchema = z.object({
   id: z.string(),
