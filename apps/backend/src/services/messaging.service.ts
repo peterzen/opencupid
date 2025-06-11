@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 import type {
   ConversationParticipantWithExtras,
   MessageInConversation,
-} from '@zod/dto/messaging.dto'
+} from '@zod/messaging/messaging.dto'
 import { Message } from '@zod/generated'
 
 const conversationSummaryInclude = {
@@ -99,7 +99,6 @@ export class MessageService {
           include: {
             profileImages: {
               where: { position: 0 }, // Get the first image (profile picture)
-              select: { url: true },
             },
           },
         },

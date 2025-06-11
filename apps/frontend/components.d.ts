@@ -47,6 +47,7 @@ declare module 'vue' {
     LogoutButton: typeof import('./src/components/nav/LogoutButton.vue')['default']
     MessageList: typeof import('./src/components/messaging/MessageList.vue')['default']
     MessageNav: typeof import('./src/components/messaging/MessageNav.vue')['default']
+    MessageReceivedToast: typeof import('./src/components/messaging/MessageReceivedToast.vue')['default']
     ModalDialogComponent: typeof import('./src/components/ModalDialogComponent.vue')['default']
     Navbar: typeof import('./src/components/nav/Navbar.vue')['default']
     NoProfileInfoCTAComponent: typeof import('./src/components/profiles/NoProfileInfoCTAComponent.vue')['default']

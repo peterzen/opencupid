@@ -1,20 +1,25 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
 import { type PublicProfile } from '@zod/profile/profile.dto'
 import { useMessageStore } from '@/store/messageStore'
-import type { ConversationSummary } from '@zod/dto/messaging.dto'
+import type { ConversationSummary } from '@zod/messaging/messaging.dto'
 import ConversationSummaries from '@/components/messaging/ConversationSummaries.vue'
 import SendMessage from '@/components/messaging/SendMessage.vue'
 import MessageList from '@/components/messaging/MessageList.vue'
 import { IconArrowSingleLeft, IconMenu } from '@/components/icons/DoodleIcons'
 import ProfileImage from '@/components/profiles/image/ProfileImage.vue'
 
+import router from '@/router'
+
 const profileStore = useProfileStore()
 const messageStore = useMessageStore()
 
-const profiles = ref<PublicProfile[]>([])
-// const recipient = ref<ProfileSummary | null>(null)
+// Props
+const props = defineProps<{
+  conversationId?: string
+}>()
+
 const isLoading = ref(false)
 const showModal = ref(false)
 
@@ -29,28 +34,43 @@ const recipient = computed(() => {
   return messageStore.activeConversation?.partnerProfile || null
 })
 
+watch(
+  () => props.conversationId,
+  async (newId, oldId) => {
+    if (newId !== oldId) {
+      if (!newId) {
+        await messageStore.setActiveConversation(null)
+      } else {
+        isLoading.value = true
+        await messageStore.setActiveConversationById(newId)
+        isLoading.value = false
+      }
+    }
+  }
+)
+
 onMounted(async () => {
   isLoading.value = true
-  const fetched = await profileStore.findProfiles()
-  if (fetched) {
-    profiles.value = fetched
-  } else {
-    console.error('Failed to fetch profiles')
-  }
-
   const convos = await messageStore.fetchConversations()
+  if (props.conversationId) {
+    await messageStore.setActiveConversationById(props.conversationId)
+  }
   console.log('Conversations fetched:', convos)
   isLoading.value = false
 })
 
 async function handleSelectConvo(convo: ConversationSummary) {
+  isLoading.value = true
+  router.push({ name: 'Messaging', params: { conversationId: convo.conversationId } })
   await messageStore.setActiveConversation(convo)
+  isLoading.value = false
   setTimeout(async () => {
     await messageStore.markAsRead(convo.conversationId)
   }, 2000)
 }
 
 async function handleDeselectConvo() {
+  router.push({ name: 'Messaging' })
   await messageStore.setActiveConversation(null)
 }
 </script>
@@ -125,23 +145,6 @@ async function handleDeselectConvo() {
       </div>
     </BModal>
   </div>
-
-  <!-- <div class="mb-4">
-          <h4>Users</h4>
-          <ul class="list-group">
-            <li
-              v-for="profile in profiles"
-              :key="profile.id"
-              class="list-group-item d-flex justify-content-between align-items-center"
-              @click="recipient = profile"
-            >
-              <span class="publicname">{{ profile.publicName }}</span>
-              <div class="thumbnail">
-                <ProfileImage :profile="profile" />
-              </div>
-            </li>
-          </ul>
-        </div> -->
 </template>
 <style scoped>
 :deep(.thumbnail) {

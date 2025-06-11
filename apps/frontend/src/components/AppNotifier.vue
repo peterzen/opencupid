@@ -1,25 +1,39 @@
-<script setup lang="ts">
+<script setup>
+import { onMounted, onUnmounted } from 'vue'
 import { bus } from '@/lib/bus'
+import { useToast } from 'vue-toastification'
 
-import { showToast } from '@/lib/toastify'
-import type { MessageInConversation } from '@zod/dto/messaging.dto'
-import { useI18n } from 'vue-i18n'
+import router from '@/router'
 
-const { t } = useI18n()
+import MessageReceivedToast from '@/components/messaging/MessageReceivedToast.vue'
 
-bus.on('message:received', ({ message }) => {
-  // const senderName = message.partnerProfile?.publicName || t('messaging.unknown_sender')
-  showToast({
-    type: 'info',
-    message: t('messaging.new_message_notification', {
-      sender:  t('messaging.unknown_sender'),
-    }),
-    options: {
-      autoClose: 5000,
+const toast = useToast()
+
+function handleMessageReceived({ message }) {
+  toast(
+    {
+      component: MessageReceivedToast,
+      props: {
+        toastId: `${message.id}`,
+        message: message,
+      },
     },
-  })
+    {
+      onClick: closeToast => {
+        console.log('Toast clicked:', message.id)
+        router.push({ name: 'Messaging', params: { conversationId: message.conversationId },force: true })
+        closeToast()
+      },
+    }
+  )
+}
+onMounted(() => {
+  bus.on('message:received', handleMessageReceived)
+})
+onUnmounted(() => {
+  bus.off('message:received', handleMessageReceived)
 })
 </script>
 <template>
-  <div ></div>
+  <div></div>
 </template>

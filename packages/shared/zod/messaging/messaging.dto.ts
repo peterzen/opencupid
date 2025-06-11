@@ -14,6 +14,7 @@ const conversationParticipantFields = {
   isArchived: true,
 } as const
 
+// this is used in the db layer
 const MessageInConversationSchema = MessageSchema.pick({
   id: true,
   conversationId: true,
@@ -21,10 +22,17 @@ const MessageInConversationSchema = MessageSchema.pick({
   content: true,
   createdAt: true,
 }).extend({
+  sender: ProfileSummarySchema,
+})
+export type MessageInConversation = z.infer<typeof MessageInConversationSchema>
+
+// this is used in the dto layer
+const MessageDTOSchema = MessageInConversationSchema.extend({
+  sender: ProfileSummarySchema,
   isMine: z.boolean().optional(),
 })
+export type MessageDTO = z.infer<typeof MessageDTOSchema>
 
-export type MessageInConversation = z.infer<typeof MessageInConversationSchema>
 
 const MessageInConversationSummarySchema = MessageSchema.pick({
   content: true,
@@ -34,7 +42,7 @@ const MessageInConversationSummarySchema = MessageSchema.pick({
 })
 
 
- const ConversationSummarySchema = ConversationParticipantSchema.pick({
+const ConversationSummarySchema = ConversationParticipantSchema.pick({
   id: true,
   profileId: true,
   conversationId: true,

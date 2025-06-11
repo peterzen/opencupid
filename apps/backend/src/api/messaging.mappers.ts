@@ -1,8 +1,10 @@
 import type { Prisma } from '@prisma/client';
-import {
+import type {
   ConversationParticipantWithExtras,
-  ConversationSummary, MessageInConversation
-} from '@zod/dto/messaging.dto';
+  ConversationSummary,
+  MessageDTO,
+  MessageInConversation,
+} from '@zod/messaging/messaging.dto';
 import { mapProfileSummary } from './mappers';
 
 function mapConversationMeta(c: { id: string; updatedAt: Date; createdAt: Date }) {
@@ -11,6 +13,13 @@ function mapConversationMeta(c: { id: string; updatedAt: Date; createdAt: Date }
     updatedAt: c.updatedAt,
     createdAt: c.createdAt,
   }
+}
+
+export function extractSenderProfile(
+  p: ConversationParticipantWithExtras,
+  senderProfileId: string
+) {
+  return p.conversation.participants.find(p => p.profileId === senderProfileId)?.profile
 }
 
 export function mapConversationParticipantToSummary(
@@ -41,16 +50,28 @@ export function mapConversationParticipantToSummary(
   }
 }
 
-export function mapMessageToMessageInConversation(
+export function mapMessageDTO(
   m: Prisma.MessageGetPayload<{}>,
-  currentProfileId: string
-): MessageInConversation {
+  p: ConversationParticipantWithExtras
+): MessageDTO {
+  const sender = extractSenderProfile(p, m.senderId)
   return {
     id: m.id,
     conversationId: m.conversationId,
     senderId: m.senderId,
     content: m.content,
     createdAt: m.createdAt,
-    isMine: m.senderId === currentProfileId,
+    sender: mapProfileSummary(sender!)
   }
 }
+
+export function mapMessageForMessageList(
+  m: MessageInConversation,
+): MessageDTO {
+ 
+  const message: MessageDTO = {
+    ...m,
+  }
+  return message;
+}
+

@@ -20,10 +20,18 @@ app.use(createBootstrap()) // bootstrap-vue-next
 import { useIcons } from './lib/icons'
 useIcons(app)
 
-// toastify
-import Vue3Toastify from 'vue3-toastify'
-import { defaultOptions } from './lib/toastify'
-app.use(Vue3Toastify, defaultOptions)
+// vue-toastification
+// import Toast from "vue-toastification";
+// import { defaultOptions } from './lib/toast'
+// app.use(Toast, {
+//   ...defaultOptions,
+//   shareAppContext: true,
+// })
+
+// vue-toastification
+import registerToast from './lib/toast'
+registerToast(app)
+
 
 import { appUseI18n } from './lib/i18n'
 appUseI18n(app)

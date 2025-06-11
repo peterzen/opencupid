@@ -5,7 +5,8 @@ import { MessageService } from '@/services/messaging.service'
 import { z } from 'zod'
 import {
   mapConversationParticipantToSummary,
-  mapMessageToMessageInConversation,
+  mapMessageDTO,
+  mapMessageForMessageList,
 } from '../messaging.mappers'
 import type {
   MessagesResponse,
@@ -53,9 +54,8 @@ const messageRoutes: FastifyPluginAsync = async fastify => {
 
     try {
       const raw = await messageService.listMessagesForConversation(conversationId)
-      // await messageService.markConversationRead(profileId, conversationId)
 
-      const messages = raw.map(m => mapMessageToMessageInConversation(m, profileId))
+      const messages = raw.map(m => mapMessageForMessageList(m))
       const response: MessagesResponse = { success: true, messages }
       return reply.code(200).send(response)
 
@@ -132,10 +132,12 @@ const messageRoutes: FastifyPluginAsync = async fastify => {
     if (!updatedConvo)
       return sendError(reply, 404, 'Conversation not found or could not be created')
 
+    const messageDTO = mapMessageDTO(message, updatedConvo)
+
     const response: SendMessageResponse = {
       success: true,
       conversation: mapConversationParticipantToSummary(updatedConvo, senderProfileId),
-      message: mapMessageToMessageInConversation(message, senderProfileId),
+      message: messageDTO,
     }
 
     reply.code(200).send(response)
@@ -143,13 +145,7 @@ const messageRoutes: FastifyPluginAsync = async fastify => {
     // Broadcast the new message to the recipient's WebSocket connections
     broadcastToProfile(fastify, recipientProfileId, {
       type: 'new_message',
-      payload: {
-        id: message.id,
-        content: message.content,
-        senderId: message.senderId,
-        conversationId: message.conversationId,
-        createdAt: message.createdAt,
-      },
+      payload: messageDTO,
     })
   })
 }

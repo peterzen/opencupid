@@ -1,4 +1,4 @@
-import { type ToastMessage } from '@/lib/toastify'
+import { type ToastMessage } from '@/lib/toast'
 import { defineStore } from 'pinia'
 
 export const useLocalStore = defineStore('local', {

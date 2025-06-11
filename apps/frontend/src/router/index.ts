@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
+// import useToast from 'vue-toastification'
 
 import { useAuthStore } from '@/store/authStore'
 import { useLocalStore } from '@/store/localStore'
-import { showToast } from '@/lib/toastify'
 
 import Login from '@/views/Login.vue'
 import UserHome from '@/views/UserHome.vue'
@@ -59,9 +59,10 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true },
   },
   {
-    path: '/inbox',
+    path: '/inbox/:conversationId?',
     name: 'Messaging',
     component: Messaging,
+    props: true,
     meta: { requiresAuth: true },
   },
   // Redirect root to login page
@@ -98,12 +99,14 @@ router.beforeEach(async (to, from, next) => {
   }
 })
 
+// const toast = useToast()
+
 router.afterEach((to, from) => {
   const localStore = useLocalStore()
   const flashMessage = localStore.getFlashMessage()
 
   if (flashMessage) {
-    showToast(flashMessage)
+    // toast(flashMessage)
   }
 
   // Set the page title based on the route name

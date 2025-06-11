@@ -4,7 +4,7 @@ import { useWebSocket } from '@vueuse/core'
 import { api } from '@/lib/api'
 import { bus } from '@/lib/bus'
 
-import type { ConversationSummary, MessageInConversation } from '@zod/dto/messaging.dto'
+import type { ConversationSummary, MessageDTO, MessageInConversation } from '@zod/messaging/messaging.dto'
 import type {
   MessagesResponse,
   ConversationsResponse,
@@ -17,7 +17,7 @@ import type {
 export const useMessageStore = defineStore('message', {
   state: () => ({
     conversations: [] as ConversationSummary[],
-    messages: [] as MessageInConversation[],
+    messages: [] as MessageDTO[],
     activeConversation: null as ConversationSummary | null,
     hasUnreadMessages: false,
     unreadCount: 0,
@@ -79,7 +79,8 @@ export const useMessageStore = defineStore('message', {
       const data = JSON.parse(event.data)
       // console.log('WebSocket message received:', data)
       if (data.type === 'new_message') {
-        const message: MessageInConversation = data.payload
+        const message: MessageDTO = data.payload
+        console.log('New message received:', message)
         // Update conversation summary (and bump it to top)
         const convoIndex = this.conversations.findIndex(c => c.conversationId === message.conversationId)
 
@@ -135,13 +136,6 @@ export const useMessageStore = defineStore('message', {
       return this.conversations
     },
 
-    // async fetchUnreadCount() {
-    //   const res = await api.get('/messages/conversations/unread-count')
-    //   if (res.data.success) {
-    //     this.unreadCount = res.data.count
-    //   }
-    // },
-
     async markAsRead(convoId: string) {
       try {
         const updateConvo = await api.post<ConversationResponse>(`/messages/conversations/${convoId}/mark-read`)
@@ -187,6 +181,17 @@ export const useMessageStore = defineStore('message', {
         await this.fetchMessagesForConversation(this.activeConversation.conversationId)
       }
     },
+
+    async setActiveConversationById(conversationId: string) {
+      const convo = this.conversations.find(c => c.conversationId === conversationId)
+      if (convo) {
+        await this.setActiveConversation(convo)
+      } else {
+        console.warn('Conversation not found:', conversationId)
+        this.activeConversation = null
+        this.messages = []
+      }
+    }
   },
 })
 

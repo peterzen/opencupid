@@ -6,7 +6,7 @@ import ImageTag from '@/components/profiles/image/ImageTag.vue'
 
 // Props & Emits
 const props = defineProps<{
-  profile: ProfileImages
+  profile: ProfileImages,
 }>()
 
 const profileImage = computed(() => {
