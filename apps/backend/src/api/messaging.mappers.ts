@@ -66,12 +66,12 @@ export function mapMessageDTO(
 }
 
 export function mapMessageForMessageList(
-  m: MessageInConversation,
+  m: MessageInConversation, profileId: string
 ): MessageDTO {
- 
-  const message: MessageDTO = {
+console.error('Mapping message for list:', m.senderId , profileId)
+  return {
     ...m,
+    isMine: m.senderId === profileId,
   }
-  return message;
 }
 

@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { type ConversationSummary } from '@zod/messaging/messaging.dto'
-import ProfileImage from '@/components/profiles/image/ProfileImage.vue'
+import ProfileThumbnail from '../profiles/image/ProfileThumbnail.vue'
 
 defineProps<{
   conversations: ConversationSummary[]
   activeConversation: ConversationSummary | null
 }>()
 
-// Emits
-const emit = defineEmits<{
+defineEmits<{
   (e: 'convo:select', val: ConversationSummary): void
 }>()
 </script>
@@ -22,10 +21,10 @@ const emit = defineEmits<{
       :class="{
         'focus-ring': activeConversation?.conversationId === convo.conversationId,
       }"
-      @click="emit('convo:select', convo)"
+      @click="$emit('convo:select', convo)"
     >
       <div class="thumbnail me-2 flex-shrink-0">
-        <ProfileImage :profile="convo.partnerProfile" />
+        <ProfileThumbnail :profile="convo.partnerProfile" />
       </div>
       <div class="overflow-hidden flex-grow-1 d-flex flex-column">
         <span class="d-block text-truncate fs-6">{{ convo.partnerProfile.publicName }}</span>

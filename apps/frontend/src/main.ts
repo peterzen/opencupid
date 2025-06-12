@@ -20,18 +20,13 @@ app.use(createBootstrap()) // bootstrap-vue-next
 import { useIcons } from './lib/icons'
 useIcons(app)
 
-// vue-toastification
-// import Toast from "vue-toastification";
-// import { defaultOptions } from './lib/toast'
-// app.use(Toast, {
-//   ...defaultOptions,
-//   shareAppContext: true,
-// })
+import { useLocalStore } from './store/localStore'
+const localStore = useLocalStore()
+localStore.initialize()
 
-// vue-toastification
+// toasts
 import registerToast from './lib/toast'
 registerToast(app)
-
 
 import { appUseI18n } from './lib/i18n'
 appUseI18n(app)

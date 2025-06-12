@@ -1,21 +1,46 @@
-import { type ToastMessage } from '@/lib/toast'
+// import { type ToastMessage } from '@/lib/toast'
 import { defineStore } from 'pinia'
+import { bus } from '@/lib/bus'
 
 export const useLocalStore = defineStore('local', {
   state: () => ({
-    flashMessage: null as ToastMessage | null,
+    messageDrafts: {} as Record<string, string>, // Maps recipient profileIDs to their drafts
+    // flashMessage: null as ToastMessage | null,
   }),
   actions: {
-    setFlashMessage(message: string, type: string) {
-      this.flashMessage = {
-        message: message,
-        type: type,
-      } as ToastMessage
+    setMessageDraft(profileId: string, message: string) {
+      this.messageDrafts[profileId] = message
+      localStorage.setItem('messageDrafts', JSON.stringify(this.messageDrafts))
     },
-    getFlashMessage() {
-      const message = this.flashMessage
-      this.flashMessage = null
-      return message
+    getMessageDraft(profileId: string): string {
+      return this.messageDrafts[profileId] || ''
     },
+    async initialize() {
+      const stored = localStorage.getItem('messageDrafts')
+      if (stored) {
+        try {
+          this.messageDrafts = JSON.parse(stored)
+        } catch {
+          this.messageDrafts = {}
+        }
+      }
+
+      bus.on('auth:logout', this.cleanUp)
+    },
+    async cleanUp() {
+      this.messageDrafts = {}
+      localStorage.removeItem('messageDrafts')
+    }
+    // setFlashMessage(message: string, type: string) {
+    //   this.flashMessage = {
+    //     message: message,
+    //     type: type,
+    //   } as ToastMessage
+    // },
+    // getFlashMessage() {
+    //   const message = this.flashMessage
+    //   this.flashMessage = null
+    //   return message
+    // },
   },
 })

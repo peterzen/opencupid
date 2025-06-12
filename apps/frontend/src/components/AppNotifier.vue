@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue'
 import { bus } from '@/lib/bus'
 import { useToast } from 'vue-toastification'
@@ -6,10 +6,11 @@ import { useToast } from 'vue-toastification'
 import router from '@/router'
 
 import MessageReceivedToast from '@/components/messaging/MessageReceivedToast.vue'
+import { type MessageDTO } from '@zod/messaging/messaging.dto'
 
 const toast = useToast()
 
-function handleMessageReceived({ message }) {
+function handleMessageReceived({ message }: { message: MessageDTO }) {
   toast(
     {
       component: MessageReceivedToast,

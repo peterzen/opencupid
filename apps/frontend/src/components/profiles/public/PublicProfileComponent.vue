@@ -7,8 +7,13 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEnumOptions } from '../composables/useEnumOptions'
 import ImageTag from '../image/ImageTag.vue'
+import { IconMessage } from '@/components/icons/DoodleIcons'
 
 const { t } = useI18n()
+
+defineEmits<{
+  (e: 'send:message', profile: PublicProfile): void
+}>()
 
 const props = defineProps<{
   profile: PublicProfile
@@ -73,6 +78,16 @@ const pronounsLabel = computed(() => {
               </BCarouselSlide>
             </BCarousel>
           </div>
+        </div>
+        <div class="action-buttons">
+          <BButton
+            v-if="!props.isLoading"
+            variant="outline-primary"
+            size="sm"
+            @click="() => $emit('send:message', props.profile)">
+            <IconMessage class="svg-icon me-1" />
+            {{ $t('profiles.send_message_button') }}
+          </BButton>
         </div>
         <div class="publicname-wrapper">
           <span class="fw-bolder fs-2">{{ props.profile.publicName }}</span>

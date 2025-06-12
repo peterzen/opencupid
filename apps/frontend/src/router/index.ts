@@ -103,11 +103,11 @@ router.beforeEach(async (to, from, next) => {
 
 router.afterEach((to, from) => {
   const localStore = useLocalStore()
-  const flashMessage = localStore.getFlashMessage()
+  // const flashMessage = localStore.getFlashMessage()
 
-  if (flashMessage) {
+  // if (flashMessage) {
     // toast(flashMessage)
-  }
+  // }
 
   // Set the page title based on the route name
   // const title = to.name ? `${to.name} - My App` : 'My App';

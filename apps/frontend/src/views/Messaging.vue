@@ -1,18 +1,14 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from 'vue'
-import { useProfileStore } from '@/store/profileStore'
-import { type PublicProfile } from '@zod/profile/profile.dto'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useMessageStore } from '@/store/messageStore'
 import type { ConversationSummary } from '@zod/messaging/messaging.dto'
 import ConversationSummaries from '@/components/messaging/ConversationSummaries.vue'
 import SendMessage from '@/components/messaging/SendMessage.vue'
 import MessageList from '@/components/messaging/MessageList.vue'
-import { IconArrowSingleLeft, IconMenu } from '@/components/icons/DoodleIcons'
-import ProfileImage from '@/components/profiles/image/ProfileImage.vue'
 
 import router from '@/router'
+import MessagingNav from '../components/messaging/MessagingNav.vue'
 
-const profileStore = useProfileStore()
 const messageStore = useMessageStore()
 
 // Props
@@ -23,17 +19,12 @@ const props = defineProps<{
 const isLoading = ref(false)
 const showModal = ref(false)
 
-async function sendMessage(content: string) {
-  if (!recipient.value || !content) return
-  isLoading.value = true
-  await messageStore.sendMessage(recipient.value.id, content)
-  isLoading.value = false
-}
-
 const recipient = computed(() => {
   return messageStore.activeConversation?.partnerProfile || null
 })
 
+// Watch for changes in conversationId router prop so we can update
+// the active conversation
 watch(
   () => props.conversationId,
   async (newId, oldId) => {
@@ -51,12 +42,16 @@ watch(
 
 onMounted(async () => {
   isLoading.value = true
-  const convos = await messageStore.fetchConversations()
+  await messageStore.fetchConversations()
   if (props.conversationId) {
     await messageStore.setActiveConversationById(props.conversationId)
   }
-  console.log('Conversations fetched:', convos)
   isLoading.value = false
+})
+
+onUnmounted(() => {
+  // Clear active conversation when component is unmounted
+  messageStore.setActiveConversation(null)
 })
 
 async function handleSelectConvo(convo: ConversationSummary) {
@@ -95,32 +90,17 @@ async function handleDeselectConvo() {
       v-if="recipient"
       id="message-view"
     >
-      <div class="d-flex align-items-center justify-content-between p-2">
-        <div class="back-button">
-          <a class="btn btn-secondary-outline" @click="handleDeselectConvo">
-            <IconArrowSingleLeft class="svg-icon fs-4" />
-          </a>
-        </div>
-
-        <div class="d-flex flex-column align-items-center">
-          <div class="thumbnail me-2">
-            <ProfileImage :profile="recipient" />
-          </div>
-          <div class="">
-            <span class="d-block text-truncate fs-6">{{ recipient.publicName }}</span>
-          </div>
-        </div>
-
-        <div class="action-button">
-          <IconMenu class="svg-icon fs-4" @click="showModal = true" />
-        </div>
-      </div>
+      <MessagingNav
+        :recipient="recipient"
+        @deselect:convo="handleDeselectConvo"
+        @modal:open="showModal = true"
+      />
 
       <div class="flex-grow-1 overflow-hidden d-flex flex-column">
         <MessageList :messages="messageStore.messages" />
       </div>
       <div class="d-flex align-items-center w-100 mb-5 py-2 px-2">
-        <SendMessage @message:send="sendMessage" :recipientProfile="recipient" v-if="recipient" />
+        <SendMessage :recipientProfile="recipient" v-if="recipient" />
       </div>
     </div>
 
@@ -147,10 +127,5 @@ async function handleDeselectConvo() {
   </div>
 </template>
 <style scoped>
-:deep(.thumbnail) {
-  width: 40px;
-  height: 40px;
-  overflow: hidden;
-  border-radius: 50%;
-}
+
 </style>

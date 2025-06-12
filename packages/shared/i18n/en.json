@@ -104,11 +104,18 @@
     "login": "Login",
     "logout": "Logout"
   },
+  "profiles": {
+    "send_message_button": "Message"
+  },
   "messaging": {
     "send_message_button": "Send",
     "message_input_placeholder": "Type your message here...",
     "new_message_notification": "{sender} sent a message",
-    "unknown_sender": "Someone"
+    "send_message_to_user": "Send a message to {name}",
+    "unknown_sender": "Someone",
+    "message_input_hint":"Press Enter to send",
+    "send_failed": "Oops, this didn't work. Please try again.",
+    "message_sent_success": "Message sent successfully!"
   },
   "uicomponents": {
     "submitbutton": {

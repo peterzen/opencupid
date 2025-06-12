@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { mapMessageDTO } from '../../api/messaging.mappers'
+import { mapMessageDTO, mapMessageForMessageList } from '../../api/messaging.mappers'
 vi.mock('@shared/config/appconfig', () => ({ appConfig: { IMAGE_URL_BASE: 'http://img' } }))
 
 const msg: any = {
@@ -12,7 +12,7 @@ const msg: any = {
 
 describe('messaging mappers', () => {
   it('marks message as mine', () => {
-    const m = mapMessageDTO(msg, 'p1')
+    const m = mapMessageForMessageList(msg, 'p1')
     expect(m.isMine).toBe(true)
   })
 })

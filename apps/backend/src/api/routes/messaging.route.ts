@@ -14,6 +14,7 @@ import type {
   ConversationResponse,
   SendMessageResponse,
 } from '@shared/dto/apiResponse.dto'
+import { profile } from 'console'
 
 // Route params for ID lookups
 const IdLookupParamsSchema = z.object({
@@ -55,7 +56,7 @@ const messageRoutes: FastifyPluginAsync = async fastify => {
     try {
       const raw = await messageService.listMessagesForConversation(conversationId)
 
-      const messages = raw.map(m => mapMessageForMessageList(m))
+      const messages = raw.map(m => mapMessageForMessageList(m, profileId))
       const response: MessagesResponse = { success: true, messages }
       return reply.code(200).send(response)
 
@@ -137,7 +138,7 @@ const messageRoutes: FastifyPluginAsync = async fastify => {
     const response: SendMessageResponse = {
       success: true,
       conversation: mapConversationParticipantToSummary(updatedConvo, senderProfileId),
-      message: messageDTO,
+      message: mapMessageForMessageList(messageDTO, senderProfileId),
     }
 
     reply.code(200).send(response)

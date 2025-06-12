@@ -1,55 +1,92 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { IconSend } from '../icons/DoodleIcons'
+import { ref, watch, watchEffect } from 'vue'
 import { type ProfileSummary } from '@zod/profile/profile.dto'
-import ProfileImage from '@/components/profiles/image/ProfileImage.vue'
 
-defineProps<{
+import { useLocalStore } from '@/store/localStore'
+import { funnel } from 'remeda'
+import { useMessaging } from '../composables/useMessaging'
+import { type MessageDTO } from '@zod/messaging/messaging.dto'
+
+const props = defineProps<{
   recipientProfile: ProfileSummary
 }>()
 const emit = defineEmits<{
-  (e: 'message:send', content: string): void
+  (e: 'message:sent', message: MessageDTO | null): void
 }>()
 const content = ref('')
 
-const valid = computed(() => content.value.trim() !== '')
+const { sendMessage, isSending, isSent, errorMsg } = useMessaging()
 
-function handleSubmit() {
+// Local store for managing message drafts
+const localStore = useLocalStore()
+const debouncer = funnel<[string], string>(
+  (val: string) => {
+    localStore.setMessageDraft(props.recipientProfile.id, content.value)
+  },
+  {
+    minQuietPeriodMs: 3000,
+  }
+)
+
+// Watch message input field and save draft in localStore
+watch(content, val => {
+  debouncer.call(val)
+})
+
+watchEffect(() => {
+  // Load the draft message from local store when the component is mounted
+  const draft = localStore.getMessageDraft(props.recipientProfile.id)
+  if (draft) {
+    content.value = draft
+  }
+})
+
+const textarea = ref<HTMLTextAreaElement>()
+
+// Give focus to textarea - expose method to parent which can call it
+// when it's rendered or when needed
+function focusTextarea() {
+  textarea.value?.focus()
+}
+
+defineExpose({
+  focusTextarea,
+})
+
+async function handleSendMessage() {
   if (content.value.trim() === '') return
-  emit('message:send', content.value)
+  const sentMessage = await sendMessage(props.recipientProfile, content.value)
+  emit('message:sent', sentMessage!)
   content.value = '' // Clear the input after sending
+  localStore.setMessageDraft(props.recipientProfile.id, '') // Clear the draft in local store
 }
 </script>
 
 <template>
   <div class="send-message-wrapper w-100">
-    <!-- <div class="d-flex align-items-center mb-2">
-      <div class="thumbnail me-2">
-        <ProfileImage :profile="recipientProfile" />
+    <BForm>
+      <div class="d-flex flex-column align-items-center mb-2">
+        <BFormGroup label="" label-for="content-input" class="me-2 flex-grow-1 w-100">
+          <BFormTextarea
+            id="content-input"
+            ref="textarea"
+            v-model="content"
+            rows="1"
+            max-rows="5"
+            no-resize
+            autofocus
+            @keyup.enter="handleSendMessage"
+            :placeholder="$t('messaging.message_input_placeholder')"
+          />
+          <div class="form-text text-muted d-flex justify-content-end">
+            <small>{{ $t('messaging.message_input_hint') }}</small>
+          </div>
+        </BFormGroup>
+        <!-- <BButton type="submit" variant="primary" :disabled="!valid">
+          <IconSend class="svg-icon me-1" />
+          {{ $t('messaging.send_message_button') }}
+        </BButton> -->
       </div>
-      <div class="flex-grow-1">
-        <span class="d-block text-truncate fs-6">{{ recipientProfile.publicName }}</span>
-      </div>
-    </div> -->
-    <BForm @submit.prevent="handleSubmit">
-			<div class="d-flex flex-row align-items-center mb-2">
-      <BFormGroup label="" label-for="content-input" class="me-2 flex-grow-1">
-        <BFormInput
-          id="content-input"
-          v-model="content"
-          type="text"
-					autocomplete="off"
-					autofocus
-          :placeholder="$t('messaging.message_input_placeholder')"
-          @keyup.enter="handleSubmit"
-          required
-        />
-      </BFormGroup>
-      <BButton type="submit" variant="primary" :disabled="!valid">
-        <IconSend class="svg-icon me-1" />
-        {{ $t('messaging.send_message_button') }}
-      </BButton>
-			</div>
     </BForm>
   </div>
 </template>

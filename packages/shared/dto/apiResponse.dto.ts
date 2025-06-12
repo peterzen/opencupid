@@ -15,10 +15,9 @@ import type {
   UpdatedProfileImageFragment,
 } from '@zod/profile/profile.dto'
 import type { PublicTag } from '@zod/dto/tag.dto'
-import type { ConversationSummary, MessageDTO, MessageInConversation } from '@zod/messaging/messaging.dto'
+import type { ConversationSummary, MessageDTO } from '@zod/messaging/messaging.dto'
 import type { SettingsUser, OtpSendReturn } from '@zod/user/user.dto'
 import type { City } from '@zod/city/city.schema'
-import { Message } from '@zod/generated'
 
 export type GetMyProfileResponse = ApiSuccess<{ profile: OwnerProfile }>
 export type GetPublicProfileResponse = ApiSuccess<{ profile: PublicProfile }>

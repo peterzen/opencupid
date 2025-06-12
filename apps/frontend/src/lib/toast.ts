@@ -1,4 +1,4 @@
-import Toast, { POSITION, PluginOptions } from 'vue-toastification'
+import Toast, { POSITION, type PluginOptions } from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 
 const theme = document.documentElement.getAttribute('data-bs-theme')

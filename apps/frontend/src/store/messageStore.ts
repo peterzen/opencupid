@@ -69,10 +69,12 @@ export const useMessageStore = defineStore('message', {
 
     // Check last read timestamp against last message and update unread flag
     updateUnreadFlag() {
-      this.hasUnreadMessages = this.conversations.some(c => {
-        const lastMessage = c.lastMessage?.createdAt || new Date(0) // Fallback to epoch if no last message
-        return c.lastReadAt ? c.lastReadAt < lastMessage : true
-      })
+      this.hasUnreadMessages = this.conversations
+        .filter(c => c.lastMessage?.isMine !== true)
+        .some(c => {
+          const lastMessage = c.lastMessage?.createdAt || new Date(0) // Fallback to epoch if no last message
+          return c.lastReadAt ? c.lastReadAt < lastMessage : true
+        })
     },
 
     wsMessageHandler(event: MessageEvent) {
@@ -153,7 +155,7 @@ export const useMessageStore = defineStore('message', {
     async sendMessage(
       recipientProfileId: string,
       content: string
-    ): Promise<ConversationSummary | null> {
+    ): Promise<MessageDTO | null> {
       try {
         const res = await api.post<SendMessageResponse>(`/messages/conversations/${recipientProfileId}`, { content })
 
@@ -167,7 +169,7 @@ export const useMessageStore = defineStore('message', {
           if (this.activeConversation?.conversationId === conversation.conversationId) {
             this.messages.push(message)
           }
-          return res.data.conversation
+          return message
         }
       } catch (error) {
         console.error('Failed to send message:', error)

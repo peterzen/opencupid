@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { type MessageInConversation } from '@zod/messaging/messaging.dto'
+import { type MessageDTO } from '@zod/messaging/messaging.dto'
 import { nextTick, onMounted, ref, watch } from 'vue'
 
-const props = defineProps<{ messages: MessageInConversation[] }>()
+const props = defineProps<{ messages: MessageDTO[] }>()
 
 const messageListRef = ref<HTMLElement | null>(null)
 
