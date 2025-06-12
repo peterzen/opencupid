@@ -4,6 +4,8 @@ import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
+import { VitePWA } from 'vite-plugin-pwa'
+
 import Components from 'unplugin-vue-components/vite'
 import { BootstrapVueNextResolver } from 'bootstrap-vue-next'
 import svgLoader from 'vite-svg-loader'
@@ -66,6 +68,14 @@ export default defineConfig(({ mode }) => {
           )
         },
       },
+      // TODO enable PWA when ready
+      // VitePWA({
+      //   registerType: 'autoUpdate',
+      //   workbox: {
+      //     clientsClaim: true,
+      //     skipWaiting: true
+      //   }
+      // })
     ],
     css: {
       preprocessorOptions: {
