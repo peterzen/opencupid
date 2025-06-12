@@ -4,7 +4,7 @@ import { ConfigEnv, defineConfig, loadEnv, UserConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
-// import { VitePWA } from 'vite-plugin-pwa'
+import { VitePWA } from 'vite-plugin-pwa'
 
 import Components from 'unplugin-vue-components/vite'
 import { BootstrapVueNextResolver } from 'bootstrap-vue-next'
@@ -71,23 +71,18 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
           )
         },
       },
-      {
-        name: 'serve-static-images',
-        configureServer(server) {
-          server.middlewares.use(
-            '/images',
-            serveStatic(path.resolve(__dirname, rootEnv.MEDIA_UPLOAD_DIR)),
-          )
-        },
-      },
 
-      // TODO enable PWA when ready
       // VitePWA({
       //   registerType: 'autoUpdate',
+      //   injectRegister: 'auto',
       //   workbox: {
       //     clientsClaim: true,
-      //     skipWaiting: true
-      //   }
+      //     skipWaiting: true,
+      //     maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
+      //   },
+      //   devOptions: {
+      //     enabled: true, 
+      //   },
       // })
     ],
     css: {

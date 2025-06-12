@@ -28,5 +28,8 @@ export const configSchema = z.object({
 
   SMS_API_KEY: z.string(),
 
-  ALTCHA_HMAC_KEY: z.string().uuid()
+  ALTCHA_HMAC_KEY: z.string().uuid(),
+
+  VAPID_PUBLIC_KEY: z.string().min(10),
+  VAPID_PRIVATE_KEY: z.string().min(10),
 })

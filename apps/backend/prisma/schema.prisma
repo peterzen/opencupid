@@ -166,6 +166,8 @@ model User {
 
   requestsSent     ConnectionRequest[] @relation("RequestsSent")
   requestsReceived ConnectionRequest[] @relation("RequestsReceived")
+
+  pushSubscription PushSubscription[]
 }
 
 model Profile {
@@ -284,4 +286,20 @@ model Message {
   senderId       String
   content        String
   createdAt      DateTime     @default(now())
+}
+
+model PushSubscription {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  endpoint String @unique
+  p256dh   String
+  auth     String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  deviceInfo String? // optional: "Firefox", "Chrome", etc.
+  lastSeen   DateTime?
 }

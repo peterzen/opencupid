@@ -4,9 +4,10 @@ import LoadingComponent from '@/components/LoadingComponent.vue'
 import LogoutButton from '@/components/nav/LogoutButton.vue'
 import { useAuthStore } from '@/store/authStore'
 import { type LoginUser } from '@zod/user/user.types'
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useColorMode } from 'bootstrap-vue-next'
 import { useLocalStore } from '@/store/localStore'
+import { useMessageStore } from '@/store/messageStore'
 
 const authStore = useAuthStore()
 
@@ -39,6 +40,11 @@ onMounted(async () => {
   }
   isLoading.value = false
 })
+
+const wsConnected = computed(() => {
+  return !!useMessageStore().socket
+})
+const messageStore = useMessageStore()
 </script>
 
 <template>
@@ -61,6 +67,21 @@ onMounted(async () => {
 
     <div class="mb-3">
       <button class="btn btn-secondary" @click="changeColor">Toggle night or day</button>
+    </div>
+
+    <div class="mb-3">
+      <PushPermissions />
+    </div>
+
+    <div class="mb-3">
+      <h5>WS</h5>
+      <BFormCheckbox v-model="messageStore.enableReconnect">Enable reconnect</BFormCheckbox>
+      <BButton class="btn btn-secondary" :pressed="wsConnected" @click="messageStore.connectWebSocket(authStore.jwt)"
+        >Connect</BButton
+      >
+      <BButton class="btn btn-secondary" @click="messageStore.disconnectWebSocket()"
+        >Disconnect</BButton
+      >
     </div>
   </div>
 </template>

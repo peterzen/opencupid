@@ -2,6 +2,8 @@ import type WebSocket from 'ws'
 import { FastifyPluginAsync } from 'fastify'
 import { sendError } from '../helpers'
 import { MessageService } from '@/services/messaging.service'
+import { WebPushService } from '@/services/webpush.service'
+
 import { z } from 'zod'
 import {
   mapConversationParticipantToSummary,
@@ -14,7 +16,6 @@ import type {
   ConversationResponse,
   SendMessageResponse,
 } from '@shared/dto/apiResponse.dto'
-import { profile } from 'console'
 
 // Route params for ID lookups
 const IdLookupParamsSchema = z.object({
@@ -25,7 +26,7 @@ const SendMessageBodySchema = z.object({
   content: z.string().min(1),
 })
 
-export function broadcastToProfile(
+function broadcastToProfile(
   fastify: any,
   recipientProfileId: string,
   payload: Record<string, any>
@@ -33,17 +34,22 @@ export function broadcastToProfile(
   const sockets = fastify.connections?.get(recipientProfileId)
   if (!sockets || sockets.size === 0) {
     fastify.log.warn(`No active WebSocket connections for recipient ${recipientProfileId}`)
-    return
+    return false
   }
   sockets.forEach((socket: WebSocket) => {
     if (socket?.readyState === socket.OPEN) {
       socket.send(JSON.stringify(payload))
     }
   })
+  return true
 }
+
+
+
 
 const messageRoutes: FastifyPluginAsync = async fastify => {
   const messageService = MessageService.getInstance()
+  const webPushService = WebPushService.getInstance()
 
   fastify.get('/:id', { onRequest: [fastify.authenticate] }, async (req, reply) => {
     const profileId = req.session.profileId
@@ -144,10 +150,12 @@ const messageRoutes: FastifyPluginAsync = async fastify => {
     reply.code(200).send(response)
 
     // Broadcast the new message to the recipient's WebSocket connections
-    broadcastToProfile(fastify, recipientProfileId, {
+    const ok = broadcastToProfile(fastify, recipientProfileId, {
       type: 'new_message',
       payload: messageDTO,
     })
+
+      webPushService.send(messageDTO)
   })
 }
 

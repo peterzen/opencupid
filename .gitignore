@@ -30,3 +30,4 @@ turbo/
 .turbo/
 
 apps/backend/prisma/migrations/
+apps/frontend/dev-dist/

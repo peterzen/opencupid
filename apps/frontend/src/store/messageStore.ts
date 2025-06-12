@@ -21,6 +21,7 @@ export const useMessageStore = defineStore('message', {
     activeConversation: null as ConversationSummary | null,
     hasUnreadMessages: false,
     unreadCount: 0,
+    enableReconnect: true,
     socket: null as any, // TODO find out why UseWebSocketReturn<any> gives TS errors
   }),
 
@@ -42,8 +43,10 @@ export const useMessageStore = defineStore('message', {
       socket.ws.value?.addEventListener('message', this.wsMessageHandler)
 
       socket.ws.value?.addEventListener('close', event => {
-        console.warn('WS closed. Reconnecting in 5s...')
-        setTimeout(() => this.connectWebSocket(token), 5000)
+        if (this.enableReconnect) {
+          console.warn('WS closed. Reconnecting in 5s...')
+          setTimeout(() => this.connectWebSocket(token), 5000)
+        }
       })
 
       console.log('WebSocket connected:', socket.ws.value)

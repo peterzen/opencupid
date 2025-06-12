@@ -1,5 +1,19 @@
 import '@/css'
 
+// @ts-expect-error: virtual:pwa-register is a Vite virtual module
+// import { registerSW } from 'virtual:pwa-register'
+
+// const updateSW = registerSW({
+//   immediate: true,
+//   onNeedRefresh() {
+//     // Show "new version available" prompt
+//   },
+//   onOfflineReady() {
+//     // Show "app is ready offline" message
+//   },
+// })
+
+
 import { Settings } from 'luxon'
 Settings.defaultZone = 'Europe/Berlin'
 
