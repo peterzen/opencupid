@@ -66,7 +66,7 @@ declare module 'vue' {
     TagSelectComponent: typeof import('./src/components/profiles/TagSelectComponent.vue')['default']
     ToggleSwitch: typeof import('./src/components/ToggleSwitch.vue')['default']
   }
-  export interface ComponentCustomProperties {
+  export interface GlobalDirectives {
     vBToggle: typeof import('bootstrap-vue-next/directives/BToggle')['vBToggle']
   }
 }

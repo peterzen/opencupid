@@ -1,18 +1,20 @@
 import fs from 'fs'
 import path from 'path'
-import { defineConfig, loadEnv } from 'vite'
+import { ConfigEnv, defineConfig, loadEnv, UserConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
-import { VitePWA } from 'vite-plugin-pwa'
+// import { VitePWA } from 'vite-plugin-pwa'
 
 import Components from 'unplugin-vue-components/vite'
 import { BootstrapVueNextResolver } from 'bootstrap-vue-next'
 import svgLoader from 'vite-svg-loader'
 import serveStatic from 'serve-static'
 
+
+
 // https://vite.dev/config/
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
   const rootEnv = loadEnv(mode, '../../', '')
   return {
     envDir: '../../',
@@ -23,6 +25,7 @@ export default defineConfig(({ mode }) => {
         IMAGE_URL_BASE: rootEnv.IMAGE_URL_BASE,
         FRONTEND_URL: rootEnv.FRONTEND_URL,
         NODE_ENV: rootEnv.NODE_ENV,
+        VAPID_PUBLIC_KEY: rootEnv.VAPID_PUBLIC_KEY,
       }),
     },
     server: {
@@ -68,6 +71,16 @@ export default defineConfig(({ mode }) => {
           )
         },
       },
+      {
+        name: 'serve-static-images',
+        configureServer(server) {
+          server.middlewares.use(
+            '/images',
+            serveStatic(path.resolve(__dirname, rootEnv.MEDIA_UPLOAD_DIR)),
+          )
+        },
+      },
+
       // TODO enable PWA when ready
       // VitePWA({
       //   registerType: 'autoUpdate',
