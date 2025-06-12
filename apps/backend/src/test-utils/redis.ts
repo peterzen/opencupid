@@ -2,20 +2,21 @@ export class MockRedis {
   hashes: Record<string, Record<string, string>> = {}
   sets: Record<string, Set<string>> = {}
   multi() {
+    const self = this
     return {
       hset(key: string, ...args: any[]) {
-        this.hset(key, ...args)
+        self.hset(key, ...args)
         return this
       },
       expire(_key: string, _ttl: number) {
         return this
       },
       sadd(key: string, ...vals: string[]) {
-        this.sadd(key, ...vals)
+        self.sadd(key, ...vals)
         return this
       },
       del(key: string) {
-        this.del(key)
+        self.del(key)
         return this
       },
       exec() {
