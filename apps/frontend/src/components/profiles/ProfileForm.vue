@@ -10,7 +10,7 @@ import type { PublicTag } from '@zod/dto/tag.dto'
 import Multiselect from 'vue-multiselect'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import TagSelectComponent from '@/components/profiles/TagSelectComponent.vue'
-import ImageEditor from './ImageEditor.vue'
+import ImageEditor from './image/ImageEditor.vue'
 import LocationSelectorComponent from './LocationSelectorComponent.vue'
 
 // Props & Emits

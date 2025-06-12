@@ -8,11 +8,13 @@ import { useProfileStore } from '@/store/profileStore'
 import type { UpdatedProfileImageFragment, OwnerProfile } from '@zod/profile/profile.dto'
 import { type OwnerProfileImage } from '@zod/profile/profileimage.dto'
 
-import ImageUpload from '@/components/profiles/ImageUpload.vue'
-import LoadingComponent from '@/components/LoadingComponent.vue'
-import ProfileImageComponent from '@/components/profiles/image/ImageTag.vue'
+import ImageUpload from './ImageUpload.vue'
+import ImageTag from './ImageTag.vue'
+import ProfileImage from './ProfileImage.vue'
 
-import HelpScribble from './HelpScribble.vue'
+import LoadingComponent from '@/components/LoadingComponent.vue'
+import HelpScribble from '../HelpScribble.vue'
+
 const profileStore = useProfileStore()
 
 const isLoading = ref(false)
@@ -91,7 +93,9 @@ function checkMove(evt: any) {
     <div v-else>
       <div class="row">
         <div class="col-sm-6 mb-3" v-if="formData.profileImages && formData.profileImages.length">
-          <ProfileImageComponent :image="formData.profileImages[0]" />
+          <div class="ratio ratio-1x1">
+            <ProfileImage :profile="modelValue"/>
+            </div>  
         </div>
         <div class="col-sm-6">
           <div
@@ -128,7 +132,7 @@ function checkMove(evt: any) {
                 </div>
                 <div :class="{ removing: isRemoving[img.id] }">
                   <div class="ratio ratio-1x1">
-                    <ProfileImageComponent :image="img" />
+                    <ImageTag :image="img" />
                   </div>
                 </div>
               </div>

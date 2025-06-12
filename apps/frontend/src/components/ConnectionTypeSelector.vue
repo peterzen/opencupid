@@ -81,7 +81,7 @@ const emit = defineEmits<{
 .svg-icon-lg {
   width: 4rem;
   height: 4rem;
-  fill: #fff;
+  fill: var(--bs-secondary);
   // stroke: white;
 }
 </style>

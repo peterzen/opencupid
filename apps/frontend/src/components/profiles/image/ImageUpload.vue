@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
 
-import AvatarUploadIcon from '@/assets/icons/files/avatar-upload.svg'
+import { detectMobile } from '@/lib/mobile-detect'
+
 import type { UpdatedProfileImageFragment, OwnerProfile } from '@zod/profile/profile.dto'
 import LoadingComponent from '@/components/LoadingComponent.vue'
+import UploadButton from './UploadButton.vue'
+import AvatarUploadIcon from '@/assets/icons/files/avatar-upload.svg'
 
 const profileStore = useProfileStore()
 
@@ -16,6 +19,7 @@ const error = ref<string | null>('')
 const fileInput = ref<HTMLInputElement>()
 const modalOpen = ref(false)
 const captionText = ref<string>('')
+const showCaptureChooser = ref(true)
 
 // Emitters
 const emit = defineEmits<{
@@ -23,6 +27,9 @@ const emit = defineEmits<{
   (e: 'image:deleted', payload: { id: string }): void
   (e: 'update:modelValue', value: OwnerProfile): void
 }>()
+
+
+
 
 /**
  * Handle file selection: set preview and keep file
@@ -43,6 +50,9 @@ function handleFileChange(event: Event) {
   modalOpen.value = true
 }
 
+const isMobile = computed(() => {
+  return detectMobile()
+})
 /**
  * Upload the selected file
  */
@@ -63,12 +73,16 @@ async function handleUpload() {
   emit('image:uploaded', updatedProfile)
 
   // Clear after upload
+  showCaptureChooser.value = false
   preview.value = null
   selectedFile.value = null
   if (fileInput.value) fileInput.value.value = ''
 
   isLoading.value = false
   modalOpen.value = false
+  setTimeout(() => {
+    showCaptureChooser.value = true
+  }, 500) // Delay to ensure modal closes before updating
 }
 
 /**
@@ -85,29 +99,12 @@ async function handleRemovePreview() {
 </script>
 
 <template>
-  <div class="image-upload">
-    <FormKit
-      ref="fileInput"
-      type="file"
-      accept=".jpg,.jpeg,.png,.gif"
-      @change="handleFileChange"
-      help=""
-      id="image-upload-input"
-      capture="user"
-      floating-label="false"
-      :file-remove="false"
-      :file-remove-icon="false"
-      label="Add profile photo"
-      label-class="btn btn-primary"
-      inner-class="$reset d-none"
-      :multiple="false"
-    >
-      <template #label>
-        <label class="formkit-label file-upload-label btn btn-secondary" for="image-upload-input">
-          <AvatarUploadIcon />
-        </label>
-      </template>
-    </FormKit>
+  <div class="image-upload h-100">
+    <BButton v-if="isMobile" variant="secondary" class="w-100 h-100" @click="modalOpen = true">
+      <AvatarUploadIcon class="svg-icon" />
+    </BButton>
+    <UploadButton v-else @file:change="handleFileChange" :genericIcon="true" />
+
     <div v-if="error" class="text-danger mt-2">
       {{ error }}
     </div>
@@ -137,7 +134,7 @@ async function handleRemovePreview() {
           />
         </div>
       </div>
-      <div class="mb-3">
+      <!-- <div class="mb-3">
         <FormKit
           type="textarea"
           input-class="form-control-sm"
@@ -152,25 +149,34 @@ async function handleRemovePreview() {
             max: 'Name must be less than 50 characters long',
           }"
         />
-      </div>
+      </div> -->
       <ErrorComponent :error="error" />
-      <div class="mb-3 justify-content-end d-flex gap-2">
-        <FormKit
-          type="button"
-          wrapper-class=""
-          input-class="btn btn-outline-secondary btn-sm"
-          label="Nevermind"
-          @click.prevent="handleRemovePreview"
-        />
+      <div class="mb-3 justify-content-center d-flex flex-column gap-2 align-items-center">
 
         <FormKit
           type="button"
           wrapper-class=""
-          input-class="btn btn-primary btn-sm"
-          label="Save"
+          input-class="btn btn-primary btn-lg mb-3"
+          label="Looks good!"
           :disabled="isLoading"
           @click.prevent="handleUpload"
         />
+        <a href="#" @click.prevent="handleRemovePreview" class="text-secondary link-underline  link-underline-opacity-0">Nevermind</a>
+      </div>
+    </div>
+    <div
+      v-else-if="showCaptureChooser"
+      class="d-flex flex-column align-items-center h-100 justify-content-center"
+    >
+      <div class="w-50 mx-auto d-flex flex-column align-items-center">
+        <div class="mb-4">
+          <UploadButton @file:change="handleFileChange" :key="'capture-user'" />
+          <div class="mt-2 text-muted">Add a photo from your phone</div>
+        </div>
+        <div>
+          <UploadButton @file:change="handleFileChange" capture="user" :key="'capture-none'" />
+          <div class="mt-2 text-muted">Or take a photo with your camera</div>
+        </div>
       </div>
     </div>
   </BModal>
@@ -183,11 +189,19 @@ async function handleRemovePreview() {
   .formkit-inner {
     display: none;
   }
+  > div {
+    height: 100%;
+    > .formkit-wrapper {
+      width: 100% !important;
+      .formkit-label {
+        height: 100%;
+      }
+    }
+  }
 }
 
 .file-upload-label {
   width: 100%;
-
   svg {
     width: 100%;
     height: 100%;
@@ -211,5 +225,9 @@ img {
   transform: translate(-50%, -50%);
   width: 2rem;
   height: 2rem;
+}
+.svg-icon {
+  width: 4rem;
+  height: 4rem;
 }
 </style>

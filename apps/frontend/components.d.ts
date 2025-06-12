@@ -39,9 +39,9 @@ declare module 'vue' {
     IconEcosystem: typeof import('./src/components/icons/IconEcosystem.vue')['default']
     IconSupport: typeof import('./src/components/icons/IconSupport.vue')['default']
     IconTooling: typeof import('./src/components/icons/IconTooling.vue')['default']
-    ImageEditor: typeof import('./src/components/profiles/ImageEditor.vue')['default']
+    ImageEditor: typeof import('./src/components/profiles/image/ImageEditor.vue')['default']
     ImageTag: typeof import('./src/components/profiles/image/ImageTag.vue')['default']
-    ImageUpload: typeof import('./src/components/profiles/ImageUpload.vue')['default']
+    ImageUpload: typeof import('./src/components/profiles/image/ImageUpload.vue')['default']
     LoadingComponent: typeof import('./src/components/LoadingComponent.vue')['default']
     LocationSelectorComponent: typeof import('./src/components/profiles/LocationSelectorComponent.vue')['default']
     LoginConfirmComponent: typeof import('./src/components/auth/LoginConfirmComponent.vue')['default']
@@ -67,6 +67,7 @@ declare module 'vue' {
     SubmitButtonComponent: typeof import('./src/components/SubmitButtonComponent.vue')['default']
     TagSelectComponent: typeof import('./src/components/profiles/TagSelectComponent.vue')['default']
     ToggleSwitch: typeof import('./src/components/ToggleSwitch.vue')['default']
+    UploadButton: typeof import('./src/components/profiles/image/UploadButton.vue')['default']
   }
   export interface GlobalDirectives {
     vBToggle: typeof import('bootstrap-vue-next/directives/BToggle')['vBToggle']

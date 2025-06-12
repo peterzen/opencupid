@@ -64,6 +64,10 @@ onMounted(async () => {
     isActive: true,
   })
   state.isLoading = false
+
+     setTimeout(() => {
+      window.scrollTo(0, 1)
+    }, 100) // small delay gives better results
 })
 </script>
 
