@@ -10,17 +10,19 @@ import type {
   ConversationsResponse,
   ConversationResponse,
   SendMessageResponse,
+  InitiateConversationResponse,
 } from '@shared/dto/apiResponse.dto'
 
 
 
 export const useMessageStore = defineStore('message', {
   state: () => ({
+    token: null as string | null,
+    profileId: null as string | null,
     conversations: [] as ConversationSummary[],
     messages: [] as MessageDTO[],
     activeConversation: null as ConversationSummary | null,
     hasUnreadMessages: false,
-    unreadCount: 0,
     enableReconnect: true,
     socket: null as any, // TODO find out why UseWebSocketReturn<any> gives TS errors
   }),
@@ -80,32 +82,31 @@ export const useMessageStore = defineStore('message', {
         })
     },
 
-    wsMessageHandler(event: MessageEvent) {
+    async wsMessageHandler(event: MessageEvent) {
       const data = JSON.parse(event.data)
       // console.log('WebSocket message received:', data)
       if (data.type === 'new_message') {
         const message: MessageDTO = data.payload
-        console.log('New message received:', message)
+        console.log('New message received:', message, data.payload.senderId, this.profileId)
         // Update conversation summary (and bump it to top)
         const convoIndex = this.conversations.findIndex(c => c.conversationId === message.conversationId)
 
-        if (convoIndex !== -1) {
+        if (convoIndex === -1) {
+          await this.fetchConversations() // Fetch conversations if not found
+        } else {
           const [convo] = this.conversations.splice(convoIndex, 1)
           // Update last message and unread count
           const updatedConvo: ConversationSummary = {
             ...convo,
             lastMessage: message,
-            unreadCount: convo.unreadCount + 1, // Increment unread count
           }
           this.conversations.unshift(updatedConvo)
+          this.updateUnreadFlag()
         }
-        this.updateUnreadFlag()
-
         // If this is the active conversation, append to visible messages
         if (this.activeConversation?.conversationId === message.conversationId) {
           this.messages.push(message)
         } else {
-          this.unreadCount++
           bus.emit('message:received', { message })
         }
       }
@@ -155,12 +156,26 @@ export const useMessageStore = defineStore('message', {
       // await this.fetchUnreadCount()
     },
 
-    async sendMessage(
+    async initiateConversation(
       recipientProfileId: string,
+      content: string
+    ): Promise<boolean> {
+      try {
+        const res = await api.post<InitiateConversationResponse>(`/messages/conversations/initiate`, { profileId: recipientProfileId, content })
+        return res.data.success
+      } catch (error:any) {
+        console.error('Failed to send message:', error.message)
+      }
+      return false
+    },
+
+
+    async sendMessage(
+      conversationId: string,
       content: string
     ): Promise<MessageDTO | null> {
       try {
-        const res = await api.post<SendMessageResponse>(`/messages/conversations/${recipientProfileId}`, { content })
+        const res = await api.post<SendMessageResponse>(`/messages/conversations/${conversationId}`, { content })
 
         if (res.data.success) {
           const { conversation, message } = res.data
@@ -196,12 +211,19 @@ export const useMessageStore = defineStore('message', {
         this.activeConversation = null
         this.messages = []
       }
+    },
+
+    async initialize(token: string, profileId: string) {
+      this.token = token
+      this.profileId = profileId
+      this.connectWebSocket(token)
+      await this.fetchConversations()
     }
   },
 })
 
-bus.on('auth:login', ({ token }) => {
-  useMessageStore().connectWebSocket(token)
+bus.on('auth:login', async ({ token, userInfo }) => {
+  await useMessageStore().initialize(token, userInfo.profileId)
 })
 
 bus.on('auth:logout', () => {

@@ -9,18 +9,6 @@ import LoadingComponent from '@/components/LoadingComponent.vue'
 import UploadButton from './UploadButton.vue'
 import AvatarUploadIcon from '@/assets/icons/files/avatar-upload.svg'
 
-const profileStore = useProfileStore()
-
-// State
-const preview = ref<string | null>(null)
-const selectedFile = ref<File | null>(null)
-const isLoading = ref(false)
-const error = ref<string | null>('')
-const fileInput = ref<HTMLInputElement>()
-const modalOpen = ref(false)
-const captionText = ref<string>('')
-const showCaptureChooser = ref(true)
-
 // Emitters
 const emit = defineEmits<{
   (e: 'image:uploaded', payload: UpdatedProfileImageFragment): void
@@ -28,31 +16,38 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: OwnerProfile): void
 }>()
 
+const profileStore = useProfileStore()
 
+// State
+const preview = ref<string | null>(null)
+const selectedFile = ref<File | null>(null)
+const isLoading = ref(false)
+const error = ref<string | null>('')
 
+const fileInput = ref<HTMLInputElement>()
+const captionText = ref<string>('')
 
-/**
- * Handle file selection: set preview and keep file
- */
-function handleFileChange(event: Event) {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0] ?? null
-  selectedFile.value = file
-  if (!file) {
-    preview.value = null
-    return
-  }
-  const reader = new FileReader()
-  reader.onload = () => {
-    preview.value = typeof reader.result === 'string' ? reader.result : null
-  }
-  reader.readAsDataURL(file)
-  modalOpen.value = true
-}
+const showModal = ref(false)
+const showCaptureChooser = ref(true)
 
 const isMobile = computed(() => {
   return detectMobile()
 })
+
+function openModal() {
+  showCaptureChooser.value = true
+  showModal.value = true
+}
+
+function closeModal() {
+  showCaptureChooser.value = true
+  showModal.value = false
+  preview.value = null
+  selectedFile.value = null
+  isLoading.value = false
+  if (fileInput.value) fileInput.value.value = ''
+}
+
 /**
  * Upload the selected file
  */
@@ -72,36 +67,38 @@ async function handleUpload() {
   const updatedProfile = res.profile
   emit('image:uploaded', updatedProfile)
 
-  // Clear after upload
-  showCaptureChooser.value = false
-  preview.value = null
-  selectedFile.value = null
-  if (fileInput.value) fileInput.value.value = ''
+  closeModal()
 
-  isLoading.value = false
-  modalOpen.value = false
-  setTimeout(() => {
-    showCaptureChooser.value = true
-  }, 500) // Delay to ensure modal closes before updating
+  // setTimeout(() => {
+  //   showCaptureChooser.value = true
+  // }, 500) // Delay to ensure modal closes before updating
 }
 
 /**
- * Remove preview and reset state
+ * Handle file selection: set preview and keep file
  */
-async function handleRemovePreview() {
-  preview.value = null
-  selectedFile.value = null
-  if (fileInput.value) {
-    fileInput.value.value = ''
+function handleFileChange(event: Event) {
+  showCaptureChooser.value = false
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0] ?? null
+  selectedFile.value = file
+  if (!file) {
+    preview.value = null
+    return
   }
-  modalOpen.value = false
+  const reader = new FileReader()
+  reader.onload = () => {
+    preview.value = typeof reader.result === 'string' ? reader.result : null
+  }
+  reader.readAsDataURL(file)
+  showModal.value = true
 }
 </script>
 
 <template>
   <div class="image-upload h-100">
-    <BButton v-if="isMobile" variant="secondary" class="w-100 h-100" @click="modalOpen = true">
-      <AvatarUploadIcon class="svg-icon" />
+    <BButton v-if="isMobile" variant="secondary" class="w-100 h-100" @click="openModal">
+      <AvatarUploadIcon class="svg-icon w-100 h-100" />
     </BButton>
     <UploadButton v-else @file:change="handleFileChange" :genericIcon="true" />
 
@@ -110,7 +107,7 @@ async function handleRemovePreview() {
     </div>
   </div>
   <BModal
-    v-model="modalOpen"
+    v-model="showModal"
     centered
     button-size="sm"
     :focus="false"
@@ -152,7 +149,6 @@ async function handleRemovePreview() {
       </div> -->
       <ErrorComponent :error="error" />
       <div class="mb-3 justify-content-center d-flex flex-column gap-2 align-items-center">
-
         <FormKit
           type="button"
           wrapper-class=""
@@ -161,52 +157,42 @@ async function handleRemovePreview() {
           :disabled="isLoading"
           @click.prevent="handleUpload"
         />
-        <a href="#" @click.prevent="handleRemovePreview" class="text-secondary link-underline  link-underline-opacity-0">Nevermind</a>
+        <a
+          href="#"
+          @click.prevent="closeModal"
+          class="text-secondary link-underline link-underline-opacity-0"
+          >Nevermind</a
+        >
       </div>
     </div>
     <div
-      v-else-if="showCaptureChooser"
+      v-if="showCaptureChooser"
       class="d-flex flex-column align-items-center h-100 justify-content-center"
     >
       <div class="w-50 mx-auto d-flex flex-column align-items-center">
         <div class="mb-4">
-          <UploadButton @file:change="handleFileChange" :key="'capture-user'" />
+          <UploadButton @file:change="handleFileChange" :key="'capture-none'" />
           <div class="mt-2 text-muted">Add a photo from your phone</div>
         </div>
-        <div>
-          <UploadButton @file:change="handleFileChange" capture="user" :key="'capture-none'" />
+        <div class="mb-3">
+          <UploadButton @file:change="handleFileChange" capture="user" :key="'capture-user'" />
           <div class="mt-2 text-muted">Or take a photo with your camera</div>
+        </div>
+        <div>
+          <a
+            href="#"
+            @click.prevent="closeModal"
+            class="text-secondary link-underline link-underline-opacity-0"
+            >Nevermind</a
+          >
         </div>
       </div>
     </div>
   </BModal>
 </template>
 
-<style lang="scss">
-.image-upload {
-  .formkit-no-files,
-  .formkit-file-list,
-  .formkit-inner {
-    display: none;
-  }
-  > div {
-    height: 100%;
-    > .formkit-wrapper {
-      width: 100% !important;
-      .formkit-label {
-        height: 100%;
-      }
-    }
-  }
-}
+<style lang="scss" scoped>
 
-.file-upload-label {
-  width: 100%;
-  svg {
-    width: 100%;
-    height: 100%;
-  }
-}
 
 img {
   object-fit: cover;
@@ -225,9 +211,5 @@ img {
   transform: translate(-50%, -50%);
   width: 2rem;
   height: 2rem;
-}
-.svg-icon {
-  width: 4rem;
-  height: 4rem;
 }
 </style>

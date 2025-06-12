@@ -8,6 +8,7 @@ import MessageList from '@/components/messaging/MessageList.vue'
 
 import router from '@/router'
 import MessagingNav from '../components/messaging/MessagingNav.vue'
+import { type ProfileSummary } from '@zod/profile/profile.dto'
 
 const messageStore = useMessageStore()
 
@@ -21,6 +22,10 @@ const showModal = ref(false)
 
 const recipient = computed(() => {
   return messageStore.activeConversation?.partnerProfile || null
+})
+
+const convoId = computed(() => {
+  return messageStore.activeConversation?.conversationId || null
 })
 
 // Watch for changes in conversationId router prop so we can update
@@ -68,16 +73,21 @@ async function handleDeselectConvo() {
   router.push({ name: 'Messaging' })
   await messageStore.setActiveConversation(null)
 }
+
+function handleProfileSelect(profile: ProfileSummary) {
+  console.log('Profile selected:', profile)
+  router.push({ name: 'PublicProfile', params: { id: profile.id } })
+}
 </script>
 
 <template>
-  <div class="flex-grow-1 d-flex flex-row overflow-hidden">
+  <main class="flex-grow-1 d-flex flex-row overflow-hidden">
     <div
       class="col-12 col-md-3 d-md-block"
       :class="{ 'd-none': recipient }"
       id="conversations-list"
     >
-      <div class="mt-3 mx-3">
+      <div class="mx-3">
         <ConversationSummaries
           :conversations="messageStore.conversations"
           :activeConversation="messageStore.activeConversation"
@@ -93,14 +103,15 @@ async function handleDeselectConvo() {
       <MessagingNav
         :recipient="recipient"
         @deselect:convo="handleDeselectConvo"
+        @profile:select="handleProfileSelect"
         @modal:open="showModal = true"
       />
 
       <div class="flex-grow-1 overflow-hidden d-flex flex-column">
         <MessageList :messages="messageStore.messages" />
       </div>
-      <div class="d-flex align-items-center w-100 mb-5 py-2 px-2">
-        <SendMessage :recipientProfile="recipient" v-if="recipient" />
+      <div class="d-flex align-items-center w-100 py-2 px-2">
+        <SendMessage :recipientProfile="recipient" :conversationId="convoId" v-if="recipient" />
       </div>
     </div>
 
@@ -124,8 +135,6 @@ async function handleDeselectConvo() {
         <h4>Block/report/unmatch</h4>
       </div>
     </BModal>
-  </div>
+  </main>
 </template>
-<style scoped>
-
-</style>
+<style scoped></style>

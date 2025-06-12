@@ -72,7 +72,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="container mb-5 mt-3">
+  <main class="container mb-5 mt-3">
     <div class="row justify-content-center">
       <ConnectionTypeSelector
         :isDatingActive="!!profile.isDatingActive"
@@ -106,5 +106,5 @@ onMounted(async () => {
       </div>
     </div>
     <ErrorComponent :error="state.error" />
-  </div>
+  </main>
 </template>

@@ -18,6 +18,7 @@ export const useAuthStore = defineStore('auth', {
     session: null as SessionData | null,
     userId: null as string | null,
     email: null as string | null,
+    profileId: null as string | null,
     isInitialized: false,
     hasActiveProfile: false as boolean,
   }),
@@ -39,8 +40,9 @@ export const useAuthStore = defineStore('auth', {
       try {
         const payload = JSON.parse(atob(token.split('.')[1])) as JwtPayload
         this.userId = payload.userId
+        this.profileId = payload.profileId
         // Notify messageStore
-        bus.emit('auth:login', { token: this.jwt })
+        bus.emit('auth:login', { token: this.jwt, userInfo: payload })
       } catch (e) {
         console.warn('Failed to parse JWT payload:', e)
         this.userId = null

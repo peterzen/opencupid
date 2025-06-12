@@ -15,6 +15,7 @@ import type {
   ConversationsResponse,
   ConversationResponse,
   SendMessageResponse,
+  InitiateConversationResponse,
 } from '@shared/dto/apiResponse.dto'
 
 // Route params for ID lookups
@@ -22,7 +23,12 @@ const IdLookupParamsSchema = z.object({
   id: z.string().cuid(),
 })
 
-const SendMessageBodySchema = z.object({
+const ReplyToConversationParamsSchema = z.object({
+  content: z.string().min(1),
+})
+
+const InitiateConversationParamsSchema = z.object({
+  profileId: z.string().cuid(),
   content: z.string().min(1),
 })
 
@@ -115,47 +121,86 @@ const messageRoutes: FastifyPluginAsync = async fastify => {
   })
 
   /**
-   * Send a message to a conversation.  If the conversation between the specified recipient, and
-   * the sender ID does not exist, it will be created.
-   * @param :id - recipient profile ID
+  * Initiates a conversation.  
+  * @param :id - recipient profile ID
+  */
+  fastify.post('/conversations/initiate', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+
+    const senderProfileId = req.session.profileId
+    if (!senderProfileId) return sendError(reply, 401, 'Sender ID not found.')
+
+    const body = InitiateConversationParamsSchema.safeParse(req.body)
+    if (!body.success) return sendError(reply, 401, 'Invalid parameters')
+
+    const { profileId, content } = body.data
+
+    try {
+      const { conversation, message } = await messageService.initiateConversation(
+        senderProfileId,
+        profileId,
+        content
+      )
+      const messageDTO = mapMessageDTO(message, conversation)
+
+      const response: InitiateConversationResponse = {
+        success: true,
+      }
+
+      reply.code(200).send(response)
+
+      // Broadcast the new message to the recipient's WebSocket connections
+      const ok = broadcastToProfile(fastify, profileId, {
+        type: 'new_message',
+        payload: messageDTO,
+      })
+
+      webPushService.send(messageDTO)
+
+    } catch (error: any) {
+      return sendError(reply, 403, error)
+    }
+
+  })
+
+  /**
+   * Send a message to an existing conversation.  
+   * @param :id - conversation ID
    */
   fastify.post('/conversations/:id', { onRequest: [fastify.authenticate] }, async (req, reply) => {
     const senderProfileId = req.session.profileId
     if (!senderProfileId) return sendError(reply, 401, 'Sender ID not found.')
 
-    const id = IdLookupParamsSchema.safeParse(req.params)
-    if (!id.success) return sendError(reply, 404, 'Recipient ID not found')
-    const recipientProfileId = id.data.id
+    const params = IdLookupParamsSchema.safeParse(req.params)
+    if (!params.success) return sendError(reply, 401, 'Recipient ID not found')
+    const { id } = params.data
 
-    const parsed = SendMessageBodySchema.safeParse(req.body)
-    if (!parsed.success) return sendError(reply, 400, 'Invalid message body')
+    const body = ReplyToConversationParamsSchema.safeParse(req.body)
+    if (!body.success) return sendError(reply, 401, 'Invalid message body')
+    const { content } = body.data
 
-    const { content } = parsed.data
-    const { conversation: updatedConvo, message } = await messageService.sendOrStartConversation(
-      senderProfileId,
-      recipientProfileId,
-      content
-    )
-    if (!updatedConvo)
-      return sendError(reply, 404, 'Conversation not found or could not be created')
+    try {
+      const { conversation, message } = await messageService.replyInConversation(senderProfileId, id, content)
+      const messageDTO = mapMessageDTO(message, conversation)
+      const convoSummary = mapConversationParticipantToSummary(conversation, senderProfileId)
 
-    const messageDTO = mapMessageDTO(message, updatedConvo)
+      const response: SendMessageResponse = {
+        success: true,
+        conversation: convoSummary,
+        message: mapMessageForMessageList(messageDTO, senderProfileId),
+      }
 
-    const response: SendMessageResponse = {
-      success: true,
-      conversation: mapConversationParticipantToSummary(updatedConvo, senderProfileId),
-      message: mapMessageForMessageList(messageDTO, senderProfileId),
-    }
+      reply.code(200).send(response)
 
-    reply.code(200).send(response)
-
-    // Broadcast the new message to the recipient's WebSocket connections
-    const ok = broadcastToProfile(fastify, recipientProfileId, {
-      type: 'new_message',
-      payload: messageDTO,
-    })
+      // Broadcast the new message to the recipient's WebSocket connections
+      const ok = broadcastToProfile(fastify, convoSummary.partnerProfile.id, {
+        type: 'new_message',
+        payload: messageDTO,
+      })
 
       webPushService.send(messageDTO)
+    } catch (error: any) {
+      return sendError(reply, 403, 'You are not allowed to send messages to this recipient')
+    }
   })
 }
 

@@ -15,9 +15,9 @@ import { ProfileTagJoinSchema, PublicTag, PublicTagSchema } from '@zod/dto/tag.d
 import type { ProfileImage, UserRole } from '@prisma/client'
 import { ProfileTag } from '@zod/generated'
 import { appConfig } from '@shared/config/appconfig'
-import { ProfileComplete } from '@zod/profile/profile.types'
+import { OwnerProfileComplete, ProfileComplete } from '@zod/profile/profile.types'
 
-export function mapProfileToOwner(profile: ProfileComplete): OwnerProfile {
+export function mapProfileToOwner(profile: OwnerProfileComplete): OwnerProfile {
   const safe = OwnerScalarSchema.parse(profile)
 
   // Transform each image using the service
@@ -54,6 +54,7 @@ export function mapProfileToPublic(profile: ProfileComplete, roles: UserRole[]):
     ...scalars,
     profileImages: publicImages,
     tags: publicTags,
+    conversation: profile.conversationParticipants?.[0]?.conversation ?? null,
   } as PublicProfile
 }
 

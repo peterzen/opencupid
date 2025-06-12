@@ -82,18 +82,18 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
   })
 
   /**
-   * Get a profile by slug
-   * @param {string} slug - The slug of the profile to retrieve
+   * Get a profile by ID
+   * @param {string} id - The id of the profile to retrieve
    */
   fastify.get('/:id', { onRequest: [fastify.authenticate] }, async (req, reply) => {
-    if (!req.user.userId) return sendUnauthorizedError(reply)
 
+    const myProfileId = req.session.profileId
     const roles = getUserRoles(req)
 
     const { id } = IdLookupParamsSchema.parse(req.params)
 
     try {
-      const raw = await profileService.getProfileById(id)
+      const raw = await profileService.getProfileById(id, myProfileId)
       if (!raw) return sendError(reply, 404, 'Profile not found')
 
       if (raw.userId !== req.user.userId && !req.session.hasActiveProfile) {
@@ -111,13 +111,12 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
   })
 
   fastify.get('/', { onRequest: [fastify.authenticate] }, async (req, reply) => {
-    if (!req.user.userId) return sendUnauthorizedError(reply)
 
-    console.log('session', req.session)
     if (!req.session.hasActiveProfile) return sendForbiddenError(reply)
+    const myProfileId = req.session.profileId
 
     try {
-      const profiles = await profileService.findProfilesFor(req.user.userId)
+      const profiles = await profileService.findProfilesFor(myProfileId)
       const mappedProfiles = profiles.map(p => mapProfileToPublic(p, getUserRoles(req)))
       const response: GetProfilesResponse = { success: true, profiles: mappedProfiles }
       return reply.code(200).send(response)

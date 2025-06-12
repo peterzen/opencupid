@@ -1,6 +1,7 @@
-// TODO: review usage; copied for both db and dto layers
 
 import type {
+  Conversation,
+  ConversationParticipant,
   Profile,
   ProfileImage,
   ProfileTag,
@@ -18,8 +19,15 @@ export type ProfileWithTags = Profile & {
   tags: (ProfileTag & { tag: Tag })[]
 }
 
-export type ProfileComplete = ProfileWithImages & ProfileWithTags
+export type ProfileWithConversation = Profile & {
+  conversationParticipants: (ConversationParticipant & {
+    conversation: Conversation
+  })[]
+}
 
+export type ProfileComplete = ProfileWithImages & ProfileWithTags & ProfileWithConversation
+
+export type OwnerProfileComplete = ProfileWithImages & ProfileWithTags
 export interface ProfileImages {
   profileImages: { url: string | null }[];
 }

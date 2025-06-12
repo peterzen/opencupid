@@ -94,8 +94,8 @@ function checkMove(evt: any) {
       <div class="row">
         <div class="col-sm-6 mb-3" v-if="formData.profileImages && formData.profileImages.length">
           <div class="ratio ratio-1x1">
-            <ProfileImage :profile="modelValue"/>
-            </div>  
+            <ProfileImage :profile="modelValue" />
+          </div>
         </div>
         <div class="col-sm-6">
           <div
@@ -109,7 +109,7 @@ function checkMove(evt: any) {
             v-model="formData.profileImages"
             ghost-class="ghost"
             :sort="true"
-            filter="#upload-button"
+            :filter="'.nodrag'"
             :dragoverBubble="true"
             :move="checkMove"
             @change="handleReorder"
@@ -121,9 +121,10 @@ function checkMove(evt: any) {
                 class="col thumbnail"
                 :id="img.id"
               >
-                <div class="actions">
+                <div class="actions nodrag">
                   <button
-                    class="btn btn-sm rounded-circle"
+                    class="btn btn-sm  btn-secondary rounded-circle"
+                    @mousedown.stop.prevent
                     @click="handleDelete(img)"
                     :disabled="isRemoving[img.id]"
                   >
@@ -136,7 +137,7 @@ function checkMove(evt: any) {
                   </div>
                 </div>
               </div>
-              <div class="col" key="upload-button" id="upload-button">
+              <div class="col nodrag" key="upload-button" id="upload-button">
                 <ImageUpload @image:uploaded="handleUploaded" />
               </div>
             </TransitionGroup>
@@ -178,7 +179,8 @@ img {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: black;
+    
+    // background-color: black;
     // padding: 10px;
     // font-size: 0.75rem;
     // border-radius: 9999px;

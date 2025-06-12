@@ -18,33 +18,40 @@ const captureAttr = computed(() => (props.capture ? 'user' : null))
 </script>
 
 <template>
-  <FormKit
-    ref="fileInput"
-    type="file"
-    accept=".jpg,.jpeg,.png,.gif"
-    help=""
-    @change="$emit('file:change', $event)"
-    :capture="captureAttr"
-    floating-label="false"
-    :file-remove="false"
-    :file-remove-icon="false"
-    :id="'image-upload-input' + captureAttr"
-    label="Add profile photo"
-    label-class="btn btn-primary"
-    inner-class="$reset d-none"
-    :multiple="false"
-  >
-    <template #label>
-      <div class="ratio ratio-1x1">
-        <label
-          class="formkit-label file-upload-label btn btn-secondary rounded rounded-lg-5"
-          :for="'image-upload-input' + captureAttr"
-        >
-          <IconCamera2 class="svg-icon" v-if="captureAttr" />
-          <AvatarUploadIcon class="svg-icon" v-else-if="genericIcon" />
-          <IconPhoto class="svg-icon" v-else />
-        </label>
-      </div>
-    </template>
-  </FormKit>
+  <div class="image-upload-button">
+    <BFormFile
+      :id="'image-upload-input' + captureAttr"
+      accept=".jpg,.jpeg,.png,.gif"
+      ref="fileInput"
+      autofocus
+      @change="$emit('file:change', $event)"
+      :plain="true"
+      label-class="file-upload-label"
+    >
+      <template #label>
+        <div class="ratio ratio-1x1">
+          <div class="btn btn-secondary rounded rounded-lg-5 w-100 file-upload-label">
+            <IconCamera2 class="svg-icon" v-if="captureAttr" />
+            <AvatarUploadIcon class="svg-icon" v-else-if="genericIcon" />
+            <IconPhoto class="svg-icon" v-else />
+          </div>
+        </div>
+      </template>
+    </BFormFile>
+  </div>
 </template>
+
+<style lang="scss">
+.image-upload-button {
+  input {
+    display: none !important;
+  }
+  .file-upload-label {
+    width: 100%;
+  }
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+</style>

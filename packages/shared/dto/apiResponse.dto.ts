@@ -36,6 +36,9 @@ export type SendMessageResponse = ApiSuccess<{
   message: MessageDTO
 }>
 
+export type InitiateConversationResponse = ApiSuccess<{
+}>
+
 export type UserMeResponse = ApiSuccess<{ user: SettingsUser }>
 export type SendLoginLinkResponse = ApiSuccess<{ user: OtpSendReturn; status: string }>
 export type OtpLoginSuccess = ApiSuccess<{ token: string }>

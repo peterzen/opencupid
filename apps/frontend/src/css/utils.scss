@@ -1,5 +1,6 @@
-.tab-content-fixedheight > .tab-pane {
-  display: block; /* undo "display: none;" */
+.tab-content-fixedheight>.tab-pane {
+  display: block;
+  /* undo "display: none;" */
   visibility: hidden;
 }
 
@@ -7,14 +8,15 @@
   display: flex;
 }
 
-.tab-content-fixedheight > .tab-pane {
-  display: flex; /* undo "display: none;" */
+.tab-content-fixedheight>.tab-pane {
+  display: flex;
+  /* undo "display: none;" */
   visibility: hidden;
   margin-right: -100%;
   width: 100%;
 }
 
-.tab-content-fixedheight > .active {
+.tab-content-fixedheight>.active {
   visibility: visible;
 }
 
@@ -27,11 +29,13 @@
   &:hover {
     cursor: pointer;
   }
+
   user-select: none;
 }
 
 fieldset:disabled {
   opacity: 0.3;
+
   .form-control {
     background-color: inherit;
   }
@@ -47,7 +51,25 @@ body.modal-open #app {
 
 // SVG icon styles
 .svg-icon {
-  width: 1em;
-  height: 1em;
+  width: 1rem;
+  height: 1rem;
   fill: currentColor;
+}
+.svg-icon-lg {
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: currentColor;
+}
+
+.user-select-none {
+  user-select: none;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+main {
+  padding-top: 4rem;
+  padding-bottom: 1rem;
 }

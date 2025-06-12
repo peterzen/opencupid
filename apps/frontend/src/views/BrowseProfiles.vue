@@ -41,8 +41,8 @@ const handleCardClick = (profile: PublicProfile) => {
 </script>
 
 <template>
-  <div>
-    <div class="container">
+  <main class="container-fluid">
+    <div>
       <div class="browse-profiles-view">
         <LoadingComponent v-if="state.isLoading" />
 
@@ -69,5 +69,5 @@ const handleCardClick = (profile: PublicProfile) => {
     >
       <NoProfileInfoCTAComponent v-if="state.error" />
     </BModal>
-  </div>
+  </main>
 </template>

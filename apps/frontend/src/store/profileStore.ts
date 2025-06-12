@@ -135,15 +135,13 @@ export const useProfileStore = defineStore('profile', {
         const profiles = res.data.profiles.map((p: any) => PublicProfileSchema.parse(p))
         return profiles
       } catch (error: any) {
-        // console.error('Failed to fetch profiles:', error)
+        console.error('Failed to fetch profiles:', error)
 
         const status = error?.response?.status
-        const message = error?.response?.data?.message || 'Failed to fetch profile'
+        const message = error?.response?.data?.message || 'Failed to fetch profiles'
 
         if (status === 403) {
-          // You can throw a custom error, trigger a redirect, show a modal, etc.
-          // throw new Error('You are not authorized to view this profile.')
-          throw error.response?.data?.message || 'Failed to fetch profile'
+          throw error.response?.data?.message || 'Failed to fetch profiles'
         }
       }
       return null

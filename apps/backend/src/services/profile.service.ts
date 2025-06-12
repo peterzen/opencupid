@@ -2,6 +2,7 @@ import cuid from 'cuid'
 import { prisma } from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
 import {
+  OwnerProfileComplete,
   ProfileComplete,
   ProfileWithTags,
 } from '@zod/profile/profile.types'
@@ -18,6 +19,24 @@ const profileCompleteInclude = {
   },
 } satisfies Prisma.ProfileInclude
 
+const conversationWithMyProfileInclude = (myProfileId: string) => ({
+  conversationParticipants: {
+    where: {
+      conversation: {
+        participants: {
+          some: {
+            profileId: myProfileId,
+          },
+        },
+      },
+    },
+    include: {
+      conversation: true,
+    },
+  },
+});
+
+
 export class ProfileService {
   private static instance: ProfileService
 
@@ -32,26 +51,23 @@ export class ProfileService {
     return ProfileService.instance
   }
 
-  async getProfileById(profileId: string): Promise<ProfileComplete | null> {
-    // console.log(`Fetching profile with ID: ${profileId}`)
+  async getProfileById(profileId: string, myProfileId: string): Promise<ProfileComplete | null> {
+
     return prisma.profile.findUnique({
       where: { id: profileId },
-      include: profileCompleteInclude,
+      include: {
+        ...profileCompleteInclude,
+        ...conversationWithMyProfileInclude(myProfileId),
+      },
     })
   }
 
-  async getProfileBySlug(id: string): Promise<ProfileComplete | null> {
-    // console.log(`Fetching profile with ID: ${slug}`)
-    return prisma.profile.findUnique({
-      where: { id },
-      include: profileCompleteInclude,
-    })
-  }
-
-  async getProfileByUserId(userId: string): Promise<ProfileComplete | null> {
+  async getProfileByUserId(userId: string): Promise<OwnerProfileComplete | null> {
     return prisma.profile.findUnique({
       where: { userId },
-      include: profileCompleteInclude,
+      include: {
+        ...profileCompleteInclude,
+      },
     })
   }
 
@@ -104,7 +120,7 @@ export class ProfileService {
   }
 
   public async addProfileImage(
-    profile: ProfileComplete,
+    profile: ProfileComplete | OwnerProfileComplete,
     imageId: string
   ): Promise<{
     profileImages: ProfileImage[]
@@ -162,53 +178,53 @@ export class ProfileService {
   //     skip: options?.offset
   //   })
   // }
-
-  async searchProfiles(searchOptions: {
-    query?: string
-    tags?: string[]
-    active?: boolean
-    limit?: number
-    offset?: number
-  }): Promise<ProfileComplete[]> {
-    const { query, tags, active, limit, offset } = searchOptions
-
-    // Build where clause dynamically
-    const where: Prisma.ProfileWhereInput = {}
-
-    if (active !== undefined) {
-      where.isActive = active
-    }
-
-    if (query) {
-      where.OR = [
-        { publicName: { contains: query, mode: 'insensitive' } },
-        { cityName: { contains: query, mode: 'insensitive' } },
-      ]
-    }
-
-    if (tags && tags.length > 0) {
-      where.tags = {
-        some: {
-          tagId: { in: tags },
-        },
+  /*
+    async searchProfiles(searchOptions: {
+      query?: string
+      tags?: string[]
+      active?: boolean
+      limit?: number
+      offset?: number
+    }): Promise<ProfileComplete[]> {
+      const { query, tags, active, limit, offset } = searchOptions
+  
+      // Build where clause dynamically
+      const where: Prisma.ProfileWhereInput = {}
+  
+      if (active !== undefined) {
+        where.isActive = active
       }
-    }
-
-    return prisma.profile.findMany({
-      where,
-      include: {
-        profileImages: true,
-        tags: {
-          include: {
-            tag: true,
+  
+      if (query) {
+        where.OR = [
+          { publicName: { contains: query, mode: 'insensitive' } },
+          { cityName: { contains: query, mode: 'insensitive' } },
+        ]
+      }
+  
+      if (tags && tags.length > 0) {
+        where.tags = {
+          some: {
+            tagId: { in: tags },
+          },
+        }
+      }
+  
+      return prisma.profile.findMany({
+        where,
+        include: {
+          profileImages: true,
+          tags: {
+            include: {
+              tag: true,
+            },
           },
         },
-      },
-      take: limit,
-      skip: offset,
-    })
-  }
-
+        take: limit,
+        skip: offset,
+      })
+    }
+  */
   /**
    * Attach a tag to a profile.
    */
@@ -248,23 +264,17 @@ export class ProfileService {
     })
   }
 
-  async findProfilesFor(userId: string): Promise<ProfileComplete[]> {
+  async findProfilesFor(profileId: string): Promise<ProfileComplete[]> {
     return await prisma.profile.findMany({
       where: {
         isActive: true,
-        userId: {
-          not: userId,
+        id: {
+          not: profileId,
         },
       },
       include: {
-        profileImages: {
-          orderBy: { position: 'asc' },
-        },
-        tags: {
-          include: {
-            tag: true,
-          },
-        },
+        ...profileCompleteInclude,
+        ...conversationWithMyProfileInclude(profileId),
       },
     })
   }

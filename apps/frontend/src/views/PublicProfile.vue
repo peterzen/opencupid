@@ -55,7 +55,7 @@ function handleMessageSent(message: MessageDTO | null) {
 </script>
 
 <template>
-  <div class="container mb-5 mt-3">
+  <main class="container">
     <LoadingComponent v-if="isLoading" />
     <PublicProfileComponent :profile :isLoading @send:message="showMessageModal = true" />
 
@@ -90,6 +90,7 @@ function handleMessageSent(message: MessageDTO | null) {
           <SendMessage
             ref="messageInput"
             :recipientProfile="profile"
+            :conversationId="null"
             @close="showMessageModal = false"
             @message:sent="handleMessageSent"
           />
@@ -101,5 +102,5 @@ function handleMessageSent(message: MessageDTO | null) {
         </div>
       </div>
     </BModal>
-  </div>
+  </main>
 </template>

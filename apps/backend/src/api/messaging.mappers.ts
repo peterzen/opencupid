@@ -1,6 +1,6 @@
 import type { Prisma } from '@prisma/client';
 import type {
-  ConversationParticipantWithExtras,
+  ConversationParticipantWithConversationSummary,
   ConversationSummary,
   MessageDTO,
   MessageInConversation,
@@ -16,14 +16,14 @@ function mapConversationMeta(c: { id: string; updatedAt: Date; createdAt: Date }
 }
 
 export function extractSenderProfile(
-  p: ConversationParticipantWithExtras,
+  p: ConversationParticipantWithConversationSummary,
   senderProfileId: string
 ) {
   return p.conversation.participants.find(p => p.profileId === senderProfileId)?.profile
 }
 
 export function mapConversationParticipantToSummary(
-  p: ConversationParticipantWithExtras,
+  p: ConversationParticipantWithConversationSummary,
   currentProfileId: string
 ): ConversationSummary {
   const partner = p.conversation.participants.find(cp => cp.profileId !== currentProfileId)
@@ -39,7 +39,6 @@ export function mapConversationParticipantToSummary(
     lastReadAt: p.lastReadAt,
     isMuted: p.isMuted,
     isArchived: p.isArchived,
-    unreadCount: p.unreadCount,
     lastMessage: lastMessage ? {
       content: lastMessage.content,
       createdAt: lastMessage.createdAt,
@@ -52,7 +51,7 @@ export function mapConversationParticipantToSummary(
 
 export function mapMessageDTO(
   m: Prisma.MessageGetPayload<{}>,
-  p: ConversationParticipantWithExtras
+  p: ConversationParticipantWithConversationSummary
 ): MessageDTO {
   const sender = extractSenderProfile(p, m.senderId)
   return {

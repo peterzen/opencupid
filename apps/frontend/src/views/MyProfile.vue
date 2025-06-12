@@ -21,8 +21,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="container">
+  <main class="container">
     <LoadingComponent v-if="isLoading" />
     <PublicProfileComponent :profile :isLoading />
-  </div>
+  </main>
 </template>

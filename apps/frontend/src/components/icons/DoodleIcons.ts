@@ -406,6 +406,7 @@ import IconCamera2 from '@/assets/icons/interface/camera.svg'
 import IconSetting2 from '@/assets/icons/interface/setting-2.svg'
 import IconPuzzle2 from '@/assets/icons/interface/puzzle-2.svg'
 import IconMenu2 from '@/assets/icons/interface/menu-2.svg'
+import IconMenuDotsVert from '@/assets/icons/interface/menu-dots-vert.svg'
 import IconLayer from '@/assets/icons/interface/layer.svg'
 import IconTree from '@/assets/icons/interface/tree.svg'
 import IconFastRewind from '@/assets/icons/interface/fast-rewind.svg'
@@ -807,6 +808,7 @@ export {
   IconNavigation,
   IconStopwatch,
   IconMenu,
+  IconMenuDotsVert,
   IconDocRemove,
   IconQuestion2,
   IconUserAdd,

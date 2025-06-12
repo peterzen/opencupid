@@ -56,7 +56,6 @@ const ConversationSummarySchema = ConversationParticipantSchema.pick({
     createdAt: true,
   }),
   partnerProfile: ProfileSummarySchema,
-  unreadCount: z.number(),
   lastMessage: MessageInConversationSummarySchema.nullable(),
 })
 
@@ -90,6 +89,6 @@ export type ConversationParticipantWithConversationSummary =
     }
   }>
 
-export type ConversationParticipantWithExtras = ConversationParticipantWithConversationSummary & {
-  unreadCount: number,
-}
+// export type ConversationParticipantWithExtras = ConversationParticipantWithConversationSummary & {
+//   unreadCount: number,
+// }

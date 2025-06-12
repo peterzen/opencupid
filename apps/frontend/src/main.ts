@@ -1,6 +1,6 @@
 import '@/css'
 
-// @ts-expect-error: virtual:pwa-register is a Vite virtual module
+// @ ts-expect-error: virtual:pwa-register is a Vite virtual module
 // import { registerSW } from 'virtual:pwa-register'
 
 // const updateSW = registerSW({
@@ -37,6 +37,9 @@ useIcons(app)
 import { useLocalStore } from './store/localStore'
 const localStore = useLocalStore()
 localStore.initialize()
+
+import { useMessageStore } from './store/messageStore'
+useMessageStore()
 
 // toasts
 import registerToast from './lib/toast'

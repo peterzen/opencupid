@@ -6,7 +6,6 @@ import { useAuthStore } from '@/store/authStore'
 import { type LoginUser } from '@zod/user/user.types'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useColorMode } from 'bootstrap-vue-next'
-import { useLocalStore } from '@/store/localStore'
 import { useMessageStore } from '@/store/messageStore'
 
 const authStore = useAuthStore()
@@ -48,7 +47,7 @@ const messageStore = useMessageStore()
 </script>
 
 <template>
-  <div class="container mt-4">
+  <main class="container mt-4">
     <h3 class="mb-4">
       <IconSetting2 class="svg-icon" />
       Settings
@@ -72,16 +71,5 @@ const messageStore = useMessageStore()
     <div class="mb-3">
       <PushPermissions />
     </div>
-
-    <div class="mb-3">
-      <h5>WS</h5>
-      <BFormCheckbox v-model="messageStore.enableReconnect">Enable reconnect</BFormCheckbox>
-      <BButton class="btn btn-secondary" :pressed="wsConnected" @click="messageStore.connectWebSocket(authStore.jwt)"
-        >Connect</BButton
-      >
-      <BButton class="btn btn-secondary" @click="messageStore.disconnectWebSocket()"
-        >Disconnect</BButton
-      >
-    </div>
-  </div>
+  </main>
 </template>

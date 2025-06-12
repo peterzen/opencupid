@@ -124,7 +124,7 @@ function handleBackButton() {
 </script>
 
 <template>
-  <div class="login-container">
+  <main class="login-container">
     <BModal
       v-model="showModal"
       title="Login"
@@ -164,7 +164,7 @@ function handleBackButton() {
         <LoginConfirmComponent v-if="showConfirmScreen" />
       </div>
     </BModal>
-  </div>
+  </main>
 </template>
 
 <style scoped>

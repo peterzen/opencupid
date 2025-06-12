@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ProfileSchema } from "../generated";
+import { ConversationSchema, ProfileSchema } from "../generated";
 import { PublicTagSchema } from "../dto/tag.dto";
 import {
   OwnerProfileImageSchema,
@@ -62,6 +62,7 @@ export const PublicProfileSchema = ProfileUnionSchema.and(
   z.object({
     profileImages: z.array(PublicProfileImageSchema).default([]),
     tags: z.array(PublicTagSchema).default([]),
+    conversation: ConversationSchema.nullable(),
   })
 );
 
@@ -73,6 +74,7 @@ export const PublicDatingProfileSchema = ProfileSchema.pick({
 }).extend({
   profileImages: z.array(PublicProfileImageSchema).default([]),
   tags: z.array(PublicTagSchema).default([]),
+  conversation: ConversationSchema
 });
 
 export type PublicDatingProfile = z.infer<typeof PublicDatingProfileSchema>;

@@ -214,11 +214,12 @@ model Profile {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  ConversationParticipant ConversationParticipant[]
-  // Only present to satisfy Prisma; use ConversationParticipant instead
-  conversationAsA         Conversation[]            @relation("ProfileA")
-  conversationAsB         Conversation[]            @relation("ProfileB")
-  Message                 Message[]
+  conversationParticipants ConversationParticipant[]
+  conversationAsA          Conversation[]            @relation("ProfileA")
+  conversationAsB          Conversation[]            @relation("ProfileB")
+  Message                  Message[]
+
+  Conversation Conversation[]
 }
 
 model ProfileImage {
@@ -259,6 +260,10 @@ model Conversation {
 
   participants ConversationParticipant[]
   messages     Message[]
+  status       ConversationStatus        @default(INITIATED)
+
+  initiatorProfileId String
+  initiator          Profile @relation(fields: [initiatorProfileId], references: [id])
 
   @@unique([profileAId, profileBId], name: "profileAId_profileBId")
 }
@@ -276,6 +281,13 @@ model ConversationParticipant {
   isArchived Boolean   @default(false)
 
   @@unique([profileId, conversationId])
+}
+
+enum ConversationStatus {
+  INITIATED // Alice sent first message
+  ACCEPTED // Bob replied
+  BLOCKED // Either blocked
+  ARCHIVED // Archived by both or system
 }
 
 model Message {
