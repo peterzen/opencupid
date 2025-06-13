@@ -1,14 +1,13 @@
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useMessageStore } from '@/store/messageStore'
-import type { ConversationSummary } from '@zod/messaging/messaging.dto'
-import ConversationSummaries from '@/components/messaging/ConversationSummaries.vue'
-import SendMessage from '@/components/messaging/SendMessage.vue'
-import MessageList from '@/components/messaging/MessageList.vue'
-
 import router from '@/router'
-import MessagingNav from '../components/messaging/MessagingNav.vue'
-import { type ProfileSummary } from '@zod/profile/profile.dto'
+import { useMessageStore } from '@/store/messageStore'
+
+import type { ConversationSummary } from '@zod/messaging/messaging.dto'
+import type { ProfileSummary } from '@zod/profile/profile.dto'
+
+import ConversationDetail from '../components/messaging/ConversationDetail.vue'
+import ConversationSummaries from '@/components/messaging/ConversationSummaries.vue'
 
 const messageStore = useMessageStore()
 
@@ -18,15 +17,8 @@ const props = defineProps<{
 }>()
 
 const isLoading = ref(false)
-const showModal = ref(false)
 
-const recipient = computed(() => {
-  return messageStore.activeConversation?.partnerProfile || null
-})
-
-const convoId = computed(() => {
-  return messageStore.activeConversation?.conversationId || null
-})
+const detailVisible = computed(() => !!messageStore.activeConversation && !isLoading.value)
 
 // Watch for changes in conversationId router prop so we can update
 // the active conversation
@@ -60,6 +52,9 @@ onUnmounted(() => {
 })
 
 async function handleSelectConvo(convo: ConversationSummary) {
+  if( messageStore.activeConversation?.conversationId === convo.conversationId) {
+    return
+  }
   isLoading.value = true
   router.push({ name: 'Messaging', params: { conversationId: convo.conversationId } })
   await messageStore.setActiveConversation(convo)
@@ -75,7 +70,6 @@ async function handleDeselectConvo() {
 }
 
 function handleProfileSelect(profile: ProfileSummary) {
-  console.log('Profile selected:', profile)
   router.push({ name: 'PublicProfile', params: { id: profile.id } })
 }
 </script>
@@ -84,7 +78,7 @@ function handleProfileSelect(profile: ProfileSummary) {
   <main class="flex-grow-1 d-flex flex-row overflow-hidden">
     <div
       class="col-12 col-md-3 d-md-block"
-      :class="{ 'd-none': recipient }"
+      :class="{ 'd-none': detailVisible }"
       id="conversations-list"
     >
       <div class="mx-3">
@@ -95,46 +89,13 @@ function handleProfileSelect(profile: ProfileSummary) {
         />
       </div>
     </div>
-    <div
-      class="col-md-9 flex-grow-1 d-flex flex-column overflow-hidden"
-      v-if="recipient"
-      id="message-view"
-    >
-      <MessagingNav
-        :recipient="recipient"
+    <div class="col-md-9 flex-grow-1 d-flex flex-column overflow-hidden" v-if="detailVisible">
+      <ConversationDetail
+        :conversation="messageStore.activeConversation"
         @deselect:convo="handleDeselectConvo"
         @profile:select="handleProfileSelect"
-        @modal:open="showModal = true"
       />
-
-      <div class="flex-grow-1 overflow-hidden d-flex flex-column">
-        <MessageList :messages="messageStore.messages" />
-      </div>
-      <div class="d-flex align-items-center w-100 py-2 px-2">
-        <SendMessage :recipientProfile="recipient" :conversationId="convoId" v-if="recipient" />
-      </div>
     </div>
-
-    <BModal
-      v-model="showModal"
-      title=""
-      size="md"
-      :backdrop="'static'"
-      centered
-      button-size="sm"
-      :focus="false"
-      :no-close-on-backdrop="true"
-      :no-header="true"
-      :ok-title="`Block ${recipient ? recipient.publicName : ''}`"
-      cancel-title="Nevermind"
-      initial-animation
-      body-class="d-flex flex-row align-items-center justify-content-center overflow-hidden"
-      :keyboard="false"
-    >
-      <div class="w-100">
-        <h4>Block/report/unmatch</h4>
-      </div>
-    </BModal>
   </main>
 </template>
 <style scoped></style>

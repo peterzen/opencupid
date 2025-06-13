@@ -1,23 +1,27 @@
 <script lang="ts" setup>
-import GenderSymbol from '@/components/profiles/GenderSymbol.vue'
-import { countryCodeToName } from '@/lib/countries'
-import { getLanguageList } from '@/lib/languages'
-import { type PublicProfile } from '@zod/profile/profile.dto'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+import { countryCodeToName } from '@/lib/countries'
+import { type PublicProfile } from '@zod/profile/profile.dto'
 import { useEnumOptions } from '../composables/useEnumOptions'
-import ImageTag from '../image/ImageTag.vue'
-import { IconMessage } from '@/components/icons/DoodleIcons'
+
+import GenderSymbol from '@/components/profiles/GenderSymbol.vue'
+
+import ImageCarousel from './ImageCarousel.vue'
+import ActionButtons from './ActionButtons.vue'
+import LanguageList from './LanguageList.vue'
+import TagList from './TagList.vue'
 
 const { t } = useI18n()
-
-defineEmits<{
-  (e: 'send:message', profile: PublicProfile): void
-}>()
 
 const props = defineProps<{
   profile: PublicProfile
   isLoading: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'intent:conversation:open', conversationId: string): void
 }>()
 
 const age = computed(() => {
@@ -36,10 +40,6 @@ const age = computed(() => {
 
 const countryName = computed(() => {
   return props.profile.country ? countryCodeToName(props.profile.country) : ''
-})
-
-const languages = computed(() => {
-  return getLanguageList(props.profile.languages)
 })
 
 const { relationshipStatusLabels, pronounsLabels, hasKidsLabels } = useEnumOptions(t)
@@ -67,28 +67,27 @@ const pronounsLabel = computed(() => {
 <template>
   <div>
     <div class="row justify-content-center">
-      <div class="col-12 col-md-8 col-lg-6">
-        <div class="profileImages overflow-hidden">
-          <div class="ratio ratio-4x3">
-            <BCarousel controls>
-              <BCarouselSlide v-for="img in props.profile.profileImages" :key="img.url!" class="w-100 h-100">
-                <template #img>
-                  <ImageTag :image="img" className="w-100 h-100" />
-                </template>
-              </BCarouselSlide>
-            </BCarousel>
-          </div>
+      <div class="col-12 col-md-8 col-lg-6 position-relative">
+        
+        <ImageCarousel :profile="profile" />
+
+        <div class="icons">
+          <DatingFilter :profile="profile">
+            <span class="text-danger">
+              <FontAwesomeIcon icon="fa-solid fa-heart" />
+            </span>
+          </DatingFilter>
         </div>
+        
         <div class="action-buttons">
-          <BButton
-            v-if="!props.isLoading"
-            variant="outline-primary"
-            size="sm"
-            @click="() => $emit('send:message', props.profile)">
-            <IconMessage class="svg-icon me-1" />
-            {{ $t('profiles.send_message_button') }}
-          </BButton>
+          <ActionButtons
+            :profile
+            @intent:conversation:open="
+              conversationId => emit('intent:conversation:open', conversationId)
+            "
+          />
         </div>
+
         <div class="publicname-wrapper">
           <span class="fw-bolder fs-2">{{ props.profile.publicName }}</span>
           <span v-if="props.profile.isDatingActive">
@@ -108,24 +107,16 @@ const pronounsLabel = computed(() => {
           <span v-if="props.profile.country">{{ countryName }}</span>
         </div>
 
-        <div class="interests mb-2" v-if="props.profile.tags && props.profile.tags.length">
-          <ul class="tags list-unstyled mb-0 d-flex flex-wrap align-items-center">
-            <li v-for="tag in props.profile.tags" :key="tag.slug" class="me-2">
-              <BBadge variant="warning">{{ tag.name }}</BBadge>
-            </li>
-          </ul>
+        <div class="interests mb-2">
+          <TagList :profile />
         </div>
 
         <div class="introSocial mb-3">
           {{ props.profile.introSocial }}
         </div>
 
-        <div class="interests mb-2" v-if="languages && languages.length">
-          <ul class="tags list-unstyled mb-0 d-flex flex-wrap align-items-center">
-            <li v-for="lang in languages" :key="lang.value" class="me-2">
-              <BBadge variant="secondary">{{ lang.label }}</BBadge>
-            </li>
-          </ul>
+        <div class="interests mb-2">
+          <LanguageList :profile />
         </div>
 
         <div v-if="props.profile.isDatingActive">
@@ -150,11 +141,20 @@ const pronounsLabel = computed(() => {
 </template>
 
 <style scoped>
-:deep(.carousel-inner) {
-  width: 100%;
-  height: 100%;
-  /* object-fit: cover; */
-  /* filter: grayscale(100%) blur(5px); */
-  /* opacity: 0.25; */
+.icons {
+  position: absolute;
+  top: 0.5rem;
+  right: 1.5rem;
+  z-index: 10;
+}
+
+.action-buttons {
+  position: absolute;
+  /* top: 10px; */
+  /* bottom:2rem; */
+  margin-top: -3rem;
+  right: 1rem;
+  z-index: 10;
+  /* background-color: rgba(255, 255, 255, 0.8); */
 }
 </style>

@@ -27,7 +27,7 @@
     "@formkit/i18n": "^1.6.9",
     "altcha": "^2.0.2",
     "animate.css": "^4.1.1",
-    "bootstrap-vue-next": "^0.29.3",
+    "bootstrap-vue-next": "^0.29.4",
     "bootswatch": "^5.3.6",
     "i18n-iso-countries": "^7.14.0",
     "mitt": "^3.0.1",

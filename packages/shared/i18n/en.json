@@ -105,7 +105,8 @@
     "logout": "Logout"
   },
   "profiles": {
-    "send_message_button": "Message"
+    "send_message_button": "Message",
+    "profile_photos": "{name}'s photos"
   },
   "messaging": {
     "send_message_button": "Send",

@@ -5,7 +5,7 @@ import type { PublicProfile } from '@zod/profile/profile.dto'
 import ProfileImage from '@/components/profiles/image/ProfileImage.vue'
 
 // Props & Emits
-const props = defineProps<{
+defineProps<{
   profile: PublicProfile
 }>()
 

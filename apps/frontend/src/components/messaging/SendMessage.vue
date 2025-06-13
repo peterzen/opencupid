@@ -1,20 +1,25 @@
 <script setup lang="ts">
 import { ref, watch, watchEffect } from 'vue'
-import { type ProfileSummary } from '@zod/profile/profile.dto'
+import { funnel } from 'remeda'
 
 import { useLocalStore } from '@/store/localStore'
-import { funnel } from 'remeda'
-import { useMessaging } from '../composables/useMessaging'
+
 import { type MessageDTO } from '@zod/messaging/messaging.dto'
+import { type PublicProfile } from '@zod/profile/profile.dto'
+
+import { useMessaging } from '../composables/useMessaging'
+import TagList from '@/components/profiles/public/TagList.vue'
+import LanguageList from '@/components/profiles/public/LanguageList.vue'
 
 const props = defineProps<{
-  recipientProfile: ProfileSummary
+  recipientProfile: PublicProfile
   conversationId: string | null
 }>()
 
 const emit = defineEmits<{
   (e: 'message:sent', message: MessageDTO | null): void
 }>()
+
 const content = ref('')
 
 const { sendMessage, initiateConversation, isSending, isSent, errorMsg } = useMessaging()
@@ -31,40 +36,35 @@ const debouncer = funnel<[string], string>(
 )
 
 // Watch message input field and save draft in localStore
-watch(content, val => {
-  debouncer.call(val)
-})
+watch(content, val => debouncer.call(val))
 
 watchEffect(() => {
   // Load the draft message from local store when the component is mounted
   const draft = localStore.getMessageDraft(props.recipientProfile.id)
-  if (draft) {
-    content.value = draft
-  }
+  if (draft) content.value = draft
 })
 
 const textarea = ref<HTMLTextAreaElement>()
 
 // Give focus to textarea - expose method to parent which can call it
 // when it's rendered or when needed
-function focusTextarea() {
-  textarea.value?.focus()
-}
+const focusTextarea = () => textarea.value?.focus()
 
 defineExpose({
   focusTextarea,
 })
 
 async function handleSendMessage() {
-  if (content.value.trim() === '') return
+  const trimmedContent = content.value.trim()
+  if (trimmedContent === '') return
   if (props.conversationId) {
     // If conversationId is provided, use it to send the message
-    const sentMessage = await sendMessage(props.conversationId, content.value)
+    const sentMessage = await sendMessage(props.conversationId, trimmedContent)
     emit('message:sent', sentMessage!)
   } else {
-    console.log('No conversationId provided, starting a new conversation...') 
+    console.log('No conversationId provided, starting a new conversation...')
     // If no conversationId, create a new conversation and send the message
-    await initiateConversation(props.recipientProfile, content.value)
+    await initiateConversation(props.recipientProfile, trimmedContent)
     emit('message:sent', null) // Emit null to indicate a new conversation was started
   }
   content.value = '' // Clear the input after sending
@@ -75,6 +75,8 @@ async function handleSendMessage() {
 <template>
   <div class="send-message-wrapper w-100">
     <div class="mb-2">
+      <TagList :profile="props.recipientProfile" class="mb-1" />
+      <LanguageList :profile="props.recipientProfile" class="mb-1" />
       <BFormGroup label="" label-for="content-input" class="me-2 flex-grow-1 w-100">
         <BFormTextarea
           id="content-input"
@@ -90,10 +92,6 @@ async function handleSendMessage() {
           <small>{{ $t('messaging.message_input_hint') }}</small>
         </div>
       </BFormGroup>
-      <!-- <BButton type="submit" variant="primary" :disabled="!valid">
-          <IconSend class="svg-icon me-1" />
-          {{ $t('messaging.send_message_button') }}
-        </BButton> -->
     </div>
   </div>
 </template>
