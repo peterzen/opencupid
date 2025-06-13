@@ -75,8 +75,14 @@ async function handleSendMessage() {
 <template>
   <div class="send-message-wrapper w-100">
     <div class="mb-2">
-      <TagList :profile="props.recipientProfile" class="mb-1" />
-      <LanguageList :profile="props.recipientProfile" class="mb-1" />
+      <div class="mb-2">
+        <div class="d-inline-block">
+          <TagList :profile="props.recipientProfile" class="d-inline-block" />
+        </div>
+        <div class="d-inline-block">
+          <LanguageList :profile="props.recipientProfile" class="d-inline-block" />
+        </div>
+      </div>
       <BFormGroup label="" label-for="content-input" class="me-2 flex-grow-1 w-100">
         <BFormTextarea
           id="content-input"

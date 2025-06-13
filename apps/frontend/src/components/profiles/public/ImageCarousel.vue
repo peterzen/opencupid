@@ -1,12 +1,9 @@
 <script setup lang="ts">
-import { ProfileImage } from '@zod/generated'
-import { PublicProfile } from '@zod/profile/profile.dto'
-import { BCarousel } from 'bootstrap-vue-next'
 import { ref } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { IconCross } from '@/components/icons/DoodleIcons'
 
-const t = useI18n()
+import { BCarousel } from 'bootstrap-vue-next'
+import { type PublicProfile } from '@zod/profile/profile.dto'
+import { IconCross } from '@/components/icons/DoodleIcons'
 
 const props = defineProps<{
   profile: PublicProfile
@@ -40,19 +37,15 @@ const handleCloseClick = () => (showModal.value = false)
   <BModal
     v-model="showModal"
     centered
-    button-size="sm"
     modal-class="carousel-modal"
     :no-close-on-backdrop="false"
     :no-footer="true"
     :no-header="false"
     :no-title="true"
-    cancel-title="Nevermind"
-    initial-animation
+    :title-visually-hidden="true"
     :body-scrolling="false"
     :fullscreen="true"
     :lazy="true"
-    no-animation
-    :title-visually-hidden="true"
   >
     <template #header-close>
       <IconCross class="svg-icon" />
@@ -76,10 +69,8 @@ const handleCloseClick = () => (showModal.value = false)
 :deep(.carousel-inner) {
   width: 100%;
   height: 100%;
-  /* object-fit: contain; */
-  /* filter: grayscale(100%) blur(5px); */
-  /* opacity: 0.25; */
 }
+
 :deep(img) {
   width: 100%;
   height: 100%;

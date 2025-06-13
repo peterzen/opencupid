@@ -1,6 +1,6 @@
 <script lang="ts" setup>
+import { useRouter } from 'vue-router'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import router from '@/router'
 import { useMessageStore } from '@/store/messageStore'
 
 import type { ConversationSummary } from '@zod/messaging/messaging.dto'
@@ -9,9 +9,9 @@ import type { ProfileSummary } from '@zod/profile/profile.dto'
 import ConversationDetail from '../components/messaging/ConversationDetail.vue'
 import ConversationSummaries from '@/components/messaging/ConversationSummaries.vue'
 
+const router = useRouter()
 const messageStore = useMessageStore()
 
-// Props
 const props = defineProps<{
   conversationId?: string
 }>()
@@ -51,8 +51,8 @@ onUnmounted(() => {
   messageStore.setActiveConversation(null)
 })
 
-async function handleSelectConvo(convo: ConversationSummary) {
-  if( messageStore.activeConversation?.conversationId === convo.conversationId) {
+const handleSelectConvo = async (convo: ConversationSummary) => {
+  if (messageStore.activeConversation?.conversationId === convo.conversationId) {
     return
   }
   isLoading.value = true
@@ -64,37 +64,36 @@ async function handleSelectConvo(convo: ConversationSummary) {
   }, 2000)
 }
 
-async function handleDeselectConvo() {
+const handleDeselectConvo = async () => {
   router.push({ name: 'Messaging' })
   await messageStore.setActiveConversation(null)
 }
 
-function handleProfileSelect(profile: ProfileSummary) {
+const handleProfileSelect = (profile: ProfileSummary) => {
   router.push({ name: 'PublicProfile', params: { id: profile.id } })
 }
 </script>
 
 <template>
-  <main class="flex-grow-1 d-flex flex-row overflow-hidden">
-    <div
-      class="col-12 col-md-3 d-md-block"
-      :class="{ 'd-none': detailVisible }"
-      id="conversations-list"
-    >
-      <div class="mx-3">
-        <ConversationSummaries
-          :conversations="messageStore.conversations"
-          :activeConversation="messageStore.activeConversation"
-          @convo:select="handleSelectConvo"
+  <main class="d-flex flex-column h-100">
+    <h1 class="px-3 mb-2" v-if="!detailVisible">{{  $t('messaging.page_title') }}</h1>
+    <div class="flex-grow-1 d-flex flex-row overflow-hidden">
+      <div class="col-12 col-md-3 d-md-block" :class="{ 'd-none': detailVisible }">
+        <div class="mx-3">
+          <ConversationSummaries
+            :conversations="messageStore.conversations"
+            :activeConversation="messageStore.activeConversation"
+            @convo:select="handleSelectConvo"
+          />
+        </div>
+      </div>
+      <div class="col-md-9 flex-grow-1 d-flex flex-column overflow-hidden" v-if="detailVisible">
+        <ConversationDetail
+          :conversation="messageStore.activeConversation"
+          @deselect:convo="handleDeselectConvo"
+          @profile:select="handleProfileSelect"
         />
       </div>
-    </div>
-    <div class="col-md-9 flex-grow-1 d-flex flex-column overflow-hidden" v-if="detailVisible">
-      <ConversationDetail
-        :conversation="messageStore.activeConversation"
-        @deselect:convo="handleDeselectConvo"
-        @profile:select="handleProfileSelect"
-      />
     </div>
   </main>
 </template>

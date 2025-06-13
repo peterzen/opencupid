@@ -2,7 +2,6 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { countryCodeToName } from '@/lib/countries'
 import { type PublicProfile } from '@zod/profile/profile.dto'
 import { useEnumOptions } from '../composables/useEnumOptions'
 
@@ -12,6 +11,7 @@ import ImageCarousel from './ImageCarousel.vue'
 import ActionButtons from './ActionButtons.vue'
 import LanguageList from './LanguageList.vue'
 import TagList from './TagList.vue'
+import LocationLabel from './LocationLabel.vue'
 
 const { t } = useI18n()
 
@@ -36,10 +36,6 @@ const age = computed(() => {
     age--
   }
   return age
-})
-
-const countryName = computed(() => {
-  return props.profile.country ? countryCodeToName(props.profile.country) : ''
 })
 
 const { relationshipStatusLabels, pronounsLabels, hasKidsLabels } = useEnumOptions(t)
@@ -68,17 +64,12 @@ const pronounsLabel = computed(() => {
   <div>
     <div class="row justify-content-center">
       <div class="col-12 col-md-8 col-lg-6 position-relative">
-        
         <ImageCarousel :profile="profile" />
 
         <div class="icons">
-          <DatingFilter :profile="profile">
-            <span class="text-danger">
-              <FontAwesomeIcon icon="fa-solid fa-heart" />
-            </span>
-          </DatingFilter>
+          <DatingIcon :profile />
         </div>
-        
+
         <div class="action-buttons">
           <ActionButtons
             :profile
@@ -88,38 +79,40 @@ const pronounsLabel = computed(() => {
           />
         </div>
 
-        <div class="publicname-wrapper">
-          <span class="fw-bolder fs-2">{{ props.profile.publicName }}</span>
-          <span v-if="props.profile.isDatingActive">
-            <span class="text-muted fs-5">
-              ({{ age }}
+        <div class="d-flex flex-row align-items-center mt-2">
+          <div class="flex-grow-1">
+            <span class="fw-bolder fs-2"> {{ props.profile.publicName }}</span>
+          </div>
+          <div v-if="props.profile.isDatingActive" class="text-muted">
+            <span class="me-1">{{ age }}</span>
+            <span class="me-1">
               <GenderSymbol v-if="props.profile.gender" :gender="props.profile.gender" />
-
-              <span v-if="props.profile.pronouns && pronounsLabel" class="ms-2">{{
-                pronounsLabel
-              }}</span
-              >)
             </span>
-          </span>
+
+            <span v-if="props.profile.pronouns && pronounsLabel" >{{
+              pronounsLabel
+            }}</span>
+          </div>
         </div>
-        <div class="location fs-5">
-          <span v-if="props.profile.cityName">{{ props.profile.cityName }}, </span>
-          <span v-if="props.profile.country">{{ countryName }}</span>
+        <div class="mb-2 text-muted">
+          <LocationLabel :profile />
         </div>
 
-        <div class="interests mb-2">
-          <TagList :profile />
-        </div>
+        <div class="mb-3">
+          <div class="d-inline-block">
+            <TagList :profile />
+          </div>
 
+          <div class="d-inline-block">
+            <LanguageList :profile />
+          </div>
+        </div>
         <div class="introSocial mb-3">
           {{ props.profile.introSocial }}
         </div>
 
-        <div class="interests mb-2">
-          <LanguageList :profile />
-        </div>
-
         <div v-if="props.profile.isDatingActive">
+          <hr />
           <div class="dating-basics mb-3">
             <div class="introDating mb-3">
               {{ props.profile.introDating }}
@@ -127,10 +120,10 @@ const pronounsLabel = computed(() => {
 
             <ul class="list-unstyled mb-2 d-flex flex-wrap align-items-center">
               <li v-if="props.profile.relationship" class="me-2">
-                <BBadge variant="info">{{ relationshipStatusLabel }}</BBadge>
+                <span class="badge text-bg-dating">{{ relationshipStatusLabel }}</span>
               </li>
               <li v-if="props.profile.hasKids" class="me-2">
-                <BBadge variant="info">{{ hasKidsLabel }}</BBadge>
+                <span class="badge text-bg-dating">{{ hasKidsLabel }}</span>
               </li>
             </ul>
           </div>

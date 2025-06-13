@@ -1,24 +1,18 @@
 <script setup lang="ts">
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 import type { PublicProfile } from '@zod/profile/profile.dto'
-import ProfileImage from '@/components/profiles/image/ProfileImage.vue'
+import ProfileImage from '../image/ProfileImage.vue'
+import DatingIcon from './DatingIcon.vue'
 
 // Props & Emits
 defineProps<{
   profile: PublicProfile
 }>()
 
-const emit = defineEmits<{
-  // (e: 'select:profile', value: PublicProfile): void
-  // (e: 'submit', value: OwnerProfile): void
-}>()
-
-
 </script>
 
 <template>
-  <div class="card h-100 profile-card">
+  <div class="card h-100 profile-card cursor-pointer">
     <div class="ratio ratio-1x1">
       <ProfileImage :profile="profile" />
     </div>
@@ -27,11 +21,7 @@ const emit = defineEmits<{
       <p>{{ profile.introSocial }}</p>
     </div>
     <div class="icons">
-      <DatingFilter :profile="profile">
-        <span class="text-danger">
-          <FontAwesomeIcon icon="fa-solid fa-heart" />
-        </span>
-      </DatingFilter>
+      <DatingIcon :profile />
     </div>
   </div>
 </template>
@@ -44,8 +34,6 @@ const emit = defineEmits<{
 }
 
 .card {
-  cursor: pointer;
-
   &:hover {
     border-color: var(--bs-primary);
   }

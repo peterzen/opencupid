@@ -109,6 +109,7 @@
     "profile_photos": "{name}'s photos"
   },
   "messaging": {
+    "page_title": "Messages",
     "send_message_button": "Send",
     "message_input_placeholder": "Type your message here...",
     "new_message_notification": "{sender} sent a message",

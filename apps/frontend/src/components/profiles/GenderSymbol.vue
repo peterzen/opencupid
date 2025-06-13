@@ -28,8 +28,7 @@ const IconComponent = genderIcons[props.gender]
   height: 1em;
 }
 .gender-icon {
-  height: 0.75em;
-  opacity: 0.5;
+  height: 1rem;
   fill: currentColor;
 }
 </style>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
 import { reactive, onMounted, computed } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
-import router from '@/router'
 
 import { type PublicProfile } from '@zod/profile/profile.dto'
 
@@ -9,6 +9,7 @@ import LoadingComponent from '@/components/LoadingComponent.vue'
 import ProfileCardComponent from '@/components/profiles/public/ProfileCardComponent.vue'
 import NoProfileInfoCTAComponent from '@/components/profiles/NoProfileInfoCTAComponent.vue'
 
+const router = useRouter()
 const profileStore = useProfileStore()
 
 // Define your component logic here

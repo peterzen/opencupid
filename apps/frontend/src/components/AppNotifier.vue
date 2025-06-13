@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
+
 import { bus } from '@/lib/bus'
 import { useToast } from 'vue-toastification'
 
-import router from '@/router'
+const router = useRouter()
 
 import MessageReceivedToast from '@/components/messaging/MessageReceivedToast.vue'
 import { type MessageDTO } from '@zod/messaging/messaging.dto'

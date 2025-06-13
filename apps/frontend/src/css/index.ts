@@ -6,8 +6,6 @@ import '@fontsource/rubik/index.css'
 // import "@fontsource/quicksand/index.css";
 // import "@fontsource/mukta/index.css";
 
-import './bootstrap-custom.scss'
-
 import './main.scss'
 
 // Vendor CSS

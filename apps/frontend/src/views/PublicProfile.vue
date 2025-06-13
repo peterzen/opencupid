@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { reactive, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import type { PublicProfile } from '@zod/profile/profile.dto'
 import { useProfileStore } from '@/store/profileStore'
 
 import LoadingComponent from '@/components/LoadingComponent.vue'
 import PublicProfileComponent from '@/components/profiles/public/PublicProfileComponent.vue'
-import router from '@/router'
 
+const router = useRouter()
 const profileStore = useProfileStore()
 
 // Props
