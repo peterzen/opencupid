@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { OwnerProfileImage, PublicProfileImage } from '@zod/profile/profileimage.dto'
 import { type PropType } from 'vue'
 
 const props = defineProps({
@@ -9,13 +8,13 @@ const props = defineProps({
   },
   className: {
     type: String,
-    default: 'img-fluid rounded',
+    default: '',
   },
 })
 </script>
 
 <template>
-  <picture class="profile-image w-100 h-100 object-fit-cover" v-if="props.image">
+  <picture class="profile-image w-100 h-100" v-if="props.image">
     <!-- WebP responsive -->
     <source
       :srcset="`
@@ -36,3 +35,13 @@ const props = defineProps({
     />
   </picture>
 </template>
+
+<style scoped>
+img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+</style>

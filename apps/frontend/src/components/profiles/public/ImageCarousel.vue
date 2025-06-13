@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import { BCarousel } from 'bootstrap-vue-next'
 import { type PublicProfile } from '@zod/profile/profile.dto'
 import { IconCross } from '@/components/icons/DoodleIcons'
+import ImageTag from '../image/ImageTag.vue'
 
 const props = defineProps<{
   profile: PublicProfile
@@ -20,7 +21,7 @@ const handleCloseClick = () => (showModal.value = false)
 <template>
   <div class="profileImages overflow-hidden">
     <div class="ratio ratio-4x3">
-      <BCarousel controls fade v-model="slide">
+      <BCarousel controls v-model="slide">
         <BCarouselSlide
           v-for="img in props.profile.profileImages"
           :key="img.url!"
@@ -28,7 +29,7 @@ const handleCloseClick = () => (showModal.value = false)
           class="w-100 h-100"
         >
           <template #img>
-            <ImageTag :image="img" />
+            <ImageTag :image="img" className="" />
           </template>
         </BCarouselSlide>
       </BCarousel>
@@ -50,15 +51,15 @@ const handleCloseClick = () => (showModal.value = false)
     <template #header-close>
       <IconCross class="svg-icon" />
     </template>
-    <BCarousel controls indicators fade v-model="slide" class="w-100 h-100">
+    <BCarousel controls indicators v-model="slide" class="w-100 h-100">
       <BCarouselSlide
         v-for="img in props.profile.profileImages"
         :key="img.url!"
         @click="handleCloseClick"
-        class="w-100 h-100"
+        class="w-100 h-100 wrapper"
       >
         <template #img>
-          <ImageTag :image="img" />
+          <ImageTag :image="img" className="" />
         </template>
       </BCarouselSlide>
     </BCarousel>
@@ -70,12 +71,10 @@ const handleCloseClick = () => (showModal.value = false)
   width: 100%;
   height: 100%;
 }
-
-:deep(img) {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
+:deep(.carousel-item) {
+  background-color: transparent !important;
+}
+:deep(.wrapper) {
+  background-color: red;
 }
 </style>

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { type PublicProfile } from '@zod/profile/profile.dto'
 import { IconMessage } from '@/components/icons/DoodleIcons'
 import { nextTick, ref } from 'vue'
-import { MessageDTO } from '@zod/messaging/messaging.dto'
+import { type MessageDTO } from '@zod/messaging/messaging.dto'
+import { type PublicProfile } from '@zod/profile/profile.dto'
 
 import SendMessage from '@/components/messaging/SendMessage.vue'
 

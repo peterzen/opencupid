@@ -76,7 +76,7 @@ const handleProfileSelect = (profile: ProfileSummary) => {
 
 <template>
   <main class="d-flex flex-column h-100">
-    <h1 class="px-3 mb-2" v-if="!detailVisible">{{  $t('messaging.page_title') }}</h1>
+    <!-- <h1 class="px-3 mb-2" v-if="!detailVisible">{{  $t('messaging.page_title') }}</h1> -->
     <div class="flex-grow-1 d-flex flex-row overflow-hidden">
       <div class="col-12 col-md-3 d-md-block" :class="{ 'd-none': detailVisible }">
         <div class="mx-3">

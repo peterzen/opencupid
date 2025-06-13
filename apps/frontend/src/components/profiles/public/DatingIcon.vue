@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PublicProfile } from '@zod/profile/profile.dto'
+import { type PublicProfile } from '@zod/profile/profile.dto'
 
 defineProps<{
   profile: PublicProfile
@@ -8,7 +8,7 @@ defineProps<{
 
 <template>
   <DatingFilter :profile>
-    <span class="text-danger">
+    <span class="text-dating">
       <FontAwesomeIcon icon="fa-solid fa-heart" />
     </span>
   </DatingFilter>

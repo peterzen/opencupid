@@ -12,6 +12,7 @@ import ActionButtons from './ActionButtons.vue'
 import LanguageList from './LanguageList.vue'
 import TagList from './TagList.vue'
 import LocationLabel from './LocationLabel.vue'
+import DatingIcon from './DatingIcon.vue'
 
 const { t } = useI18n()
 
@@ -63,8 +64,10 @@ const pronounsLabel = computed(() => {
 <template>
   <div>
     <div class="row justify-content-center">
-      <div class="col-12 col-md-8 col-lg-6 position-relative">
-        <ImageCarousel :profile="profile" />
+      <div class="col-12 col-md-8 col-lg-6 position-relative user-select-none">
+        <div class="overflow-hidden rounded">
+          <ImageCarousel :profile="profile" />
+        </div>
 
         <div class="icons">
           <DatingIcon :profile />
@@ -89,9 +92,7 @@ const pronounsLabel = computed(() => {
               <GenderSymbol v-if="props.profile.gender" :gender="props.profile.gender" />
             </span>
 
-            <span v-if="props.profile.pronouns && pronounsLabel" >{{
-              pronounsLabel
-            }}</span>
+            <span v-if="props.profile.pronouns && pronounsLabel">{{ pronounsLabel }}</span>
           </div>
         </div>
         <div class="mb-2 text-muted">
@@ -107,14 +108,14 @@ const pronounsLabel = computed(() => {
             <LanguageList :profile />
           </div>
         </div>
-        <div class="introSocial mb-3">
+        <div class="mb-3">
           {{ props.profile.introSocial }}
         </div>
 
         <div v-if="props.profile.isDatingActive">
           <hr />
           <div class="dating-basics mb-3">
-            <div class="introDating mb-3">
+            <div class="mb-3">
               {{ props.profile.introDating }}
             </div>
 
