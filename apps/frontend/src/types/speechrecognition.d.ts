@@ -1,22 +1,22 @@
 // Declare global types if needed
-type SpeechRecognition = typeof webkitSpeechRecognition;
+export type SpeechRecognition = typeof webkitSpeechRecognition;
 
-interface SpeechRecognitionEvent extends Event {
+export interface SpeechRecognitionEvent extends Event {
   readonly results: SpeechRecognitionResultList;
 }
 
-interface SpeechRecognitionResultList {
+export interface SpeechRecognitionResultList {
   [index: number]: SpeechRecognitionResult;
   length: number;
 }
 
-interface SpeechRecognitionResult {
+export interface SpeechRecognitionResult {
   [index: number]: SpeechRecognitionAlternative;
   length: number;
   isFinal: boolean;
 }
 
-interface SpeechRecognitionAlternative {
+export interface SpeechRecognitionAlternative {
   readonly transcript: string;
   readonly confidence: number;
 }

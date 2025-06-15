@@ -2,7 +2,7 @@
 import { onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { LocationDTO } from '@zod/dto/location.dto'
+import { type LocationDTO } from '@zod/dto/location.dto'
 import fetchGeoIpInfo from '@/lib/geoip'
 
 import CountrySelector from './CountrySelector.vue'

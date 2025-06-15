@@ -10,7 +10,6 @@ import UserHome from '@/views/UserHome.vue'
 import Settings from '@/views/Settings.vue'
 import MyProfile from '@/views/MyProfile.vue'
 import Messaging from '@/views/Messaging.vue'
-import Onboarding from '@/views/Onboarding.vue'
 import PublicProfile from '@/views/PublicProfile.vue'
 import BrowseProfiles from '@/views/BrowseProfiles.vue'
 import OnboardWizard from '@/views/OnboardWizard.vue'
@@ -45,12 +44,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '/onboarding',
     name: 'Onboarding',
     component: OnboardWizard,
-    meta: { requiresAuth: true },
-  },
-  {
-    path: '/oldboarding',
-    name: 'Ooldboarding',
-    component: Onboarding,
     meta: { requiresAuth: true },
   },
   {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getLanguageSelectorOptions, MultiselectOption } from '@/lib/languages'
+import { getLanguageSelectorOptions, type MultiselectOption } from '@/lib/languages'
 import { computed, onMounted, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Multiselect from 'vue-multiselect'

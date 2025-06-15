@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ComponentPublicInstance, computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import Multiselect from 'vue-multiselect'
 import { useCitiesStore } from '@/store/cityStore'
 
 import type { PublicCity } from '@zod/dto/city.dto'
 import type { LocationDTO } from '@zod/dto/location.dto'
 import { toInitialCaps } from '@/lib/utils'
+import { type MultiselectComponent } from '@/types/multiselect'
 
 // Store
 const cityStore = useCitiesStore()
@@ -97,7 +98,7 @@ async function asyncFind(query: string) {
 // Add new city
 async function addCity(name: string) {
   const create = {
-    name: toInitialCaps(name.trim().toWellFormed()),
+    name: toInitialCaps(name.trim()),
     country: model.value.country,
   }
   isLoading.value = true

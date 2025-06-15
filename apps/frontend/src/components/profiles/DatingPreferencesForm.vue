@@ -20,7 +20,7 @@ const formData = reactive<OwnerProfile>({
   ...props.modelValue,
 })
 
-const { age } = useAgeFields(props.modelValue)
+const { age } = useAgeFields(props.modelValue.birthday)
 
 // Apply computed defaults after age becomes available
 watchEffect(() => {

@@ -1,4 +1,4 @@
-type MultiselectComponent = ComponentPublicInstance<{
+export type MultiselectComponent = ComponentPublicInstance<{
   activate: () => void
   deactivate: () => void
   open: () => void

@@ -1,8 +1,7 @@
 <script lang="ts" setup>
-import type { HasKidsType } from '@zod/generated'
 import { useI18n } from 'vue-i18n'
-import { useEnumOptions } from '../composables/useEnumOptions'
 import { ref } from 'vue'
+import type { SpeechRecognition, SpeechRecognitionEvent } from '@/types/speechrecognition'
 
 // i18n
 const { t } = useI18n()

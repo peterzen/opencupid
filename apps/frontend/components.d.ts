@@ -15,9 +15,7 @@ declare module 'vue' {
     BBadge: typeof import('bootstrap-vue-next/components/BBadge')['BBadge']
     BButton: typeof import('bootstrap-vue-next/components/BButton')['BButton']
     BCarouselSlide: typeof import('bootstrap-vue-next/components/BCarousel')['BCarouselSlide']
-    BCollapse: typeof import('bootstrap-vue-next/components/BCollapse')['BCollapse']
     BForm: typeof import('bootstrap-vue-next/components/BForm')['BForm']
-    BFormCheckbox: typeof import('bootstrap-vue-next/components/BFormCheckbox')['BFormCheckbox']
     BFormFile: typeof import('bootstrap-vue-next/components/BFormFile')['BFormFile']
     BFormFloatingLabel: typeof import('bootstrap-vue-next/components/BForm')['BFormFloatingLabel']
     BFormGroup: typeof import('bootstrap-vue-next/components/BFormGroup')['BFormGroup']
@@ -31,7 +29,6 @@ declare module 'vue' {
     BNavbar: typeof import('bootstrap-vue-next/components/BNavbar')['BNavbar']
     BNavbarNav: typeof import('bootstrap-vue-next/components/BNavbar')['BNavbarNav']
     BNavItem: typeof import('bootstrap-vue-next/components/BNav')['BNavItem']
-    BOverlay: typeof import('bootstrap-vue-next/components/BOverlay')['BOverlay']
     CaptchaWidget: typeof import('./src/components/auth/CaptchaWidget.vue')['default']
     CitySelector: typeof import('./src/components/profiles/forms/CitySelector.vue')['default']
     ConnectionTypeSelector: typeof import('./src/components/ConnectionTypeSelector.vue')['default']
@@ -41,9 +38,7 @@ declare module 'vue' {
     DatingFilter: typeof import('./src/components/profiles/display/DatingFilter.vue')['default']
     DatingIcon: typeof import('./src/components/profiles/display/DatingIcon.vue')['default']
     DatingPreferencesForm: typeof import('./src/components/profiles/DatingPreferencesForm.vue')['default']
-    DatingProfileForm: typeof import('./src/components/profiles/DatingProfileForm.vue')['default']
     ErrorComponent: typeof import('./src/components/ErrorComponent.vue')['default']
-    GenderPickerComponent: typeof import('./src/components/profiles/forms/GenderSelector.vue')['default']
     GenderSelector: typeof import('./src/components/profiles/forms/GenderSelector.vue')['default']
     GenderSymbol: typeof import('./src/components/profiles/display/GenderSymbol.vue')['default']
     GoalsSelector: typeof import('./src/components/profiles/onboarding/GoalsSelector.vue')['default']
@@ -75,7 +70,6 @@ declare module 'vue' {
     NoProfileInfoCTAComponent: typeof import('./src/components/profiles/NoProfileInfoCTAComponent.vue')['default']
     OtpLoginComponent: typeof import('./src/components/auth/OtpLoginComponent.vue')['default']
     ProfileCardComponent: typeof import('./src/components/profiles/public/ProfileCardComponent.vue')['default']
-    ProfileForm: typeof import('./src/components/profiles/ProfileForm.vue')['default']
     ProfileImage: typeof import('./src/components/profiles/image/ProfileImage.vue')['default']
     ProfileThumbnail: typeof import('./src/components/profiles/image/ProfileThumbnail.vue')['default']
     PublicProfileComponent: typeof import('./src/components/profiles/public/PublicProfileComponent.vue')['default']
@@ -90,8 +84,5 @@ declare module 'vue' {
     TagSelectComponent: typeof import('./src/components/profiles/forms/TagSelectComponent.vue')['default']
     ToggleSwitch: typeof import('./src/components/ToggleSwitch.vue')['default']
     UploadButton: typeof import('./src/components/profiles/image/UploadButton.vue')['default']
-  }
-  export interface GlobalDirectives {
-    vBToggle: typeof import('bootstrap-vue-next/directives/BToggle')['vBToggle']
   }
 }
