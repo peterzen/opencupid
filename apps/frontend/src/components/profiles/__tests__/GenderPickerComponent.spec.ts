@@ -10,13 +10,22 @@ vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: (k: string) => k }) }))
 import GenderPickerComponent from '../forms/GenderSelector.vue'
 
 describe('GenderPickerComponent', () => {
-  it('emits changed when gender updates', async () => {
+  it('emits update when gender changes', async () => {
     const wrapper = mount(GenderPickerComponent, {
       props: { modelValue: { gender: null, pronouns: null } as any },
-      global: { stubs: { FormKit: true, BButton: true, BCollapse: true } }
+      global: {
+        stubs: {
+          FormKit: true,
+          BButton: true,
+          BCollapse: true,
+          BListGroup: true,
+          BListGroupItem: true,
+          BFormRadio: true,
+        },
+      },
     })
     ;(wrapper.vm as any).gender = 'male'
     await wrapper.vm.$nextTick()
-    expect(wrapper.emitted('changed')![0][0]).toEqual({ gender: 'male', pronouns: null })
+    expect(wrapper.emitted('update:modelValue')![0][0]).toEqual({ gender: 'male', pronouns: null })
   })
 })
