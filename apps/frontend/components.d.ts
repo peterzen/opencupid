@@ -67,7 +67,6 @@ declare module 'vue' {
     LoginConfirmComponent: typeof import('./src/components/auth/LoginConfirmComponent.vue')['default']
     LogoutButton: typeof import('./src/components/nav/LogoutButton.vue')['default']
     MessageList: typeof import('./src/components/messaging/MessageList.vue')['default']
-    MessageNav: typeof import('./src/components/messaging/MessageNav.vue')['default']
     MessageReceivedToast: typeof import('./src/components/messaging/MessageReceivedToast.vue')['default']
     MessagingNav: typeof import('./src/components/messaging/MessagingNav.vue')['default']
     ModalDialogComponent: typeof import('./src/components/ModalDialogComponent.vue')['default']
