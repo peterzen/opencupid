@@ -49,6 +49,12 @@ export function createMockPrisma() {
       create: vi.fn(),
       update: vi.fn(),
     },
+    city: {
+      findMany: vi.fn(),
+      findFirst: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+    },
     $transaction: vi.fn(fn => fn(this)),
   }
 }
