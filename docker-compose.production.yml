@@ -1,0 +1,15 @@
+version: "3"
+services:
+  backend:
+    build:
+      context: ./apps/backend
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .env
+  frontend:
+    build:
+      context: ./apps/frontend
+    depends_on:
+      - backend
