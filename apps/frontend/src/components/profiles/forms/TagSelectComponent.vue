@@ -1,30 +1,20 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import Multiselect from 'vue-multiselect'
 import { useTagsStore } from '@/store/tagStore'
+import type { PublicTag } from '@zod/dto/tag.dto'
 
-import { type PublicTag } from '@zod/dto/tag.dto'
-
-// Instantiate Pinia store
+// Store
 const tagStore = useTagsStore()
 
-// Reactive state
+// v-model binding
+const model = defineModel<PublicTag[]>({
+  default: () => [],
+})
+
+// State
 const tags = ref<PublicTag[]>([])
 const isLoading = ref(false)
-
-// Props & Emits
-const props = withDefaults(
-  defineProps<{
-    modelValue?: PublicTag[]
-  }>(),
-  {
-    modelValue: () => [] as PublicTag[],
-  }
-)
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: PublicTag[]): void
-  (e: 'tags:selected', value: PublicTag[]): void
-}>()
 
 /**
  * Called when the user types in the search input
@@ -36,7 +26,7 @@ async function asyncFind(query: string) {
   }
   isLoading.value = true
   try {
-    tags.value = await tagStore.searchTags(query)
+    tags.value = await tagStore.search(query)
   } catch (error) {
     console.error('Failed to search tags:', error)
   } finally {
@@ -44,31 +34,14 @@ async function asyncFind(query: string) {
   }
 }
 
-// Computed v-model proxy (get from parent, set emits back)
-const selected = computed<PublicTag[]>({
-  get() {
-    return props.modelValue || []
-  },
-  set(val: PublicTag[]) {
-    emit('update:modelValue', val)
-    emit('tags:selected', val)
-  },
-})
-
 async function addTag(name: string) {
-  const create = {
-    name: name,
-  }
   isLoading.value = true
   try {
-    const newTag = await tagStore.addUserTag(create)
-    console.log('Adding new tag:', newTag)
+    const newTag = await tagStore.create({ name })
     tags.value.push(newTag)
-    selected.value.push(newTag) // Update the selected tags
-    emit('update:modelValue', selected.value)
+    model.value.push(newTag)
   } catch (error) {
     console.error('Failed to add tag:', error)
-    return
   } finally {
     isLoading.value = false
   }
@@ -78,20 +51,24 @@ async function addTag(name: string) {
 <template>
   <div class="interests-multiselect">
     <Multiselect
-      v-model="selected"
+      v-model="model"
       :options="tags"
       :multiple="true"
       :loading="isLoading"
       :searchable="true"
       :close-on-select="false"
-      :clear-on-select="false"
+      :clear-on-select="true"
       :internal-search="false"
+      :show-labels="false"
+      :show-no-results="true"
+      :show-no-options="false"
       :taggable="true"
-      tag-placeholder="Add this as new tag"
+      open-direction="top"
       @tag="addTag"
       label="name"
       track-by="id"
-      placeholder="Search tags"
+      tag-placeholder="Add this as new tag"
+      placeholder="Search interests..."
       @search-change="asyncFind"
     />
   </div>

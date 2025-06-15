@@ -1,0 +1,87 @@
+@import '@bootstrap/scss/functions';
+@import '@bootstrap/scss/variables';
+@import '@bootstrap/scss/mixins';
+@import '@/css/theme';
+
+.invalid-feedback {
+  display: block !important;
+}
+
+.form-control+.invalid-feedback,
+.is-valid~.invalid-feedback {
+  visibility: hidden;
+}
+
+.is-invalid~.invalid-feedback {
+  visibility: visible;
+}
+
+.btn-social-toggle {}
+
+
+.btn-push {
+  box-shadow:
+    0 4px 0 rgba(0, 0, 0, 0.2),
+    0 4px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.1s ease-in-out;
+  transform: translateY(0);
+  position: relative;
+  border: 1px solid transparentize($color: #000000, $amount: 0.95);
+}
+
+.btn-push:active,
+.btn-push.active {
+  box-shadow:
+    inset 0 4px 8px rgba(0, 0, 0, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.1);
+  transform: translateY(2px);
+}
+
+@mixin btn-colored-push($color) {
+  @extend .btn-push;
+  color: transparentize($color, 0.6);
+
+  &:hover {
+    color: transparentize($color, 0.5);
+    background-color: transparentize($color, 0.95);
+  }
+
+  &:hover:active {
+    color: transparentize($color, 0.5);
+    background-color: transparentize($color, 0.95);
+  }
+
+  &:focus {
+    color: transparentize($color, 0.5);
+    background-color: transparentize($color, 0.95);
+  }
+
+  &.active,
+  &:active {
+    background-color: transparentize($color, 0.5);
+    color: $white;
+  }
+}
+
+.btn-social-toggle {
+  @include btn-colored-push($social);
+}
+
+.btn-dating-toggle {
+  @include btn-colored-push($dating);
+}
+
+
+// List group checkbox/radio lists
+// expand clickable area to the whole list item
+// to improve UX on mobile devices
+.list-group-item .form-check {
+  width: 100%;
+  display: flex;
+
+  .form-check-label {
+    flex-grow: 1;
+    text-align: left;
+    margin-left: 0.5rem;
+  }
+}

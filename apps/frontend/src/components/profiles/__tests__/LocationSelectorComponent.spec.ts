@@ -5,7 +5,7 @@ vi.mock('vue-multiselect', () => ({ default: { template: '<div />' } }))
 vi.mock('@/lib/countries', () => ({ getCountryOptions: () => [{ label: 'USA', value: 'US' }] }))
 vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: (k: string) => k }) }))
 
-import LocationSelectorComponent from '../LocationSelectorComponent.vue'
+import LocationSelectorComponent from '../forms/LocationSelector.vue'
 
 describe('LocationSelectorComponent', () => {
   it('emits updates when fields change', async () => {

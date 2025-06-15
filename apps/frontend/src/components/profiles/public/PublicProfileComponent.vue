@@ -5,14 +5,14 @@ import { useI18n } from 'vue-i18n'
 import { type PublicProfile } from '@zod/profile/profile.dto'
 import { useEnumOptions } from '../composables/useEnumOptions'
 
-import GenderSymbol from '@/components/profiles/GenderSymbol.vue'
+import GenderSymbol from '@/components/profiles/display/GenderSymbol.vue'
 
 import ImageCarousel from './ImageCarousel.vue'
 import ActionButtons from './ActionButtons.vue'
-import LanguageList from './LanguageList.vue'
-import TagList from './TagList.vue'
-import LocationLabel from './LocationLabel.vue'
-import DatingIcon from './DatingIcon.vue'
+import LanguageList from '../display/LanguageList.vue'
+import TagList from '../display/TagList.vue'
+import LocationLabel from '../display/LocationLabel.vue'
+import DatingIcon from '../display/DatingIcon.vue'
 
 const { t } = useI18n()
 
@@ -105,7 +105,7 @@ const pronounsLabel = computed(() => {
           </div>
 
           <div class="d-inline-block">
-            <LanguageList :profile />
+            <LanguageList :languages="profile.languages" />
           </div>
         </div>
         <div class="mb-3">

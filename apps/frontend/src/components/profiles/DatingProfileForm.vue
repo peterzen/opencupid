@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { reactive, computed, watch, ref } from 'vue'
+import { reactive, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import type { OwnerDatingPreferences, OwnerProfile } from '@zod/profile/profile.dto'
-import GenderPickerComponent, { type GenderPickerModel } from './GenderPickerComponent.vue'
+import GenderPickerComponent, { type GenderPickerModel } from './forms/GenderSelector.vue'
 import ToggleSwitch from '@/components/ToggleSwitch.vue'
 import DatingPreferencesForm from './DatingPreferencesForm.vue'
-import VueSlider from 'vue-3-slider-component'
-import { useProfileFields } from './useProfileFields'
 import { useEnumOptions } from './composables/useEnumOptions'
+import AgeSelector from './forms/AgeSelector.vue'
 
 const state = reactive({
   error: '',
@@ -37,23 +36,9 @@ watch(
   { deep: true }
 )
 
-// // Computed proxies for multiselect v-models
-const birthYear = computed({
-  get: () => (formData.birthday ? new Date(formData.birthday).getFullYear() : null),
-  set: (year: number) => {
-    birthyearPreview.value = year
-    if (year && year <= birthYearMax.value && year >= birthYearMin.value) {
-      formData.birthday = new Date(year, 0, 1)
-      const changed = { ...formData, birthday: formData.birthday }
-      emit('update:modelValue', changed)
-      return
-    }
-  },
-})
 
-const birthyearPreview = ref(birthYear.value)
 
-const { birthYearMin, birthYearMax } = useProfileFields(formData)
+
 
 function handleGenderUpdate(value: GenderPickerModel) {
   const changed = { ...formData, ...value }
@@ -78,6 +63,13 @@ function handlePreferencesUpdate(value: OwnerDatingPreferences) {
   Object.assign(formData, changed)
   emit('update:modelValue', formData)
 }
+
+const birthdayModel = computed({
+  get: () => formData.birthday,
+  set: (val) => formData.birthday = val,
+})
+
+
 </script>
 
 <template>
@@ -107,26 +99,7 @@ function handlePreferencesUpdate(value: OwnerDatingPreferences) {
         rounded="sm"
       >
         <fieldset>
-          <div class="mb-4">
-            <label for="birthYear">I was born...</label>
-            <div class="d-flex flex-row align-items-center">
-              <div class="fs-2 me-2 px-4 birthday-preview">
-                <span :class="birthyearPreview ? 'visible' : 'invisible'">
-                  {{ birthyearPreview }}
-                </span>
-              </div>
-              <div class="flex-grow-1 px-3">
-                <vue-slider
-                  v-model="birthYear"
-                  :dotSize="20"
-                  :contained="true"
-                  :tooltip="'none'"
-                  :min="birthYearMin"
-                  :max="birthYearMax"
-                ></vue-slider>
-              </div>
-            </div>
-          </div>
+          <AgeSelector v-model="birthdayModel" />
 
           <div class="mb-3">
             <GenderPickerComponent :modelValue="formData" @changed="handleGenderUpdate" />

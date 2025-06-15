@@ -32,4 +32,8 @@ export const configSchema = z.object({
 
   VAPID_PUBLIC_KEY: z.string().min(10),
   VAPID_PRIVATE_KEY: z.string().min(10),
+
+  GEOIP_URL: z.string(),
+
+  TYPEAHEAD_DEBOUNCE_MS: z.coerce.number().default(300),
 })

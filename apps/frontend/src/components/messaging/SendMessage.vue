@@ -8,8 +8,8 @@ import { type MessageDTO } from '@zod/messaging/messaging.dto'
 import { type PublicProfile } from '@zod/profile/profile.dto'
 
 import { useMessaging } from '../composables/useMessaging'
-import TagList from '@/components/profiles/public/TagList.vue'
-import LanguageList from '@/components/profiles/public/LanguageList.vue'
+import TagList from '@/components/profiles/display/TagList.vue'
+import LanguageList from '@/components/profiles/display/LanguageList.vue'
 
 const props = defineProps<{
   recipientProfile: PublicProfile
@@ -80,7 +80,7 @@ async function handleSendMessage() {
           <TagList :profile="props.recipientProfile" class="d-inline-block" />
         </div>
         <div class="d-inline-block">
-          <LanguageList :profile="props.recipientProfile" class="d-inline-block" />
+          <LanguageList :languages="props.recipientProfile.languages" class="d-inline-block" />
         </div>
       </div>
       <BFormGroup label="" label-for="content-input" class="me-2 flex-grow-1 w-100">

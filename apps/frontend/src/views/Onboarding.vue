@@ -84,23 +84,23 @@ onMounted(async () => {
       <div class="tab-content p-3 border border-top-0">
         <div v-if="activeTab === 'dating'" class="tab-pane active">
           <div class="mt-2">
-            <DatingProfileForm
+            <!-- <DatingProfileForm
               :isLoading="isLoading"
               :modelValue="profile"
               @update:modelValue="val => Object.assign(profile, val)"
               @update:isDatingActive="(val: boolean) => (profile.isDatingActive = val)"
               @submit="handleProfileFormSubmit"
-            />
+            /> -->
           </div>
         </div>
         <div v-if="activeTab === 'friend'" class="tab-pane active">
           <div class="mt-4">
-            <ProfileForm
+            <!-- <ProfileForm
               :isLoading="isLoading"
               :modelValue="profile"
               @update:modelValue="val => Object.assign(profile, val)"
               @submit="handleProfileFormSubmit"
-            />
+            /> -->
           </div>
         </div>
       </div>

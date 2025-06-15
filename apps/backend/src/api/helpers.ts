@@ -1,5 +1,6 @@
 import { UserRole } from '@prisma/client'
 import { FastifyPluginAsync, FastifyRequest } from 'fastify'
+import { appConfig } from '@shared/config/appconfig'
 
 // --- Helper to send uniform error responses ---
 export function sendError(
@@ -20,6 +21,7 @@ export function sendUnauthorizedError(
   return sendError(reply, 401, message)
 }
 
+
 export function sendForbiddenError(
   reply: FastifyPluginAsync['prototype']['reply'],
   message: string = 'Forbidden'
@@ -29,4 +31,12 @@ export function sendForbiddenError(
 
 export function getUserRoles(req: FastifyRequest): UserRole[] {
   return req.session?.roles || []
+}
+
+export function addDebounceHeaders(
+  reply: FastifyPluginAsync['prototype']['reply'],
+) {
+  // disable caching and inform client of debounce interval
+  reply.header('Cache-Control', 'no-cache, no-store, must-revalidate')
+  reply.header('X-Debounce', appConfig.TYPEAHEAD_DEBOUNCE_MS.toString())
 }

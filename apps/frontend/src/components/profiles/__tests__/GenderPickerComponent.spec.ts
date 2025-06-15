@@ -7,7 +7,7 @@ vi.mock('./composables/useEnumOptions', () => ({ useEnumOptions: () => ({
 }) }))
 vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: (k: string) => k }) }))
 
-import GenderPickerComponent from '../GenderPickerComponent.vue'
+import GenderPickerComponent from '../forms/GenderSelector.vue'
 
 describe('GenderPickerComponent', () => {
   it('emits changed when gender updates', async () => {

@@ -9,9 +9,10 @@ import type { PublicTag } from '@zod/dto/tag.dto'
 
 import Multiselect from 'vue-multiselect'
 import ErrorComponent from '@/components/ErrorComponent.vue'
-import TagSelectComponent from '@/components/profiles/TagSelectComponent.vue'
+import TagSelectComponent from '@/components/profiles/forms/TagSelectComponent.vue'
 import ImageEditor from './image/ImageEditor.vue'
-import LocationSelectorComponent from './LocationSelectorComponent.vue'
+import LocationSelectorComponent from './forms/LocationSelector.vue'
+import LanguageSelector from './forms/LanguageSelector.vue'
 
 // Props & Emits
 const props = defineProps<{
@@ -40,15 +41,6 @@ watch(
 )
 
 // Computed proxies for multiselect v-models
-
-const languageOptions = reactive([] as MultiselectOption[])
-const languages = computed({
-  get: () =>
-    (formData.languages ?? []).map(lang => languageOptions.find(opt => opt.value === lang)),
-  set: (options: MultiselectOption[]) => {
-    formData.languages = options.map(opt => opt.value)
-  },
-})
 
 const haveImages = computed(() => {
   return formData.profileImages && formData.profileImages.length > 0
@@ -81,10 +73,6 @@ function handleSubmit() {
   const payload = { ...formData }
   emit('submit', payload)
 }
-
-onMounted(() => {
-  languageOptions.push(...getLanguageSelectorOptions())
-})
 </script>
 
 <template>
@@ -163,30 +151,7 @@ onMounted(() => {
         </div>
 
         <div class="mb-4">
-          <div class="languages-multiselect">
-            <Multiselect
-              v-model="languages"
-              :options="languageOptions"
-              :close-on-select="false"
-              :clear-on-select="false"
-              :multiple="true"
-              :searchable="true"
-              open-direction="bottom"
-              id="languages"
-              label="label"
-              track-by="label"
-              placeholder="I speak..."
-            >
-              <template v-slot:noResult></template>
-              <template #singleLabel="props">
-                {{ t(props.option.label) }}
-              </template>
-
-              <template #option="props">
-                {{ t(props.option.label) }}
-              </template>
-            </Multiselect>
-          </div>
+          <LanguageSelector v-model="formData.languages" />
         </div>
       </fieldset>
       <ErrorComponent :error="error" />
@@ -202,15 +167,4 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped lang="scss">
-:deep(.languages-multiselect) {
-  .multiselect__tag {
-    background-color: var(--bs-info);
-    color: var(--bs-body-bg);
 
-    i:after {
-      color: var(--bs-text-secondary);
-    }
-  }
-}
-</style>

@@ -1,7 +1,25 @@
+// import { createEntityStore } from './entityStore'
+// import type { PublicTag, CreateTagInput } from '@zod/dto/tag.dto'
+// import type { TagResponse, TagsResponse } from '@shared/dto/apiResponse.dto'
+
+// export const useTagsStore = createEntityStore<PublicTag, CreateTagInput>({
+//   name: 'tags',
+//   basePath: '/tags',
+//   extractMany: (data: TagsResponse) => data.tags,
+//   extractOne: (data: TagResponse) => data.tag,
+//   createPath: '/tags',
+//   updatePath: id => `/tags/${id}`,
+//   deletePath: id => `/tags/${id}`,
+// })
+
+
+
+
+
 import { defineStore } from 'pinia'
 import { api, axios } from '@/lib/api'
 
-import type { PublicTag, CreateTagInput } from '@zod/dto/tag.dto'
+import type { PublicTag, CreateTagInput, CreateTagPayload } from '@zod/dto/tag.dto'
 import type { Tag } from '@zod/generated'
 import type { TagResponse, TagsResponse, ApiError } from '@shared/dto/apiResponse.dto'
 
@@ -38,7 +56,7 @@ export const useTagsStore = defineStore('tags', {
     /**
      * Search tags for autocomplete
      */
-    async searchTags(q: string): Promise<PublicTag[]> {
+    async search(q: string): Promise<PublicTag[]> {
       try {
         const res = await api.get<TagsResponse>('/tags/search', {
           params: { q },
@@ -68,7 +86,7 @@ export const useTagsStore = defineStore('tags', {
     /**
      * Create a new tag
      */
-    async createTag(input: CreateTagInput): Promise<PublicTag> {
+    async create(input: CreateTagPayload): Promise<PublicTag> {
       try {
         const res = await api.post<TagResponse>('/tags', input)
         this.tags.push(res.data.tag)
@@ -111,21 +129,5 @@ export const useTagsStore = defineStore('tags', {
       }
     },
 
-    /**
-     * Add a user-created tag
-     */
-    async addUserTag(input: CreateTagInput): Promise<PublicTag> {
-      try {
-        const res = await api.post<TagResponse>('/tags/user', input)
-        return res.data.tag
-      } catch (error: any) {
-        console.error('Failed to add user tag:', error)
-        if (axios.isAxiosError(error) && error.response) {
-          const errData = error.response.data as ServiceError
-          throw errData.message
-        }
-        throw 'Failed to add user tag'
-      }
-    },
   },
 })

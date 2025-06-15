@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import { getLanguageList } from '@/lib/languages'
-import { type PublicProfile, type ProfileSummary } from '@zod/profile/profile.dto'
 import { computed } from 'vue'
 
-const props = defineProps<{
-  profile: PublicProfile
-}>()
+const props = withDefaults(
+  defineProps<{
+    languages?: string[]
+  }>(),
+  {
+    languages: () => [] as string[],
+  }
+)
 
 const languages = computed(() => {
-  return getLanguageList(props.profile.languages)
+  return getLanguageList(props.languages)
 })
 </script>
 

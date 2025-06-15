@@ -12,7 +12,7 @@ import svgLoader from 'vite-svg-loader'
 import serveStatic from 'serve-static'
 
 
-
+process.env.DEBUG = 'vite:*' // Add this to force verbose output
 // https://vite.dev/config/
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
   const rootEnv = loadEnv(mode, '../../', '')
@@ -26,6 +26,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         FRONTEND_URL: rootEnv.FRONTEND_URL,
         NODE_ENV: rootEnv.NODE_ENV,
         VAPID_PUBLIC_KEY: rootEnv.VAPID_PUBLIC_KEY,
+        GEOIP_URL: rootEnv.GEOIP_URL
       }),
     },
     server: {
@@ -41,6 +42,12 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
           rewriteWsOrigin: true,
           ws: true,
           secure: false, // accept self-signed TLS
+        },
+        '/geo': {
+          target: 'http://ifconfig.froggle.org/',
+          changeOrigin: true,
+          secure: false, // accept self-signed TLS
+          rewrite: (path) => path.replace(/^\/geo/, '/json'),
         },
       },
       https: {
@@ -91,6 +98,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
           silenceDeprecations: ['import', 'mixed-decls', 'color-functions', 'global-builtin'],
           includePaths: ['node_modules'],
           quietDeps: true,
+          additionalData: '',
         },
       },
     },
@@ -99,6 +107,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         '@': path.resolve(__dirname, './src'),
         '@shared': path.resolve(__dirname, '../../packages/shared'),
         '@zod': path.resolve(__dirname, '../../packages/shared/zod'),
+        '@bootstrap': path.resolve(__dirname, 'node_modules/bootstrap'),
       },
     },
   }

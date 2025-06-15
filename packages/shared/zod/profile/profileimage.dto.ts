@@ -22,8 +22,10 @@ const ownerFields = {
   id: true,
 } as const
 
-export const OwnerProfileImageSchema = ProfileImageSchema
-  .pick(ownerFields)
+export const OwnerProfileImageScalarSchema = ProfileImageSchema.pick(ownerFields)
+export type OwnerProfileImageScalar = z.infer<typeof OwnerProfileImageScalarSchema>
+
+export const OwnerProfileImageSchema = OwnerProfileImageScalarSchema
   .extend({
     primaryForProfile: ProfileSchema.optional(),
     otherForProfiles: z.array(ProfileSchema).optional(),
@@ -44,6 +46,24 @@ export const ReorderProfileImagesPayloadSchema = z.object({
 })
 export type ReorderProfileImagesPayload = z.infer<typeof ReorderProfileImagesPayloadSchema>
 
+
+
+
+
+// API response schemas
+
+export const ApiSuccessSchema = z.object({
+  success: z.boolean(),
+});
+
+export const ProfileImagesResponseSchema = z.object({
+  images: z.array(OwnerProfileImageSchema).default([]),
+});
+
+export const ImageApiResponseSchema = ApiSuccessSchema.merge(ProfileImagesResponseSchema)
+export type ImageApiResponse = z.infer<typeof ImageApiResponseSchema>
+
+export type ProfileImagesResponse = z.infer<typeof ProfileImagesResponseSchema>;
 
 
 

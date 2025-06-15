@@ -1,0 +1,119 @@
+<script lang="ts" setup>
+import type { HasKidsType } from '@zod/generated'
+import { useI18n } from 'vue-i18n'
+import { useEnumOptions } from '../composables/useEnumOptions'
+import { ref } from 'vue'
+
+// i18n
+const { t } = useI18n()
+
+const model = defineModel<string | null>({
+  default: () => '',
+})
+
+const debug = ref('')
+
+const isListening = ref(false)
+const lastTranscript = ref('')
+const lastConfidence = ref(0)
+const error = ref('')
+const status = ref('idle')
+
+let recognition: SpeechRecognition | null = null
+
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+  const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition
+  recognition = new SpeechRecognition()
+  recognition.lang = 'en-US'
+  recognition.continuous = false
+  recognition.interimResults = false
+
+  recognition.onstart = () => {
+    status.value = 'started'
+    isListening.value = true
+  }
+
+  recognition.onend = () => {
+    status.value = 'ended'
+    isListening.value = false
+  }
+
+  recognition.onerror = (e: any) => {
+    error.value = e.error
+    status.value = 'error'
+    isListening.value = false
+  }
+
+  recognition.onresult = (event: SpeechRecognitionEvent) => {
+    const result = event.results[0][0]
+    lastTranscript.value = result.transcript
+    lastConfidence.value = result.confidence
+    model.value += (model.value ? ' ' : '') + result.transcript
+    status.value = 'result'
+  }
+
+  recognition.onspeechend = () => {
+    status.value = 'speechend'
+    recognition?.stop()
+  }
+
+  recognition.onaudioend = () => {
+    status.value = 'audioend'
+  }
+
+  recognition.onnomatch = () => {
+    status.value = 'no match'
+  }
+}
+
+const toggleListening = () => {
+  if (!recognition) {
+    status.value = 'SpeechRecognition not supported'
+    return
+  }
+
+  if (isListening.value) {
+    recognition.stop()
+    status.value = 'manually stopped'
+  } else {
+    try {
+      recognition.start()
+      status.value = 'starting...'
+    } catch (e: any) {
+      error.value = e.message
+      status.value = 'start failed'
+    }
+  }
+}
+</script>
+
+<template>
+  <div>
+    <BFormFloatingLabel label="My name is..." label-for="publicName" class="my-2">
+      <BFormTextarea
+        v-model="model"
+        id="content-input"
+        :placeholder="$t('profiles.introtext_placeholder')"
+        :label="$t('profiles.introtext_label')"
+        max-rows="5"
+        no-resize
+        size="lg"
+        :required="true"
+        class="mb-3"
+      />
+    </BFormFloatingLabel>
+
+    <button type="button" class="btn btn-outline-primary mt-2" @click="toggleListening">
+      <i class="fas fa-microphone"></i> {{ isListening ? 'Listening…' : 'Dictate' }}
+    </button>
+    <div v-if="recognition">
+      <p><strong>isListening:</strong> {{ isListening }}</p>
+      <p><strong>lastTranscript:</strong> {{ lastTranscript }}</p>
+      <p><strong>lastConfidence:</strong> {{ lastConfidence }}</p>
+      <p><strong>error:</strong> {{ error }}</p>
+      <p><strong>lang:</strong> {{ recognition?.lang }}</p>
+      <p><strong>interimResults:</strong> {{ recognition?.interimResults }}</p>
+      <p><strong>continuous:</strong> {{ recognition?.continuous }}</p>
+    </div>
+  </div>
+</template>

@@ -1,22 +1,15 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { useProfileStore } from '@/store/profileStore'
+import { computed, ref } from 'vue'
 
 import { detectMobile } from '@/lib/mobile-detect'
 
-import type { UpdatedProfileImageFragment, OwnerProfile } from '@zod/profile/profile.dto'
 import LoadingComponent from '@/components/LoadingComponent.vue'
+import ErrorComponent from '@/components/ErrorComponent.vue'
 import UploadButton from './UploadButton.vue'
 import AvatarUploadIcon from '@/assets/icons/files/avatar-upload.svg'
+import { useImageStore } from '@/store/imageStore'
 
-// Emitters
-const emit = defineEmits<{
-  (e: 'image:uploaded', payload: UpdatedProfileImageFragment): void
-  (e: 'image:deleted', payload: { id: string }): void
-  (e: 'update:modelValue', value: OwnerProfile): void
-}>()
-
-const profileStore = useProfileStore()
+const imageStore = useImageStore()
 
 // State
 const preview = ref<string | null>(null)
@@ -34,12 +27,12 @@ const isMobile = computed(() => {
   return detectMobile()
 })
 
-function openModal() {
+const openModal = () => {
   showCaptureChooser.value = true
   showModal.value = true
 }
 
-function closeModal() {
+const closeModal = () => {
   showCaptureChooser.value = true
   showModal.value = false
   preview.value = null
@@ -51,12 +44,12 @@ function closeModal() {
 /**
  * Upload the selected file
  */
-async function handleUpload() {
+const handleUpload = async () => {
   if (!selectedFile.value) return
   isLoading.value = true
   error.value = ''
 
-  const res = await profileStore.uploadProfileImage(selectedFile.value, captionText.value)
+  const res = await imageStore.uploadProfileImage(selectedFile.value, captionText.value)
 
   if (!res.success) {
     console.error('Upload error:', res.message)
@@ -64,20 +57,13 @@ async function handleUpload() {
     isLoading.value = false
     return
   }
-  const updatedProfile = res.profile
-  emit('image:uploaded', updatedProfile)
-
   closeModal()
-
-  // setTimeout(() => {
-  //   showCaptureChooser.value = true
-  // }, 500) // Delay to ensure modal closes before updating
 }
 
 /**
  * Handle file selection: set preview and keep file
  */
-function handleFileChange(event: Event) {
+const handleFileChange = (event: Event) => {
   showCaptureChooser.value = false
   const input = event.target as HTMLInputElement
   const file = input.files?.[0] ?? null
@@ -192,8 +178,6 @@ function handleFileChange(event: Event) {
 </template>
 
 <style lang="scss" scoped>
-
-
 img {
   object-fit: cover;
 }

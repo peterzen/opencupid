@@ -1,11 +1,11 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { ZodSchema, z } from 'zod'
+import { ZodSchema, ZodTypeAny, z } from 'zod'
 
-export function validateBody<T extends ZodSchema<any>>(
-  schema: T,
+export function validateBody<T>(
+  schema: ZodTypeAny,
   req: FastifyRequest,
   reply: FastifyReply
-) {
+): T | null {
   const result = schema.safeParse(req.body)
   if (!result.success) {
     reply.status(400).send({ error: result.error.flatten() })

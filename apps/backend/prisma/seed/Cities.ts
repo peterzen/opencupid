@@ -6,23 +6,21 @@ const prisma = new PrismaClient()
 
 async function main() {
   const toUpsert = cities.map(c => ({
-    id: c.cityId,
     name: c.name,
     country: c.country,
     lat: c.loc.coordinates[1],
     lon: c.loc.coordinates[0],
+    isApproved: true, // Assuming all cities are approved by default
   }))
 
-  const recordsToInsert = 10//toUpsert.length
-
+  const recordsToInsert = 100//toUpsert.length
+  // await prisma.$executeRawUnsafe(`DELETE FROM City`);
   // Upsert all in batches
-  for (let i = 0; i < recordsToInsert; i += 1000) {
-    const batch = toUpsert.slice(i, i + 1000)
+  for (let i = 0; i < recordsToInsert; i += 10) {
+    const batch = toUpsert.slice(i, i + 10)
     await Promise.all(batch.map(city =>
-      prisma.city.upsert({
-        where: { id: city.id },
-        update: {},
-        create: city
+      prisma.city.create({
+        data: city
       })
     ))
   }

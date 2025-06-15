@@ -22,4 +22,5 @@ declare const __APP_CONFIG__: {
   readonly FRONTEND_URL: string
   readonly NODE_ENV: string
   readonly VAPID_PUBLIC_KEY: string
+  readonly GEOIP_URL: string
 }

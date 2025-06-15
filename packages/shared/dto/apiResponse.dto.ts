@@ -12,21 +12,22 @@ import type {
   OwnerProfile,
   PublicProfile,
   UpdatedProfileFragment,
-  UpdatedProfileImageFragment,
 } from '@zod/profile/profile.dto'
 import type { PublicTag } from '@zod/dto/tag.dto'
 import type { ConversationSummary, MessageDTO } from '@zod/messaging/messaging.dto'
 import type { SettingsUser, OtpSendReturn } from '@zod/user/user.dto'
-import type { City } from '@zod/city/city.schema'
+import type {  PublicCity } from '@zod/dto/city.dto'
 
 export type GetMyProfileResponse = ApiSuccess<{ profile: OwnerProfile }>
 export type GetPublicProfileResponse = ApiSuccess<{ profile: PublicProfile }>
 export type GetProfilesResponse = ApiSuccess<{ profiles: PublicProfile[] }>
 export type UpdateProfileResponse = ApiSuccess<{ profile: UpdatedProfileFragment }>
-export type ProfileImagesResponse = ApiSuccess<{ profile: UpdatedProfileImageFragment }>
 
 export type TagsResponse = ApiSuccess<{ tags: PublicTag[] }>
 export type TagResponse = ApiSuccess<{ tag: PublicTag }>
+
+export type CitiesResponse = ApiSuccess<{ cities: PublicCity[] }>
+export type CityResponse = ApiSuccess<{ city: PublicCity }>
 
 export type MessagesResponse = ApiSuccess<{ messages: MessageDTO[] }>
 export type ConversationsResponse = ApiSuccess<{ conversations: ConversationSummary[] }>
@@ -48,5 +49,5 @@ export interface OtpLoginFailure {
 }
 export type OtpLoginResponse = OtpLoginSuccess | OtpLoginFailure
 
-export type CitySearchResponse = City[]
+export type CitySearchResponse = PublicCity[]
 export type CaptchaChallengeResponse = ApiSuccess<any> // altcha challenge shape

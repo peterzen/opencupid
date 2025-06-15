@@ -1,11 +1,11 @@
 import { mount } from '@vue/test-utils'
 import { describe, it, expect, vi } from 'vitest'
 
-vi.mock('../genderIcons', () => ({
+vi.mock('./display/genderIcons', () => ({
   genderIcons: { male: { template: '<span class="male" />' } }
 }))
 
-import GenderSymbol from '../GenderSymbol.vue'
+import GenderSymbol from '../display/GenderSymbol.vue'
 
 describe('GenderSymbol', () => {
   it('renders icon for gender', () => {

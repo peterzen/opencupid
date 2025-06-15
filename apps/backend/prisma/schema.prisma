@@ -80,13 +80,21 @@ enum UserRole {
 }
 
 model City {
-  id      Int    @id
+  id      String @id @default(cuid())
   name    String
   country String // ISO2 code e.g. "US", "DE"
-  lat     Float
-  lon     Float
+  lat     Float?
+  lon     Float?
 
   profiles Profile[]
+
+  isUserCreated Boolean  @default(false)
+  isApproved    Boolean  @default(false)
+  isHidden      Boolean  @default(false)
+  isDeleted     Boolean  @default(false)
+  createdBy     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   // indexes to speed up lookups
   @@index([name])
@@ -171,15 +179,16 @@ model User {
 }
 
 model Profile {
-  id          String @id @default(cuid())
-  slug        String @unique
+  id          String  @id @default(cuid())
+  slug        String  @unique
   publicName  String
-  country     String @default("")
-  cityName    String @default("")
-  cityId      Int?
-  city        City?  @relation(fields: [cityId], references: [id])
-  introSocial String @default("")
+  country     String  @default("")
+  cityName    String  @default("")
+  cityId      String?
+  city        City?   @relation(fields: [cityId], references: [id])
+  introSocial String  @default("")
 
+  isSocialActive Boolean @default(false)
   isDatingActive Boolean @default(false)
   isActive       Boolean @default(false)
   isReported     Boolean @default(false)

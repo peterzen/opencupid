@@ -28,17 +28,19 @@ export const TagParamsSchema = z.object({
 export type TagParams = z.infer<typeof TagParamsSchema>
 
 /** Create payload */
-export const CreateTagSchema = z.object({
-  name: z.string().min(1),
-  createdBy: z.string().cuid().optional(),
+export const CreateTagSchema = TagSchema.pick({
+  name: true,
+  createdBy: true,
+  isUserCreated: true,
 })
+
 export type CreateTagInput = z.infer<typeof CreateTagSchema>
 
-// Payload schema for updating a tag
-export const UpdateTagPayloadSchema = z.object({
+// Payload schema for creating a tag
+export const CreateTagPayloadSchema = z.object({
   name: z.string().min(1),
 })
-export type UpdateTagPayload = z.infer<typeof UpdateTagPayloadSchema>
+export type CreateTagPayload = z.infer<typeof CreateTagPayloadSchema>
 
 // ProfileTag schema with joined Tag 
 export const ProfileTagWithTagSchema = ProfileTagSchema.extend({

@@ -1,4 +1,3 @@
-
 services:
   # backend:
   #   build:
@@ -25,7 +24,7 @@ services:
       POSTGRES_USER: appuser
       POSTGRES_PASSWORD: secret
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -33,23 +32,32 @@ services:
     restart: unless-stopped
     image: maildev/maildev
     ports:
-      - "1080:1080"
-      - "1025:1025"
+      - '1080:1080'
+      - '1025:1025'
 
   redis:
     image: redis:7
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - '6379:6379'
+
+# https://github.com/mpolden/echoip
+  echoip:
+    container_name: echoip
+    image: mpolden/echoip
+    restart: always
+    ports:
+      - '3002:8080'
+      # TODO configure MaxMind GeoIP/GeoLite d
 
   imgsrv:
     build:
       context: apps/imgsrv
     restart: unless-stopped
     env_file:
-    - .env
+      - .env
     ports:
-      - "3001:3001"
+      - '3001:3001'
     volumes:
       - ${MEDIA_UPLOAD_DIR}:/srv/nginx
 
@@ -61,10 +69,9 @@ services:
       - db
       - imgsrv
     env_file:
-    - .env
+      - .env
     ports:
-      - "443:443"
-
+      - '443:443'
 
 volumes:
   postgres_data:

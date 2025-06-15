@@ -1,19 +1,18 @@
-import { type OwnerProfile } from '@zod/profile/profile.dto'
 import { computed } from 'vue'
 
-export function useProfileFields(profile: OwnerProfile) {
+export function useAgeFields(birthday: Date | null) {
   const birthYearMax = computed(() => {
     return new Date().getFullYear() - 18
   })
 
   const birthYearMin = computed(() => {
-    return 1920
+    return 1950
   })
 
   const age = computed(() => {
-    if (!profile.birthday) return null
+    if (!birthday) return null
     const currentYear = new Date().getFullYear()
-    return currentYear - new Date(profile.birthday).getFullYear()
+    return currentYear - new Date(birthday).getFullYear()
   })
 
   return {

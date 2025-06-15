@@ -1,7 +1,7 @@
 import slugify from 'slugify'
 import { prisma } from '../lib/prisma'
 import { Tag } from '@zod/generated'
-import { CreateTagInput } from '@zod/db/tag.schema'
+import { CreateTagInput } from '@zod/dto/tag.dto'
 
 export class TagService {
   private static instance: TagService
@@ -50,19 +50,7 @@ export class TagService {
         slug,
         createdBy: data.createdBy,
         isApproved: true,
-      },
-    })
-  }
-
-  public async createUserTag(data: CreateTagInput): Promise<Tag> {
-    const slug = slugify(data.name, { lower: true, strict: true })
-    return prisma.tag.create({
-      data: {
-        name: data.name,
-        slug,
-        createdBy: data.createdBy,
-        isUserCreated: true,
-        isApproved: true, // User-created tags are automatically approved
+        isUserCreated: data.isUserCreated,
       },
     })
   }

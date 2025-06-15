@@ -16,6 +16,7 @@ const baseFields = {
   work: true,
   isActive: true,
   isDatingActive: true,
+  // isSocialActive: true,
 } as const;
 
 const publicDatingProfileFields = {
@@ -121,12 +122,12 @@ export type UpdatedProfileFragment = z.infer<typeof UpdatedProfileFragmentSchema
 
 
 // Fragment for updated profile images
-export const UpdatedProfileImageFragmentSchema = ProfileSchema
-  .pick({})
-  .extend({
-    profileImages: z.array(OwnerProfileImageSchema).default([]),
-  });
-export type UpdatedProfileImageFragment = z.infer<typeof UpdatedProfileImageFragmentSchema>;
+// export const UpdatedProfileImageFragmentSchema = ProfileSchema
+//   .pick({})
+//   .extend({
+//     profileImages: z.array(OwnerProfileImageSchema).default([]),
+//   });
+// export type UpdatedProfileImageFragment = z.infer<typeof UpdatedProfileImageFragmentSchema>;
 
 export const OwnerDatingPreferencesSchema = ProfileSchema.pick({
   ...privateDatingPreferencesFields,
@@ -142,3 +143,14 @@ export const ProfileSummarySchema = z.object({
 
 export type ProfileSummary = z.infer<typeof ProfileSummarySchema>;
 
+
+
+export const OnboardingProfileSchema = z.object({
+  publicName: z.string().min(2),
+  cityName: z.string(),
+  country: z.string(),
+  languages: z.array(z.string()).default([]),
+  tags: z.array(PublicTagSchema).default([]),
+})
+
+export type OnboardingProfile = z.infer<typeof OnboardingProfileSchema>;

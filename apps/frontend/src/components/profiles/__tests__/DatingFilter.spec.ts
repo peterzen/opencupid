@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { describe, it, expect } from 'vitest'
-import DatingFilter from '../DatingFilter.vue'
+import DatingFilter from '../display/DatingFilter.vue'
 
 const profile = (active: boolean) => ({ isDatingActive: active } as any)
 

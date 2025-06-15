@@ -119,6 +119,10 @@
     "send_failed": "Oops, this didn't work. Please try again.",
     "message_sent_success": "Message sent successfully!"
   },
+  "onboarding":{
+    "name_title": "Hello!",
+    "country_placeholder": "Country"
+  },
   "uicomponents": {
     "submitbutton": {
       "working": "Working...",

@@ -1,80 +1,49 @@
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { VueDraggableNext } from 'vue-draggable-next'
+import { useImageStore } from '@/store/imageStore'
 
-import { useProfileStore } from '@/store/profileStore'
-
-import type { UpdatedProfileImageFragment, OwnerProfile } from '@zod/profile/profile.dto'
-import { type OwnerProfileImage } from '@zod/profile/profileimage.dto'
-
-import ImageUpload from './ImageUpload.vue'
-import ImageTag from './ImageTag.vue'
-import ProfileImage from './ProfileImage.vue'
+import type { OwnerProfileImage } from '@zod/profile/profileimage.dto'
 
 import LoadingComponent from '@/components/LoadingComponent.vue'
+import ImageUpload from './ImageUpload.vue'
+import ImageTag from './ImageTag.vue'
 import HelpScribble from '../HelpScribble.vue'
 
-const profileStore = useProfileStore()
+const imageStore = useImageStore()
 
 const isLoading = ref(false)
-const isRemoving = reactive<Record<string, boolean>>({})
+const isRemoving = ref<Record<string, boolean>>({})
 const error = ref<string>('')
 
-// Props & Emits
-const props = defineProps<{
-  modelValue: OwnerProfile
-}>()
-
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: OwnerProfile): void
-}>()
-
-const formData = reactive<OwnerProfile>({ ...props.modelValue })
-
-// Sync prop changes into formData
-watch(
-  () => props.modelValue,
-  async newVal => {
-    Object.assign(formData, newVal)
-  },
-  { deep: true }
-)
+const model = computed(() => {
+  return imageStore.images
+})
 
 /**
  * Remove an image by ID
  */
 async function handleDelete(image: OwnerProfileImage) {
-  isRemoving[image.id] = true
+  isRemoving.value[image.id] = true
 
-  const res = await profileStore.deleteImage(image)
+  const res = await imageStore.deleteImage(image)
   if (!res.success) {
     error.value = res.message
-    isRemoving[image.id] = false
+    isRemoving.value[image.id] = false
     return
   }
-  Object.assign(formData, res.profile)
-  emit('update:modelValue', formData)
 }
 
-async function handleUploaded(updatedProfile: UpdatedProfileImageFragment) {
-  const update = {
-    ...formData,
-    ...updatedProfile,
-  }
-  emit('update:modelValue', update)
-}
-
-async function handleReorder(event: any) {
+const handleReorder = async (event: any) => {
+  console.log('Reorder event:', event)
   const payload = event.moved
   if (!payload) return
-  const newOrder = formData.profileImages.map((img, position) => ({
+  const newOrder = model.value.map((img, position) => ({
     id: img.id,
     position,
   }))
-  const res = await profileStore.reorderImages(newOrder)
-  Object.assign(formData, res)
-  emit('update:modelValue', formData)
+  const res = await imageStore.reorderImages(newOrder)
 }
 
 /**
@@ -82,8 +51,15 @@ async function handleReorder(event: any) {
  */
 function checkMove(evt: any) {
   const el = evt.draggedContext
-  return el.futureIndex < formData.profileImages.length
+  return el.futureIndex < model.value.length
 }
+
+
+onMounted(async () => {
+  isLoading.value = true
+  await imageStore.fetchImages()
+  isLoading.value = false
+})
 </script>
 
 <template>
@@ -92,21 +68,21 @@ function checkMove(evt: any) {
 
     <div v-else>
       <div class="row">
-        <div class="col-sm-6 mb-3" v-if="formData.profileImages && formData.profileImages.length">
+        <!-- <div class="col-sm-6 mb-3" v-if="model && model.length">
           <div class="ratio ratio-1x1">
-            <ProfileImage :profile="modelValue" />
+            <ImageTag
+              v-if="profileImage"
+              :image="profileImage"
+              className="rounded"/>
           </div>
-        </div>
+        </div> -->
         <div class="col-sm-6">
-          <div
-            v-if="!formData.profileImages || formData.profileImages.length === 0"
-            class="position-absolute end-0 me-5"
-          >
+          <div v-if="!model || model.length === 0" class="position-absolute end-0 me-5">
             <HelpScribble text="Your photo here" />
           </div>
           <VueDraggableNext
-            class="row row-cols-3 row-cols-sm-3 row-cols-md-3 g-4 sortable-grid"
-            v-model="formData.profileImages"
+            class="row row-cols-2 row-cols-sm-3 row-cols-md-3 g-4 sortable-grid p-4"
+            v-model="model"
             ghost-class="ghost"
             :sort="true"
             :filter="'.nodrag'"
@@ -115,15 +91,10 @@ function checkMove(evt: any) {
             @change="handleReorder"
           >
             <TransitionGroup name="fade">
-              <div
-                v-for="img in formData.profileImages"
-                :key="img.id"
-                class="col thumbnail"
-                :id="img.id"
-              >
+              <div v-for="img in model" :key="img.id" class="col thumbnail" :id="img.id">
                 <div class="actions nodrag">
                   <button
-                    class="btn btn-sm  btn-secondary rounded-circle"
+                    class="btn btn-sm btn-secondary rounded-circle"
                     @mousedown.stop.prevent
                     @click="handleDelete(img)"
                     :disabled="isRemoving[img.id]"
@@ -133,12 +104,12 @@ function checkMove(evt: any) {
                 </div>
                 <div :class="{ removing: isRemoving[img.id] }">
                   <div class="ratio ratio-1x1">
-                    <ImageTag :image="img" className="rounded"/>
+                    <ImageTag :image="img" className="rounded" />
                   </div>
                 </div>
               </div>
               <div class="col nodrag" key="upload-button" id="upload-button">
-                <ImageUpload @image:uploaded="handleUploaded" />
+                <ImageUpload />
               </div>
             </TransitionGroup>
           </VueDraggableNext>
@@ -179,7 +150,7 @@ img {
     display: flex;
     align-items: center;
     justify-content: center;
-    
+
     // background-color: black;
     // padding: 10px;
     // font-size: 0.75rem;

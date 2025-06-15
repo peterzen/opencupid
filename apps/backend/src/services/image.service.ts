@@ -45,7 +45,7 @@ export class ImageGalleryService {
   async listImages(userId: string): Promise<ProfileImage[]> {
     return prisma.profileImage.findMany({
       where: { userId },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { position: 'asc' },
     })
   }
 

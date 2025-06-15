@@ -2,16 +2,13 @@ import { validateBody } from '@/utils/zodValidate'
 import {
   PublicTagSchema,
   SearchQuerySchema,
-  TagParamsSchema,
-  UpdateTagPayloadSchema,
+  CreateTagPayloadSchema,
+  CreateTagPayload,
 } from '@zod/dto/tag.dto'
 import { FastifyPluginAsync } from 'fastify'
-import { sendError } from '../helpers'
+import { sendError, addDebounceHeaders } from '../helpers'
 import { TagService } from 'src/services/tag.service'
 import type { TagResponse, TagsResponse } from '@shared/dto/apiResponse.dto'
-
-// debounce duration in milliseconds
-const SEARCH_DEBOUNCE_MS = 300
 
 const tagsRoutes: FastifyPluginAsync = async fastify => {
   const tagService = TagService.getInstance()
@@ -23,9 +20,8 @@ const tagsRoutes: FastifyPluginAsync = async fastify => {
     const { q } = SearchQuerySchema.parse(req.query)
     try {
       const tags = await tagService.search(q)
-      // disable caching and inform client of debounce interval
-      reply.header('Cache-Control', 'no-cache, no-store, must-revalidate')
-      reply.header('X-Debounce', SEARCH_DEBOUNCE_MS.toString())
+      addDebounceHeaders(reply)
+
       if (!tags || tags.length === 0) {
         const response: TagsResponse = { success: true, tags: [] }
         return reply.code(200).send(response)
@@ -43,21 +39,31 @@ const tagsRoutes: FastifyPluginAsync = async fastify => {
    * Create a new tag
    */
   fastify.post(
-    '/user',
+    '/',
     {
       onRequest: [fastify.authenticate],
-      config: { rateLimit: { max: 10, timeWindow: '1 minute' } },
+      // rate limiter
+      config: {
+        rateLimit: {
+          max: 2,
+          timeWindow: '1 minute',
+          onExceeded: (req, key) => {
+            fastify.log.warn(`Rate limit exceeded for user: ${key}`)
+          },
+        }
+      },
     },
     async (req, reply) => {
       const userId = req.user.userId
       if (!userId) {
         return sendError(reply, 401, 'Unauthorized')
       }
-      const data = await validateBody(UpdateTagPayloadSchema, req, reply)
+      // validateBody has some typing issues
+      const data: CreateTagPayload | null = await validateBody(CreateTagPayloadSchema, req, reply)
       if (!data) return
       try {
         const created = await tagService.create({
-          ...data,
+          name: data.name,
           createdBy: userId, // Set the creator to the authenticated user
           isUserCreated: true, // Mark as user-created
         })

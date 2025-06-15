@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { PublicProfile } from '@zod/profile/profile.dto'
 import ProfileImage from '../image/ProfileImage.vue'
-import DatingIcon from './DatingIcon.vue'
-import LanguageList from './LanguageList.vue'
-import TagList from './TagList.vue'
-import LocationLabel from './LocationLabel.vue'
+import DatingIcon from '../display/DatingIcon.vue'
+import LanguageList from '../display/LanguageList.vue'
+import TagList from '../display/TagList.vue'
+import LocationLabel from '../display/LocationLabel.vue'
 // Props & Emits
 defineProps<{
   profile: PublicProfile
@@ -16,17 +16,17 @@ defineProps<{
     <div class="icons">
       <DatingIcon :profile />
     </div>
-    <div class="ratio ratio-1x1">
+    <div class="ratio ratio-3x4">
       <ProfileImage :profile="profile" className="" />
     </div>
-    <div class="d-flex flex-column flex-grow-1">
-      <div class="card-title  d-flex align-items-center justify-content-between flex-row">
+    <div class="overlay d-flex flex-column flex-grow-1">
+      <div class="card-title mb-0 pb-0 d-flex align-items-center justify-content-between flex-row">
         <h5 class="flex-grow-1 fw-bold m-0">{{ profile.publicName }}</h5>
         <small>
           <LocationLabel :profile/>
         </small>
       </div>
-      <div class="p-2 bg-light flex-grow-1">
+      <div class="p-2 flex-grow-1">
         <TagList :profile/>
       </div>
       <!-- <p class="card-text" :class="{ 'truncated-text': profile.introSocial.length > 100 }">
@@ -50,13 +50,17 @@ defineProps<{
   }
 }
 .card-title {
-  background-color: rgba(80,80,80, 0.5);
   text-shadow: 0 0 5px rgba(0,0,0,0.8);
   color: var(--bs-light);
   padding: 0.5rem;
-  position: absolute;
   width: 100%;
-  margin-top: -2.5rem;
+}
+
+.overlay {
+  width: 100%;
+  position: absolute;
+  bottom: 0rem;
+  background-color: rgba(80,80,80, 0.5);
 }
 
 .truncated-text {

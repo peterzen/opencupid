@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n'
 import VueSlider from 'vue-3-slider-component'
 import { type MultiselectOption } from '@/lib/languages'
 import { useEnumOptions } from './composables/useEnumOptions'
-import { useProfileFields } from './useProfileFields'
+import { useAgeFields } from './composables/useProfileFields'
 // https://github.com/s-sasaki-0529/vue-slider-component
 
 const props = defineProps<{
@@ -20,7 +20,7 @@ const formData = reactive<OwnerProfile>({
   ...props.modelValue,
 })
 
-const { age } = useProfileFields(props.modelValue)
+const { age } = useAgeFields(props.modelValue)
 
 // Apply computed defaults after age becomes available
 watchEffect(() => {

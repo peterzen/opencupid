@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { api, axios } from '@/lib/api'
+import { api } from '@/lib/api'
 import type {
   OwnerProfile,
   PublicProfile,
@@ -12,22 +12,17 @@ import {
   UpdatedProfileFragmentSchema,
   UpdateProfilePayloadSchema,
 } from '@zod/profile/profile.dto'
-import { type OwnerProfileImage, type ProfileImagePosition } from '@zod/profile/profileimage.dto'
 import type {
   GetMyProfileResponse,
   GetPublicProfileResponse,
   GetProfilesResponse,
   UpdateProfileResponse,
-  ProfileImagesResponse,
-  ApiError,
 } from '@shared/dto/apiResponse.dto'
 
-type UploadResponse = ProfileImagesResponse | ApiError
 
 export const useProfileStore = defineStore('profile', {
   state: () => ({
     profile: {} as null | OwnerProfile, // Current user's profile
-    profileImages: [] as OwnerProfileImage[], // List of profile images
   }),
 
   actions: {
@@ -53,58 +48,6 @@ export const useProfileStore = defineStore('profile', {
       } catch (error: any) {
         console.error('Store: cannot to update profile:', error)
         throw error.response?.data?.message || 'Failed to update profile'
-      }
-    },
-
-    async uploadProfileImage(file: File, captionText: string): Promise<UploadResponse> {
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('captionText', captionText)
-
-      try {
-        const { data } = await api.post<ProfileImagesResponse>('/profiles/image', formData)
-        return data
-      } catch (err: unknown) {
-        const out: ApiError = {
-          success: false,
-          message: 'An unexpected error occurred',
-        }
-
-        if (axios.isAxiosError(err) && err.response) {
-          const resp = err.response.data as Partial<ApiError>
-          out.message = resp.message ?? out.message
-          if (resp.fieldErrors) out.fieldErrors = resp.fieldErrors
-        } else if (err instanceof Error) {
-          out.message = err.message
-        }
-
-        return out
-      }
-    },
-
-    async deleteImage(image: OwnerProfileImage): Promise<UploadResponse> {
-      try {
-        const { data } = await api.delete<ProfileImagesResponse>(`/profiles/image/${image.id}`)
-        return data
-      } catch (error: any) {
-        const out: ApiError = {
-          success: false,
-          message: 'An unexpected error occurred',
-        }
-        return out
-      }
-    },
-
-    async reorderImages(images: ProfileImagePosition[]): Promise<UploadResponse> {
-      try {
-        const { data } = await api.patch<ProfileImagesResponse>('/profiles/image/order', { images })
-        return data
-      } catch (error: any) {
-        const out: ApiError = {
-          success: false,
-          message: 'An unexpected error occurred',
-        }
-        return out
       }
     },
 

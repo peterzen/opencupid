@@ -27,9 +27,9 @@ describe('GET /search', () => {
   })
 })
 
-describe('POST /user', () => {
-  it('creates tag for user', async () => {
-    const handler = fastify.routes['POST /user']
+describe('POST /', () => {
+  it('creates tag', async () => {
+    const handler = fastify.routes['POST /']
     mockTagService.create.mockResolvedValue({ id: 'ck1234567890abcd12345679', name: 'Foo', slug: 'foo' })
     await handler({ user: { userId: 'u1' }, body: { name: 'Foo' } } as any, reply as any)
     expect(reply.payload.success).toBe(true)
