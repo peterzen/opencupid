@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+vi.mock('@shared/config/appconfig', () => ({ appConfig: { TYPEAHEAD_DEBOUNCE_MS: 300 } }))
 import tagsRoutes from '../../api/routes/tags.route'
 import { MockFastify, MockReply } from '../../test-utils/fastify'
 
