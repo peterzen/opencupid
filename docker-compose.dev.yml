@@ -18,3 +18,10 @@ services:
       - backend
     ports:
       - "5173:80"
+
+  maildev:
+    image: maildev/maildev
+    restart: unless-stopped
+    ports:
+      - "1080:1080"
+      - "1025:1025"
