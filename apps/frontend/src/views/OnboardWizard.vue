@@ -1,22 +1,11 @@
 <script setup lang="ts">
-import { IconArrowLeft, IconChevronsLeft } from '@/components/icons/DoodleIcons'
 import LocationSelectorComponent from '@/components/profiles/forms/LocationSelector.vue'
 import { useStepper } from '@vueuse/core'
-import { LocationSchema, type LocationDTO } from '@zod/dto/location.dto'
+import { type LocationDTO } from '@zod/dto/location.dto'
 import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import z from 'zod'
 
-import { PublicTagSchema } from '@zod/dto/tag.dto'
-import {
-  GenderSchema,
-  HasKidsSchema,
-  ProfileImageSchema,
-  PronounsSchema,
-  RelationshipStatusSchema,
-  type GenderType,
-  type PronounsType,
-} from '@zod/generated'
+import { type GenderType, type PronounsType } from '@zod/generated'
 
 import LanguageSelector from '@/components/profiles/forms/LanguageSelector.vue'
 import AgeSelector from '@/components/profiles/forms/AgeSelector.vue'
@@ -33,41 +22,16 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import SpinnerComponent from '@/components/SpinnerComponent.vue'
 import { useRouter } from 'vue-router'
 import { useProfileStore } from '@/store/profileStore'
+import {
+  EditableOwnerProfile,
+  EditableOwnerProfileSchema,
+  OwnerProfile,
+  UpdateProfilePayload,
+  UpdateProfilePayloadSchema,
+} from '@zod/profile/profile.dto'
 
 const { t } = useI18n()
-const profileStore= useProfileStore()
-
-const OnboardingFormSchema = z.object({
-  publicName: z
-    .string()
-    .min(2, t('onboarding.name_required'))
-    .max(50, t('onboarding.name_too_long'))
-    .default(''),
-  location: LocationSchema,
-  birthday: z
-    .date()
-    .nullable()
-    .refine(date => {
-      if (!date) return false
-      const today = new Date()
-      const age = today.getFullYear() - date.getFullYear()
-      return age >= 18 && age <= 100
-    }, t('onboarding.age_invalid'))
-    .optional(),
-  languages: z.array(z.string()).default([]),
-  tags: z.array(PublicTagSchema).default([]),
-  isSocialActive: z.boolean().default(false),
-  isDatingActive: z.boolean().default(false),
-  gender: GenderSchema,
-  pronouns: PronounsSchema,
-  relationship: RelationshipStatusSchema.nullable(),
-  hasKids: HasKidsSchema.nullable(),
-  profileImages: z.array(ProfileImageSchema),
-  introSocial: z.string(),
-  introDating: z.string(),
-})
-
-type OnboardingForm = z.infer<typeof OnboardingFormSchema>
+const profileStore = useProfileStore()
 
 // https://github.com/vueuse/vueuse/blob/main/packages/core/useStepper/index.md
 // https://playground.vueuse.org/?vueuse=13.3.0#eNrFWG1v2zYQ/isXf6htIFLarvtixGle0AIthjZYsu3DPAy0dHKYUKRAUk68LP99R4p6sx03aTv0SyKRx7vnnjvenXw/OCmKeFniYDI4NInmhQWDtixAMLmYzgbWzAZHM8nzQmkL91AavLBYFKjhATKtchge03FaPkiUxmFHVCNLLF9iI0hytD+TiZLGQqZ0DtNGanQ/kwAZ18Z+YjlOYPhRyeG+WxSsWasW5lwILhcnaarRmGaZ9FpN2k6SBAuL6QQyJgxWe0zPlfycZeSdpbPdvYKtcpSW9CQaU24jEk6HwAwMaatgYgj/9vfo2MO4dcUERqYdeip/hrSgIy6ds8xy8mgCfgPAciucS7+RBHQlPCYAbn5ngpMTozFMjzxdcUMPvHhRrdTc+EMP/u8w0BOxip9Nk6eVANQCOyz2qX4bW81z2t6bTmvWg1GLOt9i6tIv7zCwHjSYkmqry55HIUKb6s/DxnYDf/aD1oTzr5jLRJQpmpHHENSPG5NVcLNSUmoqCaac59ySTm+dZzAKEY+TUms6GS+ZKDEO5kdjOu7g1FILdak+4R1pINU9zUwIly/mFAkInmisFHCZ4t0EZJnPUY8nMFdKIJOVfU33U0vYO9GarWJ3tUb3IFAu7NWEEolOkg+BAVkKEcDERuU4Gv29D9xv7dXomB3x8dseeAJ5eFCVA7r89GIxLwSzSG8Ahylf+ofqERJKQkO1IhNkesGK6DVcl8bybBUlRA5qX0KceDiwjMhbOuBpJDypx8SJ6ADJ/TcVqbMBTG5wRdI8pefaVkclKZ2X1irCWS8ATFJu2FxgSrJ7j7E8dteotsnD9oinY9Lf0XWcCJ7ckKJuPDfFlpGlGAex2GdoV+Cg5eCgQ2B4Dm++KNY+5jZ69ZJ8Pq7yLy40LolPZ8EvdGk1BaVHfdDhiMSCLpi00VwJR1wP3WbqBrhdlBuhdX+iRIm16IaQE9rX/ai0XvZiz7MOCm7OKhyjzVJJ/PbOBzeP3rsqCNJ1BMpSt7ImxWVRWrKUqxSFQ9+rnZ0s2iPQL+OfacWuCgzMPWL1F6q0zzZal+dn2uxnxZPYWy/6W8jbirBf4L83qqorbMGynhsdgNzd2apfR6pp2D6Fe8jXW3qLPbnC5Gau7jqs53otO4NJweYoXCfabvPoAzDfmMAqSLFQhltgYZqAVhIyxMMDr2zd085lf7r3oSlucXqtXX67042pjq9XCD5y5KF/qYWe6uJXZErd4r8mV9omv0lY0NvypFnK1QZJ4MvgurIvUNcTPfNvLjXS75gJ1cTy7W7VenZ71EjRXHXOxHPD/Xj4N3tB1bLrhGiGEW5cnW1bf7eNf2Ho2nDOjVx9mJXRXUD+DxwXVbfejaTPYX9EcBFvZ4TH+7JrxG9cI37Vvfa9A7dRRiMhFHckWKyobWtV0siY0oipU+rl1b8oZ24aK1iCkRNSS9SZULcRK6kOXnkd/V7fmz86c8fRe8K+0TAPaZRpJxLnXn/0WMufH+vBH/wff6d3+hByYqsb/ef66fCgM1QP9ulLm6psxhfxtVGSPsf9rO/qc15wgfpz4WYiatDNN9BsQHOtuv3o15ovJn/GtYIt69eGusOEHs6p16NeUmY3e5bpBVI9cdvvLvzVaTep9JRuPNyx+SsaJUqHsRI7paAQ7I6cR/vB/zpAHfPSvLuzKE3tlAPafvHNBvRjwdkO11u4P8Vv/Dn6ahk8/AcWuUbe
@@ -114,7 +78,9 @@ const { current, isFirst, stepNames, steps, goToNext, goToPrevious, goTo, isNext
     // Dating steps
     age: {
       state: computed(() =>
-        OnboardingFormSchema.pick({ birthday: true }).safeParse(birthdayModel.value) ? true : false
+        EditableOwnerProfileSchema.pick({ birthday: true }).safeParse(birthdayModel.value)
+          ? true
+          : false
       ),
       flags: '',
       isCompleted: false,
@@ -140,14 +106,8 @@ const { current, isFirst, stepNames, steps, goToNext, goToPrevious, goTo, isNext
       isCompleted: false,
     },
   })
-
-const formData = reactive<OnboardingForm>({
-  publicName: '',
-  // location: {
-  //   country: '',
-  //   cityId: '',
-  //   cityName: '',
-  // } as LocationDTO,
+const formData = reactive<EditableOwnerProfile>({
+  publicName: 'dfgdfg',
   location: {
     country: 'AD',
     cityId: 'cmbwaaywq00036wp34ual7mmw',
@@ -162,9 +122,8 @@ const formData = reactive<OnboardingForm>({
   pronouns: 'unspecified' as PronounsType,
   relationship: null,
   hasKids: null,
-  profileImages: [],
-  introSocial: '',
-  introDating: '',
+  introSocial: 'dfgdfg',
+  introDating: 'dfgdfg',
 })
 
 function modelProxy<T extends object, K extends keyof T>(target: T, key: K) {
@@ -194,24 +153,17 @@ const genderPronounsModel = computed({
 
 const isLoading = ref(false)
 const isComplete = ref(false)
+
 const saveProfile = async () => {
-
-  const profileData = {
-    publicName: formData.publicName,
-    location: formData.location,
-    birthday: formData.birthday,
-    languages: formData.languages,
-    tags: formData.tags,
-    isSocialActive: formData.isSocialActive,
-    isDatingActive: formData.isDatingActive
-  }
   isLoading.value = true
-
-  setTimeout(() => {
-    console.log('Saving profile data:', formData)
-    // Simulate saving data
-    isLoading.value = false
-  }, 2000)
+  await profileStore.updateProfile(formData)
+  console.log('Profile saved:', formData)
+  isLoading.value = false
+  // setTimeout(() => {
+  //   console.log('Saving profile data:', formData)
+  //   // Simulate saving data
+  //   isLoading.value = false
+  // }, 2000)
   // isLoading.value = false
 }
 

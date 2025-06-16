@@ -1,50 +1,51 @@
 import {
-  OwnerScalarSchema,
   PublicProfile,
-  OwnerProfile,
   ProfileUnionSchema,
   ProfileSummary,
+  OwnerProfile,
+  EditableOwnerProfileSchema,
 } from '@zod/profile/profile.dto'
+import { type DbProfileComplete, DbProfileWithImagesSchema } from '@zod/profile/profile.db'
+import { LocationSchema } from '@zod/dto/location.dto'
+
 import {
-  OwnerProfileImage,
+  type OwnerProfileImage,
   OwnerProfileImageSchema,
-  PublicProfileImage,
+  type PublicProfileImage,
   PublicProfileImageSchema,
 } from '@zod/profile/profileimage.dto'
-import { ProfileTagJoinSchema, PublicTag, PublicTagSchema } from '@zod/dto/tag.dto'
-import type { ProfileImage, UserRole } from '@prisma/client'
-import { ProfileTag } from '@zod/generated'
+import { ProfileTagToTagTransformSchema, PublicTag, PublicTagSchema } from '@zod/dto/tag.dto'
+import { type ProfileImage } from '@prisma/client'
+import { type ProfileTag } from '@zod/generated'
+
 import { appConfig } from '@shared/config/appconfig'
-import { OwnerProfileComplete, ProfileComplete } from '@zod/profile/profile.types'
 
-export function mapProfileToOwner(profile: OwnerProfileComplete): OwnerProfile {
-  const safe = OwnerScalarSchema.parse(profile)
-
-  // Transform each image using the service
-  const ownerImages = profile.profileImages ? mapProfileImagesToOwner(profile.profileImages) : []
-
-  const publicTags: PublicTag[] = profile.tags
-    .map((pt: ProfileTag) => ProfileTagJoinSchema.parse(pt)) // yields Tag
-    .map((tag: PublicTag) => PublicTagSchema.parse(tag))
-
+export const DbProfileToOwnerProfileTransform = DbProfileWithImagesSchema.transform((db): OwnerProfile => {
+  const tags = mapProfileTags(db.tags)
+  const images = db.profileImages ? mapProfileImagesToOwner(db.profileImages) : []
+  const location = LocationSchema.parse(db)
   return {
-    ...safe,
-    profileImages: ownerImages,
-    tags: publicTags,
+    ...db,
+    profileImages: images,
+    location: location,
+    tags,
   }
-}
+})
+
+
+
 
 export function mapProfileTags(profileTags: ProfileTag[]): PublicTag[] {
   return profileTags
-    .map((pt: ProfileTag) => ProfileTagJoinSchema.parse(pt))
+    .map((pt: ProfileTag) => ProfileTagToTagTransformSchema.parse(pt))
     .map((tag: PublicTag) => PublicTagSchema.parse(tag))
 }
 
-export function mapProfileToPublic(profile: ProfileComplete, roles: UserRole[]): PublicProfile {
+export function mapProfileToPublic(profile: DbProfileComplete, hasDatingPermission: boolean): PublicProfile {
   // shape discriminated union ProfileUnionSchema
   const dProf = {
     ...profile,
-    isDatingActive: roles.includes('user_dating') && profile.isDatingActive,
+    isDatingActive: hasDatingPermission && profile.isDatingActive,
   }
   const scalars = ProfileUnionSchema.parse(dProf)
   const publicImages = profile.profileImages ? mapProfileImagesToPublic(profile.profileImages) : []

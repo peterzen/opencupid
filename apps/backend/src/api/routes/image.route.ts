@@ -1,8 +1,9 @@
+import { z } from 'zod'
 import { FastifyPluginAsync } from 'fastify'
 import multipart, { MultipartValue } from '@fastify/multipart'
 
 import { ProfileService } from 'src/services/profile.service'
-import { ImageGalleryService } from 'src/services/image.service'
+import { ImageService } from 'src/services/image.service'
 import { uploadTmpDir } from '@/lib/media'
 import { sendError, sendForbiddenError } from '../helpers'
 import {
@@ -10,8 +11,7 @@ import {
 } from 'src/api/mappers'
 import { ReorderProfileImagesPayloadSchema } from '@zod/profile/profileimage.dto'
 import { appConfig } from '@shared/config/appconfig'
-import { z } from 'zod'
-import type { ImageApiResponse, ProfileImagesResponse } from '@zod/profile/profileimage.dto'
+import type { ImageApiResponse } from '@zod/profile/profileimage.dto'
 
 
 // Route params for ID lookups
@@ -35,7 +35,7 @@ const imageRoutes: FastifyPluginAsync = async fastify => {
 
   // instantiate services
   const profileService = ProfileService.getInstance()
-  const imageService = ImageGalleryService.getInstance()
+  const imageService = ImageService.getInstance()
 
   fastify.get('/me', { onRequest: [fastify.authenticate] }, async (req, reply) => {
 
@@ -112,7 +112,7 @@ const imageRoutes: FastifyPluginAsync = async fastify => {
         if (!stored) {
           return sendError(reply, 500, 'Failed to store image')
         }
-        const updated = await profileService.addProfileImage(profile, stored.id)
+        const updated = await profileService.addProfileImage(profile.id, stored.id)
         const images = mapProfileImagesToOwner(updated.profileImages)
         const response: ImageApiResponse = { success: true, images }
         return reply.code(200).send(response)
@@ -135,11 +135,11 @@ const imageRoutes: FastifyPluginAsync = async fastify => {
       if (!ok) {
         return sendError(reply, 500, 'Failed to delete image')
       }
-      const updated = await profileService.getProfileByUserId(req.user.userId)
+      const updated = await imageService.listImages(req.user.userId)
       if (!updated) {
         return sendError(reply, 400, 'No user profile found to update after image deletion')
       }
-      const images = mapProfileImagesToOwner(updated.profileImages)
+      const images = mapProfileImagesToOwner(updated)
       const response: ImageApiResponse = { success: true, images }
       return reply.code(200).send(response)
     } catch (err) {

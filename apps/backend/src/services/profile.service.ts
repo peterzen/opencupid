@@ -1,14 +1,13 @@
 import cuid from 'cuid'
 import { prisma } from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
-import {
-  OwnerProfileComplete,
-  ProfileComplete,
-  ProfileWithTags,
-} from '@zod/profile/profile.types'
 
 import { Profile, ProfileImage, ProfileTag } from '@zod/generated'
-import { type UpdateProfilePayload } from '@zod/profile/profile.dto'
+import {
+
+  type UpdateProfilePayload
+} from '@zod/profile/profile.dto'
+import { DbProfileComplete, DbProfile } from '@zod/profile/profile.db'
 
 const profileCompleteInclude = {
   profileImages: {
@@ -51,7 +50,7 @@ export class ProfileService {
     return ProfileService.instance
   }
 
-  async getProfileById(profileId: string, myProfileId: string): Promise<ProfileComplete | null> {
+  async getProfileWithConversationsById(profileId: string, myProfileId: string): Promise<DbProfileComplete | null> {
 
     return prisma.profile.findUnique({
       where: { id: profileId },
@@ -62,7 +61,7 @@ export class ProfileService {
     })
   }
 
-  async getProfileByUserId(userId: string): Promise<OwnerProfileComplete | null> {
+  async getProfileByUserId(userId: string): Promise<DbProfile | null> {
     return prisma.profile.findUnique({
       where: { userId },
       include: {
@@ -75,7 +74,7 @@ export class ProfileService {
     tx: Prisma.TransactionClient,
     userId: string,
     data: UpdateProfilePayload
-  ): Promise<ProfileWithTags> {
+  ): Promise<DbProfile> {
     // 1) pull out the tags array
     const { tags, ...rest } = data
 
@@ -120,14 +119,14 @@ export class ProfileService {
   }
 
   public async addProfileImage(
-    profile: ProfileComplete | OwnerProfileComplete,
+    profileId: string,
     imageId: string
   ): Promise<{
     profileImages: ProfileImage[]
   }> {
     return prisma.profile.update({
       where: {
-        id: profile.id,
+        id: profileId,
       },
       data: {
         profileImages: { connect: { id: imageId } },
@@ -264,7 +263,7 @@ export class ProfileService {
     })
   }
 
-  async findProfilesFor(profileId: string): Promise<ProfileComplete[]> {
+  async findProfilesFor(profileId: string): Promise<DbProfileComplete[]> {
     return await prisma.profile.findMany({
       where: {
         isActive: true,

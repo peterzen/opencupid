@@ -1,23 +1,29 @@
 import { z } from "zod";
-import { ConversationSchema, ProfileSchema } from "../generated";
+
+
+import {
+  ConversationSchema,
+  ProfileSchema
+} from "../generated";
+
+
+
 import { PublicTagSchema } from "../dto/tag.dto";
 import {
-  OwnerProfileImageSchema,
   PublicProfileImageSchema
 } from "./profileimage.dto";
+import { LocationSchema } from "@zod/dto/location.dto";
 
 const baseFields = {
   id: true,
   languages: true,
   publicName: true,
   introSocial: true,
-  cityId: true,
   cityName: true,
   country: true,
-  work: true,
   isActive: true,
   isDatingActive: true,
-  // isSocialActive: true,
+  isSocialActive: true,
 } as const;
 
 const publicDatingProfileFields = {
@@ -29,21 +35,37 @@ const publicDatingProfileFields = {
   pronouns: true,
 } as const;
 
-const privateDatingPreferencesFields = {
+const datingPreferencesFields = {
   prefAgeMin: true,
   prefAgeMax: true,
   prefGender: true,
   prefKids: true,
 } as const;
 
+const editableFields = {
+  // cityId: true,  // TODO !!add it back when DB records are updated
+  // country: true,
+  // cityName: true,
+  languages: true,
+  birthday: true,
+  publicName: true,
+  introSocial: true,
+  introDating: true,
+  hasKids: true,
+  relationship: true,
+  gender: true,
+  pronouns: true,
+  isDatingActive: true,
+  isSocialActive: true,
+} as const;
 
-export const PublicScalarsSchema = ProfileSchema.pick({
+const PublicScalarsSchema = ProfileSchema.pick({
   ...baseFields,
 }).extend({
   isDatingActive: z.literal(false)
 })
 
-export const PublicDatingScalarsSchema = ProfileSchema.pick({
+const PublicDatingScalarsSchema = ProfileSchema.pick({
   ...baseFields,
   ...publicDatingProfileFields,
 }).extend({
@@ -58,8 +80,6 @@ export const ProfileUnionSchema = z.discriminatedUnion('isDatingActive', [
   PublicDatingScalarsSchema,
 ])
 
-// export type ProfileUnion = z.infer<typeof ProfileUnionSchema>
-
 export const PublicProfileSchema = ProfileUnionSchema.and(
   z.object({
     profileImages: z.array(PublicProfileImageSchema).default([]),
@@ -71,68 +91,72 @@ export const PublicProfileArraySchema = z.array(PublicProfileSchema);
 
 export type PublicProfile = z.infer<typeof PublicProfileSchema>;
 
-export const PublicDatingProfileSchema = ProfileSchema.pick({
-  ...baseFields,
-  ...publicDatingProfileFields,
-}).extend({
-  profileImages: z.array(PublicProfileImageSchema).default([]),
-  tags: z.array(PublicTagSchema).default([]),
-  conversation: ConversationSchema
-});
-
-export type PublicDatingProfile = z.infer<typeof PublicDatingProfileSchema>;
-
 export const OwnerScalarSchema = ProfileSchema.pick({
   ...baseFields,
   ...publicDatingProfileFields,
-  ...privateDatingPreferencesFields,
+  ...datingPreferencesFields,
   id: true,
   isActive: true,
 });
 
-export const OwnerProfileSchema = OwnerScalarSchema.extend({
-  profileImages: z.array(OwnerProfileImageSchema).default([]),
+
+
+
+// export const OwnerProfileSchema = OwnerScalarSchema.extend({
+//   profileImages: z.array(OwnerProfileImageSchema).default([]),
+//   tags: z.array(PublicTagSchema).default([]),
+// });
+// export type OwnerProfile = z.infer<typeof OwnerProfileSchema>;
+
+
+export const OwnerProfileSchema = ProfileSchema.pick({
+  ...editableFields
+}).extend({
+  profileImages: z.array(PublicProfileImageSchema).default([]),
   tags: z.array(PublicTagSchema).default([]),
-});
+  location: LocationSchema
+})
 export type OwnerProfile = z.infer<typeof OwnerProfileSchema>;
 
-// export const PartialOwnerScalarSchema = OwnerScalarSchema
-//   .partial()
-// export type PartialOwnerScalar = z.infer<typeof PartialOwnerScalarSchema>;
+export const EditableOwnerProfileSchema = ProfileSchema.pick({
+  ...editableFields
+}).extend({
+  tags: z.array(PublicTagSchema).default([]),
+  location: LocationSchema
+})
+export type EditableOwnerProfile = z.infer<typeof EditableOwnerProfileSchema>;
 
-export const ProfileFormSubmitSchema = OwnerScalarSchema
-  .partial()
-  .extend({
-    tags: z.array(PublicTagSchema).default([]),
-  });
-export type ProfileFormSubmit = z.infer<typeof ProfileFormSubmitSchema>;
+export const EditableOwnerToProfilePayloadTransform = EditableOwnerProfileSchema.transform((data) => {
+  return {
+    ...data,
+    tags: data.tags.map(tag => tag.id),
+    cityId: data.location.cityId, // TODO !!remove nullable when DB records are updated
+    country: data.location.country,
+    cityName: data.location.cityName,
+    location: undefined
+  }
+})
 
-
-export const UpdateProfilePayloadSchema = OwnerScalarSchema
-  .partial()
-  .extend({
-    tags: z.array(z.string().cuid()).optional(),
-  })
+export const UpdateProfilePayloadSchema = ProfileSchema.pick({
+  ...editableFields
+}).extend({
+  tags: z.array(z.string().cuid()),
+})
+// export const UpdateProfilePayloadSchema = EditableOwnerProfileSchema.transform((data) => {
+//   return {
+//     ...data,
+//     tags: data.tags.map(tag => tag.id),
+//     cityId: data.location.cityId, // TODO !!remove nullable when DB records are updated
+//     country: data.location.country,
+//     cityName: data.location.cityName,
+//     location: undefined
+//   }
+// })
 export type UpdateProfilePayload = z.infer<typeof UpdateProfilePayloadSchema>;
 
-// Updated profile fragment with tags but no images
-export const UpdatedProfileFragmentSchema = OwnerScalarSchema.extend({
-  tags: z.array(PublicTagSchema).default([]),
-});
-export type UpdatedProfileFragment = z.infer<typeof UpdatedProfileFragmentSchema>;
-
-
-
-// Fragment for updated profile images
-// export const UpdatedProfileImageFragmentSchema = ProfileSchema
-//   .pick({})
-//   .extend({
-//     profileImages: z.array(OwnerProfileImageSchema).default([]),
-//   });
-// export type UpdatedProfileImageFragment = z.infer<typeof UpdatedProfileImageFragmentSchema>;
 
 export const OwnerDatingPreferencesSchema = ProfileSchema.pick({
-  ...privateDatingPreferencesFields,
+  ...datingPreferencesFields,
 }).partial()
 export type OwnerDatingPreferences = z.infer<typeof OwnerDatingPreferencesSchema>;
 
@@ -147,24 +171,3 @@ export type ProfileSummary = z.infer<typeof ProfileSummarySchema>;
 
 
 
-// export const CreateProfileInputSchema = ProfileSchema.pick({
-//   publicName: true,
-//   country: true,
-//   cityId: true,
-//   languages: true,
-//   isActive: true,
-//   isDatingActive: true,
-//   isSocialActive: true,
-//   introDating: true,
-//   introSocial: true,
-//   hasKids: true,
-//   relationship: true,
-//   gender: true,
-//   birthday: true,
-//   pronouns: true,
-// }).extend({
-//   tags: z.array(PublicTagSchema).default([]),
-// });
-
-
-// export type CreateProfileInput = z.infer<typeof CreateProfileInputSchema>

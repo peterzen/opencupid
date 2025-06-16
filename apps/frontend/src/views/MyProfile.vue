@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, onMounted, ref } from 'vue'
+import { reactive, onMounted } from 'vue'
 import type { PublicProfile } from '@zod/profile/profile.dto'
 import { useProfileStore } from '@/store/profileStore'
 

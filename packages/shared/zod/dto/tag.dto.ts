@@ -58,8 +58,8 @@ export const SearchQuerySchema = z.object({
 
 
 // Match { id, tagId, profileId, tag: { ... } }
-export const ProfileTagJoinSchema = ProfileTagSchema
+export const ProfileTagToTagTransformSchema = ProfileTagSchema
   .merge(z.object({ tag: TagSchema }))
   .transform(join => join.tag)
 
-export type ProfileTagJoin = z.infer<typeof ProfileTagJoinSchema>
+export type ProfileTagJoin = z.infer<typeof ProfileTagToTagTransformSchema>

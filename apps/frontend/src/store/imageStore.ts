@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import { api, axios } from '@/lib/api'
 import type { ApiError, ApiSuccess } from '@shared/dto/apiResponse.dto'
 import { type ImageApiResponse, ImageApiResponseSchema, type OwnerProfileImage, type ProfileImagePosition } from '@zod/profile/profileimage.dto'
+import { bus } from '@/lib/bus'
 
 
 type ImageStoreResponse = ApiSuccess<{}> | ApiError
@@ -68,6 +69,7 @@ export const useImageStore = defineStore('image', {
         this.images = images
         return { success: true }
       } catch (error: any) {
+        this.images = [] // Reset images on error
         return {
           success: false,
           message: 'An unexpected error occurred',
@@ -83,6 +85,7 @@ export const useImageStore = defineStore('image', {
         return { success: true }
       } catch (error: any) {
         console.error('Failed to fetch profile images:', error)
+        this.images = [] // Reset images on error
         return {
           success: false,
           message: error.response?.data?.message || 'Failed to fetch profile images'
@@ -90,5 +93,19 @@ export const useImageStore = defineStore('image', {
       }
     },
 
+    initialize() {
+      this.images = []
+    }
   },
+})
+
+
+
+bus.on('auth:login', () => {
+  useImageStore().initialize()
+})
+
+bus.on('auth:logout', () => {
+  console.log('Clearing image store on logout')
+  useImageStore().initialize()
 })

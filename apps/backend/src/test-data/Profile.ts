@@ -1,7 +1,6 @@
 import 'dotenv/config'
 
 import { prisma } from '@/lib/prisma'
-import mime from 'mime-types'
 import { faker, SexType } from '@faker-js/faker'
 import fs from 'fs'
 
@@ -9,15 +8,13 @@ import { downloadImage, randomBoolean } from './utils'
 import { User, GenderType, UserRoleType } from '@zod/generated'
 import { HasKids, Pronouns, RelationshipStatus } from '@prisma/client'
 
-import { ImageGalleryService } from '../services/image.service'
-import path, { basename, dirname } from 'path'
-import { makeImageLocation } from '@/lib/media'
+import { ImageService } from '../services/image.service'
+import path, { basename } from 'path'
 import { ProfileService } from '@/services/profile.service'
-import type { OwnerProfile, ProfileComplete } from '@zod/db/profile.db'
 import cuid from 'cuid'
 import { appConfig } from '@shared/config/appconfig'
 
-const imageService = ImageGalleryService.getInstance()
+const imageService = ImageService.getInstance()
 const profileService = ProfileService.getInstance()
 
 const howMany = 1
@@ -63,15 +60,15 @@ export function createRandomProfile(user: User) {
 
   const datingProfile = isDatingActive
     ? {
-        languages: faker.helpers.arrayElements(languages, faker.number.int({ min: 1, max: 3 })),
-        work: faker.person.jobTitle(),
-        introDating: faker.person.bio() + ' ' + faker.lorem.sentences({ min: 1, max: 4 }),
-        birthday: faker.date.birthdate({ min: 18, max: 60, mode: 'age' }),
-        gender: gender,
-        relationship: faker.helpers.enumValue(RelationshipStatus),
-        hasKids: faker.helpers.enumValue(HasKids),
-        pronouns: faker.helpers.enumValue(Pronouns),
-      }
+      languages: faker.helpers.arrayElements(languages, faker.number.int({ min: 1, max: 3 })),
+      work: faker.person.jobTitle(),
+      introDating: faker.person.bio() + ' ' + faker.lorem.sentences({ min: 1, max: 4 }),
+      birthday: faker.date.birthdate({ min: 18, max: 60, mode: 'age' }),
+      gender: gender,
+      relationship: faker.helpers.enumValue(RelationshipStatus),
+      hasKids: faker.helpers.enumValue(HasKids),
+      pronouns: faker.helpers.enumValue(Pronouns),
+    }
     : {}
 
   return {
@@ -185,7 +182,7 @@ async function main() {
       try {
         console.log(`Added image ${profileImage.id} `, profileImage)
 
-        profileService.addProfileImage(createdProfile as ProfileComplete, profileImage.id)
+        profileService.addProfileImage(createdProfile.id, profileImage.id)
       } catch (err) {
         console.error(`Error adding image for user ${createdUser.email}:`, err)
       }

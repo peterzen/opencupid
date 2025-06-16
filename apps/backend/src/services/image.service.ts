@@ -14,8 +14,8 @@ const sizes = [
   { name: 'card', width: 480 }, // keep aspect ratio
   { name: 'full', width: 1280 }, // max width
 ]
-export class ImageGalleryService {
-  private static instance: ImageGalleryService
+export class ImageService {
+  private static instance: ImageService
 
   /**
    * Private constructor to prevent direct instantiation
@@ -25,11 +25,11 @@ export class ImageGalleryService {
   /**
    * Get singleton instance
    */
-  public static getInstance(): ImageGalleryService {
-    if (!ImageGalleryService.instance) {
-      ImageGalleryService.instance = new ImageGalleryService()
+  public static getInstance(): ImageService {
+    if (!ImageService.instance) {
+      ImageService.instance = new ImageService()
     }
-    return ImageGalleryService.instance
+    return ImageService.instance
   }
 
   /**

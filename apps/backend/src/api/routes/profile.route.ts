@@ -1,28 +1,33 @@
 import { FastifyPluginAsync } from 'fastify'
+import { Prisma } from '@prisma/client'
+import { z } from 'zod'
 
 import {
-  UpdatedProfileFragmentSchema,
-  UpdateProfilePayload,
+  type UpdateProfilePayload,
   UpdateProfilePayloadSchema
 } from '@zod/profile/profile.dto'
 
 import { ProfileService } from 'src/services/profile.service'
 import { validateBody } from '@/utils/zodValidate'
-import { getUserRoles, sendError, sendForbiddenError, sendUnauthorizedError } from '../helpers'
 import {
+  getUserRoles,
+  sendError,
+  sendForbiddenError,
+  sendUnauthorizedError
+} from '../helpers'
+import {
+  DbProfileToOwnerProfileTransform,
   mapProfileTags,
-  mapProfileToOwner,
   mapProfileToPublic,
 } from 'src/api/mappers'
 import { UserService } from 'src/services/user.service'
-import { Prisma } from '@prisma/client'
 import type {
   GetMyProfileResponse,
   GetPublicProfileResponse,
   GetProfilesResponse,
   UpdateProfileResponse,
 } from '@shared/dto/apiResponse.dto'
-import { z } from 'zod'
+import { DbProfileSchema } from '@zod/profile/profile.db'
 
 // Route params for ID lookups
 const IdLookupParamsSchema = z.object({
@@ -30,8 +35,8 @@ const IdLookupParamsSchema = z.object({
 })
 
 
-const profileRoutes: FastifyPluginAsync = async fastify => {
 
+const profileRoutes: FastifyPluginAsync = async fastify => {
 
   // instantiate services
   const profileService = ProfileService.getInstance()
@@ -42,13 +47,12 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
    * @description This route retrieves the current user's social and dating profiles.
    */
   fastify.get('/me', { onRequest: [fastify.authenticate] }, async (req, reply) => {
-    if (!req.user.userId) return sendUnauthorizedError(reply)
 
     try {
       const fetched = await profileService.getProfileByUserId(req.user.userId)
       if (!fetched) return sendError(reply, 404, 'Social profile not found')
 
-      const profile = mapProfileToOwner(fetched)
+      const profile = DbProfileToOwnerProfileTransform.parse(fetched)
       const response: GetMyProfileResponse = { success: true, profile }
       return reply.code(200).send(response)
     } catch (err) {
@@ -69,14 +73,14 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
     const { id } = IdLookupParamsSchema.parse(req.params)
 
     try {
-      const raw = await profileService.getProfileById(id, myProfileId)
+      const raw = await profileService.getProfileWithConversationsById(id, myProfileId)
       if (!raw) return sendError(reply, 404, 'Profile not found')
 
       if (raw.userId !== req.user.userId && !req.session.hasActiveProfile) {
         return sendForbiddenError(reply, 'You do not have access to this profile')
       }
 
-      const profile = mapProfileToPublic(raw, roles)
+      const profile = mapProfileToPublic(raw, roles.includes('user_dating'))
       // const profile = publicProfileSchema.parse(raw)
       const response: GetPublicProfileResponse = { success: true, profile }
       return reply.code(200).send(response)
@@ -93,7 +97,9 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
 
     try {
       const profiles = await profileService.findProfilesFor(myProfileId)
-      const mappedProfiles = profiles.map(p => mapProfileToPublic(p, getUserRoles(req)))
+      const roles = getUserRoles(req)
+      const hasDatingPermission = roles.includes('user_dating')
+      const mappedProfiles = profiles.map(p => mapProfileToPublic(p, hasDatingPermission))
       const response: GetProfilesResponse = { success: true, profiles: mappedProfiles }
       return reply.code(200).send(response)
     } catch (err) {
@@ -106,7 +112,6 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
    * Update the current user's profile
    */
   fastify.patch('/profile', { onRequest: [fastify.authenticate] }, async (req, reply) => {
-    if (!req.user.userId) return sendUnauthorizedError(reply)
 
     const data = await validateBody(UpdateProfilePayloadSchema, req, reply) as UpdateProfilePayload
     if (!data) return
@@ -120,7 +125,7 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
     } else {
       userService.removeRole(user, 'user_dating')
     }
-    user.hasActiveProfile = data.isActive || false
+    user.hasActiveProfile = [data.isDatingActive, data.isSocialActive].some(Boolean)
 
     try {
       const updated = await fastify.prisma.$transaction(async tx => {
@@ -134,16 +139,9 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
         return updatedProfile
       })
 
-      const { tags, profileImages, ...rest } = updated
-
-      const profile = UpdatedProfileFragmentSchema.parse({
-        tags: mapProfileTags(updated.tags),
-        ...rest,
-      })
-
       // Clear session to force re-fetch on next request, we need the roles updated
       await req.deleteSession()
-      const response: UpdateProfileResponse = { success: true, profile }
+      const response: UpdateProfileResponse = { success: true, profile: updated }
       return reply.code(200).send(response)
     } catch (err) {
       fastify.log.error(err)
