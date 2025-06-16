@@ -2,6 +2,7 @@
 import { useI18n } from 'vue-i18n'
 import { ref } from 'vue'
 import type { SpeechRecognition, SpeechRecognitionEvent } from '@/types/speechrecognition'
+import { IconGlobe, IconMic, IconMic2 } from '@/components/icons/DoodleIcons'
 
 // i18n
 const { t } = useI18n()
@@ -10,6 +11,11 @@ const model = defineModel<string | null>({
   default: () => '',
 })
 
+const props = defineProps<{
+  languages: string[],
+  placeholder: string,
+}>()
+
 const debug = ref('')
 
 const isListening = ref(false)
@@ -17,11 +23,13 @@ const lastTranscript = ref('')
 const lastConfidence = ref(0)
 const error = ref('')
 const status = ref('idle')
+const currentLanguage = ref(props.languages[0] || 'en')
 
 let recognition: SpeechRecognition | null = null
 
 if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-  const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition
+  const SpeechRecognition =
+    (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition
   recognition = new SpeechRecognition()
   recognition.lang = 'en-US'
   recognition.continuous = false
@@ -88,7 +96,45 @@ const toggleListening = () => {
 
 <template>
   <div>
-    <BFormFloatingLabel label="My name is..." label-for="publicName" class="my-2">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <IconGlobe class="svg-icon me-2" />
+      </div>
+      <ul class="nav nav-underline flex-grow-1">
+        <li class="nav-item me-2" v-for="lang in props.languages" :key="lang">
+          <a
+            class="nav-link"
+            :class="{ active: currentLanguage === lang }"
+            :aria-label="lang"
+            :aria-selected="currentLanguage === lang"
+            aria-current="page"
+            href="#"
+            @click="currentLanguage = lang"
+            ><small>{{ lang }}</small></a
+          >
+        </li>
+      </ul>
+      <div class="">
+        <BButton variant="secondary" size="sm" pill @click="toggleListening">
+          <IconMic2 class="svg-icon" />
+          <i class="fas fa-microphone"></i> {{ isListening ? 'Listening…' : 'Dictate' }}
+        </BButton>
+      </div>
+    </div>
+    <BFormFloatingLabel :label="props.placeholder" label-for="publicName">
+      <BFormTextarea
+        v-model="model"
+        id="content-input"
+        placeholder="Tell a bit about yourself"
+        max-rows="5"
+        no-resize
+        size="lg"
+        :required="true"
+        class="mb-3"
+      />
+    </BFormFloatingLabel>
+
+    <!-- <BFormFloatingLabel label="My name is..." label-for="publicName">
       <BFormTextarea
         v-model="model"
         id="content-input"
@@ -100,11 +146,8 @@ const toggleListening = () => {
         :required="true"
         class="mb-3"
       />
-    </BFormFloatingLabel>
+    </BFormFloatingLabel> -->
 
-    <button type="button" class="btn btn-outline-primary mt-2" @click="toggleListening">
-      <i class="fas fa-microphone"></i> {{ isListening ? 'Listening…' : 'Dictate' }}
-    </button>
     <div v-if="recognition">
       <p><strong>isListening:</strong> {{ isListening }}</p>
       <p><strong>lastTranscript:</strong> {{ lastTranscript }}</p>
@@ -116,3 +159,11 @@ const toggleListening = () => {
     </div>
   </div>
 </template>
+
+
+
+<style scoped lang="scss">
+.nav-link {
+  padding: 0.15rem 1rem ;
+}
+</style>

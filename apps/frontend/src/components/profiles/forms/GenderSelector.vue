@@ -71,7 +71,6 @@ const showPronouns = computed(() => {
 </script>
 <template>
   <div>
-    <label>I identify as...</label>
     <BListGroup class="overflow-scroll" style="max-height: 40vh">
       <BListGroupItem
         v-for="g in sortedOptions"

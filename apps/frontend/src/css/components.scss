@@ -3,6 +3,9 @@
 @import '@bootstrap/scss/mixins';
 @import '@/css/theme';
 
+
+// Form validation styles
+// fix dancing fields
 .invalid-feedback {
   display: block !important;
 }
@@ -16,7 +19,6 @@
   visibility: visible;
 }
 
-.btn-social-toggle {}
 
 
 .btn-push {

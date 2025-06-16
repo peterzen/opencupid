@@ -76,7 +76,7 @@ onMounted(async () => {
               className="rounded"/>
           </div>
         </div> -->
-        <div class="col-sm-6">
+        <div class="col-sm-12">
           <div v-if="!model || model.length === 0" class="position-absolute end-0 me-5">
             <HelpScribble text="Your photo here" />
           </div>

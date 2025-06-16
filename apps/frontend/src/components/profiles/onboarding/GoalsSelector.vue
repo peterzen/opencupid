@@ -29,40 +29,50 @@ const toggleDating = () => {
 
 <template>
   <div class="d-flex gap-4 flex-row justify-content-between w-100">
-    <button
-      type="button"
-      class="btn btn-social-toggle"
+    <div
+      class="card btn-social-toggle"
       :class="{ active: model.isSocialActive }"
       @click="toggleSocial"
     >
-      <IconSocialize class="svg-icon-lg h-100 w-100" />
-    </button>
-    <button
-      type="button"
-      class="btn btn-dating-toggle"
+      <div class="m-4">
+        <IconSocialize class="svg-icon-lg h-100 w-100" />
+      </div>
+      <div class="card-body">
+        <p class="card-text">Socializing, hanging out, traveling, and meeting new people</p>
+      </div>
+      <div class="card-footer text-center">
+        <div class="form-control-lg">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            :checked="model.isSocialActive"
+            value="true"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="card btn-dating-toggle"
       :class="{ active: model.isDatingActive }"
       @click="toggleDating"
     >
-      <IconDate class="svg-icon-lg h-100 w-100" />
-    </button>
-  </div>
-  <div class="d-flex gap-4 flex-row justify-content-between w-100 mt-3">
-    <div>
-      <p class="description-social">
-        Describe sacializing 
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque fermentum elementum
-        pulvinar. Integer elementum congue odio ut scelerisque. Nam tincidunt scelerisque mauris,
-        viverra,
-      </p>
-    </div>
-
-    <div>
-      <p  class="description-dating">
-        Describe dating 
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque fermentum elementum
-        pulvinar. Integer elementum congue odio ut scelerisque. Nam tincidunt scelerisque mauris,
-        viverra,
-      </p>
+      <div class="m-4">
+        <IconDate class="svg-icon-lg h-100 w-100" />
+      </div>
+      <div class="card-body">
+        <p class="card-text">Dating, finding a partner, and exploring romantic relationships.</p>
+      </div>
+      <div class="card-footer text-center">
+        <div class="form-control-lg">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            :checked="model.isDatingActive"
+            value="true"
+          />
+        </div>
+      </div>
     </div>
   </div>
 </template>
