@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n'
 import VueSlider from 'vue-3-slider-component'
 import { type MultiselectOption } from '@/lib/languages'
 import { useEnumOptions } from './composables/useEnumOptions'
-import { useAgeFields } from './composables/useProfileFields'
+import { useAgeFields } from './composables/useAgeFields'
 // https://github.com/s-sasaki-0529/vue-slider-component
 
 const props = defineProps<{

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useAgeFields } from '../composables/useProfileFields'
+import { useAgeFields } from '../composables/useAgeFields'
 
 import VueSlider from 'vue-3-slider-component'
 
