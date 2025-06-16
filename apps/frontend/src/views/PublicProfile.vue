@@ -16,15 +16,17 @@ const props = defineProps<{
 }>()
 
 // Local state
-const isLoading = ref(false)
 const profile = reactive<PublicProfile>({} as PublicProfile)
+const error = ref<string | null>(null)
 
 onMounted(async () => {
-  isLoading.value = true
   const profileId = props.id
-  const fetched = await profileStore.getPublicProfile(profileId)
-  Object.assign(profile, fetched)
-  isLoading.value = false
+  const res = await profileStore.getPublicProfile(profileId)
+  if (!res.success) {
+    error.value = res.message
+    return
+  }
+  Object.assign(profile, res.data)
 })
 
 const handleOpenConversation = (conversationId: string) => {
@@ -37,10 +39,11 @@ const handleOpenConversation = (conversationId: string) => {
 
 <template>
   <main class="container">
-    <LoadingComponent v-if="isLoading" />
+    <LoadingComponent v-if="profileStore.isLoading" />
     <PublicProfileComponent
+      v-else
       :profile
-      :isLoading
+      :isLoading="profileStore.isLoading"
       @intent:conversation:open="handleOpenConversation"
     />
   </main>

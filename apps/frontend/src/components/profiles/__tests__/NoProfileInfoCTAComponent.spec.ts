@@ -11,7 +11,7 @@ vi.mock('vue-router', () => ({
   }),
 }))
 
-import NoProfileInfoCTAComponent from '../NoProfileInfoCTAComponent.vue'
+import NoProfileInfoCTAComponent from '../NoProfileInfoCTA.vue'
 
 describe('NoProfileInfoCTAComponent', () => {
   it('pushes onboarding route on click', async () => {

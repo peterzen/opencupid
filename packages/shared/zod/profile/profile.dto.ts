@@ -11,6 +11,7 @@ const baseFields = {
   languages: true,
   publicName: true,
   introSocial: true,
+  cityId: true,
   cityName: true,
   country: true,
   work: true,
@@ -66,6 +67,7 @@ export const PublicProfileSchema = ProfileUnionSchema.and(
     conversation: ConversationSchema.nullable(),
   })
 );
+export const PublicProfileArraySchema = z.array(PublicProfileSchema);
 
 export type PublicProfile = z.infer<typeof PublicProfileSchema>;
 
@@ -110,7 +112,7 @@ export const UpdateProfilePayloadSchema = OwnerScalarSchema
   .partial()
   .extend({
     tags: z.array(z.string().cuid()).optional(),
-  });
+  })
 export type UpdateProfilePayload = z.infer<typeof UpdateProfilePayloadSchema>;
 
 // Updated profile fragment with tags but no images
@@ -145,12 +147,24 @@ export type ProfileSummary = z.infer<typeof ProfileSummarySchema>;
 
 
 
-export const OnboardingProfileSchema = z.object({
-  publicName: z.string().min(2),
-  cityName: z.string(),
-  country: z.string(),
-  languages: z.array(z.string()).default([]),
-  tags: z.array(PublicTagSchema).default([]),
-})
+// export const CreateProfileInputSchema = ProfileSchema.pick({
+//   publicName: true,
+//   country: true,
+//   cityId: true,
+//   languages: true,
+//   isActive: true,
+//   isDatingActive: true,
+//   isSocialActive: true,
+//   introDating: true,
+//   introSocial: true,
+//   hasKids: true,
+//   relationship: true,
+//   gender: true,
+//   birthday: true,
+//   pronouns: true,
+// }).extend({
+//   tags: z.array(PublicTagSchema).default([]),
+// });
 
-export type OnboardingProfile = z.infer<typeof OnboardingProfileSchema>;
+
+// export type CreateProfileInput = z.infer<typeof CreateProfileInputSchema>

@@ -3,13 +3,12 @@ import { api } from '@/lib/api'
 import type {
   OwnerProfile,
   PublicProfile,
-  UpdatedProfileFragment,
   UpdateProfilePayload,
 } from '@zod/profile/profile.dto'
 import {
   OwnerProfileSchema,
+  PublicProfileArraySchema,
   PublicProfileSchema,
-  UpdatedProfileFragmentSchema,
   UpdateProfilePayloadSchema,
 } from '@zod/profile/profile.dto'
 import type {
@@ -18,76 +17,84 @@ import type {
   GetProfilesResponse,
   UpdateProfileResponse,
 } from '@shared/dto/apiResponse.dto'
+import {
+  storeSuccess,
+  storeError,
+  type StoreVoidSuccess,
+  type StoreResponse,
+  type StoreError
+} from './helpers'
 
 
 export const useProfileStore = defineStore('profile', {
   state: () => ({
-    profile: {} as null | OwnerProfile, // Current user's profile
+    profile: null as OwnerProfile | null,// Current user's profile
+    profileList: [] as PublicProfile[], // List of public profiles
+    isLoading: false, // Loading state
   }),
 
   actions: {
-    // Fetch the current user's profile
-    async getUserProfile(): Promise<OwnerProfile> {
+
+    async fetchUserProfile(): Promise<StoreVoidSuccess | StoreError> {
       try {
+        this.isLoading = true // Set loading state
         const res = await api.get<GetMyProfileResponse>('/profiles/me')
-        this.profile = OwnerProfileSchema.parse(res.data.profile)
-        console.log('Fetched user profile:', this.profile)
-        return this.profile
+        const fetched = OwnerProfileSchema.parse(res.data.profile)
+        this.profile = fetched // Update local state
+        return storeSuccess()
       } catch (error: any) {
-        console.error('Failed to fetch user profile:', error)
-        throw error.response?.data?.message || 'Failed to fetch user profile'
+        this.profile = null // Reset profile on error
+        return storeError(error, 'Failed to fetch profile')
+      } finally {
+        this.isLoading = false // Reset loading state
       }
     },
 
     // Update the current user's social profile
-    async updateProfile(profileData: UpdateProfilePayload): Promise<UpdatedProfileFragment> {
+    async updateProfile(profileData: UpdateProfilePayload): Promise<StoreVoidSuccess | StoreError> {
       try {
         const update = UpdateProfilePayloadSchema.parse(profileData)
+        this.isLoading = true // Set loading state
         const res = await api.patch<UpdateProfileResponse>('/profiles/profile', update)
-        return UpdatedProfileFragmentSchema.parse(res.data.profile)
+        const updated = OwnerProfileSchema.parse(res.data.profile)
+        this.profile = updated
+        return storeSuccess()
       } catch (error: any) {
-        console.error('Store: cannot to update profile:', error)
-        throw error.response?.data?.message || 'Failed to update profile'
+        return storeError(error, 'Failed to update profile')
+      } finally {
+        this.isLoading = false // Reset loading state
       }
     },
+
+
 
     // Fetch a profile by ID
-    async getPublicProfile(profileId: string): Promise<PublicProfile | null> {
+    async getPublicProfile(profileId: string): Promise<StoreResponse<PublicProfile>> {
       try {
+        this.isLoading = true // Set loading state
         const res = await api.get<GetPublicProfileResponse>(`/profiles/${profileId}`)
-        return PublicProfileSchema.parse(res.data.profile)
-        // return res.data.profile
+        const fetched = PublicProfileSchema.parse(res.data.profile)
+        return storeSuccess(fetched)
       } catch (error: any) {
-        // console.error('Failed to fetch profile:', error)
-
-        const status = error?.response?.status
-        const message = error?.response?.data?.message || 'Failed to fetch profile'
-
-        if (status === 403) {
-          // You can throw a custom error, trigger a redirect, show a modal, etc.
-          // throw new Error('You are not authorized to view this profile.')
-          throw error.response?.data?.message || 'Failed to fetch profile'
-        }
+        return storeError(error, 'Failed to fetch profile')
+      } finally {
+        this.isLoading = false // Reset loading state
       }
-      return null
     },
 
-    async findProfiles(): Promise<PublicProfile[] | null> {
+    async findProfiles(): Promise<StoreResponse<StoreVoidSuccess | StoreError>> {
       try {
+        this.isLoading = true // Set loading state
         const res = await api.get<GetProfilesResponse>('/profiles')
-        const profiles = res.data.profiles.map((p: any) => PublicProfileSchema.parse(p))
-        return profiles
+        const fetched = PublicProfileArraySchema.parse(res.data.profiles)
+        this.profileList = fetched // Update local state
+        return storeSuccess()
       } catch (error: any) {
-        console.error('Failed to fetch profiles:', error)
-
-        const status = error?.response?.status
-        const message = error?.response?.data?.message || 'Failed to fetch profiles'
-
-        if (status === 403) {
-          throw error.response?.data?.message || 'Failed to fetch profiles'
-        }
+        this.profileList = [] // Reset profile list on error
+        return storeError(error, 'Failed to fetch profiles')
+      } finally {
+        this.isLoading = false // Reset loading state
       }
-      return null
     },
   },
 })

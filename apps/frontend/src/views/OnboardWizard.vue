@@ -32,8 +32,10 @@ import NameInput from '../components/profiles/forms/NameInput.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import SpinnerComponent from '@/components/SpinnerComponent.vue'
 import { useRouter } from 'vue-router'
+import { useProfileStore } from '@/store/profileStore'
 
 const { t } = useI18n()
+const profileStore= useProfileStore()
 
 const OnboardingFormSchema = z.object({
   publicName: z
@@ -69,37 +71,44 @@ type OnboardingForm = z.infer<typeof OnboardingFormSchema>
 
 // https://github.com/vueuse/vueuse/blob/main/packages/core/useStepper/index.md
 // https://playground.vueuse.org/?vueuse=13.3.0#eNrFWG1v2zYQ/isXf6htIFLarvtixGle0AIthjZYsu3DPAy0dHKYUKRAUk68LP99R4p6sx03aTv0SyKRx7vnnjvenXw/OCmKeFniYDI4NInmhQWDtixAMLmYzgbWzAZHM8nzQmkL91AavLBYFKjhATKtchge03FaPkiUxmFHVCNLLF9iI0hytD+TiZLGQqZ0DtNGanQ/kwAZ18Z+YjlOYPhRyeG+WxSsWasW5lwILhcnaarRmGaZ9FpN2k6SBAuL6QQyJgxWe0zPlfycZeSdpbPdvYKtcpSW9CQaU24jEk6HwAwMaatgYgj/9vfo2MO4dcUERqYdeip/hrSgIy6ds8xy8mgCfgPAciucS7+RBHQlPCYAbn5ngpMTozFMjzxdcUMPvHhRrdTc+EMP/u8w0BOxip9Nk6eVANQCOyz2qX4bW81z2t6bTmvWg1GLOt9i6tIv7zCwHjSYkmqry55HIUKb6s/DxnYDf/aD1oTzr5jLRJQpmpHHENSPG5NVcLNSUmoqCaac59ySTm+dZzAKEY+TUms6GS+ZKDEO5kdjOu7g1FILdak+4R1pINU9zUwIly/mFAkInmisFHCZ4t0EZJnPUY8nMFdKIJOVfU33U0vYO9GarWJ3tUb3IFAu7NWEEolOkg+BAVkKEcDERuU4Gv29D9xv7dXomB3x8dseeAJ5eFCVA7r89GIxLwSzSG8Ahylf+ofqERJKQkO1IhNkesGK6DVcl8bybBUlRA5qX0KceDiwjMhbOuBpJDypx8SJ6ADJ/TcVqbMBTG5wRdI8pefaVkclKZ2X1irCWS8ATFJu2FxgSrJ7j7E8dteotsnD9oinY9Lf0XWcCJ7ckKJuPDfFlpGlGAex2GdoV+Cg5eCgQ2B4Dm++KNY+5jZ69ZJ8Pq7yLy40LolPZ8EvdGk1BaVHfdDhiMSCLpi00VwJR1wP3WbqBrhdlBuhdX+iRIm16IaQE9rX/ai0XvZiz7MOCm7OKhyjzVJJ/PbOBzeP3rsqCNJ1BMpSt7ImxWVRWrKUqxSFQ9+rnZ0s2iPQL+OfacWuCgzMPWL1F6q0zzZal+dn2uxnxZPYWy/6W8jbirBf4L83qqorbMGynhsdgNzd2apfR6pp2D6Fe8jXW3qLPbnC5Gau7jqs53otO4NJweYoXCfabvPoAzDfmMAqSLFQhltgYZqAVhIyxMMDr2zd085lf7r3oSlucXqtXX67042pjq9XCD5y5KF/qYWe6uJXZErd4r8mV9omv0lY0NvypFnK1QZJ4MvgurIvUNcTPfNvLjXS75gJ1cTy7W7VenZ71EjRXHXOxHPD/Xj4N3tB1bLrhGiGEW5cnW1bf7eNf2Ho2nDOjVx9mJXRXUD+DxwXVbfejaTPYX9EcBFvZ4TH+7JrxG9cI37Vvfa9A7dRRiMhFHckWKyobWtV0siY0oipU+rl1b8oZ24aK1iCkRNSS9SZULcRK6kOXnkd/V7fmz86c8fRe8K+0TAPaZRpJxLnXn/0WMufH+vBH/wff6d3+hByYqsb/ef66fCgM1QP9ulLm6psxhfxtVGSPsf9rO/qc15wgfpz4WYiatDNN9BsQHOtuv3o15ovJn/GtYIt69eGusOEHs6p16NeUmY3e5bpBVI9cdvvLvzVaTep9JRuPNyx+SsaJUqHsRI7paAQ7I6cR/vB/zpAHfPSvLuzKE3tlAPafvHNBvRjwdkO11u4P8Vv/Dn6ahk8/AcWuUbe
-const { current, isFirst, stepNames, goToNext, goToPrevious, goTo, isNext, isCurrent } = useStepper(
-  {
-    name: {
+const { current, isFirst, stepNames, steps, goToNext, goToPrevious, goTo, isNext, isCurrent } =
+  useStepper({
+    publicname: {
       state: computed(() => (formData.publicName ? formData.publicName.length >= 3 : null)),
       flags: '',
+      isCompleted: false,
     },
     location: {
       state: computed(() => (formData.location.country && formData.location.cityId ? true : false)),
       flags: '',
+      isCompleted: false,
     },
     looking_for: {
       state: computed(() =>
         [formData.isDatingActive, formData.isSocialActive].some(t => t) ? true : false
       ),
       flags: '',
+      isCompleted: false,
     },
     interests: {
       state: computed(() => formData.tags.length > 0),
       flags: '',
+      isCompleted: false,
     },
     languages: {
       state: computed(() => (formData.languages.length > 0 ? true : false)),
       flags: '',
+      isCompleted: false,
     },
     introSocial: {
       state: computed(() => formData.introSocial.length > 0),
       flags: '',
+      isCompleted: false,
     },
     photos: {
       state: computed(() => true),
       flags: 'stage_one_end',
+      isCompleted: false,
     },
 
     // Dating steps
@@ -108,25 +117,29 @@ const { current, isFirst, stepNames, goToNext, goToPrevious, goTo, isNext, isCur
         OnboardingFormSchema.pick({ birthday: true }).safeParse(birthdayModel.value) ? true : false
       ),
       flags: '',
+      isCompleted: false,
     },
     gender: {
       state: computed(() => formData.gender && formData.pronouns),
       flags: '',
+      isCompleted: false,
     },
     family_situation: {
       state: computed(() => formData.relationship && formData.hasKids),
       flags: '',
+      isCompleted: false,
     },
     introDating: {
       state: computed(() => formData.introDating.length > 0),
       flags: 'stage_two_end',
+      isCompleted: false,
     },
     confirm: {
       state: computed(() => true),
       flags: '',
+      isCompleted: false,
     },
-  }
-)
+  })
 
 const formData = reactive<OnboardingForm>({
   publicName: '',
@@ -182,6 +195,16 @@ const genderPronounsModel = computed({
 const isLoading = ref(false)
 const isComplete = ref(false)
 const saveProfile = async () => {
+
+  const profileData = {
+    publicName: formData.publicName,
+    location: formData.location,
+    birthday: formData.birthday,
+    languages: formData.languages,
+    tags: formData.tags,
+    isSocialActive: formData.isSocialActive,
+    isDatingActive: formData.isDatingActive
+  }
   isLoading.value = true
 
   setTimeout(() => {
@@ -194,6 +217,7 @@ const saveProfile = async () => {
 
 const handleNext = async () => {
   if (current.value) {
+    current.value.isCompleted = true
     if (current.value.flags === 'stage_one_end') {
       console.log('Stage completed:', current.value.state)
       if (formData.isDatingActive) {
@@ -231,13 +255,18 @@ const handleGoToProfile = async () => {
 const handleGoToBrowse = () => {
   router.push({ name: 'BrowseProfiles' })
 }
+
+const handlePrevious = () => {
+  current.value.isCompleted = false
+  goToPrevious()
+}
 </script>
 
 <template>
   <main class="container pb-5 h-100 d-flex flex-column justify-content-center align-items-center">
     <div class="w-100 d-flex justify-content-between align-items-center">
       <BButton
-        @click="goToPrevious"
+        @click="handlePrevious"
         v-if="!isFirst && !isComplete"
         href="#"
         variant="link-secondary"
@@ -247,9 +276,10 @@ const handleGoToBrowse = () => {
         <FontAwesomeIcon icon="fa-solid fa-chevron-left" class="" />
       </BButton>
     </div>
+
     <div class="d-flex align-items-center flex-grow-1 col-12 justify-content-center">
       <BForm id="onboarding" novalidate class="w-100" @submit.prevent="submitHandler">
-        <fieldset v-if="isCurrent('name')" class="w-100">
+        <fieldset v-if="isCurrent('publicname')" class="w-100">
           <legend>{{ t('onboarding.name_title') }}</legend>
           <NameInput v-model="publicNameModel" />
         </fieldset>
@@ -359,6 +389,16 @@ const handleGoToBrowse = () => {
           >
         </div>
       </BForm>
+      <!-- <div v-if="!isComplete" class="d-flex justify-content-center indicators ">
+        <ul class="list-unstyled text-muted">
+          <li v-for="stepKey in stepNames" :key="stepKey" class="d-inline">
+            <FontAwesomeIcon
+              :icon="steps[stepKey].isCompleted ? 'fa-solid fa-circle' : 'fa-circle-dot'"
+              class="me-2"
+            />
+          </li>
+        </ul>
+      </div> -->
     </div>
 
     <!-- <pre>{{ formData }}</pre> -->
@@ -372,5 +412,12 @@ fieldset legend {
   margin-bottom: 1rem;
   text-align: center;
   color: var(--bs-secondary);
+}
+.indicators {
+  bottom: 0;
+  margin-bottom: 1rem;
+  font-size: 0.5rem;
+  position: absolute;
+  opacity: 0.2;
 }
 </style>
