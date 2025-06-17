@@ -39,7 +39,7 @@ const imageRoutes: FastifyPluginAsync = async fastify => {
 
   fastify.get('/me', { onRequest: [fastify.authenticate] }, async (req, reply) => {
 
-    if (!req.session.hasActiveProfile) return sendForbiddenError(reply)
+    // if (!req.session.hasActiveProfile) return sendForbiddenError(reply)
 
     try {
       const rawImages = await imageService.listImages(req.user.userId)

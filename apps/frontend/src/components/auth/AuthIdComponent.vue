@@ -40,17 +40,22 @@ async function handleSendLoginLink() {
   emit('otp:send', authIdentifier.value)
 }
 
-const validateAuthIdInput = (node: any) => {
-  const value = node.value as string
-  // console.log('Validating Auth ID empty:', value)
-  if (!value || value === '') return false
-  // console.log('Validating Auth ID Input:', value)
-  if (emailRegex.test(value) || phoneRegex.test(value)) {
-    // console.log('User ID is valid:', value)
-    return true
-  }
-  return false
-}
+const inputState = computed(() => {
+  // console.log('Validating Auth ID:', authIdInput.value)
+  if (!authIdInput.value || authIdInput.value==='') return null
+  // Check if the input is a valid email or phone number
+  return emailRegex.test(authIdInput.value) || phoneRegex.test(authIdInput.value)
+})
+
+const formState = computed(() => {
+  // console.log('Form state:', inputState.value)
+  return inputState.value && captchaPayload.value !== ''
+})
+
+const validated = computed(() => {
+  // console.log('Validating Auth ID state:', state.value)
+  return !!(authIdInput.value !== '' && inputState.value)
+})
 
 function handleCaptchaUpdatePayload(payload: string) {
   // console.log('Captcha payload updated:', payload)
@@ -68,74 +73,79 @@ const authIdInputRef = ref<InstanceType<any> | null>(null)
       </div>
     </div>
 
-    <FormKit
-      type="form"
-      id="userIdForm"
-      :actions="false"
-      :disabled="props.isLoading"
-      #default="{ state: { valid } }"
-      @submit="handleSendLoginLink"
+    <BForm
+      @submit.prevent="handleSendLoginLink"
+      class="userIdForm"
+      :novalidate="true"
+      :validated="validated"
+      :disabled="isLoading"
+      :state="formState"
     >
       <div class="mb-3">
-        <FormKit
-          type="text"
-          v-model="authIdInput"
-          :label="t('auth.auth_id_input_label')"
-          id="authIdInput"
-          ref="authIdInputRef"
-          autofocus
-          :floating-label="true"
-          input-class="form-control-lg"
-          validation="+validateAuthIdInput"
-          :placeholder="t('auth.auth_id_input_placeholder')"
-          :validation-rules="{
-            validateAuthIdInput,
-          }"
-          validation-visibility="live"
-        >
-          <template #suffixIcon>
-            <div class="suffix-icon">
-              <span class="text-success" v-if="valid">
+        <BFormFloatingLabel floating 
+        label="Email or phone number" label-for="authIdInput" class="my-2"
+        :state="null">
+          <BInput
+            size="lg"
+            v-model.trim="authIdInput"
+            id="authIdInput"
+            ref="authIdInputRef"
+            type="text"
+            :label="t('auth.auth_id_input_label')"
+            :placeholder="t('auth.auth_id_input_placeholder')"
+            maxlength="25"
+            aria-autocomplete="none"
+            autofocus
+            autocomplete="off"
+      :state="inputState"
+            lazy
+          >
+          </BInput>
+           <div class="suffix-icon">
+              <span class="text-success" v-if="inputState">
                 <DoodleIcons name="IconTick" class="svg-icon" />
               </span>
               <span class="text-muted" v-else>
                 <DoodleIcons name="IconMail" class="svg-icon" v-if="authIdInput.includes('@')" />
-                <DoodleIcons name="IconPhone" class="svg-icon" v-else-if="authIdInput.startsWith('+')" />
+                <DoodleIcons
+                  name="IconPhone"
+                  class="svg-icon"
+                  v-else-if="authIdInput.startsWith('+')"
+                />
               </span>
             </div>
-          </template>
-        </FormKit>
+        </BFormFloatingLabel>
+
       </div>
 
       <div class="mb-3">
         <CaptchaWidget v-if="!props.isLoading" @update:payload="handleCaptchaUpdatePayload" />
       </div>
-
-      <FormKit
+      <BButton
         type="submit"
-        wrapper-class="d-grid gap-2 mb-3"
-        input-class="btn-primary btn-lg w-100"
-        :disabled="!valid || props.isLoading"
+        variant="primary"
+        size="lg"
+        class="w-100"
+        label="Continue"
+        :disabled="isLoading || !formState"
       >
         <DoodleIcons name="IconLogin" class="svg-icon" /> {{ t('auth.login') }}
-      </FormKit>
-    </FormKit>
+      </BButton>
+    </BForm>
   </div>
 </template>
 
-<style scoped>
-:deep(ul.formkit-messages) {
-  display: none;
-}
-
+<style scoped lang="scss">
 .suffix-icon {
   position: absolute;
   top: 0.5em;
   right: 1em;
-}
-
-.formkit-input {
-  padding-right: 3.5rem;
+  height: 2rem;
+  padding-top: 0.25rem;
+  .svg-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
 }
 
 .svg-icon {
@@ -146,5 +156,10 @@ const authIdInputRef = ref<InstanceType<any> | null>(null)
   width: 7.5rem;
   height: 7.5rem;
   color: currentColor;
+}
+
+input.form-control.is-valid,
+input.form-control.is-invalid {
+  background-image: none !important;
 }
 </style>

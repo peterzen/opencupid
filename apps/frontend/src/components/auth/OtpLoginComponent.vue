@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { type LoginUser } from '@zod/user/user.types'
 import { otpRegex } from '@/lib/utils'
 
@@ -23,14 +23,23 @@ async function handleOTPEntered() {
   emit('otp:submit', otpInput.value)
 }
 
-function validateOtp(node: any) {
-  const value = node.value as string
-  console.log('Validating OTP:', value)
-  if (!value) return false
-
+const inputState = computed(() => {
+  // console.log('Validating OTP:', otpInput.value)
+  if (!otpInput.value) return null
   // Simple validation for OTP: must be a number and 6 digits long
-  return otpRegex.test(value)
-}
+  return otpRegex.test(otpInput.value)
+})
+
+const validated = computed(() => {
+  // console.log('Validating Auth ID state:', state.value)
+  return !!(otpInput.value !== '' && inputState.value)
+})
+
+watch(inputState, state => {
+  if (state === true) {
+    emit('otp:submit', otpInput.value)
+  }
+})
 </script>
 
 <template>
@@ -56,16 +65,35 @@ function validateOtp(node: any) {
       </div>
     </div>
 
-    <FormKit
-      type="form"
-      id="otpForm"
-      :actions="false"
-      :disabled="isLoading"
-      #default="{ state: { valid } }"
-      @submit="handleOTPEntered"
+    <BForm
+      @submit.prevent="handleOTPEntered"
+      class="otp-form"
+      :novalidate="true"
+      :validated="validated"
+      :disabled="isLoading || !inputState"
     >
       <div class="mb-3">
-        <FormKit
+        <BFormFloatingLabel label="Enter code" label-for="otpInput" class="my-2">
+          <BInput
+            size="lg"
+            v-model.trim="otpInput"
+            id="otp"
+            type="text"
+            placeholder=""
+            label="otpInput"
+            maxlength="25"
+            aria-autocomplete="none"
+            autofocus
+            autocomplete="off"
+            lazy
+            required
+            :state="inputState"
+          >
+          </BInput>
+          <BFormInvalidFeedback>Code should be 6 digits </BFormInvalidFeedback>
+        </BFormFloatingLabel>
+
+        <!-- <FormKit
           type="text"
           v-model="otpInput"
           label="Login code..."
@@ -80,17 +108,18 @@ function validateOtp(node: any) {
             validateOtp,
           }"
           validation-visibility="live"
-        />
+        /> -->
       </div>
 
-      <FormKit
+      <!-- <BButton
         type="submit"
-        wrapper-class="d-grid gap-2 mb-3"
-        input-class="btn-primary btn-lg w-100"
+        size="lg"
+        class="w-100"
+        variant="primary"
         label="Continue"
-        :disabled="!valid || isLoading"
-      />
-    </FormKit>
+        :disabled="isLoading || !inputState"
+      >Continue</BButton> -->
+    </BForm>
   </div>
 </template>
 
@@ -105,8 +134,8 @@ function validateOtp(node: any) {
   right: 1em;
 }
 
-.formkit-input {
-  padding-right: 3.5rem;
-  /* Adjust padding to accommodate suffix icon */
+input.form-control.is-valid,
+input.form-control.is-invalid {
+  background-image: none !important;
 }
 </style>

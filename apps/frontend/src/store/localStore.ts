@@ -1,9 +1,11 @@
 // import { type ToastMessage } from '@/lib/toast'
 import { defineStore } from 'pinia'
 import { bus } from '@/lib/bus'
+import { language } from '@vue/eslint-config-prettier/skip-formatting'
 
 export const useLocalStore = defineStore('local', {
   state: () => ({
+    language: 'en' as string, // Default language
     messageDrafts: {} as Record<string, string>, // Maps recipient profileIDs to their drafts
     // flashMessage: null as ToastMessage | null,
   }),

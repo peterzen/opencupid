@@ -193,6 +193,7 @@ model Profile {
   isActive       Boolean @default(false)
   isReported     Boolean @default(false)
   isBlocked      Boolean @default(false)
+  isOnboarded    Boolean @default(false)
 
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])

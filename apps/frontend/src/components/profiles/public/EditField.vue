@@ -3,9 +3,9 @@ import { type Component, inject, ref } from 'vue'
 import DoodleIcons from '@/components/icons/DoodleIcons.vue'
 import { useProfileStore } from '@/store/profileStore'
 import useEditFields from '../composables/useEditFields'
-import { EditableOwnerProfile } from '@zod/profile/profile.dto'
+import { OwnerProfileInput } from '@zod/profile/profile.dto'
 
-type EditableFieldKey = keyof EditableOwnerProfile
+type EditableFieldKey = keyof OwnerProfileInput
 
 const profileStore = useProfileStore()
 
@@ -17,7 +17,7 @@ const props = defineProps<{
 }>()
 
 const isOwner = inject<boolean>('isOwner', false)
-const editableModel = inject<EditableOwnerProfile>('editableModel', {} as EditableOwnerProfile)
+const editableModel = inject<OwnerProfileInput>('editableModel', {} as OwnerProfileInput)
 
 const handleButtonClick = () => {
   profileStore.currentField = props.fieldName

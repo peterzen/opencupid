@@ -1,4 +1,4 @@
-import { EditableOwnerProfile, OwnerProfile, PublicProfile } from "@zod/profile/profile.dto"
+import { OwnerProfileInput, OwnerProfile, PublicProfile } from "@zod/profile/profile.dto"
 import { computed } from "vue"
 
 function modelProxy<T extends object, K extends keyof T>(target: T, key: K) {
@@ -10,7 +10,7 @@ function modelProxy<T extends object, K extends keyof T>(target: T, key: K) {
   })
 }
 
-export default function useEditFields(model: EditableOwnerProfile | OwnerProfile) {
+export default function useEditFields(model: OwnerProfileInput | OwnerProfile) {
 
   function getModelProxy<K extends keyof typeof model>(key: K) {
     return modelProxy(model, key)

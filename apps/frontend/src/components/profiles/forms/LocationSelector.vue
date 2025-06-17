@@ -20,12 +20,17 @@ const model = defineModel<LocationDTO>({
   }),
 })
 
+const props = defineProps<{
+  geoIp?: boolean
+}>()
+
 onMounted(() => {
-  if (model.value.country) return
+  if (model.value.country || !props.geoIp) return
+  model.value = {} as LocationDTO
   fetchGeoIpInfo()
     .then(countryCode => {
       if (countryCode) {
-        // model.value.country = countryCode
+        model.value.country = countryCode
       }
     })
     .catch(error => {

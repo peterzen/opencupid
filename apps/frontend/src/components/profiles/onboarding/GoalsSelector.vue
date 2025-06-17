@@ -28,7 +28,7 @@ const toggleDating = () => {
 </script>
 
 <template>
-  <div class="d-flex gap-4 flex-row justify-content-between w-100">
+  <div class="d-flex gap-2 flex-row justify-content-between w-100">
     <div
       class="card btn-social-toggle"
       :class="{ active: model.isSocialActive }"

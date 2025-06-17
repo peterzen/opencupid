@@ -17,20 +17,22 @@ const pronounsChoices = pronounsOptions() as MultiselectOption[]
 </script>
 
 <template>
-  <label>They refer to me as...</label>
-  <BListGroup>
-    <BListGroupItem
-      v-for="p in pronounsChoices"
-      :key="p.value"
-      class="d-flex justify-content-between align-items-center"
-    >
-      <BFormRadio
-        name="pronouns"
-        v-model="model"
-        :id="`list-pronouns-${p.value}`"
-        :value="p.value"
-        >{{ p.label }}</BFormRadio
+  <div>
+    <label>They refer to me as...</label>
+    <BListGroup>
+      <BListGroupItem
+        v-for="p in pronounsChoices"
+        :key="p.value"
+        class="d-flex justify-content-between align-items-center"
       >
-    </BListGroupItem>
-  </BListGroup>
+        <BFormRadio
+          name="pronouns"
+          v-model="model"
+          :id="`list-pronouns-${p.value}`"
+          :value="p.value"
+          >{{ p.label }}</BFormRadio
+        >
+      </BListGroupItem>
+    </BListGroup>
+  </div>
 </template>
