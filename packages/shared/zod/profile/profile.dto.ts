@@ -43,9 +43,9 @@ const datingPreferencesFields = {
 } as const;
 
 const editableFields = {
-  // cityId: true,  // TODO !!add it back when DB records are updated
-  // country: true,
-  // cityName: true,
+  cityId: true,  // TODO !!add it back when DB records are updated
+  country: true,
+  cityName: true,
   languages: true,
   birthday: true,
   publicName: true,
