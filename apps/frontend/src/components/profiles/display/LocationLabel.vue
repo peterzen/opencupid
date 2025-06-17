@@ -2,20 +2,20 @@
 import { computed } from 'vue'
 
 import { countryCodeToName } from '@/lib/countries'
-import type { PublicProfile } from '@zod/profile/profile.dto'
+import { LocationDTO } from '@zod/dto/location.dto';
 
 const props = defineProps<{
-  profile: PublicProfile
+  location: LocationDTO
 }>()
 
 const countryName = computed(() => {
-  return props.profile.country ? countryCodeToName(props.profile.country) : ''
+  return props.location.country ? countryCodeToName(props.location.country) : ''
 })
 </script>
 
 <template>
-  <span>
-    <span v-if="profile.cityName">{{ profile.cityName }}, </span>
-    <span v-if="profile.country">{{ countryName }}</span>
+  <span v-if="location">
+    <span v-if="location.cityName">{{ location.cityName }}, </span>
+    <span v-if="location.country">{{ countryName }}</span>
   </span>
 </template>

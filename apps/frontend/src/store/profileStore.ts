@@ -10,7 +10,6 @@ import {
   OwnerProfileSchema,
   PublicProfileArraySchema,
   PublicProfileSchema,
-  UpdateProfilePayloadSchema,
 } from '@zod/profile/profile.dto'
 import type {
   GetMyProfileResponse,
@@ -31,6 +30,9 @@ export const useProfileStore = defineStore('profile', {
     profile: null as OwnerProfile | null,// Current user's profile
     profileList: [] as PublicProfile[], // List of public profiles
     isLoading: false, // Loading state
+
+    fieldEditModal: false,
+    currentField: '' as keyof EditableOwnerProfile | null, // Field being edited
   }),
 
   actions: {
@@ -53,7 +55,7 @@ export const useProfileStore = defineStore('profile', {
     async updateProfile(profileData: EditableOwnerProfile): Promise<StoreVoidSuccess | StoreError> {
       try {
         const update = EditableOwnerToProfilePayloadTransform.parse(profileData)
-        
+
         console.log('Updating profile with data:', update)
         this.isLoading = true // Set loading state
         const res = await api.patch<UpdateProfileResponse>('/profiles/profile', update)
@@ -66,8 +68,6 @@ export const useProfileStore = defineStore('profile', {
         this.isLoading = false // Reset loading state
       }
     },
-
-
 
     // Fetch a profile by ID
     async getPublicProfile(profileId: string): Promise<StoreResponse<PublicProfile>> {
@@ -97,5 +97,13 @@ export const useProfileStore = defineStore('profile', {
         this.isLoading = false // Reset loading state
       }
     },
+
+    open() {
+      this.fieldEditModal = true
+    },
+
+    close() {
+      this.fieldEditModal = false
+    }
   },
 })

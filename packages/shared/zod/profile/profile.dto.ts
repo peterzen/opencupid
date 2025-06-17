@@ -43,9 +43,9 @@ const datingPreferencesFields = {
 } as const;
 
 const editableFields = {
-  cityId: true,  // TODO !!add it back when DB records are updated
-  country: true,
-  cityName: true,
+  // cityId: true,  // TODO !!add it back when DB records are updated
+  // country: true,
+  // cityName: true,
   languages: true,
   birthday: true,
   publicName: true,
@@ -82,6 +82,7 @@ export const ProfileUnionSchema = z.discriminatedUnion('isDatingActive', [
 
 export const PublicProfileSchema = ProfileUnionSchema.and(
   z.object({
+    location: LocationSchema,
     profileImages: z.array(PublicProfileImageSchema).default([]),
     tags: z.array(PublicTagSchema).default([]),
     conversation: ConversationSchema.nullable(),
@@ -91,26 +92,18 @@ export const PublicProfileArraySchema = z.array(PublicProfileSchema);
 
 export type PublicProfile = z.infer<typeof PublicProfileSchema>;
 
-export const OwnerScalarSchema = ProfileSchema.pick({
-  ...baseFields,
-  ...publicDatingProfileFields,
-  ...datingPreferencesFields,
-  id: true,
-  isActive: true,
-});
-
-
-
-
-// export const OwnerProfileSchema = OwnerScalarSchema.extend({
-//   profileImages: z.array(OwnerProfileImageSchema).default([]),
-//   tags: z.array(PublicTagSchema).default([]),
+// const OwnerScalarSchema = ProfileSchema.pick({
+//   ...baseFields,
+//   ...publicDatingProfileFields,
+//   ...datingPreferencesFields,
+//   id: true,
+//   isActive: true,
 // });
-// export type OwnerProfile = z.infer<typeof OwnerProfileSchema>;
 
 
 export const OwnerProfileSchema = ProfileSchema.pick({
-  ...editableFields
+  ...editableFields,
+  id: true,
 }).extend({
   profileImages: z.array(PublicProfileImageSchema).default([]),
   tags: z.array(PublicTagSchema).default([]),
@@ -118,19 +111,25 @@ export const OwnerProfileSchema = ProfileSchema.pick({
 })
 export type OwnerProfile = z.infer<typeof OwnerProfileSchema>;
 
+export type OwnerOrPublicProfile = OwnerProfile | PublicProfile
+
 export const EditableOwnerProfileSchema = ProfileSchema.pick({
-  ...editableFields
+  ...editableFields,
+  id: true,
+
 }).extend({
+  profileImages: z.array(PublicProfileImageSchema).default([]),
   tags: z.array(PublicTagSchema).default([]),
   location: LocationSchema
 })
 export type EditableOwnerProfile = z.infer<typeof EditableOwnerProfileSchema>;
 
 export const EditableOwnerToProfilePayloadTransform = EditableOwnerProfileSchema.transform((data) => {
+  const {location,profileImages, ...rest} = data;
   return {
-    ...data,
+    ...rest,
     tags: data.tags.map(tag => tag.id),
-    cityId: data.location.cityId, // TODO !!remove nullable when DB records are updated
+    cityId: data.location.cityId,
     country: data.location.country,
     cityName: data.location.cityName,
     location: undefined
@@ -138,20 +137,14 @@ export const EditableOwnerToProfilePayloadTransform = EditableOwnerProfileSchema
 })
 
 export const UpdateProfilePayloadSchema = ProfileSchema.pick({
-  ...editableFields
+  ...editableFields,
+  cityId: true,
+  country: true,
+  cityName: true,
 }).extend({
   tags: z.array(z.string().cuid()),
 })
-// export const UpdateProfilePayloadSchema = EditableOwnerProfileSchema.transform((data) => {
-//   return {
-//     ...data,
-//     tags: data.tags.map(tag => tag.id),
-//     cityId: data.location.cityId, // TODO !!remove nullable when DB records are updated
-//     country: data.location.country,
-//     cityName: data.location.cityName,
-//     location: undefined
-//   }
-// })
+
 export type UpdateProfilePayload = z.infer<typeof UpdateProfilePayloadSchema>;
 
 

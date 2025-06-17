@@ -8,7 +8,7 @@ const props = defineProps<{
 
 <template>
   <ul
-    class="tags list-unstyled mb-0 d-flex flex-wrap align-items-center user-select-none"
+    class="tags list-unstyled mb-0 d-inline-flex flex-wrap align-items-center"
     v-if="props.profile.tags && props.profile.tags.length"
   >
     <li v-for="tag in props.profile.tags" :key="tag.slug" class="me-2">

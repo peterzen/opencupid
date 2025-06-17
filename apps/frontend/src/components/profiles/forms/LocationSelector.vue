@@ -20,7 +20,7 @@ const model = defineModel<LocationDTO>({
   }),
 })
 
-onMounted( () => {
+onMounted(() => {
   if (model.value.country) return
   fetchGeoIpInfo()
     .then(countryCode => {
@@ -36,12 +36,10 @@ onMounted( () => {
 
 <template>
   <div>
-    <div>
-      <CountrySelector v-model="model.country" />
+    <CountrySelector v-model="model.country" />
 
-      <div class="mt-3">
-        <CitySelector v-model="model" :required="true" />
-      </div>
+    <div class="mt-3">
+      <CitySelector v-model="model" :required="true" />
     </div>
   </div>
 </template>

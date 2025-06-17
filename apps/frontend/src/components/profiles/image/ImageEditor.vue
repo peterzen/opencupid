@@ -13,7 +13,6 @@ import HelpScribble from '../HelpScribble.vue'
 
 const imageStore = useImageStore()
 
-const isLoading = ref(false)
 const isRemoving = ref<Record<string, boolean>>({})
 const error = ref<string>('')
 
@@ -36,7 +35,6 @@ async function handleDelete(image: OwnerProfileImage) {
 }
 
 const handleReorder = async (event: any) => {
-  console.log('Reorder event:', event)
   const payload = event.moved
   if (!payload) return
   const newOrder = model.value.map((img, position) => ({
@@ -56,15 +54,13 @@ function checkMove(evt: any) {
 
 
 onMounted(async () => {
-  isLoading.value = true
   await imageStore.fetchImages()
-  isLoading.value = false
 })
 </script>
 
 <template>
   <div class="image-editor">
-    <LoadingComponent v-if="isLoading" />
+    <LoadingComponent v-if="imageStore.isLoading" />
 
     <div v-else>
       <div class="row">

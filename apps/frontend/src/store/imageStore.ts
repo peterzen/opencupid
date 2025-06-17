@@ -12,6 +12,7 @@ type ImageStoreResponse = ApiSuccess<{}> | ApiError
 export const useImageStore = defineStore('image', {
   state: () => ({
     images: [] as OwnerProfileImage[], // List of profile images
+    isLoading: false, // Loading state
   }),
 
   actions: {
@@ -21,6 +22,7 @@ export const useImageStore = defineStore('image', {
       formData.append('captionText', captionText)
 
       try {
+        this.isLoading = true // Set loading state
         const { data } = await api.post<ImageApiResponse>('/image', formData)
         const { success, images } = ImageApiResponseSchema.parse(data)
         this.images = images
@@ -45,11 +47,14 @@ export const useImageStore = defineStore('image', {
         }
 
         return out
+      } finally {
+        this.isLoading = false // Reset loading state
       }
     },
 
     async deleteImage(image: OwnerProfileImage): Promise<ImageStoreResponse> {
       try {
+        this.isLoading = true // Set loading state
         const { data } = await api.delete<ImageApiResponse>(`/image/${image.id}`)
         const { success, images } = ImageApiResponseSchema.parse(data)
         this.images = images
@@ -59,11 +64,14 @@ export const useImageStore = defineStore('image', {
           success: false,
           message: 'An unexpected error occurred',
         }
+      } finally {
+        this.isLoading = false // Reset loading state
       }
     },
 
     async reorderImages(imagesForUpdate: ProfileImagePosition[]): Promise<ImageStoreResponse> {
       try {
+        this.isLoading = true // Set loading state
         const { data } = await api.patch<ImageApiResponse>('/image/order', { images: imagesForUpdate })
         const { success, images } = ImageApiResponseSchema.parse(data)
         this.images = images
@@ -74,11 +82,14 @@ export const useImageStore = defineStore('image', {
           success: false,
           message: 'An unexpected error occurred',
         }
+      } finally {
+        this.isLoading = false // Reset loading state
       }
     },
 
     async fetchImages(): Promise<ImageStoreResponse> {
       try {
+        this.isLoading = true // Set loading state
         const { data } = await api.get<ImageApiResponse>('/image/me')
         const { success, images } = ImageApiResponseSchema.parse(data)
         this.images = images
@@ -90,6 +101,8 @@ export const useImageStore = defineStore('image', {
           success: false,
           message: error.response?.data?.message || 'Failed to fetch profile images'
         }
+      } finally {
+        this.isLoading = false // Reset loading state
       }
     },
 

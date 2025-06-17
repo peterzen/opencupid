@@ -25,7 +25,12 @@ import App from './App.vue'
 import router from './router'
 
 const app = createApp(App)
-
+app.config.warnHandler = (msg, vm, trace) => {
+  console.error('Vue warning:', msg, trace)
+  if (msg.includes('computed value is readonly')) {
+    debugger
+  }
+}
 app.use(createPinia())
 app.use(router)
 app.use(createBootstrap()) // bootstrap-vue-next

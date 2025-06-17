@@ -13,6 +13,7 @@ import Messaging from '@/views/Messaging.vue'
 import PublicProfile from '@/views/PublicProfile.vue'
 import BrowseProfiles from '@/views/BrowseProfiles.vue'
 import OnboardWizard from '@/views/OnboardWizard.vue'
+import EditProfile from '@/views/EditProfile.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -32,6 +33,12 @@ const routes: Array<RouteRecordRaw> = [
     path: '/me',
     name: 'MyProfile',
     component: MyProfile,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/me/edit',
+    name: 'EditProfile',
+    component: EditProfile,
     meta: { requiresAuth: true },
   },
   {
@@ -106,7 +113,7 @@ router.afterEach((to, from) => {
   // const flashMessage = localStore.getFlashMessage()
 
   // if (flashMessage) {
-    // toast(flashMessage)
+  // toast(flashMessage)
   // }
 
   // Set the page title based on the route name

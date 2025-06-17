@@ -11,24 +11,22 @@ import LanguageSelector from '@/components/profiles/forms/LanguageSelector.vue'
 import AgeSelector from '@/components/profiles/forms/AgeSelector.vue'
 import GoalsSelector from '../components/profiles/onboarding/GoalsSelector.vue'
 import TagSelectComponent from '@/components/profiles/forms/TagSelectComponent.vue'
-import GenderSelector from '@/components/profiles/forms/GenderSelector.vue'
+import GenderSelector from '@/components/profiles/forms/GenderPronounSelector.vue'
 import RelationstatusSelector from '@/components/profiles/forms/RelationstatusSelector.vue'
 import IntrotextEditor from '@/components/profiles/forms/IntrotextEditor.vue'
 import HaskidsSelector from '@/components/profiles/forms/HaskidsSelector.vue'
 import ImageEditor from '@/components/profiles/image/ImageEditor.vue'
-import NameInput from '../components/profiles/forms/NameInput.vue'
+import PublicNameInput from '../components/profiles/forms/PublicNameInput.vue'
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import SpinnerComponent from '@/components/SpinnerComponent.vue'
 import { useRouter } from 'vue-router'
 import { useProfileStore } from '@/store/profileStore'
 import {
-  EditableOwnerProfile,
+  type EditableOwnerProfile,
   EditableOwnerProfileSchema,
-  OwnerProfile,
-  UpdateProfilePayload,
-  UpdateProfilePayloadSchema,
 } from '@zod/profile/profile.dto'
+import useEditFields from '@/components/profiles/composables/useEditFields'
 
 const { t } = useI18n()
 const profileStore = useProfileStore()
@@ -106,7 +104,9 @@ const { current, isFirst, stepNames, steps, goToNext, goToPrevious, goTo, isNext
       isCompleted: false,
     },
   })
+
 const formData = reactive<EditableOwnerProfile>({
+  id: '',
   publicName: 'dfgdfg',
   location: {
     country: 'AD',
@@ -124,32 +124,18 @@ const formData = reactive<EditableOwnerProfile>({
   hasKids: null,
   introSocial: 'dfgdfg',
   introDating: 'dfgdfg',
+  profileImages: [],
 })
 
-function modelProxy<T extends object, K extends keyof T>(target: T, key: K) {
-  return computed({
-    get: () => target[key],
-    set: val => {
-      target[key] = val
-    },
-  })
-}
-const publicNameModel = modelProxy(formData, 'publicName')
-const birthdayModel = modelProxy(formData, 'birthday')
-const relationshipModel = modelProxy(formData, 'relationship')
-const hasKidsModel = modelProxy(formData, 'hasKids')
-const introSocialModel = modelProxy(formData, 'introSocial')
-const introDatingModel = modelProxy(formData, 'introDating')
-
-const genderPronounsModel = computed({
-  get: () => {
-    return { gender: formData.gender, pronouns: formData.pronouns }
-  },
-  set: val => {
-    formData.gender = val.gender
-    formData.pronouns = val.pronouns
-  },
-})
+const {
+  publicNameModel,
+  birthdayModel,
+  relationshipModel,
+  hasKidsModel,
+  introSocialModel,
+  introDatingModel,
+  genderPronounsModel,
+} = useEditFields(formData)
 
 const isLoading = ref(false)
 const isComplete = ref(false)
@@ -238,7 +224,7 @@ const handlePrevious = () => {
       <BForm id="onboarding" novalidate class="w-100" @submit.prevent="submitHandler">
         <fieldset v-if="isCurrent('publicname')" class="w-100">
           <legend>{{ t('onboarding.name_title') }}</legend>
-          <NameInput v-model="publicNameModel" />
+          <PublicNameInput v-model="publicNameModel" />
         </fieldset>
 
         <fieldset v-else-if="isCurrent('location')">

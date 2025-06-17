@@ -110,9 +110,7 @@ export class ProfileService {
         isActive: true, // TODO change this to isVisible when we have that field
       },
       include: {
-        tags: {
-          include: { tag: true },
-        },
+        ...profileCompleteInclude,
       },
     })
     return updated

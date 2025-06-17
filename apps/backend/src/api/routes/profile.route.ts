@@ -131,12 +131,13 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
       const updated = await fastify.prisma.$transaction(async tx => {
         const updatedProfile = await profileService.updateProfile(tx, req.user.userId, data)
         // if (!updatedProfile) return sendError(reply, 404, 'Profile not found')
+        const profile = DbProfileToOwnerProfileTransform.parse(updatedProfile)
 
         // Mark user as onboarded
         user.isOnboarded = true
         const updatedUser = await userService.updateUser(tx, user)
         if (!updatedUser) return sendError(reply, 500, 'Failed to update user')
-        return updatedProfile
+        return profile
       })
 
       // Clear session to force re-fetch on next request, we need the roles updated

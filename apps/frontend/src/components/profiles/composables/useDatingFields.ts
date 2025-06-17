@@ -1,8 +1,8 @@
-import { PublicProfile } from '@zod/profile/profile.dto'
-import { computed, h } from 'vue'
+import { type PublicProfile } from '@zod/profile/profile.dto'
+import { computed, h, type Ref } from 'vue'
 import { useEnumOptions } from './useEnumOptions'
 
-export function useDatingFields(profile: PublicProfile, t: (key: string) => string) {
+export function useDatingFields(profile: Ref<PublicProfile>, t: (key: string) => string) {
   const birthYearMax = computed(() => {
     return new Date().getFullYear() - 18
   })
@@ -12,30 +12,30 @@ export function useDatingFields(profile: PublicProfile, t: (key: string) => stri
   })
 
   const age = computed(() => {
-    if (!profile.isDatingActive || !profile.birthday) return null
+    if (!profile.value.isDatingActive || !profile.value.birthday) return null
     const currentYear = new Date().getFullYear()
-    return currentYear - new Date(profile.birthday).getFullYear()
+    return currentYear - new Date(profile.value.birthday).getFullYear()
   })
 
   const { relationshipStatusLabels, pronounsLabels, hasKidsLabels } = useEnumOptions(t)
 
   const hasKids = computed(() => {
-    if (!profile.isDatingActive || profile.hasKids === 'unspecified') return ''
-    return hasKidsLabels()[profile.hasKids!] || profile.hasKids
+    if (!profile.value.isDatingActive || profile.value.hasKids === 'unspecified') return ''
+    return hasKidsLabels()[profile.value.hasKids!] || profile.value.hasKids
   })
 
   const relationshipStatus = computed(() => {
-    if (!profile.isDatingActive) return ''
-    if (!profile.relationship || profile.relationship === 'unspecified') return ''
+    if (!profile.value.isDatingActive) return ''
+    if (!profile.value.relationship || profile.value.relationship === 'unspecified') return ''
 
-    return relationshipStatusLabels()[profile.relationship] || profile.relationship
+    return relationshipStatusLabels()[profile.value.relationship] || profile.value.relationship
   })
 
   const pronouns = computed(() => {
-    if (!profile.isDatingActive) return ''
-    if (!profile.pronouns || profile.pronouns === 'unspecified') return ''
+    if (!profile.value.isDatingActive) return ''
+    if (!profile.value.pronouns || profile.value.pronouns === 'unspecified') return ''
 
-    return pronounsLabels()[profile.pronouns] || profile.pronouns
+    return pronounsLabels()[profile.value.pronouns] || profile.value.pronouns
   })
 
 

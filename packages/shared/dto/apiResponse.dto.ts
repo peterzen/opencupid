@@ -11,17 +11,16 @@ export type ApiResponse<T> = ApiSuccess<T> | ApiError
 import type {
   OwnerProfile,
   PublicProfile,
-  UpdatedProfileFragment,
 } from '@zod/profile/profile.dto'
 import type { PublicTag } from '@zod/dto/tag.dto'
 import type { ConversationSummary, MessageDTO } from '@zod/messaging/messaging.dto'
 import type { SettingsUser, OtpSendReturn } from '@zod/user/user.dto'
-import type {  PublicCity } from '@zod/dto/city.dto'
+import type { PublicCity } from '@zod/dto/city.dto'
 
 export type GetMyProfileResponse = ApiSuccess<{ profile: OwnerProfile }>
 export type GetPublicProfileResponse = ApiSuccess<{ profile: PublicProfile }>
 export type GetProfilesResponse = ApiSuccess<{ profiles: PublicProfile[] }>
-export type UpdateProfileResponse = ApiSuccess<{ profile: UpdatedProfileFragment }>
+export type UpdateProfileResponse = ApiSuccess<{ profile: OwnerProfile }>
 
 export type TagsResponse = ApiSuccess<{ tags: PublicTag[] }>
 export type TagResponse = ApiSuccess<{ tag: PublicTag }>

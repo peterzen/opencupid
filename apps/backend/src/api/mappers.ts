@@ -55,6 +55,7 @@ export function mapProfileToPublic(profile: DbProfileComplete, hasDatingPermissi
     ...scalars,
     profileImages: publicImages,
     tags: publicTags,
+    location: LocationSchema.parse(profile),
     conversation: profile.conversationParticipants?.[0]?.conversation ?? null,
   } as PublicProfile
 }

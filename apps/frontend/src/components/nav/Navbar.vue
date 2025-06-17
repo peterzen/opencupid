@@ -22,15 +22,6 @@ function handleLogoutClick() {
 <template>
   <BNavbar variant="secondary" fixed="top" class="" v-if="isLoggedIn">
     <BNavbarNav class="d-flex justify-content-between w-100">
-      <BNavItem to="/onboarding" active-class="active">
-        <DoodleIcons name="IconPen" class="svg-icon-lg" />
-        <span class="d-none d-sm-inline">{{ $t('nav.onboarding') }}</span>
-      </BNavItem>
-
-      <BNavItem to="/me" active-class="active">
-        <DoodleIcons name="IconUser" class="svg-icon-lg" />
-        <span class="d-none d-sm-inline">{{ $t('nav.profile') }}</span>
-      </BNavItem>
 
       <BNavItem to="/browse" active-class="active">
         <DoodleIcons name="IconSearch" class="svg-icon-lg" />
@@ -48,6 +39,11 @@ function handleLogoutClick() {
           />
         </span>
         <span class="d-none d-sm-inline">{{ $t('nav.inbox') }}</span>
+      </BNavItem>
+      
+      <BNavItem to="/me" active-class="active">
+        <DoodleIcons name="IconUser" class="svg-icon-lg" />
+        <span class="d-none d-sm-inline">{{ $t('nav.profile') }}</span>
       </BNavItem>
 
       <BNavItem to="/settings" active-class="active">

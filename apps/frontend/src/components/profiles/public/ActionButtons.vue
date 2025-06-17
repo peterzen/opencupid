@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import DoodleIcons from '@/components/icons/DoodleIcons.vue'
-import { nextTick, ref } from 'vue'
+import { inject, nextTick, ref } from 'vue'
 import { type MessageDTO } from '@zod/messaging/messaging.dto'
 import { type PublicProfile } from '@zod/profile/profile.dto'
 
@@ -9,6 +9,7 @@ import SendMessage from '@/components/messaging/SendMessage.vue'
 const props = defineProps<{
   profile: PublicProfile
 }>()
+const isOwner = inject<boolean>('isOwner', false)
 
 const emit = defineEmits<{
   (e: 'intent:message', profile: PublicProfile): void
@@ -48,16 +49,22 @@ const handleMessageIntent = () => {
     emit('intent:conversation:open', props.profile.conversation.id)
   }
 }
+
 </script>
 
 <template>
   <div>
-    <span v-if="!profile.conversation || profile.conversation.status === 'ACCEPTED'">
-      <BButton :pill="true" class="overlay-button" @click="handleMessageIntent">
+    <div>
+      <BButton
+        v-if="(!profile.conversation || profile.conversation.status === 'ACCEPTED') && !isOwner"
+        :pill="true"
+        class="btn-overlay"
+        @click="handleMessageIntent"
+      >
         <DoodleIcons name="IconMessage" class="svg-icon-lg p-0" />
         <!-- {{ $t('profiles.send_message_button') }} -->
       </BButton>
-    </span>
+    </div>
 
     <BModal
       v-model="showMessageModal"

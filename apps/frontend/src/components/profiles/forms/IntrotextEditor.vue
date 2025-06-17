@@ -127,6 +127,7 @@ const toggleListening = () => {
         id="content-input"
         placeholder="Tell a bit about yourself"
         max-rows="5"
+        min-rows="3"
         no-resize
         size="lg"
         :required="true"
