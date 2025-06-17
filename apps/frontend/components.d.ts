@@ -47,6 +47,7 @@ declare module 'vue' {
     DatingFilter: typeof import('./src/components/profiles/display/DatingFilter.vue')['default']
     DatingIcon: typeof import('./src/components/profiles/display/DatingIcon.vue')['default']
     DatingPreferencesForm: typeof import('./src/components/profiles/DatingPreferencesForm.vue')['default']
+    DoodleIcons: typeof import('./src/components/icons/DoodleIcons.vue')['default']
     ErrorComponent: typeof import('./src/components/ErrorComponent.vue')['default']
     GenderSelector: typeof import('./src/components/profiles/forms/GenderSelector.vue')['default']
     GenderSymbol: typeof import('./src/components/profiles/display/GenderSymbol.vue')['default']
