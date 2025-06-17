@@ -2,7 +2,7 @@
 import LocationSelectorComponent from '@/components/profiles/forms/LocationSelector.vue'
 import { useStepper } from '@vueuse/core'
 import { type LocationDTO } from '@zod/dto/location.dto'
-import { computed, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { type GenderType, type PronounsType } from '@zod/generated'
@@ -166,6 +166,11 @@ const saveProfile = async () => {
   // }, 2000)
   // isLoading.value = false
 }
+
+onMounted(async () => {
+  await profileStore.fetchUserProfile()
+  Object.assign(formData, profileStore.profile)
+})
 
 const handleNext = async () => {
   if (current.value) {

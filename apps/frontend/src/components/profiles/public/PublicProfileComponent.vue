@@ -1,9 +1,7 @@
 <script lang="ts" setup>
-import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { type PublicProfile } from '@zod/profile/profile.dto'
-import { useEnumOptions } from '../composables/useEnumOptions'
 
 import GenderSymbol from '@/components/profiles/display/GenderSymbol.vue'
 
@@ -13,6 +11,7 @@ import LanguageList from '../display/LanguageList.vue'
 import TagList from '../display/TagList.vue'
 import LocationLabel from '../display/LocationLabel.vue'
 import DatingIcon from '../display/DatingIcon.vue'
+import { useDatingFields } from '../composables/useDatingFields'
 
 const { t } = useI18n()
 
@@ -25,40 +24,7 @@ const emit = defineEmits<{
   (e: 'intent:conversation:open', conversationId: string): void
 }>()
 
-const age = computed(() => {
-  if (!props.profile.isDatingActive) return ''
-  if (!props.profile.birthday) return ''
-
-  const birthDate = new Date(props.profile.birthday)
-  const today = new Date()
-  let age = today.getFullYear() - birthDate.getFullYear()
-  const m = today.getMonth() - birthDate.getMonth()
-  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-    age--
-  }
-  return age
-})
-
-const { relationshipStatusLabels, pronounsLabels, hasKidsLabels } = useEnumOptions(t)
-
-const hasKidsLabel = computed(() => {
-  if (!props.profile.isDatingActive || props.profile.hasKids === 'unspecified') return ''
-  return hasKidsLabels()[props.profile.hasKids!] || props.profile.hasKids
-})
-
-const relationshipStatusLabel = computed(() => {
-  if (!props.profile.isDatingActive) return ''
-  if (!props.profile.relationship || props.profile.relationship === 'unspecified') return ''
-
-  return relationshipStatusLabels()[props.profile.relationship] || props.profile.relationship
-})
-
-const pronounsLabel = computed(() => {
-  if (!props.profile.isDatingActive) return ''
-  if (!props.profile.pronouns || props.profile.pronouns === 'unspecified') return ''
-
-  return pronounsLabels()[props.profile.pronouns] || props.profile.pronouns
-})
+const { age, relationshipStatus, pronouns, hasKids } = useDatingFields(props.profile, t)
 </script>
 
 <template>
@@ -66,7 +32,7 @@ const pronounsLabel = computed(() => {
     <div class="row justify-content-center">
       <div class="col-12 col-md-8 col-lg-6 position-relative user-select-none">
         <div class="overflow-hidden rounded">
-          <ImageCarousel :profile="profile" />
+          <ImageCarousel :profile />
         </div>
 
         <div class="icons">
@@ -92,7 +58,7 @@ const pronounsLabel = computed(() => {
               <GenderSymbol v-if="props.profile.gender" :gender="props.profile.gender" />
             </span>
 
-            <span v-if="props.profile.pronouns && pronounsLabel">{{ pronounsLabel }}</span>
+            <span v-if="props.profile.pronouns && pronouns">{{ pronouns }}</span>
           </div>
         </div>
         <div class="mb-2 text-muted">
@@ -121,10 +87,10 @@ const pronounsLabel = computed(() => {
 
             <ul class="list-unstyled mb-2 d-flex flex-wrap align-items-center">
               <li v-if="props.profile.relationship" class="me-2">
-                <span class="badge text-bg-dating">{{ relationshipStatusLabel }}</span>
+                <span class="badge text-bg-dating">{{ relationshipStatus }}</span>
               </li>
               <li v-if="props.profile.hasKids" class="me-2">
-                <span class="badge text-bg-dating">{{ hasKidsLabel }}</span>
+                <span class="badge text-bg-dating">{{ hasKids }}</span>
               </li>
             </ul>
           </div>

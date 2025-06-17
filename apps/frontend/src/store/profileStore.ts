@@ -53,6 +53,8 @@ export const useProfileStore = defineStore('profile', {
     async updateProfile(profileData: EditableOwnerProfile): Promise<StoreVoidSuccess | StoreError> {
       try {
         const update = EditableOwnerToProfilePayloadTransform.parse(profileData)
+        
+        console.log('Updating profile with data:', update)
         this.isLoading = true // Set loading state
         const res = await api.patch<UpdateProfileResponse>('/profiles/profile', update)
         const updated = OwnerProfileSchema.parse(res.data.profile)
