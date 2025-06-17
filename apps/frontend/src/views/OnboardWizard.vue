@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import LocationSelectorComponent from '@/components/profiles/forms/LocationSelector.vue'
-import { useStepper } from '@vueuse/core'
+import { useLocalStorage, useStepper } from '@vueuse/core'
 import { type LocationDTO } from '@zod/dto/location.dto'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -11,7 +11,7 @@ import LanguageSelector from '@/components/profiles/forms/LanguageSelector.vue'
 import AgeSelector from '@/components/profiles/forms/AgeSelector.vue'
 import GoalsSelector from '../components/profiles/onboarding/GoalsSelector.vue'
 import TagSelectComponent from '@/components/profiles/forms/TagSelectComponent.vue'
-import GenderSelector from '@/components/profiles/forms/GenderPronounSelector.vue'
+import GenderPronounSelector from '@/components/profiles/forms/GenderPronounSelector.vue'
 import RelationstatusSelector from '@/components/profiles/forms/RelationstatusSelector.vue'
 import IntrotextEditor from '@/components/profiles/forms/IntrotextEditor.vue'
 import HaskidsSelector from '@/components/profiles/forms/HaskidsSelector.vue'
@@ -22,14 +22,14 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import SpinnerComponent from '@/components/SpinnerComponent.vue'
 import { useRouter } from 'vue-router'
 import { useProfileStore } from '@/store/profileStore'
-import {
-  type EditableOwnerProfile,
-  EditableOwnerProfileSchema,
-} from '@zod/profile/profile.dto'
+import { type OwnerProfileInput, OwnerProfileInputSchema } from '@zod/profile/profile.dto'
 import useEditFields from '@/components/profiles/composables/useEditFields'
+import { useAuthStore } from '@/store/authStore'
+import { useLocalStore } from '@/store/localStore'
 
 const { t } = useI18n()
 const profileStore = useProfileStore()
+const localStore = useLocalStore()
 
 // https://github.com/vueuse/vueuse/blob/main/packages/core/useStepper/index.md
 // https://playground.vueuse.org/?vueuse=13.3.0#eNrFWG1v2zYQ/isXf6htIFLarvtixGle0AIthjZYsu3DPAy0dHKYUKRAUk68LP99R4p6sx03aTv0SyKRx7vnnjvenXw/OCmKeFniYDI4NInmhQWDtixAMLmYzgbWzAZHM8nzQmkL91AavLBYFKjhATKtchge03FaPkiUxmFHVCNLLF9iI0hytD+TiZLGQqZ0DtNGanQ/kwAZ18Z+YjlOYPhRyeG+WxSsWasW5lwILhcnaarRmGaZ9FpN2k6SBAuL6QQyJgxWe0zPlfycZeSdpbPdvYKtcpSW9CQaU24jEk6HwAwMaatgYgj/9vfo2MO4dcUERqYdeip/hrSgIy6ds8xy8mgCfgPAciucS7+RBHQlPCYAbn5ngpMTozFMjzxdcUMPvHhRrdTc+EMP/u8w0BOxip9Nk6eVANQCOyz2qX4bW81z2t6bTmvWg1GLOt9i6tIv7zCwHjSYkmqry55HIUKb6s/DxnYDf/aD1oTzr5jLRJQpmpHHENSPG5NVcLNSUmoqCaac59ySTm+dZzAKEY+TUms6GS+ZKDEO5kdjOu7g1FILdak+4R1pINU9zUwIly/mFAkInmisFHCZ4t0EZJnPUY8nMFdKIJOVfU33U0vYO9GarWJ3tUb3IFAu7NWEEolOkg+BAVkKEcDERuU4Gv29D9xv7dXomB3x8dseeAJ5eFCVA7r89GIxLwSzSG8Ahylf+ofqERJKQkO1IhNkesGK6DVcl8bybBUlRA5qX0KceDiwjMhbOuBpJDypx8SJ6ADJ/TcVqbMBTG5wRdI8pefaVkclKZ2X1irCWS8ATFJu2FxgSrJ7j7E8dteotsnD9oinY9Lf0XWcCJ7ckKJuPDfFlpGlGAex2GdoV+Cg5eCgQ2B4Dm++KNY+5jZ69ZJ8Pq7yLy40LolPZ8EvdGk1BaVHfdDhiMSCLpi00VwJR1wP3WbqBrhdlBuhdX+iRIm16IaQE9rX/ai0XvZiz7MOCm7OKhyjzVJJ/PbOBzeP3rsqCNJ1BMpSt7ImxWVRWrKUqxSFQ9+rnZ0s2iPQL+OfacWuCgzMPWL1F6q0zzZal+dn2uxnxZPYWy/6W8jbirBf4L83qqorbMGynhsdgNzd2apfR6pp2D6Fe8jXW3qLPbnC5Gau7jqs53otO4NJweYoXCfabvPoAzDfmMAqSLFQhltgYZqAVhIyxMMDr2zd085lf7r3oSlucXqtXX67042pjq9XCD5y5KF/qYWe6uJXZErd4r8mV9omv0lY0NvypFnK1QZJ4MvgurIvUNcTPfNvLjXS75gJ1cTy7W7VenZ71EjRXHXOxHPD/Xj4N3tB1bLrhGiGEW5cnW1bf7eNf2Ho2nDOjVx9mJXRXUD+DxwXVbfejaTPYX9EcBFvZ4TH+7JrxG9cI37Vvfa9A7dRRiMhFHckWKyobWtV0siY0oipU+rl1b8oZ24aK1iCkRNSS9SZULcRK6kOXnkd/V7fmz86c8fRe8K+0TAPaZRpJxLnXn/0WMufH+vBH/wff6d3+hByYqsb/ef66fCgM1QP9ulLm6psxhfxtVGSPsf9rO/qc15wgfpz4WYiatDNN9BsQHOtuv3o15ovJn/GtYIt69eGusOEHs6p16NeUmY3e5bpBVI9cdvvLvzVaTep9JRuPNyx+SsaJUqHsRI7paAQ7I6cR/vB/zpAHfPSvLuzKE3tlAPafvHNBvRjwdkO11u4P8Vv/Dn6ahk8/AcWuUbe
@@ -76,7 +76,7 @@ const { current, isFirst, stepNames, steps, goToNext, goToPrevious, goTo, isNext
     // Dating steps
     age: {
       state: computed(() =>
-        EditableOwnerProfileSchema.pick({ birthday: true }).safeParse(birthdayModel.value)
+        OwnerProfileInputSchema.pick({ birthday: true }).safeParse(birthdayModel.value)
           ? true
           : false
       ),
@@ -105,27 +105,26 @@ const { current, isFirst, stepNames, steps, goToNext, goToPrevious, goTo, isNext
     },
   })
 
-const formData = reactive<EditableOwnerProfile>({
-  id: '',
-  publicName: 'dfgdfg',
+const formData = reactive({
+  publicName: '',
+  birthday: null,
+  tags: [],
+  languages: [localStore.language],
   location: {
-    country: 'AD',
-    cityId: 'cmbwaaywq00036wp34ual7mmw',
+    country: '',
+    cityId: '',
     cityName: '',
   } as LocationDTO,
-  birthday: null,
-  languages: ['en'],
-  tags: [],
   isDatingActive: false,
   isSocialActive: true,
   gender: 'unspecified' as GenderType,
   pronouns: 'unspecified' as PronounsType,
   relationship: null,
   hasKids: null,
-  introSocial: 'dfgdfg',
-  introDating: 'dfgdfg',
+  introSocial: '',
+  introDating: '',
   profileImages: [],
-})
+} as unknown as OwnerProfileInput) 
 
 const {
   publicNameModel,
@@ -137,26 +136,12 @@ const {
   genderPronounsModel,
 } = useEditFields(formData)
 
-const isLoading = ref(false)
 const isComplete = ref(false)
 
 const saveProfile = async () => {
-  isLoading.value = true
   await profileStore.updateProfile(formData)
   console.log('Profile saved:', formData)
-  isLoading.value = false
-  // setTimeout(() => {
-  //   console.log('Saving profile data:', formData)
-  //   // Simulate saving data
-  //   isLoading.value = false
-  // }, 2000)
-  // isLoading.value = false
 }
-
-onMounted(async () => {
-  await profileStore.fetchUserProfile()
-  Object.assign(formData, profileStore.profile)
-})
 
 const handleNext = async () => {
   if (current.value) {
@@ -229,7 +214,7 @@ const handlePrevious = () => {
 
         <fieldset v-else-if="isCurrent('location')">
           <legend>I'm from...</legend>
-          <LocationSelectorComponent v-model="formData.location" />
+          <LocationSelectorComponent v-model="formData.location" :geoIp="true" />
         </fieldset>
 
         <fieldset v-else-if="isCurrent('looking_for')">
@@ -259,7 +244,8 @@ const handlePrevious = () => {
 
         <fieldset v-else-if="isCurrent('gender')">
           <legend>I identify as...</legend>
-          <GenderSelector v-model="genderPronounsModel" />
+          {{ genderPronounsModel }}
+          <GenderPronounSelector v-model="genderPronounsModel" />
         </fieldset>
 
         <fieldset v-else-if="isCurrent('family_situation')">
@@ -294,12 +280,12 @@ const handlePrevious = () => {
         </fieldset>
 
         <fieldset v-else-if="isCurrent('confirm')">
-          <div v-if="isLoading" class="text-center">
+          <div v-if="profileStore.isLoading" class="text-center">
             <SpinnerComponent />
           </div>
           <div v-else>
             <legend>Done!</legend>
-            <div v-if="!isLoading" class="d-flex flex-column gap-3">
+            <div v-if="!profileStore.isLoading" class="d-flex flex-column gap-3">
               <BButton
                 @click="handleGoToProfile"
                 variant="success"

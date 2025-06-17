@@ -104,6 +104,7 @@ export type PublicProfile = z.infer<typeof PublicProfileSchema>;
 export const OwnerProfileSchema = ProfileSchema.pick({
   ...editableFields,
   id: true,
+  isOnboarded: true,
 }).extend({
   profileImages: z.array(PublicProfileImageSchema).default([]),
   tags: z.array(PublicTagSchema).default([]),
@@ -113,7 +114,7 @@ export type OwnerProfile = z.infer<typeof OwnerProfileSchema>;
 
 export type OwnerOrPublicProfile = OwnerProfile | PublicProfile
 
-export const EditableOwnerProfileSchema = ProfileSchema.pick({
+export const OwnerProfileInputSchema = ProfileSchema.pick({
   ...editableFields,
   id: true,
 
@@ -122,9 +123,9 @@ export const EditableOwnerProfileSchema = ProfileSchema.pick({
   tags: z.array(PublicTagSchema).default([]),
   location: LocationSchema
 })
-export type EditableOwnerProfile = z.infer<typeof EditableOwnerProfileSchema>;
+export type OwnerProfileInput = z.infer<typeof OwnerProfileInputSchema>;
 
-export const EditableOwnerToProfilePayloadTransform = EditableOwnerProfileSchema.transform((data) => {
+export const OwnerProfileInputToProfilePayloadTransform = OwnerProfileInputSchema.transform((data) => {
   const {location,profileImages, ...rest} = data;
   return {
     ...rest,

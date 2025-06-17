@@ -7,8 +7,10 @@ import { useAuthStore } from '@/store/authStore'
 
 import { computed } from 'vue'
 import { useMessageStore } from '@/store/messageStore'
+import { useProfileStore } from '@/store/profileStore'
 
 const authStore = useAuthStore()
+const profilesStore = useProfileStore()
 
 const isLoggedIn = computed(() => authStore.isLoggedIn)
 const hasUnreadMessages = computed(() => useMessageStore().hasUnreadMessages)
@@ -17,6 +19,10 @@ function handleLogoutClick() {
   authStore.logout() // Clear the authentication state
   useRouter().push({ name: 'Login' }) // Redirect to the login page
 }
+
+const profileLink = computed(() => {
+  return profilesStore.profile?.isOnboarded ? '/me' : '/onboarding'
+})
 </script>
 
 <template>
@@ -40,8 +46,8 @@ function handleLogoutClick() {
         </span>
         <span class="d-none d-sm-inline">{{ $t('nav.inbox') }}</span>
       </BNavItem>
-      
-      <BNavItem to="/me" active-class="active">
+
+      <BNavItem :to="profileLink" active-class="active">
         <DoodleIcons name="IconUser" class="svg-icon-lg" />
         <span class="d-none d-sm-inline">{{ $t('nav.profile') }}</span>
       </BNavItem>

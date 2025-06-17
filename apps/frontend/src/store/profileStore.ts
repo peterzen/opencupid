@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia'
 import { api } from '@/lib/api'
 import type {
-  EditableOwnerProfile,
+  OwnerProfileInput,
   OwnerProfile,
   PublicProfile,
 } from '@zod/profile/profile.dto'
 import {
-  EditableOwnerToProfilePayloadTransform,
+  OwnerProfileInputToProfilePayloadTransform,
   OwnerProfileSchema,
   PublicProfileArraySchema,
   PublicProfileSchema,
@@ -32,7 +32,7 @@ export const useProfileStore = defineStore('profile', {
     isLoading: false, // Loading state
 
     fieldEditModal: false,
-    currentField: '' as keyof EditableOwnerProfile | null, // Field being edited
+    currentField: '' as keyof OwnerProfileInput | null, // Field being edited
   }),
 
   actions: {
@@ -52,9 +52,9 @@ export const useProfileStore = defineStore('profile', {
     },
 
     // Update the current user's social profile
-    async updateProfile(profileData: EditableOwnerProfile): Promise<StoreVoidSuccess | StoreError> {
+    async updateProfile(profileData: OwnerProfileInput): Promise<StoreVoidSuccess | StoreError> {
       try {
-        const update = EditableOwnerToProfilePayloadTransform.parse(profileData)
+        const update = OwnerProfileInputToProfilePayloadTransform.parse(profileData)
 
         console.log('Updating profile with data:', update)
         this.isLoading = true // Set loading state

@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { reactive, onMounted, ref, provide } from 'vue'
+import { reactive, onMounted, ref, provide, computed } from 'vue'
 import { OwnerProfile, PublicProfile } from '@zod/profile/profile.dto'
 import { useProfileStore } from '@/store/profileStore'
 
 import LoadingComponent from '@/components/LoadingComponent.vue'
 import PublicProfileComponent from '@/components/profiles/public/PublicProfileComponent.vue'
+import { ownerToPublicProfile } from '@zod/profile/profile.transform'
 
 const profileStore = useProfileStore()
 
@@ -24,6 +25,7 @@ const handleOkClick = async () => {
     console.error('Failed to fetch updated profile after edit.')
   }
 }
+const publicProfile = computed(() => ownerToPublicProfile(profileStore.profile))
 
 provide('isOwner', true)
 provide('editableModel', editableModel)
@@ -56,7 +58,8 @@ provide('editableModel', editableModel)
     <PublicProfileComponent
       v-if="profileStore.profile"
       :isLoading="profileStore.isLoading"
-      @intent:field:edit="showModal = true"    
-      :profile="profileStore.profile as PublicProfile"/>
+      @intent:field:edit="showModal = true"
+      :profile="profileStore.profile as PublicProfile"
+    />
   </main>
 </template>
