@@ -7,6 +7,7 @@ import { type LoginUser } from '@zod/user/user.types'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useColorMode } from 'bootstrap-vue-next'
 import { useMessageStore } from '@/store/messageStore'
+import LanguageSelector from '@/components/settings/LanguageSelector.vue'
 
 const authStore = useAuthStore()
 
@@ -48,21 +49,22 @@ const messageStore = useMessageStore()
 
 <template>
   <main class="container mt-4">
-    <h3 class="mb-4">
-      <DoodleIcons name="IconSetting2" class="svg-icon" />
+    <h3 class="mb-4 d-flex align-items-center">
+      <DoodleIcons name="IconSetting2" class="svg-icon me-2" />
       Settings
     </h3>
 
     <LoadingComponent v-if="isLoading" />
 
-    <div class="mb-3">
-      <p v-if="user.email">Email: {{ user.email }}</p>
-      <p v-if="user.phonenumber">Phone number: {{ user.phonenumber }}</p>
-    </div>
-
-    <div class="mb-3">
+    <div class="mb-3 d-flex align-items-center">
+      <div class="me-2">
+        <span v-if="user.email">Email: {{ user.email }}</span>
+        <span v-if="user.phonenumber">Phone number: {{ user.phonenumber }}</span>
+      </div>
       <LogoutButton />
     </div>
+
+    <div class="mb-3"></div>
 
     <div class="mb-3">
       <button class="btn btn-secondary" @click="changeColor">Toggle night or day</button>
@@ -70,6 +72,9 @@ const messageStore = useMessageStore()
 
     <div class="mb-3">
       <PushPermissions />
+    </div>
+    <div class="mb-3">
+      <LanguageSelector />
     </div>
   </main>
 </template>

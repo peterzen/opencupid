@@ -1,10 +1,18 @@
 // src/plugins/countries.ts
+import { useI18nStore } from '@/store/i18nStore'
 import countries from 'i18n-iso-countries'
+
+// const i18nStore = useI18nStore()
 
 // Always register English (fallback)
 import enLocale from 'i18n-iso-countries/langs/en.json'
-import { getLocale } from './i18n'
+import frLocale from 'i18n-iso-countries/langs/fr.json'
+import huLocale from 'i18n-iso-countries/langs/hu.json'
+import itLocale from 'i18n-iso-countries/langs/it.json'
 countries.registerLocale(enLocale)
+countries.registerLocale(huLocale)
+countries.registerLocale(frLocale)
+countries.registerLocale(itLocale)
 
 // Lazy-register other languages only when first needed
 export async function ensureCountryLocale(locale: string) {
@@ -14,7 +22,7 @@ export async function ensureCountryLocale(locale: string) {
 }
 
 export function getCountryOptions() {
-  const list = countries.getNames(getLocale(), {
+  const list = countries.getNames('en', {
     select: 'official',
   })
   const options = Object.entries(list)
@@ -24,7 +32,7 @@ export function getCountryOptions() {
 }
 
 export function countryCodeToName(code: string) {
-  return countries.getName(code, getLocale(), { select: 'official' })
+  return countries.getName(code, 'en', { select: 'official' })
 }
 
 export { countries }

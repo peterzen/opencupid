@@ -1,5 +1,5 @@
 <template>
-  <a @click="handleClick" href="#" class="btn btn-secondary">
+  <a @click="handleClick" href="#" class="btn btn-secondary btn-sm">
     <DoodleIcons name="IconLogout" class="svg-icon" />
     Logout</a
   >

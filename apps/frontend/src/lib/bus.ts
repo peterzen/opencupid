@@ -8,6 +8,7 @@ type Events = {
   'auth:logout': void
 
   'message:received': { message: MessageDTO }
+  'language:changed': { language: string }
 }
 
 export const bus = mitt<Events>()

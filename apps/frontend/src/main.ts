@@ -28,7 +28,7 @@ const app = createApp(App)
 app.config.warnHandler = (msg, vm, trace) => {
   console.error('Vue warning:', msg, trace)
   if (msg.includes('computed value is readonly')) {
-    debugger
+    // debugger
   }
 }
 app.use(createPinia())
@@ -53,7 +53,7 @@ registerToast(app)
 import { appUseI18n } from './lib/i18n'
 appUseI18n(app)
 
-import { useFormKit } from '@/lib/formkit'
-useFormKit(app)
+// import { useFormKit } from '@/lib/formkit'
+// useFormKit(app)
 
 app.mount('#app')

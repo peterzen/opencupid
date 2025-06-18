@@ -122,17 +122,18 @@ export const useAuthStore = defineStore('auth', {
       // TODO implement me
       return true
     },
-    // Update the current user's profile
-    // async updateUser(userData: Record<string, any>) {
-    //   try {
-    //     const res = await axios.patch("/users/me", userData)
-    //     return { success: true, user: res.data.user, error: null }
-    //   } catch (error: any) {
-    //     console.error('Failed to update profile:', error)
-    //     const msg = error.response?.data?.message || 'Failed to update profile'
-    //     return { success: false, user: null, error: msg }
-    //   }
-    // },
+
+    // Update the current user
+    async updateUser(userData: Record<string, any>) {
+      try {
+        const res = await api.patch("/users/me", userData)
+        return { success: true, user: res.data.user, error: null }
+      } catch (error: any) {
+        console.error('Failed to update profile:', error)
+        const msg = error.response?.data?.message || 'Failed to update profile'
+        return { success: false, user: null, error: msg }
+      }
+    },
 
     logout() {
       this.userId = null
@@ -144,3 +145,10 @@ export const useAuthStore = defineStore('auth', {
     },
   },
 })
+
+
+bus.on('language:changed', async ({ language }) => {
+  await useAuthStore().updateUser({ language })
+})
+
+

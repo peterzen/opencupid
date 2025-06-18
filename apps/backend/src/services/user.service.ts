@@ -134,6 +134,16 @@ export class UserService {
     })
   }
 
+  async update(user: User): Promise<User | null> {
+    return prisma.user.update({
+      where: { id: user.id },
+      data: {
+        ...user,
+      },
+    })
+  }
+
+
   generateOTP() {
     // Generate a 6-digit OTP
     return otpGenerator.generate(6, {

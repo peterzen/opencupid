@@ -1,0 +1,48 @@
+import { defineStore } from "pinia";
+import { useI18n } from "vue-i18n";
+import { ref, watch } from "vue";
+import { bus } from "@/lib/bus";
+
+import { Settings } from 'luxon'
+Settings.defaultZone = 'Europe/Berlin'
+
+const STORAGE_KEY = 'language'
+export const useI18nStore = defineStore('i18n', () => {
+
+  const { locale, availableLocales } = useI18n()
+  const currentLanguage = ref(localStorage.getItem(STORAGE_KEY) || 'en')
+  locale.value = currentLanguage.value
+
+  // Sync changes to localStorage + vue-i18n
+  watch(currentLanguage, (newLang) => {
+    locale.value = newLang
+    // Set the locale for Luxon
+    Settings.defaultLocale = locale.value
+    localStorage.setItem(STORAGE_KEY, newLang)
+    bus.emit('language:changed', { language: newLang })
+  })
+
+  function getLanguage() {
+    return currentLanguage.value
+  }
+
+  function setLanguage(lang: string) {
+
+    if (!availableLocales.includes(lang)) {
+      console.error(`Unsupported language: ${lang}`)
+      return
+    }
+    currentLanguage.value = lang
+  }
+
+  function getAvailableLocales() {
+    return availableLocales
+  }
+
+  return {
+    currentLanguage,
+    getAvailableLocales,
+    setLanguage,
+    getLanguage,
+  }
+})

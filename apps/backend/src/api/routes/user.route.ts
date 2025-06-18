@@ -12,6 +12,7 @@ import { appConfig } from '@shared/config/appconfig'
 import { AuthIdentifierCaptchaInputSchema, OtpLoginInputSchema, OtpSendReturn } from '@zod/user/user.dto'
 import type { OtpLoginResponse, SendLoginLinkResponse, UserMeResponse } from '@shared/dto/apiResponse.dto'
 import { JwtPayload } from '@zod/user/user.types'
+import { User } from '@zod/generated'
 
 
 const userRoutes: FastifyPluginAsync = async fastify => {
@@ -144,6 +145,32 @@ const userRoutes: FastifyPluginAsync = async fastify => {
 
       const response: UserMeResponse = { success: true, user }
       return reply.code(200).send(response)
+    }
+  )
+
+  // !!! TODO this is a temporary endpoint/hack to update the language
+  // need to be replaced with a proper user settings endpoint
+  fastify.patch(
+    '/me',
+    {
+      onRequest: [fastify.authenticate],
+    },
+    async (req, reply) => {
+      const { language } = req.body as { language: string }
+      if (!language) {
+        return sendError(reply, 400, 'Language is required')
+      }
+      try {
+        await userService.update({
+          id: req.user.userId,
+          language
+        } as User)
+        await req.deleteSession()
+
+        return reply.code(200).send({ success: true })
+      } catch (error) {
+        return sendError(reply, 500, 'Failed to update language')
+      }
     }
   )
 }
