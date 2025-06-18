@@ -1,9 +1,11 @@
-import { FastifyPluginAsync } from 'fastify'
+import { FastifyPluginAsync, FastifyReply, FastifyRequest } from 'fastify'
 import { Prisma } from '@prisma/client'
 import { z } from 'zod'
 
 import {
   type UpdateProfilePayload,
+  CreateProfilePayload,
+  CreateProfilePayloadSchema,
   UpdateProfilePayloadSchema
 } from '@zod/profile/profile.dto'
 
@@ -27,7 +29,7 @@ import type {
   GetProfilesResponse,
   UpdateProfileResponse,
 } from '@shared/dto/apiResponse.dto'
-import { DbProfileSchema } from '@zod/profile/profile.db'
+import { Profile, ProfileSchema } from '@zod/generated'
 
 // Route params for ID lookups
 const IdLookupParamsSchema = z.object({
@@ -97,8 +99,7 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
 
     try {
       const profiles = await profileService.findProfilesFor(myProfileId)
-      const roles = getUserRoles(req)
-      const hasDatingPermission = roles.includes('user_dating')
+      const hasDatingPermission = req.session.profile.isDatingActive
       const mappedProfiles = profiles.map(p => mapProfileToPublic(p, hasDatingPermission))
       const response: GetProfilesResponse = { success: true, profiles: mappedProfiles }
       return reply.code(200).send(response)
@@ -111,25 +112,42 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
   /**
    * Update the current user's profile
    */
-  fastify.patch('/profile', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+  fastify.patch('/me', { onRequest: [fastify.authenticate] }, async (req, reply) => {
 
     const data = await validateBody(UpdateProfilePayloadSchema, req, reply) as UpdateProfilePayload
     if (!data) return
+    return updateProfile(data, req, reply)
+  })
 
+  /**
+   * Create a new profile for the current user
+   * @description This route is used to create a new profile for the current user.
+   * It is called during the onboarding process.
+   */
+  fastify.post('/me', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    const data = await validateBody(CreateProfilePayloadSchema, req, reply) as CreateProfilePayload
+    if (!data) return
+    // @ts-expect-error - We are setting isOnboarded here, which is not part of CreateProfilePayload
+    //  i'm not gonna bloody write a transform for this
+    data.isOnboarded = true // Set the onboarding flag to true
+    return updateProfile(data, req, reply)
+  })
+
+  async function updateProfile(profileData: CreateProfilePayload | UpdateProfilePayload, req: FastifyRequest, reply: FastifyReply) {
     const user = await userService.getUserById(req.user.userId)
     if (!user) return sendUnauthorizedError(reply)
 
-    // set flags on user object (these are used in authorization)
-    if (data.isDatingActive) {
-      userService.addRole(user, 'user_dating')
-    } else {
-      userService.removeRole(user, 'user_dating')
-    }
-    user.hasActiveProfile = [data.isDatingActive, data.isSocialActive].some(Boolean)
+    // // set flags on user object (these are used in authorization)
+    // if (profileData.isDatingActive) {
+    //   userService.addRole(user, 'user_dating')
+    // } else {
+    //   userService.removeRole(user, 'user_dating')
+    // }
+    user.hasActiveProfile = [profileData.isDatingActive, profileData.isSocialActive].some(Boolean)
 
     try {
       const updated = await fastify.prisma.$transaction(async tx => {
-        const updatedProfile = await profileService.updateProfile(tx, req.user.userId, data)
+        const updatedProfile = await profileService.updateProfile(tx, req.user.userId, profileData)
         // if (!updatedProfile) return sendError(reply, 404, 'Profile not found')
         const profile = DbProfileToOwnerProfileTransform.parse(updatedProfile)
 
@@ -152,7 +170,8 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
       }
       return sendError(reply, 500, 'Failed to update profile')
     }
-  })
+  }
+
 
 }
 

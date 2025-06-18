@@ -1,13 +1,13 @@
 // src/services/session.service.ts
 import Redis from 'ioredis'
 import { UserRole } from '@prisma/client'
-import { SessionData } from '@zod/user/user.db'
+import { SessionData, SessionDataSchema } from '@zod/user/user.types'
 
 export class SessionService {
   constructor(
     private redis: Redis,
     private ttlSec = 60 * 60 * 24 * 7 // 7 days
-  ) {}
+  ) { }
 
   private sessionKey(id: string) {
     return `session:${id}`
@@ -21,32 +21,11 @@ export class SessionService {
    */
   async getOrCreate(id: string, data: SessionData): Promise<SessionData> {
     const hkey = this.sessionKey(id)
-    const rkey = this.rolesKey(id)
 
-    // Store hash fields (userId, lang) and overwrite roles set atomically
     await this.redis
       .multi()
-      // Update hash
-      .hset(
-        hkey,
-        'userId',
-        data.userId,
-        'profileId',
-        data.profileId,
-        'lang',
-        data.lang,
-        'isOnboarded',
-        data.isOnboarded ? 'true' : 'false',
-        'hasActiveProfile',
-        data.hasActiveProfile ? 'true' : 'false'
-      )
-      // Reset TTL on hash
+      .set(hkey, JSON.stringify(data))
       .expire(hkey, this.ttlSec)
-      // Overwrite roles set
-      .del(rkey)
-      .sadd(rkey, ...data.roles)
-      // Reset TTL on set
-      .expire(rkey, this.ttlSec)
       .exec()
 
     return data
@@ -57,19 +36,20 @@ export class SessionService {
    */
   async get(id: string): Promise<SessionData | null> {
     const hkey = this.sessionKey(id)
-    const rkey = this.rolesKey(id)
+    const raw = await this.redis.get(hkey)
+    if (!raw) return null
 
-    const [hash, roles] = await Promise.all([this.redis.hgetall(hkey), this.redis.smembers(rkey)])
-    if (!hash.userId) return null
+    const result = SessionDataSchema.safeParse(JSON.parse(raw))
+    return result.success ? result.data : null
 
-    return {
-      userId: hash.userId,
-      profileId: hash.profileId,
-      lang: hash.lang || 'en',
-      roles: roles as UserRole[],
-      isOnboarded: hash.isOnboarded === 'true',
-      hasActiveProfile: hash.hasActiveProfile === 'true',
-    }
+    // return {
+    //   userId: session.userId,
+    //   profileId: session.profileId,
+    //   lang: session.lang || 'en',
+    //   roles: session.roles ?? [],
+    //   isOnboarded: Boolean(session.isOnboarded),
+    //   hasActiveProfile: Boolean(session.hasActiveProfile),
+    // }
   }
 
   /**

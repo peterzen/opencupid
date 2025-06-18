@@ -5,6 +5,7 @@ import { Prisma } from '@prisma/client'
 import { Profile, ProfileImage, ProfileTag } from '@zod/generated'
 import {
 
+  CreateProfilePayload,
   type UpdateProfilePayload
 } from '@zod/profile/profile.dto'
 import { DbProfileComplete, DbProfile } from '@zod/profile/profile.db'
@@ -73,7 +74,7 @@ export class ProfileService {
   async updateProfile(
     tx: Prisma.TransactionClient,
     userId: string,
-    data: UpdateProfilePayload
+    data: CreateProfilePayload | UpdateProfilePayload
   ): Promise<DbProfile> {
     // 1) pull out the tags array
     const { tags, ...rest } = data

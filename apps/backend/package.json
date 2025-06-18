@@ -12,6 +12,8 @@
     "lint": "eslint . --ext .ts",
     "format": "prettier --write src/",
     "test-data": "npx ts-node -r tsconfig-paths/register  src/test-data/Profile.ts",
+    "redis:flush": "docker compose exec redis redis-cli FLUSHALL",
+    "redis:sessions": "docker compose exec redis  redis-cli KEYS '*'",
     "test": "vitest"
   },
   "prisma": {

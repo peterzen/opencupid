@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { OwnerDatingPreferences, OwnerProfile } from '@zod/profile/profile.dto'
+import type { UpdateDatingPreferencesPayload, OwnerProfile } from '@zod/profile/profile.dto'
 import { computed, reactive, ref, watch, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import VueSlider from 'vue-3-slider-component'
@@ -13,7 +13,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'changed', value: OwnerDatingPreferences): void
+  (e: 'changed', value: UpdateDatingPreferencesPayload): void
 }>()
 
 const formData = reactive<OwnerProfile>({
@@ -87,7 +87,7 @@ const ageMaxMin = computed(() => {
 })
 
 function handleGenderPrefsUpdate() {
-  const changed: OwnerDatingPreferences = {
+  const changed: UpdateDatingPreferencesPayload = {
     prefGender: formData.prefGender,
     prefKids: formData.prefKids,
     prefAgeMax: formData.prefAgeMax,

@@ -3,7 +3,7 @@ import {
   ProfileUnionSchema,
   ProfileSummary,
   OwnerProfile,
-  OwnerProfileInputSchema,
+  OwnerCreateProfileFormSchema,
 } from '@zod/profile/profile.dto'
 import { type DbProfileComplete, DbProfileWithImagesSchema } from '@zod/profile/profile.db'
 import { LocationSchema } from '@zod/dto/location.dto'

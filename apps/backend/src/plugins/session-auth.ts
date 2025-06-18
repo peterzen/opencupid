@@ -3,12 +3,12 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import fastifyJwt from '@fastify/jwt'
 import Redis from 'ioredis'
 
-import { type SessionData } from '@zod/user/user.db'
 
-import { UserService, type UserWithProfileId } from 'src/services/user.service'
+import { UserService, type UserWithProfile } from 'src/services/user.service'
 import { SessionService } from '../services/session.service'
 import { sendUnauthorizedError } from 'src/api/helpers'
 import { appConfig } from '@shared/config/appconfig'
+import { SessionData, SessionProfile, SessionProfileSchema } from '@zod/user/user.types'
 
 // Extend Fastify types
 declare module 'fastify' {
@@ -64,18 +64,18 @@ export default fp(async (fastify: FastifyInstance) => {
       let user
 
       try {
-        user = (await UserService.getInstance().getUserById(userId, {
+        user = await UserService.getInstance().getUserById(userId, {
           include: {
-            profile: {
-              select: { id: true },
-            },
+            profile: true,
           },
-        })) as UserWithProfileId
+        }) as UserWithProfile
         if (!user) return sendUnauthorizedError(reply, 'User not found')
       } catch (error) {
         fastify.log.error('Error fetching user for session refresh:', error)
         return sendUnauthorizedError(reply, 'Session refresh failed')
       }
+
+      const profile = SessionProfileSchema.parse(user.profile || null)
 
       const sessionData: SessionData = {
         lang: user.language || 'en', // Default to 'en' if no language is set
@@ -84,9 +84,10 @@ export default fp(async (fastify: FastifyInstance) => {
         profileId: user.profile?.id || '',
         isOnboarded: user.isOnboarded || false,
         hasActiveProfile: user.hasActiveProfile || false,
+        profile: profile
       }
       sess = await sessionService.getOrCreate(sessionId, sessionData)
-      // console.log(`Created new session for user ${user.id} with session ID ${sessionId}`)
+      console.error(`Created new session for user ${user.id} with session ID ${sessionId}`)
     } else {
       // Refresh TTL on simple reads
       await sessionService.refreshTtl(sessionId)

@@ -3,21 +3,37 @@ import { type Component, inject, ref } from 'vue'
 import DoodleIcons from '@/components/icons/DoodleIcons.vue'
 import { useProfileStore } from '@/store/profileStore'
 import useEditFields from '../composables/useEditFields'
-import { OwnerProfileInput } from '@zod/profile/profile.dto'
+import {
+  type EditFieldProfileFormWithImages,
+} from '@zod/profile/profile.form'
 
-type EditableFieldKey = keyof OwnerProfileInput
+// Only allow field names that are accepted by getModelProxy
+type AllowedFieldKey =
+  | "isSocialActive"
+  | "isDatingActive"
+  | "gender"
+  | "pronouns"
+  | "relationship"
+  | "hasKids"
+  | "publicName"
+  | "introSocial"
+  | "languages"
+  | "introDating"
+  | "birthday"
+  | "tags"
+  | "location"
 
 const profileStore = useProfileStore()
 
 const props = defineProps<{
-  fieldName: EditableFieldKey
+  fieldName: AllowedFieldKey
   editComponent: Component
-	buttonClass?: string // optional class for the button
+  buttonClass?: string // optional class for the button
   editProps?: Record<string, any> // allow additional props to be passed to the edit component
 }>()
 
 const isOwner = inject<boolean>('isOwner', false)
-const editableModel = inject<OwnerProfileInput>('editableModel', {} as OwnerProfileInput)
+const editableModel = inject<EditFieldProfileFormWithImages>('editableModel', {} as EditFieldProfileFormWithImages)
 
 const handleButtonClick = () => {
   profileStore.currentField = props.fieldName

@@ -1,24 +1,24 @@
 <script setup lang="ts">
 import { reactive, onMounted, ref, provide, computed } from 'vue'
-import { OwnerProfile, PublicProfile } from '@zod/profile/profile.dto'
 import { useProfileStore } from '@/store/profileStore'
 
 import LoadingComponent from '@/components/LoadingComponent.vue'
 import PublicProfileComponent from '@/components/profiles/public/PublicProfileComponent.vue'
 import { ownerToPublicProfile } from '@zod/profile/profile.transform'
+import { type EditFieldProfileFormWithImages } from '@zod/profile/profile.form'
 
 const profileStore = useProfileStore()
 
 const showModal = ref(false)
-const editableModel: OwnerProfile = reactive({} as OwnerProfile)
+const editableModel: EditFieldProfileFormWithImages = reactive({} as EditFieldProfileFormWithImages)
 
 onMounted(async () => {
-  await profileStore.fetchUserProfile()
+  await profileStore.fetchOwnerProfile()
   Object.assign(editableModel, profileStore.profile)
 })
 
 const handleOkClick = async () => {
-  const res = await profileStore.updateProfile(editableModel)
+  const res = await profileStore.updateOwnerProfile(editableModel)
   if (res.success) {
     // profileStore.close()
   } else {
@@ -56,10 +56,10 @@ provide('editableModel', editableModel)
       <div id="field-edit-modal" class="w-100"></div>
     </BModal>
     <PublicProfileComponent
-      v-if="profileStore.profile"
+      v-if="publicProfile"
       :isLoading="profileStore.isLoading"
       @intent:field:edit="showModal = true"
-      :profile="profileStore.profile as PublicProfile"
+      :profile="publicProfile"
     />
   </main>
 </template>

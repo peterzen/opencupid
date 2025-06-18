@@ -22,10 +22,11 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import SpinnerComponent from '@/components/SpinnerComponent.vue'
 import { useRouter } from 'vue-router'
 import { useProfileStore } from '@/store/profileStore'
-import { type OwnerProfileInput, OwnerProfileInputSchema } from '@zod/profile/profile.dto'
 import useEditFields from '@/components/profiles/composables/useEditFields'
 import { useAuthStore } from '@/store/authStore'
 import { useLocalStore } from '@/store/localStore'
+import { EditProfileForm, EditProfileFormSchema } from '@zod/profile/profile.form'
+import ErrorComponent from '@/components/ErrorComponent.vue'
 
 const { t } = useI18n()
 const profileStore = useProfileStore()
@@ -76,9 +77,7 @@ const { current, isFirst, stepNames, steps, goToNext, goToPrevious, goTo, isNext
     // Dating steps
     age: {
       state: computed(() =>
-        OwnerProfileInputSchema.pick({ birthday: true }).safeParse(birthdayModel.value)
-          ? true
-          : false
+        EditProfileFormSchema.pick({ birthday: true }).safeParse(birthdayModel.value) ? true : false
       ),
       flags: '',
       isCompleted: false,
@@ -115,16 +114,15 @@ const formData = reactive({
     cityId: '',
     cityName: '',
   } as LocationDTO,
-  isDatingActive: false,
-  isSocialActive: true,
   gender: 'unspecified' as GenderType,
   pronouns: 'unspecified' as PronounsType,
   relationship: null,
   hasKids: null,
   introSocial: '',
   introDating: '',
-  profileImages: [],
-} as unknown as OwnerProfileInput) 
+  isDatingActive: false,
+  isSocialActive: false,
+} as EditProfileForm)
 
 const {
   publicNameModel,
@@ -137,9 +135,15 @@ const {
 } = useEditFields(formData)
 
 const isComplete = ref(false)
+const error = ref('')
 
 const saveProfile = async () => {
-  await profileStore.updateProfile(formData)
+  const res = await profileStore.createOwnerProfile(formData)
+  if (!res.success) {
+    console.error('Failed to save profile:', res.message)
+    error.value = res.message || 'Failed to save profile'
+    return
+  }
   console.log('Profile saved:', formData)
 }
 
@@ -284,24 +288,27 @@ const handlePrevious = () => {
             <SpinnerComponent />
           </div>
           <div v-else>
-            <legend>Done!</legend>
-            <div v-if="!profileStore.isLoading" class="d-flex flex-column gap-3">
-              <BButton
-                @click="handleGoToProfile"
-                variant="success"
-                size="lg"
-                pill
-                class="d-flex align-items-center justify-content-center"
-                >Go to my profile</BButton
-              >
-              <BButton
-                @click="handleGoToBrowse"
-                variant="success"
-                size="lg"
-                pill
-                class="d-flex align-items-center justify-content-center"
-                >Go find people</BButton
-              >
+            <ErrorComponent v-if="error" :error="error" />
+            <div v-else>
+              <legend>Done!</legend>
+              <div v-if="!profileStore.isLoading" class="d-flex flex-column gap-3">
+                <BButton
+                  @click="handleGoToProfile"
+                  variant="success"
+                  size="lg"
+                  pill
+                  class="d-flex align-items-center justify-content-center"
+                  >Go to my profile</BButton
+                >
+                <BButton
+                  @click="handleGoToBrowse"
+                  variant="success"
+                  size="lg"
+                  pill
+                  class="d-flex align-items-center justify-content-center"
+                  >Go find people</BButton
+                >
+              </div>
             </div>
           </div>
         </fieldset>

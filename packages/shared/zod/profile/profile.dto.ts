@@ -13,20 +13,23 @@ import {
   PublicProfileImageSchema
 } from "./profileimage.dto";
 import { LocationSchema } from "@zod/dto/location.dto";
+import { profile } from "console";
 
-const baseFields = {
+export const baseFields = {
   id: true,
+} as const;
+
+export const socialFields = {
   languages: true,
   publicName: true,
   introSocial: true,
-  cityName: true,
-  country: true,
-  isActive: true,
-  isDatingActive: true,
-  isSocialActive: true,
+  // cityName: true,
+  // country: true,
+  // cityId: true,
 } as const;
 
-const publicDatingProfileFields = {
+
+export const datingFields = {
   introDating: true,
   hasKids: true,
   relationship: true,
@@ -35,43 +38,28 @@ const publicDatingProfileFields = {
   pronouns: true,
 } as const;
 
-const datingPreferencesFields = {
+export const datingPreferencesFields = {
   prefAgeMin: true,
   prefAgeMax: true,
   prefGender: true,
   prefKids: true,
 } as const;
 
-const editableFields = {
-  // cityId: true,  // TODO !!add it back when DB records are updated
-  // country: true,
-  // cityName: true,
-  languages: true,
-  birthday: true,
-  publicName: true,
-  introSocial: true,
-  introDating: true,
-  hasKids: true,
-  relationship: true,
-  gender: true,
-  pronouns: true,
-  isDatingActive: true,
-  isSocialActive: true,
-} as const;
 
 const PublicScalarsSchema = ProfileSchema.pick({
   ...baseFields,
+  ...socialFields,
 }).extend({
   isDatingActive: z.literal(false)
 })
 
 const PublicDatingScalarsSchema = ProfileSchema.pick({
   ...baseFields,
-  ...publicDatingProfileFields,
+  ...socialFields,
+  ...datingFields,
 }).extend({
   isDatingActive: z.literal(true)
 })
-
 
 export const ProfileUnionSchema = z.discriminatedUnion('isDatingActive', [
   // when isDatingActive = false, use the base
@@ -100,11 +88,18 @@ export type PublicProfile = z.infer<typeof PublicProfileSchema>;
 //   isActive: true,
 // });
 
-
-export const OwnerProfileSchema = ProfileSchema.pick({
-  ...editableFields,
-  id: true,
+export const ownerFields = {
+  isDatingActive: true,
+  isSocialActive: true,
   isOnboarded: true,
+} as const;
+
+// API -> client DTO 
+export const OwnerProfileSchema = ProfileSchema.pick({
+  ...baseFields,
+  ...socialFields,
+  ...datingFields,
+  ...ownerFields,
 }).extend({
   profileImages: z.array(PublicProfileImageSchema).default([]),
   tags: z.array(PublicTagSchema).default([]),
@@ -114,47 +109,56 @@ export type OwnerProfile = z.infer<typeof OwnerProfileSchema>;
 
 export type OwnerOrPublicProfile = OwnerProfile | PublicProfile
 
-export const OwnerProfileInputSchema = ProfileSchema.pick({
+export const editableFields = {
+  ...socialFields,
+  ...datingFields,
+  isDatingActive: true,
+  isSocialActive: true,
+
+} as const;
+
+
+// Client -> API DTO onboarding payload
+export const CreateProfilePayloadSchema = ProfileSchema.pick({
   ...editableFields,
-  id: true,
-
-}).extend({
-  profileImages: z.array(PublicProfileImageSchema).default([]),
-  tags: z.array(PublicTagSchema).default([]),
-  location: LocationSchema
+  cityId: true,
+  country: true,
+  cityName: true,
 })
-export type OwnerProfileInput = z.infer<typeof OwnerProfileInputSchema>;
-
-export const OwnerProfileInputToProfilePayloadTransform = OwnerProfileInputSchema.transform((data) => {
-  const {location,profileImages, ...rest} = data;
-  return {
-    ...rest,
-    tags: data.tags.map(tag => tag.id),
-    cityId: data.location.cityId,
-    country: data.location.country,
-    cityName: data.location.cityName,
-    location: undefined
-  }
+.partial().strict()
+.extend({
+  tags: z.array(z.string().cuid()),
 })
 
+export type CreateProfilePayload = z.infer<typeof CreateProfilePayloadSchema>;
+
+// Client -> API DTO profile editing payload
 export const UpdateProfilePayloadSchema = ProfileSchema.pick({
   ...editableFields,
   cityId: true,
   country: true,
   cityName: true,
-}).extend({
-  tags: z.array(z.string().cuid()),
 })
+  .omit({
+    birthday: true, // birthday is not editable
+  })
+  .extend({
+    tags: z.array(z.string().cuid()),
+  })
+  .partial()
 
 export type UpdateProfilePayload = z.infer<typeof UpdateProfilePayloadSchema>;
 
 
-export const OwnerDatingPreferencesSchema = ProfileSchema.pick({
+
+
+// client -> API DTO dating preferences update payload
+export const UpdateDatingPreferencesPayloadSchema = ProfileSchema.pick({
   ...datingPreferencesFields,
 }).partial()
-export type OwnerDatingPreferences = z.infer<typeof OwnerDatingPreferencesSchema>;
+export type UpdateDatingPreferencesPayload = z.infer<typeof UpdateDatingPreferencesPayloadSchema>;
 
-
+// Client -> API DTO used in conversations
 export const ProfileSummarySchema = z.object({
   id: z.string(),
   publicName: z.string(),

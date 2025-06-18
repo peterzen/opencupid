@@ -1,15 +1,23 @@
 import { z } from "zod"
 
-import { UserRoleSchema, UserSchema } from "@zod/generated"
+import { ProfileSchema, UserRoleSchema, UserSchema } from "@zod/generated"
 import { AuthIdentifierSchema, JwtPayloadSchema } from "./user.dto"
 
-const SessionDataSchema = z.object({
+export const SessionProfileSchema = ProfileSchema.pick({
+  id: true,
+  isDatingActive: true,
+  isSocialActive: true,
+})
+export type SessionProfile = z.infer<typeof SessionProfileSchema>
+
+export const SessionDataSchema = z.object({
   userId: z.string(),
   profileId: z.string(),
-  lang: z.string(),
+  lang: z.string().default("en"),
   roles: z.array(UserRoleSchema),
   isOnboarded: z.boolean().default(false),
   hasActiveProfile: z.boolean().default(false),
+  profile: SessionProfileSchema,
 })
 
 export type SessionData = z.infer<typeof SessionDataSchema>
@@ -30,3 +38,4 @@ export type LoginUser = z.infer<typeof LoginUserSchema>
 export type AuthIdentifier = z.infer<typeof AuthIdentifierSchema>
 
 export type JwtPayload = z.infer<typeof JwtPayloadSchema>
+// sdfsd@dfg.com

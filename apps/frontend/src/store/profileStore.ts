@@ -1,12 +1,10 @@
 import { defineStore } from 'pinia'
 import { api } from '@/lib/api'
 import type {
-  OwnerProfileInput,
   OwnerProfile,
   PublicProfile,
 } from '@zod/profile/profile.dto'
 import {
-  OwnerProfileInputToProfilePayloadTransform,
   OwnerProfileSchema,
   PublicProfileArraySchema,
   PublicProfileSchema,
@@ -24,6 +22,7 @@ import {
   type StoreResponse,
   type StoreError
 } from './helpers'
+import { EditProfileForm,  ProfileFormToPayloadTransform, EditFieldProfileFormWithImages } from '@zod/profile/profile.form'
 
 export const useProfileStore = defineStore('profile', {
   state: () => ({
@@ -32,11 +31,11 @@ export const useProfileStore = defineStore('profile', {
     isLoading: false, // Loading state
 
     fieldEditModal: false,
-    currentField: '' as keyof OwnerProfileInput | null, // Field being edited
+    currentField: '' as keyof EditFieldProfileFormWithImages | null, // Field being edited
   }),
 
   actions: {
-    async fetchUserProfile(): Promise<StoreVoidSuccess | StoreError> {
+    async fetchOwnerProfile(): Promise<StoreVoidSuccess | StoreError> {
       try {
         this.isLoading = true // Set loading state
         const res = await api.get<GetMyProfileResponse>('/profiles/me')
@@ -52,13 +51,13 @@ export const useProfileStore = defineStore('profile', {
     },
 
     // Update the current user's social profile
-    async updateProfile(profileData: OwnerProfileInput): Promise<StoreVoidSuccess | StoreError> {
+    async updateOwnerProfile(profileData: EditProfileForm): Promise<StoreVoidSuccess | StoreError> {
       try {
-        const update = OwnerProfileInputToProfilePayloadTransform.parse(profileData)
+        const update = ProfileFormToPayloadTransform.parse(profileData)
 
         console.log('Updating profile with data:', update)
         this.isLoading = true // Set loading state
-        const res = await api.patch<UpdateProfileResponse>('/profiles/profile', update)
+        const res = await api.patch<UpdateProfileResponse>('/profiles/me', update)
         const updated = OwnerProfileSchema.parse(res.data.profile)
         this.profile = updated
         return storeSuccess()
@@ -68,6 +67,25 @@ export const useProfileStore = defineStore('profile', {
         this.isLoading = false // Reset loading state
       }
     },
+
+    // Update the current user's social profile
+    async createOwnerProfile(profileData: EditProfileForm): Promise<StoreVoidSuccess | StoreError> {
+      try {
+        const update = ProfileFormToPayloadTransform.parse(profileData)
+
+        console.log('Updating profile with data:', update)
+        this.isLoading = true // Set loading state
+        const res = await api.post<UpdateProfileResponse>('/profiles/me', update)
+        const updated = OwnerProfileSchema.parse(res.data.profile)
+        this.profile = updated
+        return storeSuccess()
+      } catch (error: any) {
+        return storeError(error, 'Could not create profile')
+      } finally {
+        this.isLoading = false // Reset loading state
+      }
+    },
+
 
     // Fetch a profile by ID
     async getPublicProfile(profileId: string): Promise<StoreResponse<PublicProfile>> {
