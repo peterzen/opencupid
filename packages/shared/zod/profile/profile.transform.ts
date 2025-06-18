@@ -1,5 +1,4 @@
-import { OwnerProfile, PublicProfile } from "./profile.dto"
-import { EditProfileFormSchema } from "./profile.form";
+import type { OwnerProfile, PublicProfile } from "./profile.dto"
 
 
 export function ownerToPublicProfile(profile: OwnerProfile|null): PublicProfile|null {

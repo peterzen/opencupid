@@ -30,7 +30,7 @@ const multiselectRef = ref<MultiselectComponent>()
 const selectedCity = computed<PublicCity>({
   get() {
     return {
-      id: model.value.cityId,
+      id: model.value.cityId || '',
       name: model.value.cityName,
       country: model.value.country,
     }

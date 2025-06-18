@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 
 import { countryCodeToName } from '@/lib/countries'
-import { LocationDTO } from '@zod/dto/location.dto';
+import { type LocationDTO } from '@zod/dto/location.dto';
 
 const props = defineProps<{
   location: LocationDTO

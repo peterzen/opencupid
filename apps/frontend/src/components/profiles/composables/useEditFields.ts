@@ -1,5 +1,4 @@
-import { OwnerProfile, PublicProfile } from "@zod/profile/profile.dto"
-import { EditProfileForm,  EditFieldProfileFormWithImages } from "@zod/profile/profile.form"
+import { type EditProfileForm, type EditFieldProfileFormWithImages } from "@zod/profile/profile.form"
 import { computed } from "vue"
 
 function modelProxy<T extends object, K extends keyof T>(target: T, key: K) {

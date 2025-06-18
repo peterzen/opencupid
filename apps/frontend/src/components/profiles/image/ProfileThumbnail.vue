@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { type ProfileImages } from '@zod/profile/profile.types'
 import ProfileImage from './ProfileImage.vue'
 
 // Props & Emits
-const props = defineProps<{
-  profile: ProfileImages
+defineProps<{
+  profile: {
+    profileImages: { url: string | null }[]
+  }
 }>()
 </script>
 
 <template>
   <span class="thumbnail d-inline-flex">
     <ProfileImage :profile="profile" />
-    </span>
+  </span>
 </template>
 
 <style scoped>

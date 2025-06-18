@@ -1,20 +1,16 @@
 <script setup lang="ts">
 import LocationSelectorComponent from '@/components/profiles/forms/LocationSelector.vue'
-import { useLocalStorage, useStepper } from '@vueuse/core'
+import { useStepper } from '@vueuse/core'
 import { type LocationDTO } from '@zod/dto/location.dto'
-import { computed, onMounted, reactive, ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { type GenderType, type PronounsType } from '@zod/generated'
 
 import LanguageSelector from '@/components/profiles/forms/LanguageSelector.vue'
-import AgeSelector from '@/components/profiles/forms/AgeSelector.vue'
 import GoalsSelector from '../components/profiles/onboarding/GoalsSelector.vue'
 import TagSelectComponent from '@/components/profiles/forms/TagSelectComponent.vue'
-import GenderPronounSelector from '@/components/profiles/forms/GenderPronounSelector.vue'
-import RelationstatusSelector from '@/components/profiles/forms/RelationstatusSelector.vue'
 import IntrotextEditor from '@/components/profiles/forms/IntrotextEditor.vue'
-import HaskidsSelector from '@/components/profiles/forms/HaskidsSelector.vue'
 import ImageEditor from '@/components/profiles/image/ImageEditor.vue'
 import PublicNameInput from '../components/profiles/forms/PublicNameInput.vue'
 import DatingSteps from '@/components/profiles/onboarding/DatingSteps.vue'
@@ -24,21 +20,20 @@ import SpinnerComponent from '@/components/SpinnerComponent.vue'
 import { useRouter } from 'vue-router'
 import { useProfileStore } from '@/store/profileStore'
 import useEditFields from '@/components/profiles/composables/useEditFields'
-import { useAuthStore } from '@/store/authStore'
-import { useLocalStore } from '@/store/localStore'
-import { EditProfileForm, EditProfileFormSchema } from '@zod/profile/profile.form'
+import { type EditProfileForm } from '@zod/profile/profile.form'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import { useOnboardingWizard } from '@/components/profiles/onboarding/useProfileWizards'
+import { useI18nStore } from '@/store/i18nStore'
 
 const { t } = useI18n()
 const profileStore = useProfileStore()
-const localStore = useLocalStore()
+const i18nStore = useI18nStore()
 
 const formData = reactive({
   publicName: '',
   birthday: null,
   tags: [],
-  languages: [localStore.language],
+  languages: [i18nStore.getLanguage()],
   location: {
     country: '',
     cityId: '',

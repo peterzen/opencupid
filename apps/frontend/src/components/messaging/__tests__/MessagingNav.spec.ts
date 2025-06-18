@@ -9,7 +9,7 @@ import MessagingNav from '../MessagingNav.vue'
 describe('MessagingNav', () => {
   it('emits events on icon clicks', async () => {
     const wrapper = mount(MessagingNav, {
-      props: { recipient: { publicName: 'B' } },
+      props: { recipient: { id: '1', publicName: 'B', profileImages: [] } },
       global: { stubs: { BButton: true, ProfileThumbnail: true } }
     })
     await wrapper.find('.back-button a').trigger('click')

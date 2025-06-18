@@ -1,4 +1,4 @@
-import { ApiError } from '@shared/dto/apiResponse.dto'
+import { type ApiError } from '@shared/dto/apiResponse.dto'
 import { AxiosError } from 'axios'
 import { ZodError } from 'zod'
 

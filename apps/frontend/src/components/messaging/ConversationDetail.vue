@@ -30,9 +30,9 @@ const conversationPartner = ref<PublicProfile | null>(null)
 watchEffect(async () => {
   if (props.conversation) {
     isLoading.value = true
-    conversationPartner.value = await profileStore.getPublicProfile(
-      props.conversation.partnerProfile.id
-    )
+    const res = await profileStore.getPublicProfile(props.conversation.partnerProfile.id)
+    if (res.success) conversationPartner.value = res.data ?? null
+    else conversationPartner.value = null
     isLoading.value = false
   } else {
     conversationPartner.value = null

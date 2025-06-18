@@ -20,7 +20,6 @@ type AllowedFieldKey =
   | 'birthday'
   | 'tags'
   | 'location'
-  | 'profileImages'
 
 const profileStore = useProfileStore()
 

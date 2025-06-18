@@ -22,7 +22,7 @@ import {
   type StoreResponse,
   type StoreError
 } from './helpers'
-import { EditProfileForm,  ProfileFormToPayloadTransform, EditFieldProfileFormWithImages } from '@zod/profile/profile.form'
+import { type EditProfileForm, ProfileFormToPayloadTransform, type EditFieldProfileFormWithImages } from '@zod/profile/profile.form'
 
 export const useProfileStore = defineStore('profile', {
   state: () => ({

@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { describe, it, expect } from 'vitest'
 
-import NameInput from '../forms/NameInput.vue'
+import NameInput from '../forms/PublicNameInput.vue'
 
 describe('NameInput', () => {
   it('updates model on input', async () => {

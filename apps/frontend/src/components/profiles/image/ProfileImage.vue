@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue'
 
-import type { ProfileImages } from '@zod/profile/profile.types'
 import ImageTag from '@/components/profiles/image/ImageTag.vue'
 
 // Props & Emits
 const props = defineProps<{
-  profile: ProfileImages
+  profile: {
+    profileImages: { url: string | null }[]
+  }
 }>()
 
 const image = ref<{ url: string | null }>()

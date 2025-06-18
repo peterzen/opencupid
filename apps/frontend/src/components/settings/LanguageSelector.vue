@@ -7,7 +7,7 @@ function changeToFrench() {
   i18nStore.setLanguage('fr')
 }
 
-const labels = {
+const labels: Record<string, string> = {
   hu: 'Magyar',
   de: 'Deutsch',
   en: 'English',

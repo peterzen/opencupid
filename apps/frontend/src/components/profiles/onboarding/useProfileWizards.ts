@@ -1,5 +1,4 @@
-import { useStepper } from "@vueuse/core"
-import { EditProfileForm, EditProfileFormSchema } from "@zod/profile/profile.form"
+import { type EditProfileForm, EditProfileFormSchema } from "@zod/profile/profile.form"
 import { computed } from "vue"
 
 // https://github.com/vueuse/vueuse/blob/main/packages/core/useStepper/index.md

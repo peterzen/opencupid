@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PublicProfile } from '@zod/profile/profile.dto'
+import { type PublicProfile } from '@zod/profile/profile.dto'
 import { useDatingFields } from '../composables/useDatingFields'
 import { useI18n } from 'vue-i18n'
 

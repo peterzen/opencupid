@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted, provide, watch } from 'vue'
+import { ref } from 'vue'
 import { useOnboardingWizard } from './useProfileWizards'
-import { EditFieldProfileFormWithImages, EditProfileForm } from '@zod/profile/profile.form'
+import { type EditFieldProfileFormWithImages } from '@zod/profile/profile.form'
 import HelpScribble from '../HelpScribble.vue'
 
 import { useStepper } from '@vueuse/core'
