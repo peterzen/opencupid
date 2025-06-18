@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import DoodleIcons from '@/components/icons/DoodleIcons.vue'
+import IconSetting2 from '@/assets/icons/interface/setting-2.svg'
+import IconMessage from '@/assets/icons/interface/message.svg'
+import IconSearch from '@/assets/icons/interface/search.svg'
+import IconUser from '@/assets/icons/interface/user.svg'
 
 import { useAuthStore } from '@/store/authStore'
 
@@ -27,13 +30,13 @@ function handleLogoutClick() {
     <BNavbarNav class="d-flex justify-content-between w-100">
 
       <BNavItem to="/browse" active-class="active">
-        <DoodleIcons name="IconSearch" class="svg-icon-lg" />
+        <IconSearch class="svg-icon-lg" />
         <span class="d-none d-sm-inline">{{ $t('nav.browse') }}</span>
       </BNavItem>
 
       <BNavItem to="/inbox" active-class="active">
         <span class="icon-wrapper position-relative">
-          <DoodleIcons name="IconMessage" class="svg-icon-lg" />
+          <IconMessage  class="svg-icon-lg" />
           <FontAwesomeIcon
           v-if="hasUnreadMessages"
             icon="fa-solid fa-circle"
@@ -45,12 +48,12 @@ function handleLogoutClick() {
       </BNavItem>
 
       <BNavItem to="/me" active-class="active">
-        <DoodleIcons name="IconUser" class="svg-icon-lg" />
+        <IconUser class="svg-icon-lg" />
         <span class="d-none d-sm-inline">{{ $t('nav.profile') }}</span>
       </BNavItem>
 
       <BNavItem to="/settings" active-class="active">
-        <DoodleIcons name="IconSetting2" class="svg-icon-lg" />
+        <IconSetting2 class="svg-icon-lg" />
         <span class="d-none d-sm-inline"> {{ $t('nav.settings') }}</span>
       </BNavItem>
     </BNavbarNav>

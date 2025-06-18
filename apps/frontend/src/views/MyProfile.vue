@@ -8,6 +8,7 @@ import { ownerToPublicProfile } from '@zod/profile/profile.transform'
 import { type EditFieldProfileFormWithImages } from '@zod/profile/profile.form'
 import IconDate from '@/assets/icons/app/cupid.svg'
 import IconSocialize from '@/assets/icons/app/socialize.svg'
+import IconPencil2 from '@/assets/icons/interface/pencil-2.svg'
 
 import useEditFields from '@/components/profiles/composables/useEditFields'
 import { useOnboardingWizard } from '@/components/profiles/onboarding/useProfileWizards'
@@ -185,7 +186,7 @@ const handleEditProfile = () => {
           @click="handleToggleEditable"
           :variant="isEditable ? 'success' : 'primary'"
         >
-          <DoodleIcons name="IconPencil2" class="svg-icon" />
+          <IconPencil2 class="svg-icon" />
           {{ isEditable ? 'Done' : 'Edit Profile' }}
         </BButton>
       </div>

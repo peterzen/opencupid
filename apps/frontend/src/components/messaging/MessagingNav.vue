@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import DoodleIcons from '@/components/icons/DoodleIcons.vue'
 import { type ProfileSummary } from '@zod/profile/profile.dto'
 import ProfileThumbnail from '../profiles/image/ProfileThumbnail.vue'
+
+import IconArrowSingleLeft from '@/assets/icons/arrows/arrow-single-left.svg'
+import IconMenuDotsVert from '@/assets/icons/interface/menu-dots-vert.svg'
+
 
 defineProps<{
   recipient: ProfileSummary
@@ -18,7 +21,7 @@ defineEmits<{
   <div class="d-flex align-items-center justify-content-between p-2">
     <div class="back-button">
       <a class="btn btn-secondary-outline fs-1" @click="$emit('deselect:convo')">
-        <DoodleIcons name="IconArrowSingleLeft" class="svg-icon" />
+        <IconArrowSingleLeft class="svg-icon" />
       </a>
     </div>
 
@@ -36,7 +39,7 @@ defineEmits<{
 
     <div class="action-button">
       <a class="btn btn-secondary-outline" @click="$emit('modal:open')">
-        <DoodleIcons name="IconMenuDotsVert" class="svg-icon-lg fs-4" />
+        <IconMenuDotsVert class="svg-icon-lg fs-4" />
       </a>
     </div>
   </div>

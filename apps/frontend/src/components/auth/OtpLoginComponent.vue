@@ -3,7 +3,8 @@ import { computed, ref, watch } from 'vue'
 import { type LoginUser } from '@zod/user/user.types'
 import { otpRegex } from '@/lib/utils'
 
-import DoodleIcons from '@/components/icons/DoodleIcons.vue'
+import IconMessage from '@/assets/icons/interface/message.svg'
+import IconMail from '@/assets/icons/interface/mail.svg'
 
 const props = defineProps<{
   user: LoginUser
@@ -47,10 +48,10 @@ watch(inputState, state => {
     <div class="fs-4 mb-3">
       <span class="text-muted opacity-50">
         <span v-if="user.phonenumber">
-          <DoodleIcons name="IconMessage" class="svg-icon" />
+          <IconMessage class="svg-icon" />
         </span>
         <span v-else>
-          <DoodleIcons name="IconMail" class="svg-icon" />
+          <IconMail class="svg-icon" />
         </span>
       </span>
       Check your messages

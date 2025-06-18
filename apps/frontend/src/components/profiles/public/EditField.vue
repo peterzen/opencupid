@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { type Component, inject, ref } from 'vue'
-import DoodleIcons from '@/components/icons/DoodleIcons.vue'
+import IconPencil2 from '@/assets/icons/interface/pencil-2.svg'
 import { useProfileStore } from '@/store/profileStore'
 import useEditFields from '../composables/useEditFields'
 import { type EditFieldProfileFormWithImages } from '@zod/profile/profile.form'
@@ -50,7 +50,7 @@ const fieldProxy = getModelProxy(props.fieldName)
     <slot name="display"> </slot>
     <a href="#" @click="handleButtonClick" v-bind:class="props.buttonClass" class="me-2">
       <slot>
-        <DoodleIcons name="IconPencil2" class="svg-icon" />
+        <IconPencil2 class="svg-icon" />
       </slot>
     </a>
     <Teleport to="#field-edit-modal" v-if="profileStore.fieldEditModal">

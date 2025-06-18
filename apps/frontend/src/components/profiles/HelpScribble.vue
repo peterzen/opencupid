@@ -1,12 +1,12 @@
-<template>
-  <div class="help-scribble d-flex"  :class="`direction-${direction}`">
-    <DoodleIcons :name="icons[direction] as any" class="svg-icon animate__animated animate__swing" />
-    <span class="animate__animated animate__tada">{{ text }}</span>
-  </div>
-</template>
-
 <script setup lang="ts">
-import DoodleIcons from '@/components/icons/DoodleIcons.vue'
+import IconArrowUp from '@/assets/icons/arrows/arrow-up.svg'
+import IconArrowDown from '@/assets/icons/arrows/arrow-down.svg'
+import IconArrowRight from '@/assets/icons/arrows/arrow-right.svg'
+import IconArrowLeft from '@/assets/icons/arrows/arrow-left.svg'
+import IconArrowNe from '@/assets/icons/arrows/arrow-ne.svg'
+import IconArrowNw from '@/assets/icons/arrows/arrow-nw.svg'
+import IconArrowSe from '@/assets/icons/arrows/arrow-se.svg'
+import IconArrowSw from '@/assets/icons/arrows/arrow-sw.svg'
 
 defineProps<{
   text: string
@@ -14,16 +14,23 @@ defineProps<{
 }>()
 
 const icons = {
-  n: 'IconArrowUp',
-  s: 'IconArrowDown',
-  e: 'IconArrowRight',
-  w: 'IconArrowLeft',
-  ne: 'IconArrowNe',
-  nw: 'IconArrowNw',
-  se: 'IconArrowSe',
-  sw: 'IconArrowSw',
+  n: IconArrowUp,
+  s: IconArrowDown,
+  e: IconArrowRight,
+  w: IconArrowLeft,
+  ne: IconArrowNe,
+  nw: IconArrowNw,
+  se: IconArrowSe,
+  sw: IconArrowSw,
 }
 </script>
+
+<template>
+  <div class="help-scribble d-flex" :class="`direction-${direction}`">
+    <component :is="icons[direction]" class="svg-icon animate__animated animate__swing" />
+    <span class="animate__animated animate__tada">{{ text }}</span>
+  </div>
+</template>
 
 <style scoped>
 .help-scribble {

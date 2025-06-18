@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import DoodleIcons from '@/components/icons/DoodleIcons.vue'
 import LoadingComponent from '@/components/LoadingComponent.vue'
 import LogoutButton from '@/components/nav/LogoutButton.vue'
 import { useAuthStore } from '@/store/authStore'
@@ -8,6 +7,8 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { useColorMode } from 'bootstrap-vue-next'
 import { useMessageStore } from '@/store/messageStore'
 import LanguageSelector from '@/components/settings/LanguageSelector.vue'
+
+import IconSetting2 from '@/assets/icons/interface/setting-2.svg'
 
 const authStore = useAuthStore()
 
@@ -50,7 +51,7 @@ const messageStore = useMessageStore()
 <template>
   <main class="container mt-4">
     <h3 class="mb-4 d-flex align-items-center">
-      <DoodleIcons name="IconSetting2" class="svg-icon me-2" />
+      <IconSetting2 class="svg-icon me-2" />
       Settings
     </h3>
 

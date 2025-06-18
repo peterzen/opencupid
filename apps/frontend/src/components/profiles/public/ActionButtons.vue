@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import DoodleIcons from '@/components/icons/DoodleIcons.vue'
+
 import { inject, nextTick, ref } from 'vue'
 import { type MessageDTO } from '@zod/messaging/messaging.dto'
 import { type PublicProfile } from '@zod/profile/profile.dto'
 
 import SendMessage from '@/components/messaging/SendMessage.vue'
+import IconMessage from '@/assets/icons/interface/message.svg'
 
 const props = defineProps<{
   profile: PublicProfile
@@ -62,7 +63,7 @@ const handleMessageIntent = () => {
         class="btn-overlay"
         @click="handleMessageIntent"
       >
-        <DoodleIcons name="IconMessage" class="svg-icon-lg p-0" />
+        <IconMessage class="svg-icon-lg p-0" />
         <!-- {{ $t('profiles.send_message_button') }} -->
       </BButton>
     </div>
@@ -111,7 +112,7 @@ const handleMessageIntent = () => {
             class="d-flex flex-column align-items-center justify-content-center h-100 text-success"
           >
             <div class="my-4 animate__animated animate__zoomIn" style="height: 5rem">
-              <DoodleIcons name="IconMessage" class="svg-icon-lg h-100 w-100" />
+              <IconMessage class="svg-icon-lg h-100 w-100" />
             </div>
             <h5 class="mb-4 text-center animate__animated animate__fadeInDown">
               {{ $t('messaging.message_sent_success') }}

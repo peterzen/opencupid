@@ -11,8 +11,7 @@ import LocationLabel from '../display/LocationLabel.vue'
 import DatingIcon from '../display/DatingIcon.vue'
 import GenderPronounLabel from '../display/GenderPronounLabel.vue'
 import RelationshipTags from '../display/RelationshipTags.vue'
-import DoodleIcons from '@/components/icons/DoodleIcons.vue'
-
+import IconPhoto from '@/assets/icons/interface/photo.svg'
 // Edit components
 import EditField from '@/components/profiles/public/EditField.vue'
 import PublicNameInput from '@/components/profiles/forms/PublicNameInput.vue'
@@ -61,7 +60,7 @@ const emit = defineEmits<{
             :editComponent="ImageEditor"
             buttonClass="btn btn-overlay rounded-4"
           >
-            <DoodleIcons name="IconPhoto" class="svg-icon" />
+            <IconPhoto class="svg-icon" />
           </EditField>
         </div>
 

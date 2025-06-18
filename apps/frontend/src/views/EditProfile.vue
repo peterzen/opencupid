@@ -8,7 +8,7 @@ import { ownerToPublicProfile } from '@zod/profile/profile.transform'
 import { type EditFieldProfileFormWithImages } from '@zod/profile/profile.form'
 import IconDate from '@/assets/icons/app/cupid.svg'
 import IconSocialize from '@/assets/icons/app/socialize.svg'
-
+import IconPhoto from '@/assets/icons/interface/photo.svg'
 import useEditFields from '@/components/profiles/composables/useEditFields'
 import { useOnboardingWizard } from '@/components/profiles/onboarding/useProfileWizards'
 import { useStepper } from '@vueuse/core'
@@ -59,7 +59,7 @@ const handleOkClick = async () => {
 
         <div class="action-buttons">
           <BButton :pill="true" class="btn-overlay">
-            <DoodleIcons name="IconPhoto" class="svg-icon" />
+            <IconPhoto class="svg-icon" />
           </BButton>
         </div>
       </div>

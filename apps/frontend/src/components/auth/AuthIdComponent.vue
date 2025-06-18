@@ -3,9 +3,13 @@ import { ref, computed } from 'vue'
 import type { AuthIdentifierCaptchaInput } from '@zod/user/user.dto'
 import { emailRegex, phoneRegex } from '@/lib/utils'
 import CaptchaWidget from './CaptchaWidget.vue'
-import DoodleIcons from '@/components/icons/DoodleIcons.vue'
 import Logo from '@/assets/icons/app/logo.svg'
 import { useI18n } from 'vue-i18n'
+
+import IconTick from '@/assets/icons/interface/tick.svg'
+import IconMail from '@/assets/icons/interface/mail.svg'
+import IconPhone from '@/assets/icons/interface/phone.svg'
+import IconLogin from '@/assets/icons/interface/login.svg'
 
 const { t } = useI18n()
 
@@ -42,7 +46,7 @@ async function handleSendLoginLink() {
 
 const inputState = computed(() => {
   // console.log('Validating Auth ID:', authIdInput.value)
-  if (!authIdInput.value || authIdInput.value==='') return null
+  if (!authIdInput.value || authIdInput.value === '') return null
   // Check if the input is a valid email or phone number
   return emailRegex.test(authIdInput.value) || phoneRegex.test(authIdInput.value)
 })
@@ -82,9 +86,13 @@ const authIdInputRef = ref<InstanceType<any> | null>(null)
       :state="formState"
     >
       <div class="mb-3">
-        <BFormFloatingLabel floating 
-        label="Email or phone number" label-for="authIdInput" class="my-2"
-        :state="null">
+        <BFormFloatingLabel
+          floating
+          label="Email or phone number"
+          label-for="authIdInput"
+          class="my-2"
+          :state="null"
+        >
           <BInput
             size="lg"
             v-model.trim="authIdInput"
@@ -97,25 +105,20 @@ const authIdInputRef = ref<InstanceType<any> | null>(null)
             aria-autocomplete="none"
             autofocus
             autocomplete="off"
-      :state="inputState"
+            :state="inputState"
             lazy
           >
           </BInput>
-           <div class="suffix-icon">
-              <span class="text-success" v-if="inputState">
-                <DoodleIcons name="IconTick" class="svg-icon" />
-              </span>
-              <span class="text-muted" v-else>
-                <DoodleIcons name="IconMail" class="svg-icon" v-if="authIdInput.includes('@')" />
-                <DoodleIcons
-                  name="IconPhone"
-                  class="svg-icon"
-                  v-else-if="authIdInput.startsWith('+')"
-                />
-              </span>
-            </div>
+          <div class="suffix-icon">
+            <span class="text-success" v-if="inputState">
+              <IconTick class="svg-icon" />
+            </span>
+            <span class="text-muted" v-else>
+              <IconMail class="svg-icon" v-if="authIdInput.includes('@')" />
+              <IconPhone class="svg-icon" v-else-if="authIdInput.startsWith('+')" />
+            </span>
+          </div>
         </BFormFloatingLabel>
-
       </div>
 
       <div class="mb-3">
@@ -129,7 +132,7 @@ const authIdInputRef = ref<InstanceType<any> | null>(null)
         label="Continue"
         :disabled="isLoading || !formState"
       >
-        <DoodleIcons name="IconLogin" class="svg-icon" /> {{ t('auth.login') }}
+        <IconLogin class="svg-icon" /> {{ t('auth.login') }}
       </BButton>
     </BForm>
   </div>
