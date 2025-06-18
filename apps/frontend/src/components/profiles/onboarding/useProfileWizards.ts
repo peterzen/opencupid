@@ -27,7 +27,7 @@ export const useOnboardingWizard = (formData: EditProfileForm) => {
       isCompleted: false,
     },
     gender: {
-      state: computed(() => formData.gender && formData.pronouns),
+      state: computed(() => formData.gender && formData.gender != 'unspecified'),
       flags: '',
       isCompleted: false,
     },

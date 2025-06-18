@@ -116,24 +116,14 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
 
     const data = await validateBody(UpdateProfilePayloadSchema, req, reply) as UpdateProfilePayload
     if (!data) return
-    return updateProfile(data, req, reply)
-  })
-
-  /**
-   * Create a new profile for the current user
-   * @description This route is used to create a new profile for the current user.
-   * It is called during the onboarding process.
-   */
-  fastify.post('/me', { onRequest: [fastify.authenticate] }, async (req, reply) => {
-    const data = await validateBody(CreateProfilePayloadSchema, req, reply) as CreateProfilePayload
-    if (!data) return
     // @ts-expect-error - We are setting isOnboarded here, which is not part of CreateProfilePayload
     //  i'm not gonna bloody write a transform for this
     data.isOnboarded = true // Set the onboarding flag to true
     return updateProfile(data, req, reply)
   })
 
-  async function updateProfile(profileData: CreateProfilePayload | UpdateProfilePayload, req: FastifyRequest, reply: FastifyReply) {
+
+  async function updateProfile(profileData: UpdateProfilePayload, req: FastifyRequest, reply: FastifyReply) {
     const user = await userService.getUserById(req.user.userId)
     if (!user) return sendUnauthorizedError(reply)
 

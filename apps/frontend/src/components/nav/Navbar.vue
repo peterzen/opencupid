@@ -20,9 +20,6 @@ function handleLogoutClick() {
   useRouter().push({ name: 'Login' }) // Redirect to the login page
 }
 
-const profileLink = computed(() => {
-  return profilesStore.profile?.isOnboarded ? '/me' : '/onboarding'
-})
 </script>
 
 <template>
@@ -47,7 +44,7 @@ const profileLink = computed(() => {
         <span class="d-none d-sm-inline">{{ $t('nav.inbox') }}</span>
       </BNavItem>
 
-      <BNavItem :to="profileLink" active-class="active">
+      <BNavItem to="/me" active-class="active">
         <DoodleIcons name="IconUser" class="svg-icon-lg" />
         <span class="d-none d-sm-inline">{{ $t('nav.profile') }}</span>
       </BNavItem>

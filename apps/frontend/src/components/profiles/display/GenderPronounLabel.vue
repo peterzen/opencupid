@@ -22,12 +22,18 @@ const { age, pronouns } = useDatingFields(profileRef, t)
     <span class="me-1">{{ age }}</span>
     <span class="me-1 d-inline-flex align-items-center">
       <GenderSymbol v-if="props.profile.gender" :gender="props.profile.gender" />
-      <EditField fieldName="gender" :editComponent="GenderSelector" />
+      <EditField fieldName="gender" :editComponent="GenderSelector" >
+      <template #display>({{ props.profile.gender }})</template>
+    </EditField>
     </span>
 
     <span v-if="props.profile.pronouns && pronouns" class="d-inline-flex align-items-center">
       <span>{{ pronouns }}</span>
-      <EditField fieldName="pronouns" :editComponent="PronounSelector" />
     </span>
+    <EditField fieldName="pronouns" :editComponent="PronounSelector">
+      <template #display>
+        <span v-if="!pronouns || props.profile.pronouns==='unspecified'">{{ $t('profile.pronouns') }} </span>
+      </template>
+    </EditField>
   </div>
 </template>

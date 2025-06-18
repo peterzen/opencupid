@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, onMounted, ref, provide, computed } from 'vue'
+import { reactive, onMounted, ref, provide, computed, toRef } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
 
 import LoadingComponent from '@/components/LoadingComponent.vue'
@@ -13,6 +13,9 @@ import useEditFields from '@/components/profiles/composables/useEditFields'
 import { useOnboardingWizard } from '@/components/profiles/onboarding/useProfileWizards'
 import { useStepper } from '@vueuse/core'
 import DatingSteps from '@/components/profiles/onboarding/DatingSteps.vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const profileStore = useProfileStore()
 
@@ -21,6 +24,9 @@ const formData: EditFieldProfileFormWithImages = reactive({} as EditFieldProfile
 
 onMounted(async () => {
   await profileStore.fetchOwnerProfile()
+  if (!profileStore.profile?.isOnboarded) {
+    router.push({ name: 'Onboarding' })
+  }
   Object.assign(formData, profileStore.profile)
 })
 
@@ -37,13 +43,15 @@ const toggleSocial = () => {
 }
 
 const datingPopup = ref(false)
-const toggleDating = () => {
+const toggleDating = async () => {
   formData.isDatingActive = !formData.isDatingActive
-  if (formData.isDatingActive && !formData.birthday) {
+  if (formData.isDatingActive && !profileStore.profile?.birthday) {
     datingPopup.value = true
     profileStore.currentField = null
     profileStore.open()
+    return
   }
+  await profileStore.updateOwnerProfile(formData)
 }
 
 const handleOkClick = async () => {
@@ -56,11 +64,17 @@ const handleOkClick = async () => {
 }
 
 const handleCancelClick = () => {
+  console.log('Dating popup cancelled')
   profileStore.currentField = null
   datingPopup.value = false
+  // this handles the case where the user cancels the dating popup
+  // and the birthday is not set
+  if (formData.isDatingActive && !profileStore.profile?.birthday) {
+    formData.isDatingActive = false
+  }
 }
 
-const toggleEditable = () => {
+const handleToggleEditable = () => {
   isEditable.value = !isEditable.value
 }
 const isComplete = ref(false)
@@ -69,61 +83,68 @@ const error = ref('')
 const { datingWizard } = useOnboardingWizard(formData)
 const { current, isFirst, goToNext, goToPrevious, goTo, isCurrent } = useStepper(datingWizard)
 
-const saveProfile = async () => {
-  const res = await profileStore.createOwnerProfile(formData)
-  if (!res.success) {
-    console.error('Failed to save profile:', res.message)
-    error.value = res.message || 'Failed to save profile'
-    return
-  }
-  console.log('Profile saved:', formData)
-}
+// const saveProfile = async () => {
+//   const res = await profileStore.createOwnerProfile(formData)
+//   if (!res.success) {
+//     console.error('Failed to save profile:', res.message)
+//     error.value = res.message || 'Failed to save profile'
+//     return
+//   }
+//   console.log('Profile saved:', formData)
+// }
 
-const handleNext = async () => {
-  if (current.value) {
-    current.value.isCompleted = true
-    if (current.value.flags === 'stage_one_end') {
-      console.log('Stage completed:', current.value.state)
-      if (formData.isDatingActive) {
-        goToNext()
-      } else {
-        isComplete.value = true
-        goTo('confirm')
-        await saveProfile()
-      }
-    }
-    if (current.value.flags === 'stage_two_end') {
-      isComplete.value = true
-      goTo('confirm')
-      await saveProfile()
-      console.log('Stage completed:', current.value.state)
-    }
-    if (current.value.state) {
-      goToNext()
-    } else {
-      console.warn('Current step is not valid')
-    }
-  } else {
-    console.warn('No current step found')
-  }
+// const handleNext = async () => {
+//   if (current.value) {
+//     current.value.isCompleted = true
+//     if (current.value.flags === 'stage_one_end') {
+//       console.log('Stage completed:', current.value.state)
+//       if (formData.isDatingActive) {
+//         goToNext()
+//       } else {
+//         isComplete.value = true
+//         goTo('confirm')
+//         await saveProfile()
+//       }
+//     }
+//     if (current.value.flags === 'stage_two_end') {
+//       isComplete.value = true
+//       goTo('confirm')
+//       await saveProfile()
+//       console.log('Stage completed:', current.value.state)
+//     }
+//     if (current.value.state) {
+//       goToNext()
+//     } else {
+//       console.warn('Current step is not valid')
+//     }
+//   } else {
+//     console.warn('No current step found')
+//   }
+// }
+
+const update = (value: EditFieldProfileFormWithImages) => {}
+
+const handleEditProfile = () => {
+  router.push({ name: 'EditProfile' })
 }
 </script>
 
 <template>
   <main class="container">
-    <LoadingComponent v-if="profileStore.isLoading" />
+    <!-- <LoadingComponent v-if="profileStore.isLoading" /> -->
     <BModal
       v-model="profileStore.fieldEditModal"
       title=""
-      size="md"
       :backdrop="'static'"
       centered
+      size="lg"
       button-size="sm"
       fullscreen="sm"
       :focus="false"
       :no-close-on-backdrop="true"
       :no-header="true"
       :ok-title="'OK'"
+      :ok-class="'btn btn-primary px-5'"
       cancel-title="Nevermind"
       initial-animation
       body-class="d-flex flex-row align-items-center justify-content-center overflow-hidden"
@@ -132,25 +153,28 @@ const handleNext = async () => {
       @close="profileStore.fieldEditModal = false"
       :keyboard="false"
     >
-      <div id="field-edit-modal" class="w-100"></div>
+      <template #cancel="{ close }">
+        <a href="#" @click="close" class="link-underline link-underline-opacity-0 me-4">Nevermind</a>
+      </template>
+      <div id="field-edit-modal" class="w-100 py-5"></div>
     </BModal>
     <div class="d-flex flex-row justify-content-between align-items-center mb-2">
       <div class="d-flex">
         <div v-if="isEditable">
-          <span
+        <!-- <span
             class="btn-social-toggle px-4 py-1 rounded-4 me-2"
             @click="toggleSocial"
             :class="{ active: formData.isSocialActive }"
           >
             <IconSocialize class="svg-icon-lg" />
-          </span>
-          <span
-            class="btn-dating-toggle px-4 py-1 rounded-4"
-            @click="toggleDating"
-            :class="{ active: formData.isDatingActive }"
-          >
-            <IconDate class="svg-icon-lg" />
-          </span>
+          </span> -->
+        <span
+          class="btn-dating-toggle px-4 py-1 rounded-4"
+          @click="toggleDating"
+          :class="{ active: formData.isDatingActive }"
+        >
+          <IconDate class="svg-icon-lg" />
+        </span>
         </div>
       </div>
       <div>
@@ -158,7 +182,7 @@ const handleNext = async () => {
           pill
           class="btn btn-primary mt-1"
           size="sm"
-          @click="toggleEditable"
+          @click="handleToggleEditable"
           :variant="isEditable ? 'success' : 'primary'"
         >
           <DoodleIcons name="IconPencil2" class="svg-icon" />
@@ -174,7 +198,11 @@ const handleNext = async () => {
     />
 
     <Teleport to="#field-edit-modal" v-if="datingPopup">
-      <DatingSteps v-model="formData" :isCurrent />
+      <DatingWizard v-model="formData" @update:modelValue="update"></DatingWizard>
+      <!-- <div>
+        <DatingSteps v-model="formData" :isCurrent />
+        <fieldset v-if="isCurrent('confirm')">Cool!</fieldset>
+      </div>
       <BButton
         @click="handleNext"
         :disabled="!current.state"
@@ -182,8 +210,8 @@ const handleNext = async () => {
         variant="primary"
         size="lg"
         pill
-        >Continue</BButton
-      >
+        >Next</BButton
+      > -->
     </Teleport>
   </main>
 </template>

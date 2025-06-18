@@ -74,7 +74,7 @@ onMounted(async () => {
         </div> -->
         <div class="col-sm-12">
           <div v-if="!model || model.length === 0" class="position-absolute end-0 me-5">
-            <HelpScribble text="Your photo here" />
+            <HelpScribble text="Your photo here" direction="w"/>
           </div>
           <VueDraggableNext
             class="row row-cols-2 row-cols-sm-3 row-cols-md-3 g-4 sortable-grid p-4"

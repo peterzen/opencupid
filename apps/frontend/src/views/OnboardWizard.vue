@@ -66,13 +66,14 @@ const {
 
 const { onboardingWizard } = useOnboardingWizard(formData)
 
-const { current, isFirst, goToNext, goToPrevious, goTo, isCurrent } = useStepper(onboardingWizard)
+const { current, isFirst, goToNext, goToPrevious, goTo, isCurrent, next, index, previous, steps } =
+  useStepper(onboardingWizard)
 
 const isComplete = ref(false)
 const error = ref('')
 
 const saveProfile = async () => {
-  const res = await profileStore.createOwnerProfile(formData)
+  const res = await profileStore.updateOwnerProfile(formData)
   if (!res.success) {
     console.error('Failed to save profile:', res.message)
     error.value = res.message || 'Failed to save profile'
@@ -85,7 +86,6 @@ const handleNext = async () => {
   if (current.value) {
     current.value.isCompleted = true
     if (current.value.flags === 'stage_one_end') {
-      console.log('Stage completed:', current.value.state)
       if (formData.isDatingActive) {
         goToNext()
       } else {
@@ -93,14 +93,12 @@ const handleNext = async () => {
         goTo('confirm')
         await saveProfile()
       }
-    }
-    if (current.value.flags === 'stage_two_end') {
+    } else if (current.value.flags === 'stage_two_end') {
       isComplete.value = true
       goTo('confirm')
       await saveProfile()
       console.log('Stage completed:', current.value.state)
-    }
-    if (current.value.state) {
+    } else if (current.value.state) {
       goToNext()
     } else {
       console.warn('Current step is not valid')
@@ -141,7 +139,7 @@ const handlePrevious = () => {
     </div>
 
     <div class="d-flex align-items-center flex-grow-1 col-12 justify-content-center">
-      <BForm id="onboarding" novalidate class="w-100" >
+      <BForm id="onboarding" novalidate class="w-100">
         <fieldset v-if="isCurrent('publicname')" class="w-100">
           <legend>{{ t('onboarding.name_title') }}</legend>
           <PublicNameInput v-model="publicNameModel" />
@@ -187,7 +185,6 @@ const handlePrevious = () => {
         </fieldset>
 
         <DatingSteps v-model="formData" :isCurrent></DatingSteps>
-     
 
         <fieldset v-if="isCurrent('confirm')">
           <div v-if="profileStore.isLoading" class="text-center">
@@ -218,7 +215,6 @@ const handlePrevious = () => {
             </div>
           </div>
         </fieldset>
-
         <div class="w-100 text-center mt-4">
           <BButton
             @click="handleNext"
@@ -227,7 +223,7 @@ const handlePrevious = () => {
             variant="primary"
             size="lg"
             pill
-            >Continue</BButton
+            >Next</BButton
           >
         </div>
       </BForm>

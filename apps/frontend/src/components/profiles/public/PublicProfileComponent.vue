@@ -11,6 +11,7 @@ import LocationLabel from '../display/LocationLabel.vue'
 import DatingIcon from '../display/DatingIcon.vue'
 import GenderPronounLabel from '../display/GenderPronounLabel.vue'
 import RelationshipTags from '../display/RelationshipTags.vue'
+import DoodleIcons from '@/components/icons/DoodleIcons.vue'
 
 // Edit components
 import EditField from '@/components/profiles/public/EditField.vue'
@@ -55,9 +56,13 @@ const emit = defineEmits<{
               conversationId => emit('intent:conversation:open', conversationId)
             "
           />
-          <EditField fieldName="profileImages" :editComponent="ImageEditor" buttonClass="btn btn-overlay rounded-4">
+          <EditField
+            fieldName="profileImages"
+            :editComponent="ImageEditor"
+            buttonClass="btn btn-overlay rounded-4"
+          >
             <DoodleIcons name="IconPhoto" class="svg-icon" />
-            </EditField>
+          </EditField>
         </div>
 
         <div class="d-flex flex-row align-items-center mt-2">

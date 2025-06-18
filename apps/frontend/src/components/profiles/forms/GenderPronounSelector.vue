@@ -71,6 +71,7 @@ const showPronouns = computed(() => {
 </script>
 <template>
   <div>
+
     <GenderSelector :sortedOptions="sortedOptions" v-model="gender" />
     <BButton
       v-if="!showAll"
@@ -82,7 +83,7 @@ const showPronouns = computed(() => {
     </BButton>
 
     <div v-if="showPronouns && !showAll" class="mt-3">
-      <PronounSelector :v-model="pronouns" />
+      <PronounSelector v-model="pronouns" />
     </div>
   </div>
 </template>

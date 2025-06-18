@@ -63,6 +63,7 @@ async function addTag(name: string) {
       :show-no-results="true"
       :show-no-options="false"
       :taggable="true"
+      :maxHeight="250"
       open-direction="top"
       @tag="addTag"
       label="name"

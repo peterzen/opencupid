@@ -48,7 +48,8 @@ const fieldProxy = getModelProxy(props.fieldName)
 
 <template>
   <span v-if="isEditable">
-    <a href="#" @click="handleButtonClick" v-bind:class="props.buttonClass">
+    <slot name="display"> </slot>
+    <a href="#" @click="handleButtonClick" v-bind:class="props.buttonClass" class="me-2">
       <slot>
         <DoodleIcons name="IconPencil2" class="svg-icon" />
       </slot>
