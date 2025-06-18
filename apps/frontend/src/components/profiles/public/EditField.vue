@@ -3,25 +3,24 @@ import { type Component, inject, ref } from 'vue'
 import DoodleIcons from '@/components/icons/DoodleIcons.vue'
 import { useProfileStore } from '@/store/profileStore'
 import useEditFields from '../composables/useEditFields'
-import {
-  type EditFieldProfileFormWithImages,
-} from '@zod/profile/profile.form'
+import { type EditFieldProfileFormWithImages } from '@zod/profile/profile.form'
 
 // Only allow field names that are accepted by getModelProxy
 type AllowedFieldKey =
-  | "isSocialActive"
-  | "isDatingActive"
-  | "gender"
-  | "pronouns"
-  | "relationship"
-  | "hasKids"
-  | "publicName"
-  | "introSocial"
-  | "languages"
-  | "introDating"
-  | "birthday"
-  | "tags"
-  | "location"
+  | 'isSocialActive'
+  | 'isDatingActive'
+  | 'gender'
+  | 'pronouns'
+  | 'relationship'
+  | 'hasKids'
+  | 'publicName'
+  | 'introSocial'
+  | 'languages'
+  | 'introDating'
+  | 'birthday'
+  | 'tags'
+  | 'location'
+  | 'profileImages'
 
 const profileStore = useProfileStore()
 
@@ -32,8 +31,11 @@ const props = defineProps<{
   editProps?: Record<string, any> // allow additional props to be passed to the edit component
 }>()
 
-const isOwner = inject<boolean>('isOwner', false)
-const editableModel = inject<EditFieldProfileFormWithImages>('editableModel', {} as EditFieldProfileFormWithImages)
+const isEditable = inject<boolean>('isEditable', false)
+const editableModel = inject<EditFieldProfileFormWithImages>(
+  'editableModel',
+  {} as EditFieldProfileFormWithImages
+)
 
 const handleButtonClick = () => {
   profileStore.currentField = props.fieldName
@@ -45,9 +47,11 @@ const fieldProxy = getModelProxy(props.fieldName)
 </script>
 
 <template>
-  <span v-if="isOwner">
+  <span v-if="isEditable">
     <a href="#" @click="handleButtonClick" v-bind:class="props.buttonClass">
-      <DoodleIcons name="IconPencil2" class="svg-icon" />
+      <slot>
+        <DoodleIcons name="IconPencil2" class="svg-icon" />
+      </slot>
     </a>
     <Teleport to="#field-edit-modal" v-if="profileStore.fieldEditModal">
       <component

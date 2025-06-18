@@ -17,6 +17,7 @@ import IntrotextEditor from '@/components/profiles/forms/IntrotextEditor.vue'
 import HaskidsSelector from '@/components/profiles/forms/HaskidsSelector.vue'
 import ImageEditor from '@/components/profiles/image/ImageEditor.vue'
 import PublicNameInput from '../components/profiles/forms/PublicNameInput.vue'
+import DatingSteps from '@/components/profiles/onboarding/DatingSteps.vue'
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import SpinnerComponent from '@/components/SpinnerComponent.vue'
@@ -27,82 +28,11 @@ import { useAuthStore } from '@/store/authStore'
 import { useLocalStore } from '@/store/localStore'
 import { EditProfileForm, EditProfileFormSchema } from '@zod/profile/profile.form'
 import ErrorComponent from '@/components/ErrorComponent.vue'
+import { useOnboardingWizard } from '@/components/profiles/onboarding/useProfileWizards'
 
 const { t } = useI18n()
 const profileStore = useProfileStore()
 const localStore = useLocalStore()
-
-// https://github.com/vueuse/vueuse/blob/main/packages/core/useStepper/index.md
-// https://playground.vueuse.org/?vueuse=13.3.0#eNrFWG1v2zYQ/isXf6htIFLarvtixGle0AIthjZYsu3DPAy0dHKYUKRAUk68LP99R4p6sx03aTv0SyKRx7vnnjvenXw/OCmKeFniYDI4NInmhQWDtixAMLmYzgbWzAZHM8nzQmkL91AavLBYFKjhATKtchge03FaPkiUxmFHVCNLLF9iI0hytD+TiZLGQqZ0DtNGanQ/kwAZ18Z+YjlOYPhRyeG+WxSsWasW5lwILhcnaarRmGaZ9FpN2k6SBAuL6QQyJgxWe0zPlfycZeSdpbPdvYKtcpSW9CQaU24jEk6HwAwMaatgYgj/9vfo2MO4dcUERqYdeip/hrSgIy6ds8xy8mgCfgPAciucS7+RBHQlPCYAbn5ngpMTozFMjzxdcUMPvHhRrdTc+EMP/u8w0BOxip9Nk6eVANQCOyz2qX4bW81z2t6bTmvWg1GLOt9i6tIv7zCwHjSYkmqry55HIUKb6s/DxnYDf/aD1oTzr5jLRJQpmpHHENSPG5NVcLNSUmoqCaac59ySTm+dZzAKEY+TUms6GS+ZKDEO5kdjOu7g1FILdak+4R1pINU9zUwIly/mFAkInmisFHCZ4t0EZJnPUY8nMFdKIJOVfU33U0vYO9GarWJ3tUb3IFAu7NWEEolOkg+BAVkKEcDERuU4Gv29D9xv7dXomB3x8dseeAJ5eFCVA7r89GIxLwSzSG8Ahylf+ofqERJKQkO1IhNkesGK6DVcl8bybBUlRA5qX0KceDiwjMhbOuBpJDypx8SJ6ADJ/TcVqbMBTG5wRdI8pefaVkclKZ2X1irCWS8ATFJu2FxgSrJ7j7E8dteotsnD9oinY9Lf0XWcCJ7ckKJuPDfFlpGlGAex2GdoV+Cg5eCgQ2B4Dm++KNY+5jZ69ZJ8Pq7yLy40LolPZ8EvdGk1BaVHfdDhiMSCLpi00VwJR1wP3WbqBrhdlBuhdX+iRIm16IaQE9rX/ai0XvZiz7MOCm7OKhyjzVJJ/PbOBzeP3rsqCNJ1BMpSt7ImxWVRWrKUqxSFQ9+rnZ0s2iPQL+OfacWuCgzMPWL1F6q0zzZal+dn2uxnxZPYWy/6W8jbirBf4L83qqorbMGynhsdgNzd2apfR6pp2D6Fe8jXW3qLPbnC5Gau7jqs53otO4NJweYoXCfabvPoAzDfmMAqSLFQhltgYZqAVhIyxMMDr2zd085lf7r3oSlucXqtXX67042pjq9XCD5y5KF/qYWe6uJXZErd4r8mV9omv0lY0NvypFnK1QZJ4MvgurIvUNcTPfNvLjXS75gJ1cTy7W7VenZ71EjRXHXOxHPD/Xj4N3tB1bLrhGiGEW5cnW1bf7eNf2Ho2nDOjVx9mJXRXUD+DxwXVbfejaTPYX9EcBFvZ4TH+7JrxG9cI37Vvfa9A7dRRiMhFHckWKyobWtV0siY0oipU+rl1b8oZ24aK1iCkRNSS9SZULcRK6kOXnkd/V7fmz86c8fRe8K+0TAPaZRpJxLnXn/0WMufH+vBH/wff6d3+hByYqsb/ef66fCgM1QP9ulLm6psxhfxtVGSPsf9rO/qc15wgfpz4WYiatDNN9BsQHOtuv3o15ovJn/GtYIt69eGusOEHs6p16NeUmY3e5bpBVI9cdvvLvzVaTep9JRuPNyx+SsaJUqHsRI7paAQ7I6cR/vB/zpAHfPSvLuzKE3tlAPafvHNBvRjwdkO11u4P8Vv/Dn6ahk8/AcWuUbe
-const { current, isFirst, stepNames, steps, goToNext, goToPrevious, goTo, isNext, isCurrent } =
-  useStepper({
-    publicname: {
-      state: computed(() => (formData.publicName ? formData.publicName.length >= 3 : null)),
-      flags: '',
-      isCompleted: false,
-    },
-    location: {
-      state: computed(() => (formData.location.country && formData.location.cityId ? true : false)),
-      flags: '',
-      isCompleted: false,
-    },
-    looking_for: {
-      state: computed(() =>
-        [formData.isDatingActive, formData.isSocialActive].some(t => t) ? true : false
-      ),
-      flags: '',
-      isCompleted: false,
-    },
-    interests: {
-      state: computed(() => formData.tags.length > 0),
-      flags: '',
-      isCompleted: false,
-    },
-    languages: {
-      state: computed(() => (formData.languages.length > 0 ? true : false)),
-      flags: '',
-      isCompleted: false,
-    },
-    introSocial: {
-      state: computed(() => formData.introSocial.length > 0),
-      flags: '',
-      isCompleted: false,
-    },
-    photos: {
-      state: computed(() => true),
-      flags: 'stage_one_end',
-      isCompleted: false,
-    },
-
-    // Dating steps
-    age: {
-      state: computed(() =>
-        EditProfileFormSchema.pick({ birthday: true }).safeParse(birthdayModel.value) ? true : false
-      ),
-      flags: '',
-      isCompleted: false,
-    },
-    gender: {
-      state: computed(() => formData.gender && formData.pronouns),
-      flags: '',
-      isCompleted: false,
-    },
-    family_situation: {
-      state: computed(() => formData.relationship && formData.hasKids),
-      flags: '',
-      isCompleted: false,
-    },
-    introDating: {
-      state: computed(() => formData.introDating.length > 0),
-      flags: 'stage_two_end',
-      isCompleted: false,
-    },
-    confirm: {
-      state: computed(() => true),
-      flags: '',
-      isCompleted: false,
-    },
-  })
 
 const formData = reactive({
   publicName: '',
@@ -121,7 +51,7 @@ const formData = reactive({
   introSocial: '',
   introDating: '',
   isDatingActive: false,
-  isSocialActive: false,
+  isSocialActive: true,
 } as EditProfileForm)
 
 const {
@@ -133,6 +63,10 @@ const {
   introDatingModel,
   genderPronounsModel,
 } = useEditFields(formData)
+
+const { onboardingWizard } = useOnboardingWizard(formData)
+
+const { current, isFirst, goToNext, goToPrevious, goTo, isCurrent } = useStepper(onboardingWizard)
 
 const isComplete = ref(false)
 const error = ref('')
@@ -176,9 +110,6 @@ const handleNext = async () => {
   }
 }
 
-const submitHandler = () => {
-  console.log('Form submitted')
-}
 const router = useRouter()
 const handleGoToProfile = async () => {
   router.push({ name: 'MyProfile' })
@@ -210,7 +141,7 @@ const handlePrevious = () => {
     </div>
 
     <div class="d-flex align-items-center flex-grow-1 col-12 justify-content-center">
-      <BForm id="onboarding" novalidate class="w-100" @submit.prevent="submitHandler">
+      <BForm id="onboarding" novalidate class="w-100" >
         <fieldset v-if="isCurrent('publicname')" class="w-100">
           <legend>{{ t('onboarding.name_title') }}</legend>
           <PublicNameInput v-model="publicNameModel" />
@@ -226,11 +157,6 @@ const handlePrevious = () => {
           <GoalsSelector v-model="formData" />
         </fieldset>
 
-        <fieldset v-else-if="isCurrent('languages')">
-          <legend>I speak...</legend>
-          <LanguageSelector v-model="formData.languages" :required="true" />
-        </fieldset>
-
         <fieldset v-else-if="isCurrent('interests')">
           <legend>I'm into...</legend>
           <TagSelectComponent
@@ -241,28 +167,9 @@ const handlePrevious = () => {
           />
         </fieldset>
 
-        <fieldset v-else-if="isCurrent('age')">
-          <legend>I was born...</legend>
-          <AgeSelector v-model="birthdayModel" />
-        </fieldset>
-
-        <fieldset v-else-if="isCurrent('gender')">
-          <legend>I identify as...</legend>
-          {{ genderPronounsModel }}
-          <GenderPronounSelector v-model="genderPronounsModel" />
-        </fieldset>
-
-        <fieldset v-else-if="isCurrent('family_situation')">
-          <legend>My situation</legend>
-          <div class="mb-3">
-            <RelationstatusSelector v-model="relationshipModel" />
-          </div>
-          <HaskidsSelector v-model="hasKidsModel" />
-        </fieldset>
-
-        <fieldset v-else-if="isCurrent('photos')">
-          <legend>I look like...</legend>
-          <ImageEditor />
+        <fieldset v-else-if="isCurrent('languages')">
+          <legend>I speak...</legend>
+          <LanguageSelector v-model="formData.languages" :required="true" />
         </fieldset>
 
         <fieldset v-else-if="isCurrent('introSocial')">
@@ -274,16 +181,15 @@ const handlePrevious = () => {
           />
         </fieldset>
 
-        <fieldset v-else-if="isCurrent('introDating')">
-          <legend>I would like to find:</legend>
-          <IntrotextEditor
-            v-model="introDatingModel"
-            :languages="formData.languages"
-            placeholder="Give people an idea who you're after."
-          />
+        <fieldset v-else-if="isCurrent('photos')">
+          <legend>I look like...</legend>
+          <ImageEditor />
         </fieldset>
 
-        <fieldset v-else-if="isCurrent('confirm')">
+        <DatingSteps v-model="formData" :isCurrent></DatingSteps>
+     
+
+        <fieldset v-if="isCurrent('confirm')">
           <div v-if="profileStore.isLoading" class="text-center">
             <SpinnerComponent />
           </div>
@@ -342,18 +248,18 @@ const handlePrevious = () => {
 </template>
 
 <style lang="scss" scoped>
-fieldset legend {
+:deep(fieldset legend) {
   font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 1rem;
   text-align: center;
   color: var(--bs-secondary);
 }
-.indicators {
-  bottom: 0;
-  margin-bottom: 1rem;
-  font-size: 0.5rem;
-  position: absolute;
-  opacity: 0.2;
-}
+// .indicators {
+//   bottom: 0;
+//   margin-bottom: 1rem;
+//   font-size: 0.5rem;
+//   position: absolute;
+//   opacity: 0.2;
+// }
 </style>

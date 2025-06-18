@@ -10,6 +10,7 @@ const props = defineProps<{
   profile: PublicProfile
 }>()
 const isOwner = inject<boolean>('isOwner', false)
+const isEditable = inject<boolean>('isEditable', false)
 
 const emit = defineEmits<{
   (e: 'intent:message', profile: PublicProfile): void

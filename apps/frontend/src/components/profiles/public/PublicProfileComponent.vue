@@ -55,7 +55,9 @@ const emit = defineEmits<{
               conversationId => emit('intent:conversation:open', conversationId)
             "
           />
-          <EditField fieldName="profileImages" :editComponent="ImageEditor" buttonClass="btn btn-overlay rounded-4"/>
+          <EditField fieldName="profileImages" :editComponent="ImageEditor" buttonClass="btn btn-overlay rounded-4">
+            <DoodleIcons name="IconPhoto" class="svg-icon" />
+            </EditField>
         </div>
 
         <div class="d-flex flex-row align-items-center mt-2">

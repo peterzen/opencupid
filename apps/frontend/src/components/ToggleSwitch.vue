@@ -34,7 +34,11 @@ function toggleHandler(event: Event) {
       @change="toggleHandler"
     />
     <span class="switch"></span>
-    <span class="label">{{ props.label }}</span>
+    <slot>
+      <span class="label">
+        {{ label }}
+      </span>
+    </slot>
   </label>
 </template>
 
