@@ -27,4 +27,13 @@ describe('TagService', () => {
     expect(tag.slug).toBe('bar')
     expect(mockPrisma.tag.create).toHaveBeenCalled()
   })
+
+  it('updates slug when name provided', async () => {
+    mockPrisma.tag.update.mockResolvedValue({ id: 't1', name: 'New', slug: 'new' })
+    await service.update('t1', { name: 'New' } as any)
+    expect(mockPrisma.tag.update).toHaveBeenCalledWith({
+      where: { id: 't1' },
+      data: { name: 'New', slug: 'new' },
+    })
+  })
 })

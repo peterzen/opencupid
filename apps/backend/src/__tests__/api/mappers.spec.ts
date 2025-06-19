@@ -1,5 +1,5 @@
 import { vi, describe, it, expect } from 'vitest'
-import { mapProfileImagesToOwner } from '../../api/mappers'
+import { mapProfileImagesToOwner, mapToLocalizedUpserts } from '../../api/mappers'
 vi.mock('@shared/config/appconfig', () => ({ appConfig: { IMAGE_URL_BASE: 'http://img' } }))
 
 const image: any = {
@@ -25,5 +25,14 @@ describe('mappers', () => {
     const res = mapProfileImagesToOwner([image])
     expect(res[0]).toHaveProperty('url')
     expect(res[0].url).toMatch('http://img/path/to/img')
+  })
+
+  it('creates upsert payloads from localized data', () => {
+    const upserts = mapToLocalizedUpserts('p1', {
+      introSocialLocalized: { en: 'hi', fr: 'salut' },
+      introDatingLocalized: { en: 'hey' },
+    })
+    expect(upserts).toContainEqual({ locale: 'en', updates: { introSocial: 'hi', introDating: 'hey' } })
+    expect(upserts).toContainEqual({ locale: 'fr', updates: { introSocial: 'salut' } })
   })
 })
