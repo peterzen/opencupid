@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import Multiselect from 'vue-multiselect'
 import { useTagsStore } from '@/store/tagStore'
 import { useI18n } from 'vue-i18n'
-import type { PublicTag } from '@zod/dto/tag.dto'
+import type { PublicTag } from '@zod/tag/tag.dto'
 
 // Store
 const tagStore = useTagsStore()

@@ -44,9 +44,10 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
    * @description This route retrieves the current user's social and dating profiles.
    */
   fastify.get('/me', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    const locale = req.session.lang
 
     try {
-      const fetched = await profileService.getProfileByUserId(req.user.userId)
+      const fetched = await profileService.getProfileByUserId(locale, req.user.userId)
       if (!fetched) return sendError(reply, 404, 'Social profile not found')
 
       const profile = DbProfileToOwnerProfileTransform.parse(fetched)
@@ -69,7 +70,7 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
 
     try {
       const { id } = IdLookupParamsSchema.parse(req.params)
-      const raw = await profileService.getProfileWithConversationsById(id, myProfileId)
+      const raw = await profileService.getProfileWithConversationsById(locale, id, myProfileId)
       if (!raw) return sendError(reply, 404, 'Profile not found')
 
       if (raw.userId !== req.user.userId && !req.session.hasActiveProfile) {
@@ -94,7 +95,7 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
     const locale = req.session.lang
 
     try {
-      const profiles = await profileService.findProfilesFor(myProfileId)
+      const profiles = await profileService.findProfilesFor(locale, myProfileId)
       const hasDatingPermission = req.session.profile.isDatingActive
       const mappedProfiles = profiles.map(p => mapProfileToPublic(p, hasDatingPermission, locale))
       const response: GetProfilesResponse = { success: true, profiles: mappedProfiles }
@@ -130,10 +131,11 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
     //   userService.removeRole(user, 'user_dating')
     // }
     user.hasActiveProfile = [profileData.isDatingActive, profileData.isSocialActive].some(Boolean)
+    const locale = req.session.lang
 
     try {
       const updated = await fastify.prisma.$transaction(async tx => {
-        const updatedProfile = await profileService.updateProfile(tx, req.user.userId, profileData)
+        const updatedProfile = await profileService.updateProfile(tx, locale, req.user.userId, profileData)
         // if (!updatedProfile) return sendError(reply, 404, 'Profile not found')
         const profile = DbProfileToOwnerProfileTransform.parse(updatedProfile)
 

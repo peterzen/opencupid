@@ -36,4 +36,6 @@ export const configSchema = z.object({
   GEOIP_URL: z.string(),
 
   TYPEAHEAD_DEBOUNCE_MS: z.coerce.number().default(300),
+
+  GOOGLE_APPLICATION_CREDENTIALS: z.string()
 })

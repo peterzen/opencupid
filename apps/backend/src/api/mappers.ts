@@ -1,9 +1,9 @@
 import {
-  PublicProfile,
+  type PublicProfile,
   ProfileUnionSchema,
-  ProfileSummary,
-  OwnerProfile,
-  UpdateProfilePayload,
+  type ProfileSummary,
+  type OwnerProfile,
+  type UpdateProfilePayload,
   OwnerScalarsSchema,
 } from '@zod/profile/profile.dto'
 import { type DbProfileComplete, DbProfileWithImagesSchema } from '@zod/profile/profile.db'
@@ -15,11 +15,9 @@ import {
   type PublicProfileImage,
   PublicProfileImageSchema,
 } from '@zod/profile/profileimage.dto'
-import { ProfileTagToTagTransformSchema, PublicTag, PublicTagSchema } from '@zod/dto/tag.dto'
-import { type ProfileImage } from '@prisma/client'
-import { type ProfileTag } from '@zod/generated'
-
+import { mapProfileTags } from '@zod/tag/tag.transform'
 import { appConfig } from '@shared/config/appconfig'
+import { ProfileImage } from '@zod/generated'
 
 export const DbProfileToOwnerProfileTransform = DbProfileWithImagesSchema.transform((db): OwnerProfile => {
   const scalars = OwnerScalarsSchema.parse(db)
@@ -34,7 +32,7 @@ export const DbProfileToOwnerProfileTransform = DbProfileWithImagesSchema.transf
   }, {} as Record<string, Record<string, string>>)
 
   return {
-    ...scalars, 
+    ...scalars,
     introSocialLocalized: localizedMap['introSocial'] || {},
     introDatingLocalized: localizedMap['introDating'] || {},
     profileImages: images,
@@ -44,13 +42,6 @@ export const DbProfileToOwnerProfileTransform = DbProfileWithImagesSchema.transf
 })
 
 
-
-
-export function mapProfileTags(profileTags: ProfileTag[]): PublicTag[] {
-  return profileTags
-    .map((pt: ProfileTag) => ProfileTagToTagTransformSchema.parse(pt))
-    .map((tag: PublicTag) => PublicTagSchema.parse(tag))
-}
 
 export function mapProfileToPublic(profile: DbProfileComplete, hasDatingPermission: boolean, locale: string): PublicProfile {
 

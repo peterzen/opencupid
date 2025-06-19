@@ -1,7 +1,7 @@
 import z from "zod";
 
 import { LocationSchema } from "@zod/dto/location.dto";
-import { PublicTagSchema } from "@zod/dto/tag.dto";
+import { PublicTagSchema } from "@zod/tag/tag.dto";
 import { ProfileSchema } from "@zod/generated";
 import { editableFields, LocalizedStringSchema } from "./profile.dto";
 import { PublicProfileImageSchema } from "./profileimage.dto";

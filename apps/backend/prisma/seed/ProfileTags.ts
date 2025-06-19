@@ -1,132 +1,73 @@
-import slugify from 'slugify';
 import { PrismaClient } from '@prisma/client';
+import slugify from 'slugify';
+import fs from 'fs';
+import path from 'path';
+
 const prisma = new PrismaClient();
+const dryRun = false; // 🔁 Toggle this to false to actually write to DB
 
-const interestTags = [
-  // Permaculture & Sustainable Living
-  'Permaculture',
-  'Regenerative Agriculture',
-  'Composting',
-  'Organic Gardening',
-  'No-Dig Gardening',
-  'Food Forests',
-  'Agroforestry',
-  'Aquaponics',
-  'Rainwater Harvesting',
-  'Natural Building',
-  'Earthships',
-  'Tiny Houses',
-  'Off-Grid Living',
-  'Solar Power',
-  'Wind Energy',
-  'Zero Waste',
-  'DIY',
-  'Seed Saving',
-  'Beekeeping',
-  'Fermentation',
-  'Canning & Preserving',
-  'Foraging',
-  'Eco Villages',
-  'Slow Food',
-  'Local Food',
-  'Farmers Markets',
-  'CSA (Community Supported Agriculture)',
-  'Urban Gardening',
-  'Compost Toilets',
-  'Bokashi Composting',
-  'Greywater Systems',
-
-  // Animals
-  'Animal Rescue',
-  'Wildlife Conservation',
-  'Birdwatching',
-  'Dog Lovers',
-  'Cat Lovers',
-  'Horseback Riding',
-  'Herpetology',
-  'Marine Life',
-  'Butterfly Gardening',
-  'Chicken Keeping',
-  'Goat Keeping',
-  'Sheep Herding',
-  'Veganism',
-  'Vegetarianism',
-  'Pet Training',
-  'Animal Tracking',
-  'Animal Photography',
-  'Animal Behavior',
-
-  // Music
-  'Live Music',
-  'Folk Music',
-  'Acoustic Guitar',
-  'World Music',
-  'Music Festivals',
-  'Singing',
-  'Drumming',
-  'Handpan',
-  'Ukulele',
-  'Improvisation',
-  'Choir',
-  'Sound Healing',
-  'Vinyl Records',
-  'DJing',
-  'Songwriting',
-  'Jazz',
-  'Classical Music',
-  'Experimental Music',
-
-  // Culture
-  'Storytelling',
-  'Folk Art',
-  'Pottery',
-  'Knitting',
-  'Fiber Arts',
-  'Street Art',
-  'Photography',
-  'Painting',
-  'Dance',
-  'Circus Arts',
-  'Theatre',
-  'Poetry',
-  'Zines',
-  'Traditional Crafts',
-  'Cultural Exchange',
-  'Language Learning',
-  'History',
-
-  // Travel
-  'Backpacking',
-  'Hitchhiking',
-  'Couchsurfing',
-  'Bike Touring',
-  'Train Travel',
-  'Slow Travel',
-  'Travel Writing',
-  'Adventure Travel',
-  'Eco Tourism',
-  'Nature Walks',
-  'Volunteering Abroad',
-  'Hostelling',
-  'Wilderness Survival',
-  'Pilgrimages',
-  'Nomadic Living',
-  'Geocaching'
-];
+const interestTagsPath = path.join(__dirname, './tags.json'); // adjust path
+const interestTagsData = JSON.parse(fs.readFileSync(interestTagsPath, 'utf-8'));
 
 async function main() {
-  for (const name of interestTags) {
-    await prisma.tag.upsert({
-      where: { name },
-      update: {},
-      create: {
-        name: name,
-        slug: slugify(name, { lower: true }),
-        isApproved: true,
-      },
-    });
+  let tagCount = 0;
+  let translationCount = 0;
+
+  for (const tagEntry of interestTagsData.interestTags) {
+    const name = tagEntry.translations.en;
+    const slug = slugify(name, { lower: true });
+
+    if (dryRun) {
+      console.log(`Would upsert Tag: ${name} → slug: ${slug}`);
+    }
+
+    const createdTag = dryRun
+      ? { id: `dry-${slug}`, slug }
+      : await prisma.tag.upsert({
+        where: { slug },
+        update: {},
+        create: {
+          name,
+          slug,
+          isApproved: true,
+        },
+      });
+
+    const tagId = createdTag.id;
+    tagCount++;
+
+    for (const [locale, translationValue] of Object.entries(tagEntry.translations)) {
+      const translation = translationValue as string;
+      if (!translation.trim()) continue;
+
+      if (dryRun) {
+        console.log(`  ↳ Would upsert Translation: [${locale}] ${translation}`);
+      } else {
+        await prisma.tagTranslation.upsert({
+          where: {
+            tagId_locale: {
+              tagId,
+              locale,
+            },
+          },
+          update: { name: translation },
+          create: {
+            tagId,
+            locale,
+            name: translation,
+          },
+        });
+      }
+
+      translationCount++;
+    }
   }
-  console.log(`Seeded ${interestTags.length} interest tags!`);
+
+  console.log(
+    dryRun
+      ? `✅ Dry run complete. Would process ${tagCount} tags and ${translationCount} translations.`
+      : `✅ Seeded ${tagCount} tags and ${translationCount} translations.`
+  );
 }
 
 main()
@@ -134,6 +75,4 @@ main()
     console.error(e);
     process.exit(1);
   })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+  .finally(() => prisma.$disconnect());

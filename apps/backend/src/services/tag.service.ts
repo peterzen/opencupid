@@ -1,8 +1,31 @@
 import slugify from 'slugify'
 import { prisma } from '../lib/prisma'
 import { Tag } from '@zod/generated'
-import { CreateTagInput } from '@zod/dto/tag.dto'
+import { CreateTagInput } from '@zod/tag/tag.dto'
+import { TagWithTranslations } from '@zod/tag/tag.db'
 
+function translationWhereClause(term: string, locale: string) {
+  return {
+    translations: {
+      some: {
+        locale,
+        name: {
+          contains: term,
+          mode: 'insensitive' as const,
+        },
+      },
+    },
+  }
+}
+
+function includeTranslations(locale: string) {
+  return {
+    translations: {
+      where: { locale },
+      select: { name: true },
+    },
+  }
+}
 export class TagService {
   private static instance: TagService
 
@@ -29,30 +52,51 @@ export class TagService {
   /**
    * Find tags whose name contains the given substring (case-insensitive).
    */
-  public async search(term: string): Promise<Tag[]> {
-    return prisma.tag.findMany({
+  public async search(term: string, locale: string): Promise<TagWithTranslations[]> {
+    // use locale
+    const where = {
       where: {
         name: { contains: term, mode: 'insensitive' },
         isDeleted: false,
         isApproved: true,
         isHidden: false,
+        ...translationWhereClause(term, locale),
       },
+    }
+    return prisma.tag.findMany({
+      where: {
+        isDeleted: false,
+        isApproved: true,
+        isHidden: false,
+        ...translationWhereClause(term, locale),
+      },
+      include: includeTranslations(locale),
       take: 20, // limit results for performance
-      orderBy: { name: 'asc' },
+      orderBy: {
+        name: 'asc',
+      },
     })
   }
 
-  public async create(data: CreateTagInput): Promise<Tag> {
+  public async create(locale: string, data: CreateTagInput): Promise<TagWithTranslations> {
     const slug = slugify(data.name, { lower: true, strict: true })
-    return prisma.tag.create({
+    const tag = await prisma.tag.create({
       data: {
         name: data.name,
         slug,
         createdBy: data.createdBy,
         isApproved: true,
         isUserCreated: data.isUserCreated,
+        translations: {
+          create: {
+            locale,
+            name: data.name,
+          },
+        },
       },
+      include: includeTranslations(locale),
     })
+    return tag
   }
 
   public async update(id: string, data: Tag): Promise<Tag> {

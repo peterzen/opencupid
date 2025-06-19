@@ -42,12 +42,6 @@ export const CreateTagPayloadSchema = z.object({
 })
 export type CreateTagPayload = z.infer<typeof CreateTagPayloadSchema>
 
-// ProfileTag schema with joined Tag 
-export const ProfileTagWithTagSchema = ProfileTagSchema.extend({
-  tag: TagSchema,
-})
-
-export type ProfileTagWithTag = z.infer<typeof ProfileTagWithTagSchema>
 
 
 // Route schemas
@@ -56,10 +50,3 @@ export const SearchQuerySchema = z.object({
 });
 
 
-
-// Match { id, tagId, profileId, tag: { ... } }
-export const ProfileTagToTagTransformSchema = ProfileTagSchema
-  .merge(z.object({ tag: TagSchema }))
-  .transform(join => join.tag)
-
-export type ProfileTagJoin = z.infer<typeof ProfileTagToTagTransformSchema>

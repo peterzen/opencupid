@@ -4,11 +4,12 @@ import {
   SearchQuerySchema,
   CreateTagPayloadSchema,
   CreateTagPayload,
-} from '@zod/dto/tag.dto'
+} from '@zod/tag/tag.dto'
 import { FastifyPluginAsync } from 'fastify'
 import { sendError, addDebounceHeaders } from '../helpers'
 import { TagService } from 'src/services/tag.service'
 import type { TagResponse, TagsResponse } from '@shared/dto/apiResponse.dto'
+import { DbTagToPublicTagTransform } from '@zod/tag/tag.transform'
 
 const tagsRoutes: FastifyPluginAsync = async fastify => {
   const tagService = TagService.getInstance()
@@ -18,15 +19,17 @@ const tagsRoutes: FastifyPluginAsync = async fastify => {
    */
   fastify.get('/search', { onRequest: [fastify.authenticate] }, async (req, reply) => {
     const { q } = SearchQuerySchema.parse(req.query)
+    const locale = req.session.lang
+
     try {
-      const tags = await tagService.search(q)
+      const tags = await tagService.search(q, locale)
       addDebounceHeaders(reply)
 
       if (!tags || tags.length === 0) {
         const response: TagsResponse = { success: true, tags: [] }
         return reply.code(200).send(response)
       }
-      const publicTags = tags.map(tag => PublicTagSchema.parse(tag))
+      const publicTags = tags.map(tag => DbTagToPublicTagTransform(tag))
       const response: TagsResponse = { success: true, tags: publicTags }
       return reply.code(200).send(response)
     } catch (err) {
@@ -55,6 +58,8 @@ const tagsRoutes: FastifyPluginAsync = async fastify => {
     },
     async (req, reply) => {
       const userId = req.user.userId
+      const locale = req.session.lang
+
       if (!userId) {
         return sendError(reply, 401, 'Unauthorized')
       }
@@ -62,12 +67,12 @@ const tagsRoutes: FastifyPluginAsync = async fastify => {
       const data: CreateTagPayload | null = await validateBody(CreateTagPayloadSchema, req, reply)
       if (!data) return
       try {
-        const created = await tagService.create({
+        const created = await tagService.create(locale, {
           name: data.name,
           createdBy: userId, // Set the creator to the authenticated user
           isUserCreated: true, // Mark as user-created
         })
-        const tag = PublicTagSchema.parse(created)
+        const tag = DbTagToPublicTagTransform(created)
         const response: TagResponse = { success: true, tag }
         return reply.code(200).send(response)
       } catch (err: any) {

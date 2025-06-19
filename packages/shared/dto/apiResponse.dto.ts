@@ -12,7 +12,7 @@ import type {
   OwnerProfile,
   PublicProfile,
 } from '@zod/profile/profile.dto'
-import type { PublicTag } from '@zod/dto/tag.dto'
+import type { PublicTag } from '@zod/tag/tag.dto'
 import type { ConversationSummary, MessageDTO } from '@zod/messaging/messaging.dto'
 import type { SettingsUser, OtpSendReturn } from '@zod/user/user.dto'
 import type { PublicCity } from '@zod/dto/city.dto'

@@ -11,7 +11,7 @@ import {
 
 
 
-import { PublicTagSchema } from "../dto/tag.dto";
+import { PublicTagSchema } from "../tag/tag.dto";
 import {
   PublicProfileImageSchema
 } from "./profileimage.dto";
