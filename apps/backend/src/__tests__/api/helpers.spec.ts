@@ -5,6 +5,7 @@ import {
   sendForbiddenError,
   sendUnauthorizedError,
   getUserRoles,
+  addDebounceHeaders,
 } from '../../api/helpers'
 import { MockReply } from '../../test-utils/fastify'
 
@@ -37,5 +38,14 @@ describe('getUserRoles', () => {
   it('returns roles from session', () => {
     const req: any = { session: { roles: ['admin'] } }
     expect(getUserRoles(req)).toEqual(['admin'])
+  })
+})
+
+describe('addDebounceHeaders', () => {
+  it('sets cache control and debounce headers', () => {
+    const rep = new MockReply()
+    addDebounceHeaders(rep as any)
+    expect(rep.headers['Cache-Control']).toBe('no-cache, no-store, must-revalidate')
+    expect(rep.headers['X-Debounce']).toBe('300')
   })
 })

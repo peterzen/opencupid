@@ -48,3 +48,14 @@ describe('CityService.create', () => {
     expect(res.id).toBe('c2')
   })
 })
+
+describe('CityService.update', () => {
+  it('slugifies name when updating', async () => {
+    mockPrisma.city.update.mockResolvedValue({ id: 'c2', name: 'New City', slug: 'new-city' })
+    await service.update('c2', { name: 'New City' } as any)
+    expect(mockPrisma.city.update).toHaveBeenCalledWith({
+      where: { id: 'c2' },
+      data: { name: 'New City', slug: 'new-city' },
+    })
+  })
+})

@@ -64,3 +64,26 @@ describe('UserService.otpLogin', () => {
     expect(mockPrisma.user.update).toHaveBeenCalled()
   })
 })
+
+describe('UserService.setUserOTP', () => {
+  it('updates existing user', async () => {
+    const user = { id: 'u1', isRegistrationConfirmed: true }
+    mockPrisma.user.findUnique.mockResolvedValue(user)
+    const res = await service.setUserOTP({ email: 'a@a.com' }, '123', 'en')
+    expect(res.user).toBe(user)
+    expect(res.isNewUser).toBe(false)
+    expect(mockPrisma.user.update).toHaveBeenCalledWith({
+      where: { id: 'u1' },
+      data: { loginToken: '123', loginTokenExp: expect.any(Date) },
+    })
+  })
+
+  it('creates new user when missing', async () => {
+    mockPrisma.user.findUnique.mockResolvedValue(null)
+    mockPrisma.user.create.mockResolvedValue({ id: 'new' })
+    const res = await service.setUserOTP({ phonenumber: '+1' }, '999', 'en')
+    expect(res.isNewUser).toBe(true)
+    expect(mockPrisma.user.create).toHaveBeenCalled()
+    expect(res.user.id).toBe('new')
+  })
+})
