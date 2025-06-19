@@ -85,7 +85,7 @@ async function doOtpLogin(otp: string) {
       showOtpForm.value = false
       showUserIdForm.value = false
       await new Promise(resolve => setTimeout(resolve, 2000))
-      await router.push({ name: 'Onboarding' })
+      await router.push({ name: 'UserHome' })
       return true
     } else {
       console.log('OTP login failed:', res)

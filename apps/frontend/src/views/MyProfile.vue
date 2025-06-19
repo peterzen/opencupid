@@ -39,7 +39,7 @@ onMounted(async () => {
     return
   }
   Object.assign(formData, profileStore.profile)
-  if (!profileStore.profile?.isOnboarded) {
+  if (!profileStore.profile.isOnboarded) {
     router.push({ name: 'Onboarding' })
   }
   await fetchPublicProfile()

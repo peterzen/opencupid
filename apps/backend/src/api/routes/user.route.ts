@@ -9,7 +9,7 @@ import { SmsService } from '@/services/sms.service'
 import { CaptchaService } from '@/services/captcha.service'
 import { appConfig } from '@shared/config/appconfig'
 
-import { AuthIdentifierCaptchaInputSchema, OtpLoginInputSchema, OtpSendReturn } from '@zod/user/user.dto'
+import { AuthIdentifierCaptchaInput, AuthIdentifierCaptchaInputSchema, OtpLoginInputSchema, OtpSendReturn } from '@zod/user/user.dto'
 import type { OtpLoginResponse, SendLoginLinkResponse, UserMeResponse } from '@shared/dto/apiResponse.dto'
 import { JwtPayload } from '@zod/user/user.types'
 import { User } from '@zod/generated'
@@ -44,10 +44,11 @@ const userRoutes: FastifyPluginAsync = async fastify => {
         const newProfile = await profileService.initializeProfiles(user.id)
         profileId = newProfile.id
       } else {
+        // TODO FIXME otpLogin return a User which has no profile on it.
         profileId = user.profile?.id
       }
 
-      const payload: JwtPayload = { userId: user.id, profileId: profileId! }
+      const payload: JwtPayload = { userId: user.id, profileId: profileId }
       console.info('jwt payload', payload)
       const jwt = fastify.jwt.sign(payload)
       const response: OtpLoginResponse = { success: true, token: jwt }
@@ -58,7 +59,7 @@ const userRoutes: FastifyPluginAsync = async fastify => {
   })
 
   fastify.post('/send-login-link', async (req, reply) => {
-    const data = validateBody(AuthIdentifierCaptchaInputSchema, req, reply)
+    const data: AuthIdentifierCaptchaInput | null = validateBody(AuthIdentifierCaptchaInputSchema, req, reply)
     if (!data) return
 
     try {

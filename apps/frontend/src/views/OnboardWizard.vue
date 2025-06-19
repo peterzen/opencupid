@@ -2,7 +2,7 @@
 import LocationSelectorComponent from '@/components/profiles/forms/LocationSelector.vue'
 import { useStepper } from '@vueuse/core'
 import { type LocationDTO } from '@zod/dto/location.dto'
-import { reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { type GenderType, type PronounsType } from '@zod/generated'
@@ -118,6 +118,13 @@ const handlePrevious = () => {
   current.value.isCompleted = false
   goToPrevious()
 }
+
+onMounted(async () => {
+  await profileStore.fetchOwnerProfile()
+  if (profileStore.profile?.isOnboarded) {
+    router.push({ name: 'MyProfile' })
+  }
+})
 </script>
 
 <template>

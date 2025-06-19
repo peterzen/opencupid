@@ -1,6 +1,7 @@
 // TODO: review usage; copied for both db and dto layers
 import { z } from 'zod'
 import { UserSchema } from '../generated'
+import { OwnerProfileSchema } from '@zod/profile/profile.dto'
 
 export const JwtPayloadSchema = z.object({
   userId: z.string().cuid(),
@@ -75,3 +76,10 @@ export const OtpLoginInputSchema = z.object({
   otp: z.string().min(6, 'OTP must be at least 6 characters long').max(6, 'OTP must be exactly 6 characters long'),
 })
 export type OtpLogin = z.infer<typeof OtpLoginInputSchema>
+
+
+export const UserWithProfileSchema = UserSchema.extend({
+  profile: OwnerProfileSchema,
+})
+
+export type UserWithProfile = z.infer<typeof UserWithProfileSchema>

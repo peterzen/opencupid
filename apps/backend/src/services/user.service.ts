@@ -58,6 +58,7 @@ export class UserService {
         loginTokenExp: null, // Clear the expiration
         lastLoginAt: new Date(), // Update the last login date
       },
+      include: userSelectInclude,
     })
 
     return { user: userUpdated, isNewUser }
