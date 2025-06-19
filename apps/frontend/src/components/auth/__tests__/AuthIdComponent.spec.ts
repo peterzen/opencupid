@@ -3,6 +3,11 @@ import { describe, it, expect, vi } from 'vitest'
 
 vi.mock('@/components/icons/DoodleIcons.vue', () => ({ default: { template: '<div />' } }))
 vi.mock('@/assets/icons/app/logo.svg', () => ({ default: { template: '<div />' } }))
+vi.mock('@/assets/icons/interface/login.svg', () => ({ default: { template: '<div />' } }))
+vi.mock('@/assets/icons/interface/tick.svg', () => ({ default: { template: '<div />' } }))
+vi.mock('@/assets/icons/interface/mail.svg', () => ({ default: { template: '<div />' } }))
+vi.mock('@/assets/icons/interface/phone.svg', () => ({ default: { template: '<div />' } }))
+vi.mock('../LanguageSelector.vue', () => ({ default: { template: '<div />' } }))
 vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: (k: string) => k }) }))
 const stubFormKit = { template: '<form><slot :state="{ valid: true }" /></form>' }
 const CaptchaWidget = { template: '<div />' }
@@ -15,9 +20,12 @@ describe('AuthIdComponent', () => {
       props: { isLoading: false },
       global: { stubs: { FormKit: stubFormKit, CaptchaWidget } }
     })
-    expect((wrapper.vm as any).validateAuthIdInput({ value: 'bad' })).toBe(false)
-    expect((wrapper.vm as any).validateAuthIdInput({ value: 'test@example.com' })).toBe(true)
-    expect((wrapper.vm as any).validateAuthIdInput({ value: '+12345678901' })).toBe(true)
+    ;(wrapper.vm as any).authIdInput = 'bad'
+    expect((wrapper.vm as any).inputState).toBe(false)
+    ;(wrapper.vm as any).authIdInput = 'test@example.com'
+    expect((wrapper.vm as any).inputState).toBe(true)
+    ;(wrapper.vm as any).authIdInput = '+12345678901'
+    expect((wrapper.vm as any).inputState).toBe(true)
   })
 
   it('emits otp:send with computed identifier', async () => {
