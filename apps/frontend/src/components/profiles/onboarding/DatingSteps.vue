@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import useEditFields from '@/components/profiles/composables/useEditFields'
-import { EditProfileForm } from '@zod/profile/profile.form'
+import { type EditProfileForm } from '@zod/profile/profile.form'
 import AgeSelector from '@/components/profiles/forms/AgeSelector.vue'
 import GenderPronounSelector from '@/components/profiles/forms/GenderPronounSelector.vue'
 import RelationstatusSelector from '@/components/profiles/forms/RelationstatusSelector.vue'

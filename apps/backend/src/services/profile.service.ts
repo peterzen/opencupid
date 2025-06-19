@@ -7,7 +7,7 @@ import {
   type UpdateProfilePayload
 } from '@zod/profile/profile.dto'
 import { DbProfileComplete, DbProfile } from '@zod/profile/profile.db'
-import { mapToLocalizedUpserts } from '@/api/mappers'
+import { mapToLocalizedUpserts } from '@/api/mappers/profile.mappers'
 
 function profileCompleteInclude(locale: string) {
   const clause = {

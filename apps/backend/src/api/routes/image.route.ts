@@ -8,7 +8,7 @@ import { uploadTmpDir } from '@/lib/media'
 import { sendError, sendForbiddenError } from '../helpers'
 import {
   mapProfileImagesToOwner,
-} from 'src/api/mappers'
+} from '@/api/mappers/profile.mappers'
 import { ReorderProfileImagesPayloadSchema } from '@zod/profile/profileimage.dto'
 import { appConfig } from '@shared/config/appconfig'
 import type { ImageApiResponse } from '@zod/profile/profileimage.dto'

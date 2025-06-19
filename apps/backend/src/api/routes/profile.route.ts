@@ -17,7 +17,7 @@ import {
 import {
   DbProfileToOwnerProfileTransform,
   mapProfileToPublic,
-} from 'src/api/mappers'
+} from '@/api/mappers/profile.mappers'
 import { UserService } from 'src/services/user.service'
 import type {
   GetMyProfileResponse,

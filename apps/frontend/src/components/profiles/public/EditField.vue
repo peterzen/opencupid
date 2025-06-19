@@ -42,6 +42,7 @@ const handleButtonClick = () => {
 }
 
 const { getModelProxy } = useEditFields(editableModel)
+// @ts-expect-error - TypeScript does not know about the dynamic nature of the field name
 const fieldProxy = getModelProxy(props.fieldName)
 </script>
 

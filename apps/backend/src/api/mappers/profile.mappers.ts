@@ -11,13 +11,11 @@ import { LocationSchema } from '@zod/dto/location.dto'
 
 import {
   type OwnerProfileImage,
-  OwnerProfileImageSchema,
   type PublicProfileImage,
-  PublicProfileImageSchema,
 } from '@zod/profile/profileimage.dto'
-import { mapProfileTags } from '@zod/tag/tag.transform'
-import { appConfig } from '@shared/config/appconfig'
+import { mapProfileTags } from './tag.mappers'
 import { ProfileImage } from '@zod/generated'
+import { toOwnerProfileImage, toPublicProfileImage } from './image.mappers'
 
 export const DbProfileToOwnerProfileTransform = DbProfileWithImagesSchema.transform((db): OwnerProfile => {
   const scalars = OwnerScalarsSchema.parse(db)
@@ -40,6 +38,18 @@ export const DbProfileToOwnerProfileTransform = DbProfileWithImagesSchema.transf
     tags,
   }
 })
+
+
+export function ownerToPublicProfile(profile: OwnerProfile|null): PublicProfile|null {
+  if(!profile) return null
+  // const { location, ...rest } = profile
+
+  return {
+    ...profile,
+    conversation: null, // or keep if present
+  }
+}
+
 
 
 
@@ -88,37 +98,6 @@ export function mapProfileSummary(profile: {
     profileImages: profile?.profileImages.map(toPublicProfileImage),
   }
 }
-
-export interface MinimalProfileImage {
-  storagePath: string
-}
-
-/**
- * Constructs the public URL for the image
- */
-function getImageUrl(image: MinimalProfileImage): string {
-  const urlBase = appConfig.IMAGE_URL_BASE
-  return `${urlBase}/${image.storagePath}`
-}
-
-/**
- * Add the public URL to the image object and sanitize it
- * by removing any non-public fields
- */
-export function toPublicProfileImage(image: ProfileImage): PublicProfileImage {
-  const withUrl = { ...image, url: getImageUrl(image) }
-  return PublicProfileImageSchema.parse(withUrl)
-}
-
-/**
- * Add the public URL to the image object and sanitize it
- * by removing fields that are not accessible to the owner
- */
-export function toOwnerProfileImage(image: ProfileImage): OwnerProfileImage {
-  image.url = getImageUrl(image)
-  return OwnerProfileImageSchema.parse(image)
-}
-
 
 
 export function mapToLocalizedUpserts(

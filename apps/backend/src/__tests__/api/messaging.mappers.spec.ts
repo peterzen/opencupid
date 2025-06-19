@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { mapMessageDTO, mapMessageForMessageList, mapConversationParticipantToSummary } from '../../api/messaging.mappers'
+import { mapMessageDTO, mapMessageForMessageList, mapConversationParticipantToSummary } from '../../api/mappers/messaging.mappers'
 vi.mock('@shared/config/appconfig', () => ({ appConfig: { IMAGE_URL_BASE: 'http://img' } }))
 
 const msg: any = {

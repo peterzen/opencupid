@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<!-- <script lang="ts" setup>
 import type { UpdateDatingPreferencesPayload, OwnerProfile } from '@zod/profile/profile.dto'
 import { computed, reactive, ref, watch, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -144,4 +144,4 @@ function handleGenderPrefsUpdate() {
       />
     </div>
   </fieldset>
-</template>
+</template> -->

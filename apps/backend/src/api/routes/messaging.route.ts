@@ -9,7 +9,7 @@ import {
   mapConversationParticipantToSummary,
   mapMessageDTO,
   mapMessageForMessageList,
-} from '../messaging.mappers'
+} from '../mappers/messaging.mappers'
 import type {
   MessagesResponse,
   ConversationsResponse,

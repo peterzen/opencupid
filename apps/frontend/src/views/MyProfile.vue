@@ -1,22 +1,17 @@
 <script setup lang="ts">
-import { reactive, onMounted, ref, provide, computed, toRef } from 'vue'
+import { reactive, onMounted, ref, provide } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
 
-import LoadingComponent from '@/components/LoadingComponent.vue'
 import PublicProfileComponent from '@/components/profiles/public/PublicProfileComponent.vue'
-import { ownerToPublicProfile } from '@zod/profile/profile.transform'
 import { type EditFieldProfileFormWithImages } from '@zod/profile/profile.form'
 import IconDate from '@/assets/icons/app/cupid.svg'
-import IconSocialize from '@/assets/icons/app/socialize.svg'
 import IconPencil2 from '@/assets/icons/interface/pencil-2.svg'
 
-import useEditFields from '@/components/profiles/composables/useEditFields'
 import { useOnboardingWizard } from '@/components/profiles/onboarding/useProfileWizards'
 import { useStepper } from '@vueuse/core'
-import DatingSteps from '@/components/profiles/onboarding/DatingSteps.vue'
 import { useRouter } from 'vue-router'
 import ErrorOverlay from '@/components/ErrorOverlay.vue'
-import { PublicProfile } from '@zod/profile/profile.dto'
+import { type PublicProfile } from '@zod/profile/profile.dto'
 import { useAuthStore } from '@/store/authStore'
 
 const router = useRouter()

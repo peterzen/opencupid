@@ -5,7 +5,7 @@ import type {
   MessageDTO,
   MessageInConversation,
 } from '@zod/messaging/messaging.dto';
-import { mapProfileSummary } from './mappers';
+import { mapProfileSummary } from './profile.mappers';
 
 function mapConversationMeta(c: { id: string; updatedAt: Date; createdAt: Date }) {
   return {

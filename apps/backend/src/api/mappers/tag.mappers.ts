@@ -1,8 +1,8 @@
 import z from "zod"
 
 import { ProfileTag, ProfileTagSchema } from "@zod/generated"
-import { TagWithTranslations, TagWithTranslationsSchema } from "./tag.db"
-import { PublicTag } from "./tag.dto"
+import { TagWithTranslations, TagWithTranslationsSchema } from "@zod/tag/tag.db"
+import { PublicTag } from "@zod/tag/tag.dto"
 
 export const ProfileTagToTagTransformSchema = ProfileTagSchema
   .merge(z.object({ tag: TagWithTranslationsSchema }))

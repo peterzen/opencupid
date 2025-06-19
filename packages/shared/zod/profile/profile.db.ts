@@ -1,4 +1,11 @@
-import { ConversationParticipantSchema, ConversationSchema, LocalizedProfileFieldSchema, ProfileImageSchema, ProfileSchema, ProfileTagSchema, TagSchema } from "@zod/generated";
+import {
+  ConversationParticipantSchema,
+  ConversationSchema,
+  LocalizedProfileFieldSchema,
+  ProfileImageSchema,
+  ProfileSchema,
+  ProfileTagSchema
+} from "@zod/generated";
 import { TagWithTranslationsSchema } from "@zod/tag/tag.db";
 import z from "zod";
 

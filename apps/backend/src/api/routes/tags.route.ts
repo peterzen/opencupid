@@ -9,7 +9,7 @@ import { FastifyPluginAsync } from 'fastify'
 import { sendError, addDebounceHeaders } from '../helpers'
 import { TagService } from 'src/services/tag.service'
 import type { TagResponse, TagsResponse } from '@shared/dto/apiResponse.dto'
-import { DbTagToPublicTagTransform } from '@zod/tag/tag.transform'
+import { DbTagToPublicTagTransform } from '../mappers/tag.mappers'
 
 const tagsRoutes: FastifyPluginAsync = async fastify => {
   const tagService = TagService.getInstance()
