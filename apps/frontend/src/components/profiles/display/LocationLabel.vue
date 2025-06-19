@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { countryCodeToName } from '@/lib/countries'
 import { type LocationDTO } from '@zod/dto/location.dto';
+import { useCountries } from '@/components/composables/useCountries';
 
 const props = defineProps<{
   location: LocationDTO
 }>()
+
+const { countryCodeToName } = useCountries()
+
 
 const countryName = computed(() => {
   return props.location.country ? countryCodeToName(props.location.country) : ''

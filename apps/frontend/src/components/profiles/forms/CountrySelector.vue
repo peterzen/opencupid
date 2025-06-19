@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getCountryOptions } from '@/lib/countries'
+import { useCountries } from '@/components/composables/useCountries'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Multiselect from 'vue-multiselect'
@@ -10,6 +10,8 @@ const { t } = useI18n()
 const model = defineModel<string>({
   default: '',
 })
+
+const { getCountryOptions } = useCountries()
 
 const countrySelectOptions = getCountryOptions()
 

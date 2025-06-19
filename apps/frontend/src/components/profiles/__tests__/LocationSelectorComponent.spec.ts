@@ -2,7 +2,18 @@ import { mount } from '@vue/test-utils'
 import { describe, it, expect, vi } from 'vitest'
 
 vi.mock('vue-multiselect', () => ({ default: { template: '<div />' } }))
-vi.mock('@/lib/countries', () => ({ getCountryOptions: () => [{ label: 'USA', value: 'US' }] }))
+vi.mock('@/store/i18nStore', () => ({
+  useI18nStore: () => ({
+    getLanguage: () => 'en',
+    currentLanguage: ref('en'),
+  }),
+}))
+vi.mock('@/composables/useCountries', () => ({
+  useCountries: () => ({
+    getCountryOptions: () => [{ label: 'USA', value: 'US' }],
+    countryCodeToName: () => 'USA',
+  }),
+}))
 vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: (k: string) => k }) }))
 vi.mock('@/lib/geoip', () => ({ default: vi.fn().mockResolvedValue('US') }))
 vi.mock('@/store/cityStore', () => ({ useCitiesStore: () => ({
@@ -12,6 +23,7 @@ vi.mock('@/store/cityStore', () => ({ useCitiesStore: () => ({
 }) }))
 
 import LocationSelectorComponent from '../forms/LocationSelector.vue'
+import { ref } from 'vue'
 
 describe('LocationSelectorComponent', () => {
   it('emits updates when fields change', async () => {

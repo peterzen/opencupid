@@ -1,7 +1,14 @@
 import { mount } from '@vue/test-utils'
 import { describe, it, expect, vi } from 'vitest'
+import { ref } from 'vue'
 
-vi.mock('@/lib/countries', () => ({ getCountryOptions: () => [{ label: 'USA', value: 'US' }] }))
+vi.mock('@/store/i18nStore', () => ({
+  useI18nStore: () => ({
+    getLanguage: () => 'en',
+    currentLanguage: ref('en'),
+  }),
+}))
+
 vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: (k:string)=>k }) }))
 vi.mock('vue-multiselect', () => ({ default: { template: '<div />' } }))
 
