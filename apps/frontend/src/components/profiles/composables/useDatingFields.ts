@@ -11,6 +11,13 @@ export function useDatingFields(profile: Ref<PublicProfile>, t: (key: string) =>
     return 1950
   })
 
+  const gender = computed(() => {
+    if (!profile.value.isDatingActive){
+      return ''
+    }
+    return profile.value.gender
+  })
+
   const age = computed(() => {
     if (!profile.value.isDatingActive || !profile.value.birthday) return null
     const currentYear = new Date().getFullYear()
@@ -41,6 +48,7 @@ export function useDatingFields(profile: Ref<PublicProfile>, t: (key: string) =>
 
   return {
     age,
+    gender,
     hasKids,
     relationshipStatus,
     pronouns,

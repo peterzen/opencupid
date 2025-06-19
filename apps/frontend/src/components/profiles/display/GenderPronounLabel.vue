@@ -13,15 +13,16 @@ const { t } = useI18n()
 const props = defineProps<{
   profile: PublicProfile
 }>()
+
 const profileRef = toRef(props, 'profile')
-const { age, pronouns } = useDatingFields(profileRef, t)
+const { age, gender, pronouns } = useDatingFields(profileRef, t)
 </script>
 
 <template>
   <div v-if="props.profile.isDatingActive" class="text-muted">
     <span class="me-1">{{ age }}</span>
     <span class="me-1 d-inline-flex align-items-center">
-      <GenderSymbol v-if="props.profile.gender" :gender="props.profile.gender" />
+      <GenderSymbol v-if="gender" :gender  />
       <EditField fieldName="gender" :editComponent="GenderSelector" >
       <template #display>({{ props.profile.gender }})</template>
     </EditField>
