@@ -10,6 +10,7 @@ import IconTick from '@/assets/icons/interface/tick.svg'
 import IconMail from '@/assets/icons/interface/mail.svg'
 import IconPhone from '@/assets/icons/interface/phone.svg'
 import IconLogin from '@/assets/icons/interface/login.svg'
+import LanguageSelector from './LanguageSelector.vue'
 
 const { t } = useI18n()
 
@@ -135,6 +136,9 @@ const authIdInputRef = ref<InstanceType<any> | null>(null)
         <IconLogin class="svg-icon" /> {{ t('auth.login') }}
       </BButton>
     </BForm>
+    <div class="d-flex justify-content-center align-items-center mt-3">
+      <LanguageSelector />
+    </div>
   </div>
 </template>
 

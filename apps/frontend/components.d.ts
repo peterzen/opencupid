@@ -66,6 +66,7 @@ declare module 'vue' {
     InvitePeopleDialog: typeof import('./src/components/profiles/public/InvitePeopleDialog.vue')['default']
     LanguageList: typeof import('./src/components/profiles/display/LanguageList.vue')['default']
     LanguageSelector: typeof import('./src/components/profiles/forms/LanguageSelector.vue')['default']
+    LanguageSelectorDropdown: typeof import('./src/components/settings/LanguageSelectorDropdown.vue')['default']
     LoadingComponent: typeof import('./src/components/LoadingComponent.vue')['default']
     LocationLabel: typeof import('./src/components/profiles/display/LocationLabel.vue')['default']
     LocationSelector: typeof import('./src/components/profiles/forms/LocationSelector.vue')['default']

@@ -2,7 +2,6 @@
 import { useI18n } from 'vue-i18n'
 import { onMounted, ref, watch } from 'vue'
 import type { SpeechRecognition, SpeechRecognitionEvent } from '@/types/speechrecognition'
-import DoodleIcons from '@/components/icons/DoodleIcons.vue'
 import { useI18nStore } from '@/store/i18nStore'
 
 import IconMic2 from '@/assets/icons/interface/mic-2.svg'
@@ -136,7 +135,8 @@ watch(
       <div class="">
         <BButton variant="secondary" size="sm" pill @click="toggleListening">
           <IconMic2 class="svg-icon" />
-          <i class="fas fa-microphone"></i> {{ isListening ? 'Listening…' : 'Dictate' }}
+          <i class="fas fa-microphone"></i>
+          {{ isListening ? t('profiles.forms.dictate_listening') : t('profiles.forms.dictate') }}
         </BButton>
       </div>
     </div>
@@ -146,7 +146,7 @@ watch(
           <BFormTextarea
             v-model="model[lang]"
             id="content-input"
-            placeholder="Tell a bit about yourself"
+            :placeholder="t('profiles.forms.intro_placeholder')"
             max-rows="5"
             min-rows="3"
             no-resize

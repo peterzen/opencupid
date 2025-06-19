@@ -6,7 +6,7 @@ import { type LoginUser } from '@zod/user/user.types'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useColorMode } from 'bootstrap-vue-next'
 import { useMessageStore } from '@/store/messageStore'
-import LanguageSelector from '@/components/settings/LanguageSelector.vue'
+import LanguageSelectorDropdown from '@/components/settings/LanguageSelectorDropdown.vue'
 
 import IconSetting2 from '@/assets/icons/interface/setting-2.svg'
 
@@ -75,7 +75,7 @@ const messageStore = useMessageStore()
       <PushPermissions />
     </div>
     <div class="mb-3">
-      <LanguageSelector />
+      <LanguageSelectorDropdown />
     </div>
   </main>
 </template>

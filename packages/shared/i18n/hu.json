@@ -87,8 +87,14 @@
     "login": "Bejelentkezés",
     "auth_id_input_empty": "Kérlek add meg az e-mail címed vagy a telefonszámod.",
     "auth_id_input_label": "E-mail vagy telefonszám",
-    "auth_id_input_placeholder": "+36 30 1234567 vagy te@email.hu",
+    "auth_id_input_placeholder": "+36 30 1234567 vagy te{'@'}email.hu",
     "captcha_input_label": "Ember vagyok",
+    "login_confirm_welcome": "Üdvözlünk!",
+    "otp_check_messages": "Ellenőrizd az üzeneteidet",
+    "otp_sent_phone": "Küldtünk egy kódot a telefonszámodra, kérlek írd be alább.",
+    "otp_sent_email": "Elküldtünk egy bejelentkezési linket az e-mail címedre. Ha nem találod, nézd meg a spam mappát is.",
+    "otp_input_label": "Add meg a kódot",
+    "otp_invalid_feedback": "A kódnak 6 számjegyből kell állnia",
     "email": "E-mail",
     "password": "Jelszó"
   },
@@ -102,31 +108,96 @@
   },
   "authentication": {
     "login": "Bejelentkezés",
-    "logout": "Logout"
+    "logout": "Kijelentkezés"
   },
   "profiles": {
     "send_message_button": "Üzenet",
-    "profile_photos": "{name} fényképei"
+    "profile_photos": "{name} fényképei",
+    "no_profile_title": "Kérlek töltsd ki a profilodat",
+    "no_profile_create": "Profil létrehozása",
+    "invite_message": "Ez a közösség még növekszik, segíts terjeszteni.",
+    "invite_button": "Hívd meg barátaidat",
+    "image_editor_help": "A fotód itt",
+    "image_upload": {
+      "title": "Fotó hozzáadása",
+      "looks_good": "Jól néz ki!",
+      "add_from_phone": "Adj hozzá fotót a telefonodról",
+      "take_photo": "Vagy készíts képet a kameráddal",
+      "nevermind": "Mégsem"
+    },
+    "forms": {
+      "my_preferences": "Preferenciáim",
+      "age_range": "Korhatár",
+      "kids_label": "Gyerek(ek)?",
+      "relationship_label": "Én...",
+      "pronouns_label": "Úgy hivatkoznak rám, hogy...",
+      "name_label": "A nevem...",
+      "name_invalid": "Adj meg legalább 3 betűt",
+      "more_options": "További lehetőségek...",
+      "city_search_placeholder": "Város keresése",
+      "city_add_placeholder": "Új városként hozzáadás",
+      "city_start_typing": "Kezdj el gépelni a városod kereséséhez",
+      "tag_search_placeholder": "Érdeklődési kör keresése...",
+      "tag_add_placeholder": "Új címkeként hozzáadás",
+      "dictate_listening": "Figyelek…",
+      "dictate": "Diktálás",
+      "intro_placeholder": "Mesélj magadról",
+      "intro_who_placeholder": "Kivel szeretnél találkozni?"
+    }
   },
   "messaging": {
     "page_title": "Üzenetek",
     "send_message_button": "Küldés",
-    "message_input_placeholder": "Írj ide egy üzenetet...",
+    "message_input_placeholder": "Írj ide üzenetet...",
     "new_message_notification": "{sender} üzenetet küldött",
-    "send_message_to_user": "Üzenet küldése: {name}",
+    "send_message_to_user": "Üzenet küldése {name} részére",
     "unknown_sender": "Valaki",
-    "message_input_hint": "Enterrel küldheted",
-    "send_failed": "Hoppá, ez nem sikerült. Próbáld újra.",
-    "message_sent_success": "Üzenet elküldve!"
+    "message_input_hint": "Enter-rel küldheted",
+    "send_failed": "Hoppá, valami hiba történt. Próbáld újra.",
+    "message_sent_success": "Üzenet sikeresen elküldve!",
+    "my_turn": "Én jövök",
+    "block_report_unmatch": "Letiltás / jelentés / bontás",
+    "block_user_ok": "{name} letiltása",
+    "nevermind": "Mégsem",
+    "send_message_heading": "Üzenet küldése"
   },
   "onboarding": {
     "name_title": "Helló!",
-    "country_placeholder": "Ország"
+    "country_placeholder": "Ország",
+    "steps": {
+      "age_legend": "Születtem...",
+      "gender_legend": "Úgy azonosítom magam, hogy...",
+      "situation_legend": "Helyzetem",
+      "intro_find_legend": "Szeretnék találni:",
+      "intro_find_placeholder": "Mondd el, kit keresel."
+    },
+    "goals": {
+      "socializing": "Ismerkedés, kikapcsolódás, utazás és új emberek megismerése",
+      "dating": "Társkeresés, partner megtalálása, romantikus kapcsolatok."
+    },
+    "wizard": {
+      "all_set": "Készen állsz!",
+      "appear_message": "Mostantól látható vagy azok számára, akik hasonlót keresnek. Ezt később bármikor módosíthatod.",
+      "next": "Tovább",
+      "hint_click_next": "Kattints a Tovább gombra"
+    }
+  },
+  "settings": {
+    "language_label": "Nyelv",
+    "push_notifications": "Értesítések",
+    "enable_push": "Értesítések engedélyezése"
   },
   "uicomponents": {
     "submitbutton": {
-      "working": "Folyamatban...",
-      "submit": "Küldés"
+      "working": "Dolgozom...",
+      "submit": "Küldés",
+      "save": "Mentés"
+    },
+    "loading": {
+      "loading": "Betöltés..."
+    },
+    "spinner": {
+      "spinning": "Forgás"
     },
     "modal": {
       "close": "Bezárás"
@@ -134,7 +205,7 @@
     "toast": {
       "success": {
         "title": "Siker",
-        "message": "A művelet sikeresen megtörtént."
+        "message": "A művelet sikeres volt."
       },
       "error": {
         "title": "Hiba",

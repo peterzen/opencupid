@@ -148,7 +148,9 @@ export const useAuthStore = defineStore('auth', {
 
 
 bus.on('language:changed', async ({ language }) => {
-  await useAuthStore().updateUser({ language })
+  const store = useAuthStore()
+  if (!store.isLoggedIn) return
+  await store.updateUser({ language })
 })
 
 

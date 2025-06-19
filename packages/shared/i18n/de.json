@@ -1,23 +1,216 @@
 {
+  "general": {
+    "connectiontypes": {
+      "dating": "Partnersuche",
+      "socializing": "Geselligkeit"
+    }
+  },
   "gender": {
     "male": "Männlich",
     "female": "Weiblich",
-    "non_binary": "Nicht-binär",
+    "agender": "Agender",
+    "androgynous": "Androgyn",
+    "bigender": "Bigender",
+    "cis_man": "Cis-Mann",
+    "cis_woman": "Cis-Frau",
+    "genderfluid": "Genderfluid",
+    "genderqueer": "Genderqueer",
+    "gender_nonconforming": "Nicht geschlechtskonform",
+    "hijra": "Hijra",
+    "intersex": "Intersexuell",
+    "pangender": "Pangender",
+    "transfeminine": "Transfeminin",
+    "trans_man": "Trans-Mann",
+    "transmasculine": "Transmaskulin",
+    "transsexual": "Transsexuell",
+    "trans_woman": "Trans-Frau",
+    "two_spirit": "Zwei-Geist",
+    "non_binary": "Nichtbinär",
     "other": "Andere",
     "unspecified": "Ich möchte es lieber nicht sagen"
   },
+  "gender_preferences": {
+    "male": "Männlich",
+    "female": "Weiblich",
+    "agender": "Agender",
+    "androgynous": "Androgyn",
+    "bigender": "Bigender",
+    "cis_man": "Cis-Mann",
+    "cis_woman": "Cis-Frau",
+    "genderfluid": "Genderfluid",
+    "genderqueer": "Genderqueer",
+    "gender_nonconforming": "Nicht geschlechtskonform",
+    "hijra": "Hijra",
+    "intersex": "Intersexuell",
+    "pangender": "Pangender",
+    "transfeminine": "Transfeminin",
+    "trans_man": "Trans-Mann",
+    "transmasculine": "Transmaskulin",
+    "transsexual": "Transsexuell",
+    "trans_woman": "Trans-Frau",
+    "two_spirit": "Zwei-Geist",
+    "non_binary": "Nichtbinär",
+    "other": "Andere",
+    "unspecified": "Beliebig"
+  },
+  "pronouns": {
+    "he_him": "Er/ihm",
+    "she_her": "Sie/ihr",
+    "they_them": "Sie/ihnen",
+    "unspecified": "keine Angabe"
+  },
   "relationship": {
-    "single": "Single",
+    "single": "Ledig",
     "in_relationship": "In einer Beziehung",
     "married": "Verheiratet",
-    "other": "Andere",
+    "divorced": "Geschieden",
+    "widowed": "Verwitwet",
+    "other": "Andere (es ist kompliziert)",
     "unspecified": "Ich möchte es lieber nicht sagen"
+  },
+  "haskids": {
+    "yes": "Ja",
+    "no": "Nein",
+    "unspecified": "Ich möchte es lieber nicht sagen"
+  },
+  "haskids_label": {
+    "yes": "Hat Kinder",
+    "no": "Keine Kinder",
+    "unspecified": ""
+  },
+  "haskids_preference": {
+    "yes": "Hat Kinder",
+    "no": "Keine Kinder",
+    "unspecified": "Beliebig"
+  },
+  "auth": {
+    "login": "Anmelden",
+    "auth_id_input_empty": "Bitte gib deine E-Mail-Adresse oder Telefonnummer ein.",
+    "auth_id_input_label": "Email or phone Number",
+    "auth_id_input_placeholder": "+12 34567121 or your{'@'}email.com",
+    "captcha_input_label": "I am a human being",
+    "login_confirm_welcome": "Willkommen!",
+    "otp_check_messages": "Überprüfe deine Nachrichten",
+    "otp_sent_phone": "Wir haben dir einen Code an deine Telefonnummer gesendet. Bitte gib ihn unten ein.",
+    "otp_sent_email": "Wir haben dir einen Login-Link gesendet. Sieh in deinem Posteingang oder Spam-Ordner nach.",
+    "otp_input_label": "Code eingeben",
+    "otp_invalid_feedback": "Der Code sollte 6-stellig sein",
+    "email": "E-Mail",
+    "password": "Passwort"
   },
   "nav": {
     "home": "Startseite",
-    "onboarding": "Registrierung",
+    "onboarding": "Onboarding",
     "profile": "Profil",
-    "browse": "Durchsuchen",
-    "inbox": "Nachrichten"
+    "browse": "Browse",
+    "inbox": "Posteingang",
+    "settings": "Einstellungen"
+  },
+  "authentication": {
+    "login": "Anmelden",
+    "logout": "Abmelden"
+  },
+  "profiles": {
+    "send_message_button": "Nachricht",
+    "profile_photos": "Fotos von {name}",
+    "no_profile_title": "Bitte fülle dein Profil aus",
+    "no_profile_create": "Profil erstellen",
+    "invite_message": "This community is still growing, please help spread the word.",
+    "invite_button": "Invite friends",
+    "image_editor_help": "Dein Foto hier",
+    "image_upload": {
+      "title": "Foto hinzufügen",
+      "looks_good": "Sieht gut aus!",
+      "add_from_phone": "Foto vom Telefon hinzufügen",
+      "take_photo": "Oder mache ein Foto mit deiner Kamera",
+      "nevermind": "Schon gut"
+    },
+    "forms": {
+      "my_preferences": "Meine Präferenzen",
+      "age_range": "Altersbereich",
+      "kids_label": "Kinder?",
+      "relationship_label": "Ich bin...",
+      "pronouns_label": "Man spricht mich an mit...",
+      "name_label": "Mein Name ist...",
+      "name_invalid": "Mindestens 3 Buchstaben eingeben",
+      "more_options": "Weitere Optionen...",
+      "city_search_placeholder": "Städte suchen",
+      "city_add_placeholder": "Als neue Stadt hinzufügen",
+      "city_start_typing": "Beginne zu tippen, um deine Stadt zu finden",
+      "tag_search_placeholder": "Interessen suchen...",
+      "tag_add_placeholder": "Als neues Stichwort hinzufügen",
+      "dictate_listening": "Listening…",
+      "dictate": "Diktieren",
+      "intro_placeholder": "Tell a bit about yourself",
+      "intro_who_placeholder": "Who would you like to meet?"
+    }
+  },
+  "messaging": {
+    "page_title": "Nachrichten",
+    "send_message_button": "Senden",
+    "message_input_placeholder": "Gib hier deine Nachricht ein...",
+    "new_message_notification": "{sender} hat eine Nachricht gesendet",
+    "send_message_to_user": "Nachricht an {name} senden",
+    "unknown_sender": "Someone",
+    "message_input_hint": "Drücke Enter zum Senden",
+    "send_failed": "Hoppla, das hat nicht geklappt. Bitte versuche es erneut.",
+    "message_sent_success": "Nachricht erfolgreich gesendet!",
+    "my_turn": "Ich bin dran",
+    "block_report_unmatch": "Blockieren/melden/trennen",
+    "block_user_ok": "{name} blockieren",
+    "nevermind": "Schon gut",
+    "send_message_heading": "Nachricht senden"
+  },
+  "onboarding": {
+    "name_title": "Hallo!",
+    "country_placeholder": "Land",
+    "steps": {
+      "age_legend": "Ich wurde geboren...",
+      "gender_legend": "Ich identifiziere mich als...",
+      "situation_legend": "Meine Situation",
+      "intro_find_legend": "Ich möchte finden:",
+      "intro_find_placeholder": "Gib den Leuten eine Vorstellung davon, wen du suchst."
+    },
+    "goals": {
+      "socializing": "Geselligkeit, Ausgehen, Reisen und neue Leute treffen",
+      "dating": "Partnersuche, einen Partner finden und romantische Beziehungen erkunden."
+    },
+    "wizard": {
+      "all_set": "Alles bereit!",
+      "appear_message": "Du wirst jetzt für Personen sichtbar, die nach denselben Dingen suchen. Du kannst diese Angaben später ändern.",
+      "next": "Weiter",
+      "hint_click_next": "Klicke auf Weiter"
+    }
+  },
+  "settings": {
+    "language_label": "Sprache",
+    "push_notifications": "Push Notifications",
+    "enable_push": "Enable Push Notifications"
+  },
+  "uicomponents": {
+    "submitbutton": {
+      "working": "In Bearbeitung...",
+      "submit": "Absenden",
+      "save": "Speichern"
+    },
+    "loading": {
+      "loading": "Lädt..."
+    },
+    "spinner": {
+      "spinning": "Dreht sich"
+    },
+    "modal": {
+      "close": "Schließen"
+    },
+    "toast": {
+      "success": {
+        "title": "Erfolg",
+        "message": "Deine Aktion war erfolgreich."
+      },
+      "error": {
+        "title": "Fehler",
+        "message": "Ein Fehler ist aufgetreten. Bitte versuche es erneut."
+      }
+    }
   }
 }
