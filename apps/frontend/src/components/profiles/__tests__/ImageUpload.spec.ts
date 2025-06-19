@@ -1,6 +1,9 @@
 import { mount } from '@vue/test-utils'
 import { describe, it, expect, vi } from 'vitest'
 
+vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: (k: string) => k }) }))
+vi.mock('@/lib/mobile-detect', () => ({ detectMobile: vi.fn().mockReturnValue(false) }))
+
 vi.mock('@/assets/icons/files/avatar-upload.svg', () => ({ default: { template: '<div />' } }))
 vi.mock('@/components/LoadingComponent.vue', () => ({ default: { template: '<div />' } }))
 vi.mock('@/components/ErrorComponent.vue', () => ({ default: { template: '<div />' } }))

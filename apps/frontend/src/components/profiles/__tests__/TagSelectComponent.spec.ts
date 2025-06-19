@@ -1,6 +1,8 @@
 import { mount } from '@vue/test-utils'
 import { describe, it, expect, vi } from 'vitest'
 
+vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: (k:string)=>k }) }))
+
 const search = vi.fn().mockResolvedValue([{ id: '1', name: 'vue' }])
 const create = vi.fn().mockResolvedValue({ id: '2', name: 'new' })
 vi.mock('@/store/tagStore', () => ({ useTagsStore: () => ({ search, create }) }))

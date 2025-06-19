@@ -8,10 +8,15 @@ vi.mock('@fortawesome/vue-fontawesome', () => ({
 const push = vi.fn()
 vi.mock('vue-router', () => ({ useRouter: () => ({ push }) }))
 vi.mock('@/components/icons/DoodleIcons.vue', () => ({ default: { template: '<div />' } }))
+vi.mock('@/assets/icons/interface/setting-2.svg', () => ({ default: { template: '<div />' } }))
+vi.mock('@/assets/icons/interface/message.svg', () => ({ default: { template: '<div />' } }))
+vi.mock('@/assets/icons/interface/search.svg', () => ({ default: { template: '<div />' } }))
+vi.mock('@/assets/icons/interface/user.svg', () => ({ default: { template: '<div />' } }))
 
 const logout = vi.fn()
 vi.mock('@/store/authStore', () => ({ useAuthStore: () => ({ isLoggedIn: true, logout }) }))
 vi.mock('@/store/messageStore', () => ({ useMessageStore: () => ({ hasUnreadMessages: false }) }))
+vi.mock('@/store/profileStore', () => ({ useProfileStore: () => ({}) }))
 
 import Navbar from '../Navbar.vue'
 const stub = { template: '<div><slot /></div>' }
@@ -24,7 +29,7 @@ describe('Navbar', () => {
         mocks: { $t: (msg: string) => msg },
       }
     })
-    expect(wrapper.html()).toContain('nav.onboarding')
+    expect(wrapper.html()).toContain('nav.browse')
     expect(wrapper.html()).toContain('nav.settings')
   })
 })

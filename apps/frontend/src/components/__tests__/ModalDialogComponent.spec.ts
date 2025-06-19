@@ -1,6 +1,8 @@
 import { mount } from '@vue/test-utils'
 import { describe, it, expect, vi } from 'vitest'
 
+vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: (k: string) => k }) }))
+
 const show = vi.fn()
 const hide = vi.fn()
 
