@@ -92,7 +92,7 @@ const emit = defineEmits<{
         <div class="mb-3">
           {{ props.profile.introSocial }}
           <EditField
-            fieldName="introSocial"
+            fieldName="introSocialLocalized"
             :editComponent="IntrotextEditor"
             :editProps="{
               languages: profile.languages,
@@ -107,7 +107,7 @@ const emit = defineEmits<{
           <div class="mb-3" v-if="props.profile.isDatingActive">
             {{ props.profile.introDating }}
             <EditField
-              fieldName="introDating"
+              fieldName="introDatingLocalized"
               :editComponent="IntrotextEditor"
               :editProps="{
                 languages: profile.languages,

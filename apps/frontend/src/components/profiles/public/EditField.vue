@@ -6,20 +6,20 @@ import useEditFields from '../composables/useEditFields'
 import { type EditFieldProfileFormWithImages } from '@zod/profile/profile.form'
 
 // Only allow field names that are accepted by getModelProxy
-type AllowedFieldKey =
-  | 'isSocialActive'
-  | 'isDatingActive'
-  | 'gender'
-  | 'pronouns'
-  | 'relationship'
-  | 'hasKids'
-  | 'publicName'
-  | 'introSocial'
-  | 'languages'
-  | 'introDating'
-  | 'birthday'
-  | 'tags'
-  | 'location'
+type AllowedFieldKey = keyof EditFieldProfileFormWithImages
+  // | 'isSocialActive'
+  // | 'isDatingActive'
+  // | 'gender'
+  // | 'pronouns'
+  // | 'relationship'
+  // | 'hasKids'
+  // | 'publicName'
+  // | 'introSocial'
+  // | 'languages'
+  // | 'introDating'
+  // | 'birthday'
+  // | 'tags'
+  // | 'location'
 
 const profileStore = useProfileStore()
 

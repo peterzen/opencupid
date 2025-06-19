@@ -21,8 +21,8 @@ export default function useEditFields(model: EditFieldProfileFormWithImages|Edit
   const birthdayModel = modelProxy(model, 'birthday')
   const relationshipModel = modelProxy(model, 'relationship')
   const hasKidsModel = modelProxy(model, 'hasKids')
-  const introSocialModel = modelProxy(model, 'introSocial')
-  const introDatingModel = modelProxy(model, 'introDating')
+  const introSocialModel = modelProxy(model, 'introSocialLocalized')
+  const introDatingModel = modelProxy(model, 'introDatingLocalized')
   const locationModel = modelProxy(model, 'location')
   const genderPronounsModel = computed({
     get: () => {

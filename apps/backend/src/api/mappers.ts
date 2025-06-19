@@ -3,7 +3,8 @@ import {
   ProfileUnionSchema,
   ProfileSummary,
   OwnerProfile,
-  OwnerCreateProfileFormSchema,
+  UpdateProfilePayload,
+  OwnerScalarsSchema,
 } from '@zod/profile/profile.dto'
 import { type DbProfileComplete, DbProfileWithImagesSchema } from '@zod/profile/profile.db'
 import { LocationSchema } from '@zod/dto/location.dto'
@@ -21,11 +22,21 @@ import { type ProfileTag } from '@zod/generated'
 import { appConfig } from '@shared/config/appconfig'
 
 export const DbProfileToOwnerProfileTransform = DbProfileWithImagesSchema.transform((db): OwnerProfile => {
+  const scalars = OwnerScalarsSchema.parse(db)
   const tags = mapProfileTags(db.tags)
   const images = db.profileImages ? mapProfileImagesToOwner(db.profileImages) : []
   const location = LocationSchema.parse(db)
+
+  const localizedMap = db.localized.reduce((acc, l) => {
+    if (!acc[l.field]) acc[l.field] = {}
+    acc[l.field][l.locale] = l.value
+    return acc
+  }, {} as Record<string, Record<string, string>>)
+
   return {
-    ...db,
+    ...scalars, 
+    introSocialLocalized: localizedMap['introSocial'] || {},
+    introDatingLocalized: localizedMap['introDating'] || {},
     profileImages: images,
     location: location,
     tags,
@@ -41,7 +52,12 @@ export function mapProfileTags(profileTags: ProfileTag[]): PublicTag[] {
     .map((tag: PublicTag) => PublicTagSchema.parse(tag))
 }
 
-export function mapProfileToPublic(profile: DbProfileComplete, hasDatingPermission: boolean): PublicProfile {
+export function mapProfileToPublic(profile: DbProfileComplete, hasDatingPermission: boolean, locale: string): PublicProfile {
+
+  const get = (field: string) =>
+    profile.localized.find(l => l.field === field && l.locale === locale)?.value
+
+
   // shape discriminated union ProfileUnionSchema
   const dProf = {
     ...profile,
@@ -57,6 +73,8 @@ export function mapProfileToPublic(profile: DbProfileComplete, hasDatingPermissi
     tags: publicTags,
     location: LocationSchema.parse(profile),
     conversation: profile.conversationParticipants?.[0]?.conversation ?? null,
+    introSocial: get('introSocial') || '',
+    introDating: get('introDating') || '',
   } as PublicProfile
 }
 
@@ -108,4 +126,28 @@ export function toPublicProfileImage(image: ProfileImage): PublicProfileImage {
 export function toOwnerProfileImage(image: ProfileImage): OwnerProfileImage {
   image.url = getImageUrl(image)
   return OwnerProfileImageSchema.parse(image)
+}
+
+
+
+export function mapToLocalizedUpserts(
+  profileId: string,
+  payload: Partial<Pick<UpdateProfilePayload, 'introSocialLocalized' | 'introDatingLocalized'>>
+): Array<{ locale: string; updates: Record<string, string> }> {
+  const byLocale: Record<string, Record<string, string>> = {}
+
+  for (const field of ['introSocialLocalized', 'introDatingLocalized'] as const) {
+    const localized = payload[field]
+    if (!localized) continue
+
+    for (const [locale, value] of Object.entries(localized)) {
+      if (!byLocale[locale]) byLocale[locale] = {}
+      byLocale[locale][field.replace('Localized', '')] = value
+    }
+  }
+
+  return Object.entries(byLocale).map(([locale, updates]) => ({
+    locale,
+    updates,
+  }))
 }

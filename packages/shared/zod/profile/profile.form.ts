@@ -3,7 +3,7 @@ import z from "zod";
 import { LocationSchema } from "@zod/dto/location.dto";
 import { PublicTagSchema } from "@zod/dto/tag.dto";
 import { ProfileSchema } from "@zod/generated";
-import { editableFields } from "./profile.dto";
+import { editableFields, LocalizedStringSchema } from "./profile.dto";
 import { PublicProfileImageSchema } from "./profileimage.dto";
 
 
@@ -12,6 +12,9 @@ import { PublicProfileImageSchema } from "./profileimage.dto";
 export const EditProfileFormSchema = ProfileSchema.pick({
   ...editableFields,
 }).extend({
+  introSocialLocalized: LocalizedStringSchema,
+  introDatingLocalized: LocalizedStringSchema,
+
   tags: z.array(PublicTagSchema).default([]),
   location: LocationSchema
 })

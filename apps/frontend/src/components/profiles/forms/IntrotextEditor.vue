@@ -1,19 +1,24 @@
 <script lang="ts" setup>
 import { useI18n } from 'vue-i18n'
-import { ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import type { SpeechRecognition, SpeechRecognitionEvent } from '@/types/speechrecognition'
+import DoodleIcons from '@/components/icons/DoodleIcons.vue'
+import { useI18nStore } from '@/store/i18nStore'
+
 import IconMic2 from '@/assets/icons/interface/mic-2.svg'
 import IconGlobe from '@/assets/icons/interface/globe.svg'
 // i18n
 const { t } = useI18n()
 
-const model = defineModel<string | null>({
-  default: () => '',
+const i18nStore = useI18nStore()
+
+const model = defineModel<Record<string, string> | null>({
+  default: () => ({}),
 })
 
 const props = defineProps<{
-  languages: string[],
-  placeholder: string,
+  languages: string[]
+  placeholder: string
 }>()
 
 const debug = ref('')
@@ -23,55 +28,55 @@ const lastTranscript = ref('')
 const lastConfidence = ref(0)
 const error = ref('')
 const status = ref('idle')
-const currentLanguage = ref(props.languages[0] || 'en')
+const currentLanguage = ref(i18nStore.getLanguage() || 'en')
 
 let recognition: SpeechRecognition | null = null
 
-if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-  const SpeechRecognition =
-    (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition
-  recognition = new SpeechRecognition()
-  recognition.lang = 'en-US'
-  recognition.continuous = false
-  recognition.interimResults = false
+// if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+//   const SpeechRecognition =
+//     (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition
+//   recognition = new SpeechRecognition()
+//   recognition.lang = 'en-US'
+//   recognition.continuous = false
+//   recognition.interimResults = false
 
-  recognition.onstart = () => {
-    status.value = 'started'
-    isListening.value = true
-  }
+//   recognition.onstart = () => {
+//     status.value = 'started'
+//     isListening.value = true
+//   }
 
-  recognition.onend = () => {
-    status.value = 'ended'
-    isListening.value = false
-  }
+//   recognition.onend = () => {
+//     status.value = 'ended'
+//     isListening.value = false
+//   }
 
-  recognition.onerror = (e: any) => {
-    error.value = e.error
-    status.value = 'error'
-    isListening.value = false
-  }
+//   recognition.onerror = (e: any) => {
+//     error.value = e.error
+//     status.value = 'error'
+//     isListening.value = false
+//   }
 
-  recognition.onresult = (event: SpeechRecognitionEvent) => {
-    const result = event.results[0][0]
-    lastTranscript.value = result.transcript
-    lastConfidence.value = result.confidence
-    model.value += (model.value ? ' ' : '') + result.transcript
-    status.value = 'result'
-  }
+//   recognition.onresult = (event: SpeechRecognitionEvent) => {
+//     const result = event.results[0][0]
+//     lastTranscript.value = result.transcript
+//     lastConfidence.value = result.confidence
+//     model.value += (model.value ? ' ' : '') + result.transcript
+//     status.value = 'result'
+//   }
 
-  recognition.onspeechend = () => {
-    status.value = 'speechend'
-    recognition?.stop()
-  }
+//   recognition.onspeechend = () => {
+//     status.value = 'speechend'
+//     recognition?.stop()
+//   }
 
-  recognition.onaudioend = () => {
-    status.value = 'audioend'
-  }
+//   recognition.onaudioend = () => {
+//     status.value = 'audioend'
+//   }
 
-  recognition.onnomatch = () => {
-    status.value = 'no match'
-  }
-}
+//   recognition.onnomatch = () => {
+//     status.value = 'no match'
+//   }
+// }
 
 const toggleListening = () => {
   if (!recognition) {
@@ -92,6 +97,20 @@ const toggleListening = () => {
     }
   }
 }
+
+watch(
+  () => model.value,
+  value => {
+    if (!value) return
+
+    props.languages.forEach(lang => {
+      if (!(lang in value)) {
+        value[lang] = ''
+      }
+    })
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
@@ -121,19 +140,23 @@ const toggleListening = () => {
         </BButton>
       </div>
     </div>
-    <BFormFloatingLabel :label="props.placeholder" label-for="publicName">
-      <BFormTextarea
-        v-model="model"
-        id="content-input"
-        placeholder="Tell a bit about yourself"
-        max-rows="5"
-        min-rows="3"
-        no-resize
-        size="lg"
-        :required="true"
-        class="mb-3"
-      />
-    </BFormFloatingLabel>
+    <div class="" v-for="lang in props.languages" :key="lang">
+      <div v-if="currentLanguage === lang">
+        <BFormFloatingLabel :label="props.placeholder" label-for="publicName" v-if="model">
+          <BFormTextarea
+            v-model="model[lang]"
+            id="content-input"
+            placeholder="Tell a bit about yourself"
+            max-rows="5"
+            min-rows="3"
+            no-resize
+            size="lg"
+            :required="true"
+            class="mb-3"
+          />
+        </BFormFloatingLabel>
+      </div>
+    </div>
 
     <!-- <BFormFloatingLabel label="My name is..." label-for="publicName">
       <BFormTextarea
@@ -161,10 +184,8 @@ const toggleListening = () => {
   </div>
 </template>
 
-
-
 <style scoped lang="scss">
 .nav-link {
-  padding: 0.15rem 1rem ;
+  padding: 0.15rem 1rem;
 }
 </style>

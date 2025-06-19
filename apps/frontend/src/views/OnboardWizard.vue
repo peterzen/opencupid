@@ -45,6 +45,8 @@ const formData = reactive({
   hasKids: null,
   introSocial: '',
   introDating: '',
+  introSocialLocalized: {} as Record<string, string>,
+  introDatingLocalized: {} as Record<string, string>,
   isDatingActive: false,
   isSocialActive: true,
 } as EditProfileForm)

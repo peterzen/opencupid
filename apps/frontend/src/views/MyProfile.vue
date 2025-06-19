@@ -15,23 +15,50 @@ import { useOnboardingWizard } from '@/components/profiles/onboarding/useProfile
 import { useStepper } from '@vueuse/core'
 import DatingSteps from '@/components/profiles/onboarding/DatingSteps.vue'
 import { useRouter } from 'vue-router'
+import ErrorOverlay from '@/components/ErrorOverlay.vue'
+import { PublicProfile } from '@zod/profile/profile.dto'
+import { useAuthStore } from '@/store/authStore'
 
 const router = useRouter()
 
 const profileStore = useProfileStore()
 
 const showModal = ref(false)
+const error = ref('')
 const formData: EditFieldProfileFormWithImages = reactive({} as EditFieldProfileFormWithImages)
+
+const publicProfile = ref({} as PublicProfile)
+
+const authStore = useAuthStore()
 
 onMounted(async () => {
   await profileStore.fetchOwnerProfile()
+  console.log('Profile fetched:', profileStore.profile)
+  if (!profileStore.profile) {
+    error.value = 'Something went wrong (owner profile)'
+    return
+  }
+  Object.assign(formData, profileStore.profile)
   if (!profileStore.profile?.isOnboarded) {
     router.push({ name: 'Onboarding' })
   }
-  Object.assign(formData, profileStore.profile)
+  await fetchPublicProfile()
 })
 
-const publicProfile = computed(() => ownerToPublicProfile(profileStore.profile))
+const fetchPublicProfile = async () => {
+  if (!profileStore.profile) {
+    error.value = 'Profile not found'
+    return
+  }
+  const res = await profileStore.getPublicProfile(profileStore.profile.id)
+  if (!res.success || !res.data) {
+    error.value = 'Something went wrong (public profile)'
+    return
+  }
+  console.log('Public profile fetched:', res.data)
+  Object.assign(publicProfile.value, res.data)
+}
+// const publicProfile = computed(() => ownerToPublicProfile(profileStore.profile))
 
 const isEditable = ref(false)
 
@@ -58,6 +85,7 @@ const toggleDating = async () => {
 const handleOkClick = async () => {
   const res = await profileStore.updateOwnerProfile(formData)
   if (res.success) {
+    await fetchPublicProfile()
     // profileStore.close()
   } else {
     console.error('Failed to fetch updated profile after edit.')
@@ -75,11 +103,18 @@ const handleCancelClick = () => {
   }
 }
 
-const handleToggleEditable = () => {
+const handleStartEditing = async () => {
   isEditable.value = !isEditable.value
 }
+
+const handleFinishEditing = async () => {
+  isEditable.value = !isEditable.value
+}
+
+const handleEditProfile = () => {
+  router.push({ name: 'EditProfile' })
+}
 const isComplete = ref(false)
-const error = ref('')
 
 const { datingWizard } = useOnboardingWizard(formData)
 const { current, isFirst, goToNext, goToPrevious, goTo, isCurrent } = useStepper(datingWizard)
@@ -124,15 +159,62 @@ const { current, isFirst, goToNext, goToPrevious, goTo, isCurrent } = useStepper
 // }
 
 const update = (value: EditFieldProfileFormWithImages) => {}
-
-const handleEditProfile = () => {
-  router.push({ name: 'EditProfile' })
-}
 </script>
 
 <template>
   <main class="container">
     <!-- <LoadingComponent v-if="profileStore.isLoading" /> -->
+    <ErrorOverlay v-if="error" :error />
+
+    <div v-else class="d-flex flex-row justify-content-between align-items-center mb-2">
+      <div class="d-flex">
+        <div v-if="isEditable">
+          <!-- <span
+            class="btn-social-toggle px-4 py-1 rounded-4 me-2"
+            @click="toggleSocial"
+            :class="{ active: formData.isSocialActive }"
+          >
+            <IconSocialize class="svg-icon-lg" />
+          </span> -->
+          <span
+            class="btn-dating-toggle px-4 py-1 rounded-4"
+            @click="toggleDating"
+            :class="{ active: formData.isDatingActive }"
+          >
+            <IconDate class="svg-icon-lg" />
+          </span>
+        </div>
+      </div>
+      <div>
+        <BButton
+          v-if="isEditable"
+          pill
+          class="btn btn-primary mt-1"
+          size="sm"
+          @click="handleFinishEditing"
+          variant="success"
+        >
+          Done
+        </BButton>
+        <BButton
+          v-else
+          pill
+          class="btn btn-primary mt-1"
+          size="sm"
+          @click="handleStartEditing"
+          variant="primary"
+        >
+          <IconPencil2 class="svg-icon" />
+          Edit profile
+        </BButton>
+      </div>
+    </div>
+    <PublicProfileComponent
+      v-if="publicProfile"
+      :isLoading="profileStore.isLoading"
+      @intent:field:edit="showModal = true"
+      :profile="publicProfile"
+    />
     <BModal
       v-model="profileStore.fieldEditModal"
       title=""
@@ -155,49 +237,12 @@ const handleEditProfile = () => {
       :keyboard="false"
     >
       <template #cancel="{ close }">
-        <a href="#" @click="close" class="link-underline link-underline-opacity-0 me-4">Nevermind</a>
+        <a href="#" @click="close" class="link-underline link-underline-opacity-0 me-4"
+          >Nevermind</a
+        >
       </template>
       <div id="field-edit-modal" class="w-100 py-5"></div>
     </BModal>
-    <div class="d-flex flex-row justify-content-between align-items-center mb-2">
-      <div class="d-flex">
-        <div v-if="isEditable">
-        <!-- <span
-            class="btn-social-toggle px-4 py-1 rounded-4 me-2"
-            @click="toggleSocial"
-            :class="{ active: formData.isSocialActive }"
-          >
-            <IconSocialize class="svg-icon-lg" />
-          </span> -->
-        <span
-          class="btn-dating-toggle px-4 py-1 rounded-4"
-          @click="toggleDating"
-          :class="{ active: formData.isDatingActive }"
-        >
-          <IconDate class="svg-icon-lg" />
-        </span>
-        </div>
-      </div>
-      <div>
-        <BButton
-          pill
-          class="btn btn-primary mt-1"
-          size="sm"
-          @click="handleToggleEditable"
-          :variant="isEditable ? 'success' : 'primary'"
-        >
-          <IconPencil2 class="svg-icon" />
-          {{ isEditable ? 'Done' : 'Edit Profile' }}
-        </BButton>
-      </div>
-    </div>
-    <PublicProfileComponent
-      v-if="publicProfile"
-      :isLoading="profileStore.isLoading"
-      @intent:field:edit="showModal = true"
-      :profile="publicProfile"
-    />
-
     <Teleport to="#field-edit-modal" v-if="datingPopup">
       <DatingWizard v-model="formData" @update:modelValue="update"></DatingWizard>
       <!-- <div>

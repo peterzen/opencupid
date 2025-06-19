@@ -1,0 +1,133 @@
+/zod/
+  profile/
+    db.schema.ts           <-- z.infer<Profile> from Prisma (internal use)
+    dto.public.ts          <-- PublicProfile (API->client)
+    dto.owner.ts           <-- OwnerProfile (API->owner view)
+    dto.update.ts          <-- UpdateProfilePayload (client->API)
+    form.editable.ts       <-- EditableOwnerProfile (form binding)
+
+Tag : DB schema
+PublicTag  API -> client DTO
+  id            String           @id @default(cuid())
+  slug          String           @unique
+  name          String           @unique
+
+CreatePublicTagPayload Client->API DTO
+  name
+
+Profile    DB schema (from Prisma)
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  publicName  String
+  country     String  @default("")
+  cityName    String  @default("")
+  cityId      String?
+  city        City?   @relation(fields: [cityId], references: [id])
+  introSocial String  @default("")
+
+  isSocialActive Boolean @default(false)
+  isDatingActive Boolean @default(false)
+  isActive       Boolean @default(false)
+  isReported     Boolean @default(false)
+  isBlocked      Boolean @default(false)
+  isOnboarded    Boolean @default(false)
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  work         String              @default("")
+  languages    String[]            @default([])
+  introDating  String              @default("")
+  birthday     DateTime?
+  gender       Gender?
+  pronouns     Pronouns?
+  relationship RelationshipStatus?
+  hasKids      HasKids?
+
+  tags          ProfileTag[]
+  profileImages ProfileImage[] @relation("ProfileImages")
+
+  // Dating preferences
+  prefAgeMin Int?
+  prefAgeMax Int?
+  prefGender Gender[]  @default([])
+  prefKids   HasKids[] @default([])
+
+  // latitude         Float?
+  // longitude        Float?
+  // prefRadius       Int?    @default(50) // in km
+  // isLocationActive Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  conversationParticipants ConversationParticipant[]
+  conversationAsA          Conversation[]            @relation("ProfileA")
+  conversationAsB          Conversation[]            @relation("ProfileB")
+  Message                  Message[]
+
+  Conversation Conversation[]
+
+PublicProfile   API->client DTO
+  id          String  @id @default(cuid())
+  publicName  String
+  introSocial String  @default("")
+  languages    String[]            @default([])
+  tags          ProfileTag[] -> transform to PublicTag
+  profileImages ProfileImage[] @relation("ProfileImages")
+  conversations ConversationParticipant->Conversation
+
+  Location (transform)
+    country     String  @default("")
+    cityName    String  @default("")
+    cityId      String?
+
+  DatingProfile
+    introDating  String              @default("")
+    birthday     DateTime?
+    gender       Gender?
+    pronouns     Pronouns?
+    relationship RelationshipStatus?
+    hasKids      HasKids?
+
+
+OwnerProfile  API->client DTO (owner view)
+  id          String  @id @default(cuid())
+  publicName  String
+  introSocial String  @default("")
+  languages    String[]            @default([])
+  tags          ProfileTag[] -> transform to PublicTag
+  profileImages ProfileImage[] @relation("ProfileImages")
+
+  Location (transform)
+    country     String  @default("")
+    cityName    String  @default("")
+    cityId      String?
+
+  DatingProfile
+    introDating  String              @default("")
+    birthday     DateTime?
+    gender       Gender?
+    pronouns     Pronouns?
+    relationship RelationshipStatus?
+    hasKids      HasKids?
+
+
+  SearchPreferences (subset/transform from OwnerProfile)
+    prefAgeMin Int?
+    prefAgeMax Int?
+    prefGender Gender[]  @default([])
+    prefKids   HasKids[] @default([])
+
+
+UpdateProfilePayload Client->API DTO, existing profile
+  everything in OwnerProfile EXCEPT: id, profileImages
+
+CreateProfilePayload  Client->API DTO, new profile
+  everything in UpdateProfilePayload EXCEPT age
+
+UpdateSearchPreferencesPayload  Client->API DTO
+    prefAgeMin Int?
+    prefAgeMax Int?
+    prefGender Gender[]  @default([])
+    prefKids   HasKids[] @default([])

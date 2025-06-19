@@ -4,11 +4,10 @@ import { Prisma } from '@prisma/client'
 
 import { Profile, ProfileImage, ProfileTag } from '@zod/generated'
 import {
-
-  CreateProfilePayload,
   type UpdateProfilePayload
 } from '@zod/profile/profile.dto'
 import { DbProfileComplete, DbProfile } from '@zod/profile/profile.db'
+import { mapToLocalizedUpserts } from '@/api/mappers'
 
 const profileCompleteInclude = {
   profileImages: {
@@ -17,7 +16,10 @@ const profileCompleteInclude = {
   tags: {
     include: { tag: true },
   },
+  localized: true,
 } satisfies Prisma.ProfileInclude
+
+
 
 const conversationWithMyProfileInclude = (myProfileId: string) => ({
   conversationParticipants: {
@@ -62,6 +64,11 @@ export class ProfileService {
     })
   }
 
+  /**
+   * getProfileByUserId is used for fetching the profile of the current user.
+   * @param userId 
+   * @returns 
+   */
   async getProfileByUserId(userId: string): Promise<DbProfile | null> {
     return prisma.profile.findUnique({
       where: { userId },
@@ -74,11 +81,17 @@ export class ProfileService {
   async updateProfile(
     tx: Prisma.TransactionClient,
     userId: string,
-    data: CreateProfilePayload | UpdateProfilePayload
+    data: UpdateProfilePayload
   ): Promise<DbProfile> {
-    // 1) pull out the tags array
-    const { tags, ...rest } = data
+    // 1) Pull out complex parts
+    const {
+      tags,
+      introSocialLocalized,
+      introDatingLocalized,
+      ...rest
+    } = data
 
+    // 2) Validate that the user has a profile
     const current = await tx.profile.findUnique({
       select: { id: true },
       where: { userId },
@@ -90,12 +103,13 @@ export class ProfileService {
 
     const profileId = current.id
 
-    // 2) Delete _all_ existing tag links for this profile
+    // 3) Update tags
+    // delete all existing tags for this profile
     await tx.profileTag.deleteMany({
       where: { profileId },
     })
 
-    // 3) Re-create only the tags the user sent
+    // Re-create only the tags the user sent
     if (tags && tags.length > 0) {
       await tx.profileTag.createMany({
         data: tags.map(tagId => ({ profileId, tagId })),
@@ -103,7 +117,19 @@ export class ProfileService {
       })
     }
 
-    // 1) Update all scalar fields
+    // 4) Handle localized fields
+    const localizedPayload: Partial<UpdateProfilePayload> = {
+      introSocialLocalized,
+      introDatingLocalized,
+    }
+
+    const localizedUpdates = mapToLocalizedUpserts(profileId, localizedPayload)
+
+    for (const { locale, updates } of localizedUpdates) {
+      await this.upsertLocalizedProfileText(tx, profileId, locale, updates)
+    }
+
+    // 5) Update all scalar fields
     const updated = await tx.profile.update({
       where: { userId },
       data: {
@@ -116,6 +142,37 @@ export class ProfileService {
     })
     return updated
   }
+
+
+  async upsertLocalizedProfileText(
+    tx: Prisma.TransactionClient,
+    profileId: string,
+    locale: string,
+    updates: Record<string, string>
+  ) {
+    await Promise.all(
+      Object.entries(updates).map(([field, value]) =>
+        tx.localizedProfileField.upsert({
+          where: {
+            profileId_field_locale: {
+              profileId,
+              field,
+              locale,
+            },
+          },
+          update: { value },
+          create: {
+            profileId,
+            field,
+            locale,
+            value,
+          },
+        })
+      )
+    )
+  }
+
+
 
   public async addProfileImage(
     profileId: string,

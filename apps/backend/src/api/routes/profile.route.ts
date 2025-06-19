@@ -4,22 +4,18 @@ import { z } from 'zod'
 
 import {
   type UpdateProfilePayload,
-  CreateProfilePayload,
-  CreateProfilePayloadSchema,
   UpdateProfilePayloadSchema
 } from '@zod/profile/profile.dto'
 
 import { ProfileService } from 'src/services/profile.service'
 import { validateBody } from '@/utils/zodValidate'
 import {
-  getUserRoles,
   sendError,
   sendForbiddenError,
   sendUnauthorizedError
 } from '../helpers'
 import {
   DbProfileToOwnerProfileTransform,
-  mapProfileTags,
   mapProfileToPublic,
 } from 'src/api/mappers'
 import { UserService } from 'src/services/user.service'
@@ -29,7 +25,6 @@ import type {
   GetProfilesResponse,
   UpdateProfileResponse,
 } from '@shared/dto/apiResponse.dto'
-import { Profile, ProfileSchema } from '@zod/generated'
 
 // Route params for ID lookups
 const IdLookupParamsSchema = z.object({
@@ -70,19 +65,19 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
   fastify.get('/:id', { onRequest: [fastify.authenticate] }, async (req, reply) => {
 
     const myProfileId = req.session.profileId
-    const roles = getUserRoles(req)
-
-    const { id } = IdLookupParamsSchema.parse(req.params)
+    const locale = req.session.lang
 
     try {
+      const { id } = IdLookupParamsSchema.parse(req.params)
       const raw = await profileService.getProfileWithConversationsById(id, myProfileId)
       if (!raw) return sendError(reply, 404, 'Profile not found')
 
       if (raw.userId !== req.user.userId && !req.session.hasActiveProfile) {
         return sendForbiddenError(reply, 'You do not have access to this profile')
       }
+      const hasDatingPermission = req.session.profile.isDatingActive
 
-      const profile = mapProfileToPublic(raw, roles.includes('user_dating'))
+      const profile = mapProfileToPublic(raw, hasDatingPermission, locale)
       // const profile = publicProfileSchema.parse(raw)
       const response: GetPublicProfileResponse = { success: true, profile }
       return reply.code(200).send(response)
@@ -96,11 +91,12 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
 
     if (!req.session.hasActiveProfile) return sendForbiddenError(reply)
     const myProfileId = req.session.profileId
+    const locale = req.session.lang
 
     try {
       const profiles = await profileService.findProfilesFor(myProfileId)
       const hasDatingPermission = req.session.profile.isDatingActive
-      const mappedProfiles = profiles.map(p => mapProfileToPublic(p, hasDatingPermission))
+      const mappedProfiles = profiles.map(p => mapProfileToPublic(p, hasDatingPermission, locale))
       const response: GetProfilesResponse = { success: true, profiles: mappedProfiles }
       return reply.code(200).send(response)
     } catch (err) {

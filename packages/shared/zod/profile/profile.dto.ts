@@ -3,6 +3,9 @@ import { z } from "zod";
 
 import {
   ConversationSchema,
+  type LocalizedProfileField,
+  LocalizedProfileFieldSchema,
+  type Profile,
   ProfileSchema
 } from "../generated";
 
@@ -13,7 +16,6 @@ import {
   PublicProfileImageSchema
 } from "./profileimage.dto";
 import { LocationSchema } from "@zod/dto/location.dto";
-import { profile } from "console";
 
 export const baseFields = {
   id: true,
@@ -80,27 +82,26 @@ export const PublicProfileArraySchema = z.array(PublicProfileSchema);
 
 export type PublicProfile = z.infer<typeof PublicProfileSchema>;
 
-// const OwnerScalarSchema = ProfileSchema.pick({
-//   ...baseFields,
-//   ...publicDatingProfileFields,
-//   ...datingPreferencesFields,
-//   id: true,
-//   isActive: true,
-// });
-
 export const ownerFields = {
   isDatingActive: true,
   isSocialActive: true,
   isOnboarded: true,
 } as const;
 
-// API -> client DTO 
-export const OwnerProfileSchema = ProfileSchema.pick({
+export const OwnerScalarsSchema = ProfileSchema.pick({
   ...baseFields,
   ...socialFields,
   ...datingFields,
+  // ...datingPreferencesFields,
   ...ownerFields,
-}).extend({
+});
+
+export const LocalizedStringSchema = z.record(z.string(), z.string()).default({})
+// API -> client DTO 
+export const OwnerProfileSchema = OwnerScalarsSchema.extend({
+  introSocialLocalized: LocalizedStringSchema,
+  introDatingLocalized: LocalizedStringSchema,
+
   profileImages: z.array(PublicProfileImageSchema).default([]),
   tags: z.array(PublicTagSchema).default([]),
   location: LocationSchema
@@ -118,20 +119,6 @@ export const editableFields = {
 } as const;
 
 
-// Client -> API DTO onboarding payload
-export const CreateProfilePayloadSchema = ProfileSchema.pick({
-  ...editableFields,
-  cityId: true,
-  country: true,
-  cityName: true,
-})
-.partial().strict()
-.extend({
-  tags: z.array(z.string().cuid()),
-})
-
-export type CreateProfilePayload = z.infer<typeof CreateProfilePayloadSchema>;
-
 // Client -> API DTO profile editing payload
 export const UpdateProfilePayloadSchema = ProfileSchema.pick({
   ...editableFields,
@@ -139,11 +126,10 @@ export const UpdateProfilePayloadSchema = ProfileSchema.pick({
   country: true,
   cityName: true,
 })
-  .omit({
-    birthday: true, // birthday is not editable
-  })
   .extend({
     tags: z.array(z.string().cuid()),
+    introSocialLocalized: z.record(z.string(), z.string()).optional(),
+    introDatingLocalized: z.record(z.string(), z.string()).optional(),
   })
   .partial()
 
@@ -168,4 +154,8 @@ export const ProfileSummarySchema = z.object({
 export type ProfileSummary = z.infer<typeof ProfileSummarySchema>;
 
 
+
+
+// localized profile fields
+type ProfileWithLocalized = Profile & { localized: LocalizedProfileField[] }
 

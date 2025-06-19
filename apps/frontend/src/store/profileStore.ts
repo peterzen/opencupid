@@ -44,6 +44,7 @@ export const useProfileStore = defineStore('profile', {
         return storeSuccess()
       } catch (error: any) {
         this.profile = null // Reset profile on error
+        console.log('Error fetching profile:', error)
         return storeError(error, 'Failed to fetch profile')
       } finally {
         this.isLoading = false // Reset loading state

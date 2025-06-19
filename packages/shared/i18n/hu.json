@@ -1,23 +1,145 @@
 {
+  "general": {
+    "connectiontypes": {
+      "dating": "Randi",
+      "socializing": "Ismerkedés"
+    }
+  },
   "gender": {
     "male": "Férfi",
     "female": "Nő",
-    "non_binary": "Nem-bináris",
+    "agender": "Nemi nélküli",
+    "androgynous": "Androgün",
+    "bigender": "Bigender",
+    "cis_man": "Cisz férfi",
+    "cis_woman": "Cisz nő",
+    "genderfluid": "Genderfluid",
+    "genderqueer": "Genderqueer",
+    "gender_nonconforming": "Nemnek nem megfelelő",
+    "hijra": "Hidzsra",
+    "intersex": "Interszex",
+    "pangender": "Pangender",
+    "transfeminine": "Transzfeminin",
+    "trans_man": "Transz férfi",
+    "transmasculine": "Transzmaszkulin",
+    "transsexual": "Transzszexuális",
+    "trans_woman": "Transz nő",
+    "two_spirit": "Kétlelkű",
+    "non_binary": "Nem bináris",
     "other": "Egyéb",
-    "unspecified": "Inkább nem mondom meg"
+    "unspecified": "Nem szeretném megadni"
+  },
+  "gender_preferences": {
+    "male": "Férfi",
+    "female": "Nő",
+    "agender": "Nemi nélküli",
+    "androgynous": "Androgün",
+    "bigender": "Bigender",
+    "cis_man": "Cisz férfi",
+    "cis_woman": "Cisz nő",
+    "genderfluid": "Genderfluid",
+    "genderqueer": "Genderqueer",
+    "gender_nonconforming": "Nemnek nem megfelelő",
+    "hijra": "Hidzsra",
+    "intersex": "Interszex",
+    "pangender": "Pangender",
+    "transfeminine": "Transzfeminin",
+    "trans_man": "Transz férfi",
+    "transmasculine": "Transzmaszkulin",
+    "transsexual": "Transzszexuális",
+    "trans_woman": "Transz nő",
+    "two_spirit": "Kétlelkű",
+    "non_binary": "Nem bináris",
+    "other": "Egyéb",
+    "unspecified": "Bármelyik"
+  },
+  "pronouns": {
+    "he_him": "Ő (fiú)",
+    "she_her": "Ő (lány)",
+    "they_them": "Ők",
+    "unspecified": "nincs megadva"
   },
   "relationship": {
     "single": "Egyedülálló",
     "in_relationship": "Kapcsolatban",
     "married": "Házas",
-    "other": "Egyéb",
-    "unspecified": "Inkább nem mondom meg"
+    "divorced": "Elvált",
+    "widowed": "Özvegy",
+    "other": "Egyéb (bonyolult)",
+    "unspecified": "Nem szeretném megadni"
+  },
+  "haskids": {
+    "yes": "Igen",
+    "no": "Nem",
+    "unspecified": "Nem szeretném megadni"
+  },
+  "haskids_label": {
+    "yes": "Gyerekei vannak",
+    "no": "Nincs gyereke",
+    "unspecified": ""
+  },
+  "haskids_preference": {
+    "yes": "Gyerekei vannak",
+    "no": "Nincs gyereke",
+    "unspecified": "Bármelyik"
+  },
+  "auth": {
+    "login": "Bejelentkezés",
+    "auth_id_input_empty": "Kérlek add meg az e-mail címed vagy a telefonszámod.",
+    "auth_id_input_label": "E-mail vagy telefonszám",
+    "auth_id_input_placeholder": "+36 30 1234567 vagy te@email.hu",
+    "captcha_input_label": "Ember vagyok",
+    "email": "E-mail",
+    "password": "Jelszó"
   },
   "nav": {
     "home": "Kezdőlap",
     "onboarding": "Belépés",
     "profile": "Profil",
     "browse": "Böngészés",
-    "inbox": "Üzenetek"
+    "inbox": "Bejövő üzenetek",
+    "settings": "Beállítások"
+  },
+  "authentication": {
+    "login": "Bejelentkezés",
+    "logout": "Logout"
+  },
+  "profiles": {
+    "send_message_button": "Üzenet",
+    "profile_photos": "{name} fényképei"
+  },
+  "messaging": {
+    "page_title": "Üzenetek",
+    "send_message_button": "Küldés",
+    "message_input_placeholder": "Írj ide egy üzenetet...",
+    "new_message_notification": "{sender} üzenetet küldött",
+    "send_message_to_user": "Üzenet küldése: {name}",
+    "unknown_sender": "Valaki",
+    "message_input_hint": "Enterrel küldheted",
+    "send_failed": "Hoppá, ez nem sikerült. Próbáld újra.",
+    "message_sent_success": "Üzenet elküldve!"
+  },
+  "onboarding": {
+    "name_title": "Helló!",
+    "country_placeholder": "Ország"
+  },
+  "uicomponents": {
+    "submitbutton": {
+      "working": "Folyamatban...",
+      "submit": "Küldés"
+    },
+    "modal": {
+      "close": "Bezárás"
+    },
+    "toast": {
+      "success": {
+        "title": "Siker",
+        "message": "A művelet sikeresen megtörtént."
+      },
+      "error": {
+        "title": "Hiba",
+        "message": "Hiba történt. Kérlek, próbáld újra."
+      }
+    }
   }
 }

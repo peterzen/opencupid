@@ -45,6 +45,7 @@ declare module 'vue' {
     DatingWizard: typeof import('./src/components/profiles/onboarding/DatingWizard.vue')['default']
     EditField: typeof import('./src/components/profiles/public/EditField.vue')['default']
     ErrorComponent: typeof import('./src/components/ErrorComponent.vue')['default']
+    ErrorOverlay: typeof import('./src/components/ErrorOverlay.vue')['default']
     GenderPronounLabel: typeof import('./src/components/profiles/display/GenderPronounLabel.vue')['default']
     GenderPronounSelector: typeof import('./src/components/profiles/forms/GenderPronounSelector.vue')['default']
     GenderSelector: typeof import('./src/components/profiles/forms/GenderSelector.vue')['default']

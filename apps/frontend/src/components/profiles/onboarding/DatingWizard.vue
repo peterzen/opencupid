@@ -16,8 +16,8 @@ const formData = defineModel<EditFieldProfileFormWithImages>({
     genderPronouns: null,
     relationshipStatus: null,
     hasKids: null,
-    introSocial: '',
-    introDating: '',
+    introSocialLocalized: {},
+    introDatingLocalized: {},
   }),
 })
 
