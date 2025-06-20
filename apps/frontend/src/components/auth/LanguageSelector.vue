@@ -8,26 +8,23 @@ const { t } = useI18n()
 defineEmits<{
   (e: 'language:select', lang: string): void
 }>()
-
-const labels: Record<string, string> = {
-  hu: 'Magyar',
-  de: 'Deutsch',
-  en: 'English',
-  fr: 'Français',
-  es: 'Español',
-  it: 'Italiano',
-  pt: 'Português',
-}
 </script>
 
 <template>
   <ul class="language-selector list-inline text-muted mt-3">
-    <li v-for="lang in i18nStore.getAvailableLocales()" :key="lang" class="list-inline-item me-3">
-      <span v-if="i18nStore.currentLanguage === lang" class="text-primary">{{ labels[lang] }}</span>
-      <a v-else 
-      class="text-decoration-none text-muted"
-      href="#" 
-      @click="$emit('language:select', lang)">{{ labels[lang] }}</a>
+    <li
+      v-for="locale in i18nStore.getAvailableLocalesWithLabels()"
+      :key="locale.value"
+      class="list-inline-item me-3"
+    >
+      <span v-if="i18nStore.currentLanguage === locale.value" class="text-primary">{{ locale.label }}</span>
+      <a
+        v-else
+        class="text-decoration-none text-muted"
+        href="#"
+        @click="$emit('language:select', locale.value)"
+        >{{ locale.label }}</a
+      >
     </li>
   </ul>
 </template>

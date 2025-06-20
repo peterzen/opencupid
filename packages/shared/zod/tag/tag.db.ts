@@ -6,6 +6,7 @@ export const TagWithTranslationsSchema = TagSchema.extend({
   translations: z.array(
     z.object({
       name: z.string(),
+      locale: z.string(),
     })
   ),
 })

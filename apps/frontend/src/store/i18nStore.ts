@@ -7,6 +7,18 @@ import { Settings } from 'luxon'
 Settings.defaultZone = 'Europe/Berlin'
 
 const STORAGE_KEY = 'language'
+
+const labels: Record<string, string> = {
+  hu: 'Magyar',
+  de: 'Deutsch',
+  en: 'English',
+  fr: 'Français',
+  es: 'Español',
+  it: 'Italiano',
+  pt: 'Português',
+}
+
+
 export const useI18nStore = defineStore('i18n', () => {
 
   const { locale, availableLocales } = useI18n()
@@ -39,9 +51,17 @@ export const useI18nStore = defineStore('i18n', () => {
     return availableLocales
   }
 
+  function getAvailableLocalesWithLabels() {
+    return availableLocales.map((lang) => ({
+      value: lang,
+      label: labels[lang] || lang, // Fallback to code if no label found
+    }))
+  }
+
   return {
     currentLanguage,
     getAvailableLocales,
+    getAvailableLocalesWithLabels,
     setLanguage,
     getLanguage,
   }

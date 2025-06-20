@@ -2,12 +2,12 @@
 import { ref } from 'vue'
 
 import { BCarousel } from 'bootstrap-vue-next'
-import { type PublicProfile } from '@zod/profile/profile.dto'
+import { type PublicProfileWithConversation } from '@zod/profile/profile.dto'
 import IconCross from '@/assets/icons/interface/cross.svg'
 import ImageTag from '../image/ImageTag.vue'
 
 const props = defineProps<{
-  profile: PublicProfile
+  profile: PublicProfileWithConversation
 }>()
 
 const showModal = ref(false)

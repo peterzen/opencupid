@@ -4,16 +4,6 @@ import { useI18n } from 'vue-i18n'
 
 const i18nStore = useI18nStore()
 const { t } = useI18n()
-
-const labels: Record<string, string> = {
-  hu: 'Magyar',
-  de: 'Deutsch',
-  en: 'English',
-  fr: 'Français',
-  es: 'Español',
-  it: 'Italiano',
-  pt: 'Português',
-}
 </script>
 
 <template>
@@ -21,11 +11,11 @@ const labels: Record<string, string> = {
     <label for="language-selector" class="form-label">{{ t('settings.language_label') }}</label>
     <BFormSelect v-model="i18nStore.currentLanguage" size="sm" class="mt-3" id="language-selector">
       <BFormSelectOption
-        :value="locale"
-        v-for="locale in i18nStore.getAvailableLocales()"
-        :key="locale"
+        v-for="locale in i18nStore.getAvailableLocalesWithLabels()"
+        :value="locale.value"
+        :key="locale.value"
       >
-        {{ labels[locale] || locale }}
+        {{ locale.label }}
       </BFormSelectOption>
     </BFormSelect>
   </div>

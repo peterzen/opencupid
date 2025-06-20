@@ -1,26 +1,57 @@
 <script setup lang="ts">
-import { reactive, onMounted, ref, provide } from 'vue'
+import { reactive, onMounted, ref, provide, watch, computed } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
 
 import PublicProfileComponent from '@/components/profiles/public/PublicProfileComponent.vue'
 import { type EditFieldProfileFormWithImages } from '@zod/profile/profile.form'
 import IconDate from '@/assets/icons/app/cupid.svg'
+import IconSocialize from '@/assets/icons/app/socialize.svg'
 import IconPencil2 from '@/assets/icons/interface/pencil-2.svg'
+import IconGlobe from '@/assets/icons/interface/globe.svg'
 
 import { useOnboardingWizard } from '@/components/profiles/onboarding/useProfileWizards'
 import { useStepper } from '@vueuse/core'
 import { useRouter } from 'vue-router'
 import ErrorOverlay from '@/components/ErrorOverlay.vue'
-import { type PublicProfile } from '@zod/profile/profile.dto'
+import { type PublicProfileWithConversation } from '@zod/profile/profile.dto'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+import { useI18nStore } from '@/store/i18nStore'
 
 const router = useRouter()
 const profileStore = useProfileStore()
 
 const showModal = ref(false)
 const error = ref('')
+const selectedLocale = ref('en')
 const formData: EditFieldProfileFormWithImages = reactive({} as EditFieldProfileFormWithImages)
 
-const publicProfile = ref({} as PublicProfile)
+// const profilePreview = reactive({} as PublicProfile)
+const previewState = ref('social')
+const publicProfile = reactive({} as PublicProfileWithConversation)
+const profilePreview = computed((): PublicProfileWithConversation => {
+  return {
+    ...publicProfile,
+    isDatingActive: previewState.value === 'dating',
+  } as PublicProfileWithConversation
+})
+
+
+const fetchProfilePreview = async () => {
+  if (!profileStore.profile) {
+    error.value = 'Profile not found'
+    return
+  }
+  const res = await profileStore.getProfilePreview(profileStore.profile.id, selectedLocale.value)
+  if (!res.success || !res.data) {
+    error.value = 'Something went wrong (public profile)'
+    return
+  }
+  console.log('Public profile fetched:', res.data)
+  Object.assign(publicProfile, res.data)
+}
+// const publicProfile = computed(() => ownerToPublicProfile(profileStore.profile))
+
 
 onMounted(async () => {
   await profileStore.fetchOwnerProfile()
@@ -34,23 +65,29 @@ onMounted(async () => {
     return
   }
   Object.assign(formData, profileStore.profile)
-  await fetchPublicProfile()
+  await fetchProfilePreview()
 })
 
-const fetchPublicProfile = async () => {
-  if (!profileStore.profile) {
-    error.value = 'Profile not found'
-    return
+watch(
+  () => profileStore.profile,
+  newProfile => {
+    if (newProfile) {
+      // Object.assign(profilePreview, newProfile)
+      // fetchPublicProfile()
+    }
+  },
+  {
+    immediate: true,
   }
-  const res = await profileStore.getPublicProfile(profileStore.profile.id)
-  if (!res.success || !res.data) {
-    error.value = 'Something went wrong (public profile)'
-    return
-  }
-  console.log('Public profile fetched:', res.data)
-  Object.assign(publicProfile.value, res.data)
-}
-// const publicProfile = computed(() => ownerToPublicProfile(profileStore.profile))
+)
+
+watch(
+  () => selectedLocale.value,
+  () => {
+    fetchProfilePreview()
+  },
+ 
+)
 
 const isEditable = ref(false)
 
@@ -64,20 +101,21 @@ const toggleSocial = () => {
 
 const datingPopup = ref(false)
 const toggleDating = async () => {
-  formData.isDatingActive = !formData.isDatingActive
-  if (formData.isDatingActive && !profileStore.profile?.birthday) {
+  if (!profileStore.profile) return
+  profileStore.profile.isDatingActive = !profileStore.profile.isDatingActive
+  if (profileStore.profile.isDatingActive && !profileStore.profile.birthday) {
     datingPopup.value = true
     profileStore.currentField = null
     profileStore.open()
     return
   }
-  await profileStore.updateOwnerProfile(formData)
+  await profileStore.persistOwnerProfile()
 }
 
 const handleOkClick = async () => {
   const res = await profileStore.updateOwnerProfile(formData)
   if (res.success) {
-    await fetchPublicProfile()
+    await fetchProfilePreview()
     // profileStore.close()
   } else {
     console.error('Failed to fetch updated profile after edit.')
@@ -106,10 +144,17 @@ const handleFinishEditing = async () => {
 const handleEditProfile = () => {
   router.push({ name: 'EditProfile' })
 }
+
+const handleSetView = (socialOrDating: string) => {
+  previewState.value = socialOrDating
+}
+
 const isComplete = ref(false)
 
 const { datingWizard } = useOnboardingWizard(formData)
 const { current, isFirst, goToNext, goToPrevious, goTo, isCurrent } = useStepper(datingWizard)
+
+const languagePreviewOptions = useI18nStore().getAvailableLocalesWithLabels()
 
 // const saveProfile = async () => {
 //   const res = await profileStore.createOwnerProfile(formData)
@@ -155,19 +200,17 @@ const update = (value: EditFieldProfileFormWithImages) => {}
 
 <template>
   <main class="container">
-    <!-- <LoadingComponent v-if="profileStore.isLoading" /> -->
     <ErrorOverlay v-if="error" :error />
-
     <div v-else class="d-flex flex-row justify-content-between align-items-center mb-2">
-      <div class="d-flex">
-        <div v-if="isEditable">
-          <!-- <span
+      <div>
+        <div v-if="isEditable" class="d-flex">
+          <span
             class="btn-social-toggle px-4 py-1 rounded-4 me-2"
             @click="toggleSocial"
             :class="{ active: formData.isSocialActive }"
           >
             <IconSocialize class="svg-icon-lg" />
-          </span> -->
+          </span>
           <span
             class="btn-dating-toggle px-4 py-1 rounded-4"
             @click="toggleDating"
@@ -175,6 +218,33 @@ const update = (value: EditFieldProfileFormWithImages) => {}
           >
             <IconDate class="svg-icon-lg" />
           </span>
+        </div>
+        <div v-else>
+          <BNav tabs>
+            <BNavItem @click="handleSetView('social')" :active="previewState === 'social'">
+              <IconSocialize class="svg-icon-lg" />
+            </BNavItem>
+            <BNavItem @click="handleSetView('dating')" :active="previewState === 'dating'">
+              <IconDate class="svg-icon-lg" />
+            </BNavItem>
+            <BNavItemDropdown
+              id="my-nav-dropdown"
+              text="Dropdown"
+              toggle-class="nav-link-custom"
+              right
+            >
+            <template #button-content>
+              <IconGlobe class="svg-icon" />
+            </template>
+              <BDropdownItem
+                v-for="lang in languagePreviewOptions"
+                :key="lang.value"
+                @click="selectedLocale = lang.value"
+              >
+                {{ lang.label }}
+              </BDropdownItem>
+            </BNavItemDropdown>
+          </BNav>
         </div>
       </div>
       <div>
@@ -192,20 +262,20 @@ const update = (value: EditFieldProfileFormWithImages) => {}
           v-else
           pill
           class="btn btn-primary mt-1"
-          size="sm"
           @click="handleStartEditing"
           variant="primary"
         >
-          <IconPencil2 class="svg-icon" />
-          Edit profile
+          <FontAwesomeIcon icon="fa-solid fa-pen-to-square" />
+          <!-- <IconPencil2 class="svg-icon" /> -->
+          Edit
         </BButton>
       </div>
     </div>
     <PublicProfileComponent
-      v-if="publicProfile"
+      v-if="profilePreview"
       :isLoading="profileStore.isLoading"
       @intent:field:edit="showModal = true"
-      :profile="publicProfile"
+      :profile="profilePreview"
     />
     <BModal
       v-model="profileStore.fieldEditModal"

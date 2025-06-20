@@ -6,11 +6,14 @@ import { Profile, ProfileImage, ProfileTag } from '@zod/generated'
 import {
   type UpdateProfilePayload
 } from '@zod/profile/profile.dto'
-import { DbProfileComplete, DbProfile, DbOwnerUpdateScalars } from '@zod/profile/profile.db'
+import {
+  DbProfileComplete,
+  DbOwnerUpdateScalars,
+  DbProfileWithImages
+} from '@zod/profile/profile.db'
 import { mapToLocalizedUpserts } from '@/api/mappers/profile.mappers'
-import { UpdateDatingPreferencesPayload } from '@zod/profile/datingPreference.dto'
 
-function profileCompleteInclude(locale: string) {
+function profileCompleteInclude() {
   const clause = {
     profileImages: {
       orderBy: { position: 'asc' },
@@ -20,8 +23,8 @@ function profileCompleteInclude(locale: string) {
         tag: {
           include: {
             translations: {
-              where: { locale: locale },
-              select: { name: true },
+              // where: { locale: 'de' },
+              select: { name: true, locale: true },
             },
           }
         },
@@ -68,12 +71,12 @@ export class ProfileService {
     return ProfileService.instance
   }
 
-  async getProfileWithConversationsById(locale: string, profileId: string, myProfileId: string,): Promise<DbProfileComplete | null> {
+  async getProfileWithConversationsById(profileId: string, myProfileId: string,): Promise<DbProfileComplete | null> {
 
     return prisma.profile.findUnique({
       where: { id: profileId },
       include: {
-        ...profileCompleteInclude(locale),
+        ...profileCompleteInclude(),
         ...conversationWithMyProfileInclude(myProfileId),
       },
     })
@@ -92,11 +95,20 @@ export class ProfileService {
    * @param userId 
    * @returns 
    */
-  async getProfileCompleteByUserId(locale: string, userId: string): Promise<DbProfile | null> {
+  async getProfileCompleteByUserId(userId: string): Promise<DbProfileWithImages | null> {
     return prisma.profile.findUnique({
       where: { userId },
       include: {
-        ...profileCompleteInclude(locale),
+        ...profileCompleteInclude(),
+      },
+    })
+  }
+
+  async getProfileCompleteById( profileId: string): Promise<DbProfileWithImages | null> {
+    return prisma.profile.findUnique({
+      where: { id: profileId },
+      include: {
+        ...profileCompleteInclude(),
       },
     })
   }
@@ -114,7 +126,7 @@ export class ProfileService {
     locale: string,
     userId: string,
     data: UpdateProfilePayload
-  ): Promise<DbProfile> {
+  ): Promise<DbProfileWithImages> {
     // 1) Pull out complex parts
     const {
       tags,
@@ -169,7 +181,7 @@ export class ProfileService {
         isActive: true, // TODO change this to isVisible when we have that field
       },
       include: {
-        ...profileCompleteInclude(locale),
+        ...profileCompleteInclude(),
       },
     })
     return updated
@@ -367,7 +379,7 @@ export class ProfileService {
         },
       },
       include: {
-        ...profileCompleteInclude(locale),
+        ...profileCompleteInclude(),
         ...conversationWithMyProfileInclude(profileId),
       },
     })

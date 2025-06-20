@@ -3,7 +3,7 @@ import { useRouter } from 'vue-router'
 import { reactive, onMounted, computed, ref } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
 
-import { type PublicProfile } from '@zod/profile/profile.dto'
+import { type PublicProfile, type PublicProfileWithConversation } from '@zod/profile/profile.dto'
 
 import LoadingComponent from '@/components/LoadingComponent.vue'
 import ProfileCardComponent from '@/components/profiles/public/ProfileCardComponent.vue'
@@ -39,11 +39,11 @@ onMounted(async () => {
   const ppres = await profileStore.fetchOwnerProfile()
 })
 
-const handleCardClick = (profile: PublicProfile) => {
+const handleCardClick = (profileId: string) => {
   router.push({
     name: 'PublicProfile',
     params: {
-      id: profile.id,
+      id: profileId,
     },
   })
 }
@@ -98,7 +98,7 @@ const updateDatingPrefs = async () => {
 
           <div v-if="haveProfiles" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
             <div v-for="profile in profileStore.profileList" :key="profile.id" class="col">
-              <ProfileCardComponent :profile @click="handleCardClick(profile)" />
+              <ProfileCardComponent :profile @click="handleCardClick(profile.id)" />
             </div>
           </div>
           <BModal

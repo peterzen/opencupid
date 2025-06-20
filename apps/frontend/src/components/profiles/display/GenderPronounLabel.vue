@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type PublicProfile } from '@zod/profile/profile.dto'
+import { type PublicProfileWithConversation } from '@zod/profile/profile.dto'
 import { useDatingFields } from '../composables/useDatingFields'
 import { useI18n } from 'vue-i18n'
 import EditField from '@/components/profiles/public/EditField.vue'
@@ -11,7 +11,7 @@ import { toRef } from 'vue'
 const { t } = useI18n()
 
 const props = defineProps<{
-  profile: PublicProfile
+  profile: PublicProfileWithConversation
 }>()
 
 const profileRef = toRef(props, 'profile')

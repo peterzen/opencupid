@@ -15,9 +15,10 @@ import {
   sendUnauthorizedError
 } from '../helpers'
 import {
-  DbProfileToOwnerProfileTransform,
+  mapDbProfileToOwnerProfile,
   mapProfileToDatingPreferences,
   mapProfileToPublic,
+  mapProfileWithConversationToPublic,
 } from '@/api/mappers/profile.mappers'
 import { UserService } from 'src/services/user.service'
 import type {
@@ -36,6 +37,12 @@ const IdLookupParamsSchema = z.object({
 })
 
 
+const PreviewLookupParamsSchema = z.object({
+  id: z.string().cuid(),
+  locale: z.string()
+})
+
+
 
 const profileRoutes: FastifyPluginAsync = async fastify => {
 
@@ -51,10 +58,10 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
     const locale = req.session.lang
 
     try {
-      const fetched = await profileService.getProfileCompleteByUserId(locale, req.user.userId)
+      const fetched = await profileService.getProfileCompleteByUserId(req.user.userId)
       if (!fetched) return sendError(reply, 404, 'Social profile not found')
 
-      const profile = DbProfileToOwnerProfileTransform.parse(fetched)
+      const profile = mapDbProfileToOwnerProfile(locale, fetched)
       const response: GetMyProfileResponse = { success: true, profile }
       return reply.code(200).send(response)
     } catch (err) {
@@ -74,13 +81,39 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
 
     try {
       const { id } = IdLookupParamsSchema.parse(req.params)
-      const raw = await profileService.getProfileWithConversationsById(locale, id, myProfileId)
+      const raw = await profileService.getProfileWithConversationsById(id, myProfileId)
       if (!raw) return sendError(reply, 404, 'Profile not found')
 
       if (raw.userId !== req.user.userId && !req.session.hasActiveProfile) {
         return sendForbiddenError(reply, 'You do not have access to this profile')
       }
       const hasDatingPermission = req.session.profile.isDatingActive
+
+      const profile = mapProfileWithConversationToPublic(raw, hasDatingPermission, locale)
+      // const profile = publicProfileSchema.parse(raw)
+      const response: GetPublicProfileResponse = { success: true, profile }
+      return reply.code(200).send(response)
+    } catch (err) {
+      fastify.log.error(err)
+      return sendError(reply, 500, 'Failed to fetch profile')
+    }
+  })
+
+  fastify.get('/preview/:locale/:id', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+
+    const myProfileId = req.session.profileId
+
+    try {
+      const { id, locale } = PreviewLookupParamsSchema.parse(req.params)
+
+      if (id !== myProfileId) {
+        return sendForbiddenError(reply, 'You do not have access to this profile')
+      }
+
+      const raw = await profileService.getProfileCompleteById(id)
+      if (!raw) return sendError(reply, 404, 'Profile not found')
+
+      const hasDatingPermission = true
 
       const profile = mapProfileToPublic(raw, hasDatingPermission, locale)
       // const profile = publicProfileSchema.parse(raw)
@@ -92,6 +125,7 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
     }
   })
 
+
   fastify.get('/', { onRequest: [fastify.authenticate] }, async (req, reply) => {
 
     if (!req.session.hasActiveProfile) return sendForbiddenError(reply)
@@ -101,7 +135,7 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
     try {
       const profiles = await profileService.findProfilesFor(locale, myProfileId)
       const hasDatingPermission = req.session.profile.isDatingActive
-      const mappedProfiles = profiles.map(p => mapProfileToPublic(p, hasDatingPermission, locale))
+      const mappedProfiles = profiles.map(p => mapProfileWithConversationToPublic(p, hasDatingPermission, locale))
       const response: GetProfilesResponse = { success: true, profiles: mappedProfiles }
       return reply.code(200).send(response)
     } catch (err) {
@@ -141,7 +175,7 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
       const updated = await fastify.prisma.$transaction(async tx => {
         const updatedProfile = await profileService.updateCompleteProfile(tx, locale, req.user.userId, profileData)
         // if (!updatedProfile) return sendError(reply, 404, 'Profile not found')
-        const profile = DbProfileToOwnerProfileTransform.parse(updatedProfile)
+        const profile = mapDbProfileToOwnerProfile(locale, updatedProfile)
 
         // Mark user as onboarded
         user.isOnboarded = true
@@ -167,7 +201,7 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
 
   fastify.get('/datingprefs', { onRequest: [fastify.authenticate] }, async (req, reply) => {
 
-    if(req.session.profile.isDatingActive === false) {
+    if (req.session.profile.isDatingActive === false) {
       return sendForbiddenError(reply, 'Dating preferences are not active for this profile')
     }
 

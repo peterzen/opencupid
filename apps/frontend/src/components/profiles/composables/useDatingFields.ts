@@ -1,8 +1,8 @@
-import { type PublicProfile } from '@zod/profile/profile.dto'
+import { type PublicProfileWithConversation } from '@zod/profile/profile.dto'
 import { computed, h, type Ref } from 'vue'
 import { useEnumOptions } from './useEnumOptions'
 
-export function useDatingFields(profile: Ref<PublicProfile>, t: (key: string) => string) {
+export function useDatingFields(profile: Ref<PublicProfileWithConversation>, t: (key: string) => string) {
   const birthYearMax = computed(() => {
     return new Date().getFullYear() - 18
   })

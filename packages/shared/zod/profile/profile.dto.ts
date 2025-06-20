@@ -42,12 +42,21 @@ export const PublicProfileSchema = ProfileUnionSchema.and(
     location: LocationSchema,
     profileImages: z.array(PublicProfileImageSchema).default([]),
     tags: z.array(PublicTagSchema).default([]),
+  })
+);
+export type PublicProfile = z.infer<typeof PublicProfileSchema>;
+
+export const PublicProfileWithConversationSchema = ProfileUnionSchema.and(
+  z.object({
+    location: LocationSchema,
+    profileImages: z.array(PublicProfileImageSchema).default([]),
+    tags: z.array(PublicTagSchema).default([]),
     conversation: ConversationSchema.nullable(),
   })
 );
 export const PublicProfileArraySchema = z.array(PublicProfileSchema);
 
-export type PublicProfile = z.infer<typeof PublicProfileSchema>;
+export type PublicProfileWithConversation = z.infer<typeof PublicProfileWithConversationSchema>;
 
 
 export const OwnerScalarsSchema = ProfileSchema.pick({
@@ -69,7 +78,7 @@ export const OwnerProfileSchema = OwnerScalarsSchema.extend({
 })
 export type OwnerProfile = z.infer<typeof OwnerProfileSchema>;
 
-export type OwnerOrPublicProfile = OwnerProfile | PublicProfile
+export type OwnerOrPublicProfile = OwnerProfile | PublicProfileWithConversation
 
 export const editableFields = {
   ...socialFields,

@@ -3,11 +3,13 @@ import { api } from '@/lib/api'
 import type {
   OwnerProfile,
   PublicProfile,
+  PublicProfileWithConversation,
 } from '@zod/profile/profile.dto'
 import {
   OwnerProfileSchema,
   PublicProfileArraySchema,
   PublicProfileSchema,
+  PublicProfileWithConversationSchema,
 } from '@zod/profile/profile.dto'
 import type {
   GetMyProfileResponse,
@@ -60,12 +62,20 @@ export const useProfileStore = defineStore('profile', {
 
     // Update the current user's social profile
     async updateOwnerProfile(profileData: EditProfileForm): Promise<StoreVoidSuccess | StoreError> {
-      try {
-        const update = ProfileFormToPayloadTransform.parse(profileData)
+      const update = ProfileFormToPayloadTransform.parse(profileData)
 
-        console.log('Updating profile with data:', update)
+      if (!update) return storeError(new Error('Invalid profile data'), 'Failed to update profile')
+
+      if (this.profile) {
+        Object.assign(this.profile, update) // Update local state with new data
+      }
+      return this.persistDatingPrefs() // Persist dating preferences if they exist
+    },
+
+    async persistOwnerProfile(): Promise<StoreVoidSuccess | StoreError> {
+      try {
         this.isLoading = true // Set loading state
-        const res = await api.patch<UpdateProfileResponse>('/profiles/me', update)
+        const res = await api.patch<UpdateProfileResponse>('/profiles/me', this.profile)
         const updated = OwnerProfileSchema.parse(res.data.profile)
         this.profile = updated
         return storeSuccess()
@@ -79,11 +89,11 @@ export const useProfileStore = defineStore('profile', {
 
 
     // Fetch a profile by ID
-    async getPublicProfile(profileId: string): Promise<StoreResponse<PublicProfile>> {
+    async getPublicProfile(profileId: string): Promise<StoreResponse<PublicProfileWithConversation>> {
       try {
         this.isLoading = true // Set loading state
         const res = await api.get<GetPublicProfileResponse>(`/profiles/${profileId}`)
-        const fetched = PublicProfileSchema.parse(res.data.profile)
+        const fetched = PublicProfileWithConversationSchema.parse(res.data.profile)
         return storeSuccess(fetched)
       } catch (error: any) {
         return storeError(error, 'Failed to fetch profile')
@@ -91,6 +101,30 @@ export const useProfileStore = defineStore('profile', {
         this.isLoading = false // Reset loading state
       }
     },
+
+    /**
+     * Fetch a profile preview by ID and locale.  Returns the shape of a PublicProfile, with all dating
+     * fields.
+     * @param profileId 
+     * @param locale 
+     * @returns 
+     */
+
+    async getProfilePreview(profileId: string, locale:string): Promise<StoreResponse<PublicProfile>> {
+      try {
+        this.isLoading = true // Set loading state
+        const res = await api.get<GetPublicProfileResponse>(`/profiles/preview/${locale}/${profileId}`)
+        const fetched = PublicProfileSchema.parse(res.data.profile)
+        console.log('Fetched profile preview:', fetched )
+        return storeSuccess(fetched)
+      } catch (error: any) {
+        return storeError(error, 'Failed to fetch profile')
+      } finally {
+        this.isLoading = false // Reset loading state
+      }
+    },
+
+
 
     async findProfiles(): Promise<StoreResponse<StoreVoidSuccess | StoreError>> {
       try {

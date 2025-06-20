@@ -2,19 +2,19 @@
 
 import { inject, nextTick, ref } from 'vue'
 import { type MessageDTO } from '@zod/messaging/messaging.dto'
-import { type PublicProfile } from '@zod/profile/profile.dto'
+import { type PublicProfileWithConversation } from '@zod/profile/profile.dto'
 
 import SendMessage from '@/components/messaging/SendMessage.vue'
 import IconMessage from '@/assets/icons/interface/message.svg'
 
 const props = defineProps<{
-  profile: PublicProfile
+  profile: PublicProfileWithConversation
 }>()
 const isOwner = inject<boolean>('isOwner', false)
 const isEditable = inject<boolean>('isEditable', false)
 
 const emit = defineEmits<{
-  (e: 'intent:message', profile: PublicProfile): void
+  (e: 'intent:message', profile: PublicProfileWithConversation): void
   (e: 'intent:conversation:open', conversationId: string): void
 }>()
 

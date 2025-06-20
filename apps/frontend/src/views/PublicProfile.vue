@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import type { PublicProfile } from '@zod/profile/profile.dto'
+import type { PublicProfileWithConversation } from '@zod/profile/profile.dto'
 import { useProfileStore } from '@/store/profileStore'
 
 import LoadingComponent from '@/components/LoadingComponent.vue'
@@ -16,7 +16,7 @@ const props = defineProps<{
 }>()
 
 // Local state
-const profile = reactive<PublicProfile>({} as PublicProfile)
+const profile = reactive<PublicProfileWithConversation>({} as PublicProfileWithConversation)
 const error = ref<string | null>(null)
 
 onMounted(async () => {
