@@ -25,10 +25,11 @@ export const AuthIdentifierSchema = z.object({
 })
 
 
-
+// TODO rename this, it's more than just an auth identifier. more like a CreateUserPayload
 export const AuthIdentifierCaptchaInputSchema = AuthIdentifierSchema
   .extend({
     captchaSolution: z.string().min(1, 'Captcha solution is required'),
+    language: z.string(),
   })
   .refine(
     (data) => !!data.email || !!data.phonenumber,

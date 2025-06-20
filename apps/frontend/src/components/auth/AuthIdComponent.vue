@@ -19,7 +19,8 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'otp:send', identifier: AuthIdentifierCaptchaInput): void
+  (e: 'otp:send', identifier: AuthIdentifierCaptchaInput): void,
+  (e: 'language:select', language: string): void
 }>()
 
 // State variables
@@ -33,6 +34,7 @@ const authIdentifier = computed(() => {
     email: emailRegex.test(authIdInput.value) ? authIdInput.value : '',
     phonenumber: phoneRegex.test(authIdInput.value) ? authIdInput.value : '',
     captchaSolution: captchaPayload.value || '',
+    language:'',
   }
 })
 
@@ -137,7 +139,7 @@ const authIdInputRef = ref<InstanceType<any> | null>(null)
       </BButton>
     </BForm>
     <div class="d-flex justify-content-center align-items-center mt-3">
-      <LanguageSelector />
+      <LanguageSelector @language:select="lang => $emit('language:select', lang)" />
     </div>
   </div>
 </template>

@@ -58,7 +58,6 @@ onUnmounted(() => {
   <altcha-widget
     ref="altchaWidget"
     style="--altcha-max-width: 100%"
-    debug
     :challengeurl="challengeurl"
     disableautofocus
     hidefooter

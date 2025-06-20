@@ -10,7 +10,7 @@ const STORAGE_KEY = 'language'
 export const useI18nStore = defineStore('i18n', () => {
 
   const { locale, availableLocales } = useI18n()
-  const currentLanguage = ref(localStorage.getItem(STORAGE_KEY) || 'en')
+  const currentLanguage = ref(localStorage.getItem(STORAGE_KEY) || getBrowserLanguage(availableLocales))
   locale.value = currentLanguage.value
 
   // Sync changes to localStorage + vue-i18n
@@ -46,3 +46,12 @@ export const useI18nStore = defineStore('i18n', () => {
     getLanguage,
   }
 })
+
+function getBrowserLanguage(availableLocales: string[]): string {
+  // TODO - handle multiple languages in navigator.languages
+  // is navigator.language always == navigator.languages[0]?
+  // const browserLanguage = navigator.language || navigator.languages[0] || 'en'
+  const browserLang = (navigator.language || 'en').split('-')[0]
+  return availableLocales.includes(browserLang) ? browserLang : 'en'
+
+}

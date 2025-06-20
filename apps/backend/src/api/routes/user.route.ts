@@ -72,11 +72,11 @@ const userRoutes: FastifyPluginAsync = async fastify => {
       return reply.code(500).send({ success: false, status: 'captcha_validation_failed' })
     }
 
-    let otp = null
+    let otp = ''
 
     if (data.email) {
       otp = userService.generateOTP()
-    } else {
+    } else if (data.phonenumber) {
       const smsService = new SmsService(appConfig.SMS_API_KEY)
       const userId = cuid()
       const smsRes = await smsService.sendOtp(data.phonenumber, userId)
@@ -92,7 +92,7 @@ const userRoutes: FastifyPluginAsync = async fastify => {
       }
     }
 
-    const { user, isNewUser } = await userService.setUserOTP(data, otp, data.locale)
+    const { user, isNewUser } = await userService.setUserOTP(data, otp, data.language)
 
     const userReturned: OtpSendReturn = {
       id: user.id,

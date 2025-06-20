@@ -17,6 +17,7 @@ const localeLoaders: Record<string, () => Promise<any>> = {
   it: () => import('i18n-iso-countries/langs/it.json'),
 };
 
+let language = 'en'
 
 // Lazy-register other languages only when first needed
 async function ensureCountryLocale(locale: string) {
@@ -31,23 +32,21 @@ async function ensureCountryLocale(locale: string) {
   // console.log(`Registering country locale: ${locale}`, mod.default);
   countries.registerLocale(mod.default);
   loadedLocales.add(locale)
+  language = locale
 }
 
 
-bus.on('language:changed', async ({ language }) => {
-  await useCountries().ensureCountryLocale(language);
-})
-
+export async function initialize(locale: string) {
+  await ensureCountryLocale(locale)
+  bus.on('language:changed', async ({ language }) => {
+    await useCountries().ensureCountryLocale(language);
+  })
+}
 
 export function useCountries() {
 
-  const i18nStore = useI18nStore()
-
-  ensureCountryLocale(i18nStore.getLanguage())
-
   const getCountryOptions = () => {
-    const locale = i18nStore.getLanguage()
-    const list = countries.getNames(locale, {
+    const list = countries.getNames(language, {
       select: 'official',
     })
     const options = Object.entries(list)
@@ -57,10 +56,11 @@ export function useCountries() {
   }
 
   const countryCodeToName = (code: string) => {
-    return countries.getName(code, i18nStore.getLanguage(), { select: 'official' })
+    return countries.getName(code, language, { select: 'official' })
   }
 
   return {
+    initialize,
     getCountryOptions,
     ensureCountryLocale,
     countryCodeToName,

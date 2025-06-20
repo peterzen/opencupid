@@ -3,28 +3,21 @@ import { ref, reactive, onMounted } from 'vue'
 import { useAuthStore } from '@/store/authStore'
 import { useRoute, useRouter } from 'vue-router'
 import AuthIdComponent from '@/components/auth/AuthIdComponent.vue'
-import type {  AuthIdentifierCaptchaInput } from '@zod/user/user.dto'
+import type { AuthIdentifierCaptchaInput } from '@zod/user/user.dto'
 import OtpLoginComponent from '@/components/auth/OtpLoginComponent.vue'
 import ErrorComponent from '@/components/ErrorComponent.vue'
 import LoginConfirmComponent from '@/components/auth/LoginConfirmComponent.vue'
 
 import ChevronLeftIcon from '@/assets/icons/arrows/arrow-single-left.svg'
 import { type LoginUser } from '@zod/user/user.types'
+import { useI18nStore } from '@/store/i18nStore'
 
 // Reactive variables
 const error = ref('' as string)
 const isLoading = ref(false)
 const showModal = ref(true)
 
-const user = reactive<LoginUser>({
-  id: '',
-  email: '',
-  phonenumber: '',
-  language: '',
-  isRegistrationConfirmed: false,
-  isOnboarded: false,
-  hasActiveProfile: false,
-})
+
 
 // form state
 const showUserIdForm = ref(true)
@@ -34,6 +27,17 @@ const showConfirmScreen = ref(false)
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
+const i18nStore = useI18nStore()
+
+const user = reactive<LoginUser>({
+  id: '',
+  email: '',
+  phonenumber: '',
+  language: i18nStore.getLanguage(),
+  isRegistrationConfirmed: false,
+  isOnboarded: false,
+  hasActiveProfile: false,
+})
 
 // // On mounted lifecycle hook
 onMounted(async () => {
@@ -50,7 +54,11 @@ onMounted(async () => {
 })
 
 // Method to handle sending login link
-async function handleSendOtp(payload: AuthIdentifierCaptchaInput) {
+async function handleSendOtp(authIdCaptcha: AuthIdentifierCaptchaInput) {
+  const payload = {
+    ...authIdCaptcha,
+    language: user.language || 'en',
+  }
   try {
     error.value = ''
     isLoading.value = true
@@ -121,6 +129,11 @@ function handleBackButton() {
   error.value = ''
   isLoading.value = false
 }
+
+const handleSetLanguage = (lang: string) => {
+  user.language = lang
+  i18nStore.setLanguage(lang)
+}
 </script>
 
 <template>
@@ -152,7 +165,12 @@ function handleBackButton() {
         </div>
         <ErrorComponent :error="error" />
 
-        <AuthIdComponent :isLoading="isLoading" @otp:send="handleSendOtp" v-if="showUserIdForm" />
+        <AuthIdComponent
+          :isLoading="isLoading"
+          @otp:send="handleSendOtp"
+          @language:select="handleSetLanguage"
+          v-if="showUserIdForm"
+        />
 
         <OtpLoginComponent
           :isLoading="isLoading"

@@ -43,17 +43,14 @@ import { useLocalStore } from './store/localStore'
 const localStore = useLocalStore()
 localStore.initialize()
 
+import { appUseI18n } from './lib/i18n'
+appUseI18n(app)
+
 import { useMessageStore } from './store/messageStore'
 useMessageStore()
 
 // toasts
 import registerToast from './lib/toast'
 registerToast(app)
-
-import { appUseI18n } from './lib/i18n'
-appUseI18n(app)
-
-// import { useFormKit } from '@/lib/formkit'
-// useFormKit(app)
 
 app.mount('#app')

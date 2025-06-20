@@ -5,6 +5,10 @@ import { useI18n } from 'vue-i18n'
 const i18nStore = useI18nStore()
 const { t } = useI18n()
 
+defineEmits<{
+  (e: 'language:select', lang: string): void
+}>()
+
 const labels: Record<string, string> = {
   hu: 'Magyar',
   de: 'Deutsch',
@@ -14,21 +18,25 @@ const labels: Record<string, string> = {
   it: 'Italiano',
   pt: 'Português',
 }
-const handleSetLanguage = (locale: string) => {
-  i18nStore.setLanguage(locale)
-}
 </script>
 
 <template>
-  <div class="language-selector">
-    <ul class="list-inline text-muted">
-      <li class="list-inline-item me-3">
-        {{ t('settings.language_label') }}
-      </li>
-      <li v-for="lang in i18nStore.getAvailableLocales()" :key="lang" class="list-inline-item me-3">
-        <span v-if="i18nStore.currentLanguage === lang" class="text-primary">{{ labels[lang] }}</span>
-        <a v-else href="#" @click="handleSetLanguage(lang)">{{ labels[lang] }}</a>
-      </li>
-    </ul>
-  </div>
+  <ul class="language-selector list-inline text-muted mt-3">
+    <li v-for="lang in i18nStore.getAvailableLocales()" :key="lang" class="list-inline-item me-3">
+      <span v-if="i18nStore.currentLanguage === lang" class="text-primary">{{ labels[lang] }}</span>
+      <a v-else 
+      class="text-decoration-none text-muted"
+      href="#" 
+      @click="$emit('language:select', lang)">{{ labels[lang] }}</a>
+    </li>
+  </ul>
 </template>
+
+<style scoped lang="scss">
+.language-selector {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.9rem;
+}
+</style>
