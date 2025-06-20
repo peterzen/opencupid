@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { getLanguageSelectorOptions, type MultiselectOption } from '@/lib/languages'
+import { useLanguages } from '@/components/composables/useLanguages'
+
 import { computed, onMounted, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Multiselect from 'vue-multiselect'
+import { type MultiselectOption } from '@/types/multiselect'
 
 const { t } = useI18n()
 
@@ -23,6 +25,7 @@ const languagesComputed = computed({
   },
 })
 
+const { getLanguageSelectorOptions } = useLanguages()
 onMounted(() => {
   languageOptions.push(...getLanguageSelectorOptions())
 })
@@ -43,20 +46,11 @@ onMounted(() => {
       label="label"
       track-by="label"
       placeholder=""
-			:showLabels="false"
+      :showLabels="false"
       :showNoResults="false"
-			:selectLabel="t('common.forms.multiselect.select')"
-			:deselectLabel="t('common.forms.multiselect.deselect')"
-    >
-      <template v-slot:noResult></template>
-      <template #singleLabel="props">
-        {{ t(props.option.label) }}
-      </template>
-
-      <template #option="props">
-        {{ t(props.option.label) }}
-      </template>
-    </Multiselect>
+      :selectLabel="t('common.forms.multiselect.select')"
+      :deselectLabel="t('common.forms.multiselect.deselect')"
+    />
   </div>
 </template>
 
@@ -64,15 +58,15 @@ onMounted(() => {
 :deep(.multiselect__tag) {
   background-color: var(--bs-info);
   color: var(--bs-body-bg);
-	user-select: none;
+  user-select: none;
 
   i:after {
     color: var(--bs-text-secondary);
   }
 }
 :deep(.multiselect__input) {
-	color: var(--bs-text-secondary);
-	background-color: var(--bs-body-bg);
-	padding: 0.25rem 0.5rem;
+  color: var(--bs-text-secondary);
+  background-color: var(--bs-body-bg);
+  padding: 0.25rem 0.5rem;
 }
 </style>

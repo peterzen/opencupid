@@ -3,3 +3,9 @@ export type MultiselectComponent = ComponentPublicInstance<{
   deactivate: () => void
   open: () => void
 }>
+
+// await registerLocales();
+export type MultiselectOption = {
+  value: string
+  label: string
+}

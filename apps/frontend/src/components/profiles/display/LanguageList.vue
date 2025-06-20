@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { getLanguageList } from '@/lib/languages'
 import { computed } from 'vue'
+import { useLanguages } from '@/components/composables/useLanguages'
 
 const props = withDefaults(
   defineProps<{
@@ -10,6 +10,7 @@ const props = withDefaults(
     languages: () => [] as string[],
   }
 )
+const { getLanguageList } = useLanguages()
 
 const languages = computed(() => {
   return getLanguageList(props.languages)

@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import Navbar from '@/components/nav/Navbar.vue'
 import AppNotifier from '@/components/AppNotifier.vue'
-import { onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { useI18nStore } from './store/i18nStore'
+import { useCountries } from './components/composables/useCountries'
+import { useLanguages } from './components/composables/useLanguages'
 
 // FIXME
 // This is a workaround to ensure the page scrolls down
@@ -18,8 +18,8 @@ import { useI18nStore } from './store/i18nStore'
 //   }, 1000)
 // })
 const i18nStore = useI18nStore()
-import { useCountries } from './components/composables/useCountries'
 useCountries().initialize(i18nStore.getLanguage())
+useLanguages().initialize(i18nStore.getLanguage())
 
 </script>
 

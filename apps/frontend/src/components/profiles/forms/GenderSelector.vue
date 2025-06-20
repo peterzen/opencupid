@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { type MultiselectOption } from '@/lib/languages'
-import type { GenderType, PronounsType } from '@zod/generated'
+import type { GenderType } from '@zod/generated'
+import { type MultiselectOption } from '@/types/multiselect'
+
 import { useI18n } from 'vue-i18n'
 import { useEnumOptions } from '../composables/useEnumOptions'
 import { computed } from 'vue'
