@@ -119,6 +119,12 @@ const handlePrevious = () => {
   goToPrevious()
 }
 
+const handleSubmit = () => {
+  if (current.value.state) {
+    handleNext()
+  }
+}
+
 onMounted(async () => {
   await profileStore.fetchOwnerProfile()
   if (profileStore.profile?.isOnboarded) {
@@ -143,7 +149,7 @@ onMounted(async () => {
     </div>
 
     <div class="d-flex align-items-center flex-grow-1 col-12 justify-content-center">
-      <BForm id="onboarding" novalidate class="w-100">
+      <BForm id="onboarding" novalidate class="w-100" @submit.prevent="handleSubmit">
         <fieldset v-if="isCurrent('publicname')" class="w-100">
           <legend>{{ t('onboarding.name_title') }}</legend>
           <PublicNameInput v-model="publicNameModel" />

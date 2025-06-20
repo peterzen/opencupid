@@ -6,8 +6,9 @@ import { Profile, ProfileImage, ProfileTag } from '@zod/generated'
 import {
   type UpdateProfilePayload
 } from '@zod/profile/profile.dto'
-import { DbProfileComplete, DbProfile } from '@zod/profile/profile.db'
+import { DbProfileComplete, DbProfile, DbOwnerUpdateScalars } from '@zod/profile/profile.db'
 import { mapToLocalizedUpserts } from '@/api/mappers/profile.mappers'
+import { UpdateDatingPreferencesPayload } from '@zod/profile/datingPreference.dto'
 
 function profileCompleteInclude(locale: string) {
   const clause = {
@@ -78,12 +79,20 @@ export class ProfileService {
     })
   }
 
+  async getProfileByUserId(userId: string): Promise<Profile | null> {
+    return prisma.profile.findUnique({
+      where: { userId },
+    })
+  }
+
+
   /**
-   * getProfileByUserId is used for fetching the profile of the current user.
+   * getProfileCompleteByUserId fetches a complete profile including 
+   * localized fields tags, images identified by userId.
    * @param userId 
    * @returns 
    */
-  async getProfileByUserId(locale: string, userId: string): Promise<DbProfile | null> {
+  async getProfileCompleteByUserId(locale: string, userId: string): Promise<DbProfile | null> {
     return prisma.profile.findUnique({
       where: { userId },
       include: {
@@ -92,7 +101,15 @@ export class ProfileService {
     })
   }
 
-  async updateProfile(
+  /**
+   * updateCompleteProfile updates a user's profile including related localized fields, tags, and images.
+   * @param tx Prisma.TransactionClient - Prisma transaction client for atomic operations
+   * @param locale  Used for returning the updated record with the correct localized fields.
+   * @param userId 
+   * @param data 
+   * @returns 
+   */
+  async updateCompleteProfile(
     tx: Prisma.TransactionClient,
     locale: string,
     userId: string,
@@ -158,6 +175,13 @@ export class ProfileService {
     return updated
   }
 
+
+  async updateProfile(userId: string, data: DbOwnerUpdateScalars) {
+    return await prisma.profile.update({
+      where: { userId },
+      data: data,
+    })
+  }
 
   async upsertLocalizedProfileText(
     tx: Prisma.TransactionClient,

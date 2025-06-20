@@ -16,6 +16,7 @@ import {
 } from '../helpers'
 import {
   DbProfileToOwnerProfileTransform,
+  mapProfileToDatingPreferences,
   mapProfileToPublic,
 } from '@/api/mappers/profile.mappers'
 import { UserService } from 'src/services/user.service'
@@ -24,7 +25,10 @@ import type {
   GetPublicProfileResponse,
   GetProfilesResponse,
   UpdateProfileResponse,
+  GetDatingPreferenceseResponse,
+  UpdateDatingPreferencesResponse,
 } from '@shared/dto/apiResponse.dto'
+import { DatingPreferencesDTOSchema, UpdateDatingPreferencesPayloadSchema } from '@zod/profile/datingPreference.dto'
 
 // Route params for ID lookups
 const IdLookupParamsSchema = z.object({
@@ -47,7 +51,7 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
     const locale = req.session.lang
 
     try {
-      const fetched = await profileService.getProfileByUserId(locale, req.user.userId)
+      const fetched = await profileService.getProfileCompleteByUserId(locale, req.user.userId)
       if (!fetched) return sendError(reply, 404, 'Social profile not found')
 
       const profile = DbProfileToOwnerProfileTransform.parse(fetched)
@@ -135,7 +139,7 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
 
     try {
       const updated = await fastify.prisma.$transaction(async tx => {
-        const updatedProfile = await profileService.updateProfile(tx, locale, req.user.userId, profileData)
+        const updatedProfile = await profileService.updateCompleteProfile(tx, locale, req.user.userId, profileData)
         // if (!updatedProfile) return sendError(reply, 404, 'Profile not found')
         const profile = DbProfileToOwnerProfileTransform.parse(updatedProfile)
 
@@ -160,6 +164,43 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
     }
   }
 
+
+  fastify.get('/datingprefs', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+
+    if(req.session.profile.isDatingActive === false) {
+      return sendForbiddenError(reply, 'Dating preferences are not active for this profile')
+    }
+
+    try {
+      const fetched = await profileService.getProfileByUserId(req.user.userId)
+      if (!fetched) return sendError(reply, 404, 'Profile not found')
+
+      const datingPrefs = mapProfileToDatingPreferences(fetched)
+      const response: GetDatingPreferenceseResponse = { success: true, prefs: datingPrefs }
+      return reply.code(200).send(response)
+    } catch (err) {
+      fastify.log.error(err)
+      return sendError(reply, 500, 'Failed to load profile')
+    }
+  })
+
+  fastify.patch('/datingprefs', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+
+    const data = await validateBody(UpdateDatingPreferencesPayloadSchema, req, reply)
+    if (!data) return
+
+    try {
+      const updated = await profileService.updateProfile(req.user.userId, data)
+      if (!updated) return sendError(reply, 404, 'Profile not found')
+      const prefs = DatingPreferencesDTOSchema.parse(updated)
+      const response: UpdateDatingPreferencesResponse = { success: true, prefs }
+      return reply.code(200).send(response)
+    } catch (err) {
+      fastify.log.error(err)
+      return sendError(reply, 500, 'Failed to update dating preferences')
+    }
+
+  })
 
 }
 

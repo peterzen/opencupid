@@ -12,10 +12,8 @@ import { useStepper } from '@vueuse/core'
 import { useRouter } from 'vue-router'
 import ErrorOverlay from '@/components/ErrorOverlay.vue'
 import { type PublicProfile } from '@zod/profile/profile.dto'
-import { useAuthStore } from '@/store/authStore'
 
 const router = useRouter()
-
 const profileStore = useProfileStore()
 
 const showModal = ref(false)
@@ -24,8 +22,6 @@ const formData: EditFieldProfileFormWithImages = reactive({} as EditFieldProfile
 
 const publicProfile = ref({} as PublicProfile)
 
-const authStore = useAuthStore()
-
 onMounted(async () => {
   await profileStore.fetchOwnerProfile()
   console.log('Profile fetched:', profileStore.profile)
@@ -33,10 +29,11 @@ onMounted(async () => {
     error.value = 'Something went wrong (owner profile)'
     return
   }
-  Object.assign(formData, profileStore.profile)
   if (!profileStore.profile.isOnboarded) {
     router.push({ name: 'Onboarding' })
+    return
   }
+  Object.assign(formData, profileStore.profile)
   await fetchPublicProfile()
 })
 

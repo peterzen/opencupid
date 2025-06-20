@@ -29,30 +29,6 @@
     "other": "Other",
     "unspecified": "I'd rather not say"
   },
-  "gender_preferences": {
-    "male": "Male",
-    "female": "Female",
-    "agender": "Agender",
-    "androgynous": "Androgynous",
-    "bigender": "Bigender",
-    "cis_man": "Cisgender man",
-    "cis_woman": "Cisgender woman",
-    "genderfluid": "Genderfluid",
-    "genderqueer": "Genderqueer",
-    "gender_nonconforming": "Gender non-conforming",
-    "hijra": "Hijra",
-    "intersex": "Intersex",
-    "pangender": "Pangender",
-    "transfeminine": "Transfeminine",
-    "trans_man": "Trans man",
-    "transmasculine": "Transmasculine",
-    "transsexual": "Transsexual",
-    "trans_woman": "Trans woman",
-    "two_spirit": "Two-spirit",
-    "non_binary": "Non-binary",
-    "other": "Other",
-    "unspecified": "Any"
-  },
   "pronouns": {
     "he_him": "He/him",
     "she_her": "She/her",
@@ -77,11 +53,6 @@
     "yes": "Has kids",
     "no": "No kids",
     "unspecified": ""
-  },
-  "haskids_preference": {
-    "yes": "Has kids",
-    "no": "No kids",
-    "unspecified": "Any"
   },
   "auth": {
     "login": "Login",
@@ -152,7 +123,7 @@
     "new_message_notification": "{sender} sent a message",
     "send_message_to_user": "Send a message to {name}",
     "unknown_sender": "Someone",
-    "message_input_hint":"Press Enter to send",
+    "message_input_hint": "Press Enter to send",
     "send_failed": "Oops, this didn't work. Please try again.",
     "message_sent_success": "Message sent successfully!",
     "my_turn": "My turn",
@@ -161,7 +132,7 @@
     "nevermind": "Nevermind",
     "send_message_heading": "Send Message"
   },
-  "onboarding":{
+  "onboarding": {
     "name_title": "Hello!",
     "country_placeholder": "Country",
     "steps": {

@@ -6,6 +6,7 @@ import {
   type UpdateProfilePayload,
   OwnerScalarsSchema,
 } from '@zod/profile/profile.dto'
+import {DatingPreferencesDTOSchema, type DatingPreferencesDTO} from '@zod/profile/datingPreference.dto'
 import { type DbProfileComplete, DbProfileWithImagesSchema } from '@zod/profile/profile.db'
 import { LocationSchema } from '@zod/dto/location.dto'
 
@@ -14,7 +15,7 @@ import {
   type PublicProfileImage,
 } from '@zod/profile/profileimage.dto'
 import { mapProfileTags } from './tag.mappers'
-import { ProfileImage } from '@zod/generated'
+import { Profile, ProfileImage } from '@zod/generated'
 import { toOwnerProfileImage, toPublicProfileImage } from './image.mappers'
 
 export const DbProfileToOwnerProfileTransform = DbProfileWithImagesSchema.transform((db): OwnerProfile => {
@@ -120,4 +121,13 @@ export function mapToLocalizedUpserts(
     locale,
     updates,
   }))
+}
+
+
+export function mapProfileToDatingPreferences(
+  profile: Profile,
+): DatingPreferencesDTO {
+
+  return DatingPreferencesDTOSchema.parse(profile)
+
 }
