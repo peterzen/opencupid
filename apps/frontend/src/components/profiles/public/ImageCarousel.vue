@@ -21,7 +21,7 @@ const handleCloseClick = () => (showModal.value = false)
 <template>
   <div class="profileImages overflow-hidden">
     <div class="ratio ratio-4x3">
-      <BCarousel controls v-model="slide">
+      <BCarousel controls v-model="slide" v-if="!showModal">
         <BCarouselSlide
           v-for="img in props.profile.profileImages"
           :key="img.url!"
@@ -51,7 +51,7 @@ const handleCloseClick = () => (showModal.value = false)
     <template #header-close>
       <IconCross class="svg-icon" />
     </template>
-    <BCarousel controls indicators v-model="slide" class="w-100 h-100">
+    <BCarousel controls indicators v-model="slide" class="w-100 h-100" v-if="showModal">
       <BCarouselSlide
         v-for="img in props.profile.profileImages"
         :key="img.url!"

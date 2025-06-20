@@ -66,11 +66,11 @@ const updateDatingPrefs = async () => {
 
         <div v-else>
           <!-- <ErrorComponent v-if="error" :error /> -->
-          <div
+          <div style="height: 3rem;"
             v-if="profileStore.datingPrefs && profileStore.profile"
             class="d-flex justify-content-end align-items-center mb-3 w-100 bg-light"
           >
-            <BButton variant="primary" @click="handlePrefsClick">
+            <BButton variant="secondary" pill @click="handlePrefsClick">
               <IconSetting class="svg-icon" />
             </BButton>
 

@@ -110,15 +110,17 @@ watch(
   },
   { immediate: true }
 )
+
+
 </script>
 
 <template>
-  <div>
+  <div class="d-flex flex-column">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <div>
         <IconGlobe class="svg-icon me-2" />
       </div>
-      <ul class="nav nav-underline flex-grow-1">
+      <ul class="nav nav-pills flex-grow-1">
         <li class="nav-item me-2" v-for="lang in props.languages" :key="lang">
           <a
             class="nav-link"
@@ -132,13 +134,6 @@ watch(
           >
         </li>
       </ul>
-      <div class="">
-        <BButton variant="secondary" size="sm" pill @click="toggleListening">
-          <IconMic2 class="svg-icon" />
-          <i class="fas fa-microphone"></i>
-          {{ isListening ? t('profiles.forms.dictate_listening') : t('profiles.forms.dictate') }}
-        </BButton>
-      </div>
     </div>
     <div class="" v-for="lang in props.languages" :key="lang">
       <div v-if="currentLanguage === lang">
@@ -146,9 +141,8 @@ watch(
           <BFormTextarea
             v-model="model[lang]"
             id="content-input"
-            :placeholder="t('profiles.forms.intro_placeholder')"
-            max-rows="5"
-            min-rows="3"
+            max-rows="15"
+            rows="5"
             no-resize
             size="lg"
             :required="true"
@@ -157,6 +151,13 @@ watch(
         </BFormFloatingLabel>
       </div>
     </div>
+      <div class="align-self-end">
+        <BButton variant="secondary" size="sm" pill @click="toggleListening">
+          <IconMic2 class="svg-icon" />
+          <i class="fas fa-microphone"></i>
+          {{ isListening ? t('profiles.forms.dictate_listening') : t('profiles.forms.dictate') }}
+        </BButton>
+      </div>
 
     <!-- <BFormFloatingLabel label="My name is..." label-for="publicName">
       <BFormTextarea

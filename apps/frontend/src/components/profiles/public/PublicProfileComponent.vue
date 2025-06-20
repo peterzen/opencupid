@@ -94,26 +94,41 @@ const emit = defineEmits<{
           <EditField
             fieldName="introSocialLocalized"
             :editComponent="IntrotextEditor"
+            wrapper-class="editable-textarea"
             :editProps="{
               languages: profile.languages,
               placeholder: t('profiles.forms.intro_placeholder'),
             }"
-          />
+          >
+            <template #display>
+              <div class="editable-placeholder" v-if="!props.profile.introSocial">
+                {{ t('profiles.forms.intro_placeholder') }}
+              </div>
+            </template>
+          </EditField>
         </div>
-
-        <hr />
 
         <div class="mb-3">
           <div class="mb-3" v-if="props.profile.isDatingActive">
+            <span class="opacity-25">
+              <hr  />
+            </span>
             {{ props.profile.introDating }}
             <EditField
               fieldName="introDatingLocalized"
               :editComponent="IntrotextEditor"
+              wrapper-class="editable-textarea"
               :editProps="{
                 languages: profile.languages,
                 placeholder: t('profiles.forms.intro_who_placeholder'),
               }"
-            />
+            >
+              <template #display>
+                <div class="editable-placeholder" v-if="!props.profile.introDating">
+                  {{ t('profiles.forms.intro_who_placeholder') }}
+                </div>
+              </template>
+            </EditField>
           </div>
         </div>
         <div class="mb-3">
@@ -124,7 +139,7 @@ const emit = defineEmits<{
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .icons {
   position: absolute;
   top: 0.5rem;
@@ -140,5 +155,27 @@ const emit = defineEmits<{
   right: 1rem;
   z-index: 10;
   /* background-color: rgba(255, 255, 255, 0.8); */
+}
+
+.editable-textarea {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  :deep(.edit-button) {
+    position: absolute;
+    right: 0;
+    bottom: 0.5rem;
+  }
+
+  .editable-placeholder {
+    border: 2px dashed var(--bs-secondary);
+    border-radius: 5px;
+    height: 4rem;
+    opacity: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
 }
 </style>

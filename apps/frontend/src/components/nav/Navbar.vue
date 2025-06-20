@@ -31,7 +31,7 @@ function handleLogoutClick() {
 
       <BNavItem to="/browse" active-class="active">
         <IconSearch class="svg-icon-lg" />
-        <span class="d-none d-sm-inline">{{ $t('nav.browse') }}</span>
+        <span class="d-none d-sm-inline label">{{ $t('nav.browse') }}</span>
       </BNavItem>
 
       <BNavItem to="/inbox" active-class="active">
@@ -44,17 +44,17 @@ function handleLogoutClick() {
             style="font-size: 0.75rem"
           />
         </span>
-        <span class="d-none d-sm-inline">{{ $t('nav.inbox') }}</span>
+        <span class="d-none d-sm-inline label">{{ $t('nav.inbox') }}</span>
       </BNavItem>
 
       <BNavItem to="/me" active-class="active">
         <IconUser class="svg-icon-lg" />
-        <span class="d-none d-sm-inline">{{ $t('nav.profile') }}</span>
+        <span class="d-none d-sm-inline label">{{ $t('nav.profile') }}</span>
       </BNavItem>
 
       <BNavItem to="/settings" active-class="active">
         <IconSetting2 class="svg-icon-lg" />
-        <span class="d-none d-sm-inline"> {{ $t('nav.settings') }}</span>
+        <span class="d-none d-sm-inline label"> {{ $t('nav.settings') }}</span>
       </BNavItem>
     </BNavbarNav>
   </BNavbar>
@@ -66,5 +66,10 @@ function handleLogoutClick() {
   /* height: 1.5rem; */
   /* margin-right: 0.5rem; */
   /* padding: 0rem; */
+}
+
+:deep(.nav-link .label) {
+  vertical-align: sub;
+  margin-left: 0.25rem;
 }
 </style>

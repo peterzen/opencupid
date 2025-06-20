@@ -35,6 +35,8 @@ declare module 'vue' {
     BNavbarNav: typeof import('bootstrap-vue-next/components/BNavbar')['BNavbarNav']
     BNavItem: typeof import('bootstrap-vue-next/components/BNav')['BNavItem']
     BNavItemDropdown: typeof import('bootstrap-vue-next/components/BNav')['BNavItemDropdown']
+    BPlaceholderCard: typeof import('bootstrap-vue-next/components/BPlaceholder')['BPlaceholderCard']
+    BPlaceholderWrapper: typeof import('bootstrap-vue-next/components/BPlaceholder')['BPlaceholderWrapper']
     BSpinner: typeof import('bootstrap-vue-next/components/BSpinner')['BSpinner']
     CaptchaWidget: typeof import('./src/components/auth/CaptchaWidget.vue')['default']
     CitySelector: typeof import('./src/components/profiles/forms/CitySelector.vue')['default']

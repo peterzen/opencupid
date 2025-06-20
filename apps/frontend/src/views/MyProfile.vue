@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, onMounted, ref, provide, watch, computed } from 'vue'
+import { reactive, onMounted, ref, provide, watch, computed, watchEffect } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
 
 import PublicProfileComponent from '@/components/profiles/public/PublicProfileComponent.vue'
@@ -8,6 +8,7 @@ import IconDate from '@/assets/icons/app/cupid.svg'
 import IconSocialize from '@/assets/icons/app/socialize.svg'
 import IconPencil2 from '@/assets/icons/interface/pencil-2.svg'
 import IconGlobe from '@/assets/icons/interface/globe.svg'
+import IconTick from '@/assets/icons/interface/tick.svg'
 
 import { useOnboardingWizard } from '@/components/profiles/onboarding/useProfileWizards'
 import { useStepper } from '@vueuse/core'
@@ -113,6 +114,7 @@ const toggleDating = async () => {
 }
 
 const handleOkClick = async () => {
+  console.log('Dating popup OK clicked formData',formData)
   const res = await profileStore.updateOwnerProfile(formData)
   if (res.success) {
     await fetchProfilePreview()
@@ -155,6 +157,9 @@ const { datingWizard } = useOnboardingWizard(formData)
 const { current, isFirst, goToNext, goToPrevious, goTo, isCurrent } = useStepper(datingWizard)
 
 const languagePreviewOptions = useI18nStore().getAvailableLocalesWithLabels()
+const currentLanguage = computed(() => {
+  return languagePreviewOptions.find(lang => lang.value === selectedLocale.value) 
+})
 
 // const saveProfile = async () => {
 //   const res = await profileStore.createOwnerProfile(formData)
@@ -196,13 +201,15 @@ const languagePreviewOptions = useI18nStore().getAvailableLocalesWithLabels()
 // }
 
 const update = (value: EditFieldProfileFormWithImages) => {}
+
+
 </script>
 
 <template>
   <main class="container">
     <ErrorOverlay v-if="error" :error />
     <div v-else class="d-flex flex-row justify-content-between align-items-center mb-2">
-      <div>
+      <div style="height:3rem;">
         <div v-if="isEditable" class="d-flex">
           <span
             class="btn-social-toggle px-4 py-1 rounded-4 me-2"
@@ -220,7 +227,7 @@ const update = (value: EditFieldProfileFormWithImages) => {}
           </span>
         </div>
         <div v-else>
-          <BNav tabs>
+          <BNav pills>
             <BNavItem @click="handleSetView('social')" :active="previewState === 'social'">
               <IconSocialize class="svg-icon-lg" />
             </BNavItem>
@@ -228,6 +235,7 @@ const update = (value: EditFieldProfileFormWithImages) => {}
               <IconDate class="svg-icon-lg" />
             </BNavItem>
             <BNavItemDropdown
+            size="sm"
               id="my-nav-dropdown"
               text="Dropdown"
               toggle-class="nav-link-custom"
@@ -235,6 +243,7 @@ const update = (value: EditFieldProfileFormWithImages) => {}
             >
             <template #button-content>
               <IconGlobe class="svg-icon" />
+              {{ currentLanguage?.label }}  
             </template>
               <BDropdownItem
                 v-for="lang in languagePreviewOptions"
@@ -251,11 +260,12 @@ const update = (value: EditFieldProfileFormWithImages) => {}
         <BButton
           v-if="isEditable"
           pill
-          class="btn btn-primary mt-1"
+          class="btn btn-primary mt-1 d-flex align-items-center justify-content-center"
           size="sm"
           @click="handleFinishEditing"
           variant="success"
         >
+        <IconTick class="svg-icon-lg me-1" />
           Done
         </BButton>
         <BButton

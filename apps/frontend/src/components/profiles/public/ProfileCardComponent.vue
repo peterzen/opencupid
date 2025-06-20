@@ -12,11 +12,12 @@ defineProps<{
 </script>
 
 <template>
-  <div class="card h-100 profile-card cursor-pointer position-relative overflow-hidden d-flex flex-column user-select-none">
+  <div class="card h-100 profile-card cursor-pointer position-relative overflow-hidden d-flex flex-column user-select-none shadow"
+       @click="$emit('click', profile.id)">
     <div class="icons">
       <DatingIcon :profile />
     </div>
-    <div class="ratio ratio-3x4">
+    <div class="ratio ratio-1x1">
       <ProfileImage :profile="profile" className="" />
     </div>
     <div class="overlay d-flex flex-column flex-grow-1">
@@ -45,6 +46,7 @@ defineProps<{
 }
 
 .card {
+  font-size: 1.25rem;
   &:hover {
     border-color: var(--bs-primary);
   }
@@ -60,6 +62,7 @@ defineProps<{
   width: 100%;
   position: absolute;
   bottom: 0rem;
+  height: 7.25rem;
   background-color: rgba(80,80,80, 0.5);
 }
 

@@ -69,7 +69,7 @@ export const useProfileStore = defineStore('profile', {
       if (this.profile) {
         Object.assign(this.profile, update) // Update local state with new data
       }
-      return this.persistDatingPrefs() // Persist dating preferences if they exist
+      return this.persistOwnerProfile() // Persist dating preferences if they exist
     },
 
     async persistOwnerProfile(): Promise<StoreVoidSuccess | StoreError> {
