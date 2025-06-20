@@ -38,7 +38,8 @@ describe('AuthIdComponent', () => {
     expect(wrapper.emitted('otp:send')![0][0]).toEqual({
       email: 'test@example.com',
       phonenumber: '',
-      captchaSolution: ''
+      captchaSolution: '',
+      language: ''
     })
   })
 
