@@ -12,6 +12,34 @@ import svgLoader from 'vite-svg-loader'
 import serveStatic from 'serve-static'
 
 
+const server = (process.env.NODE_ENV === 'production') ? {} : {
+  allowedHosts: ['localhost', 'oc.dev.froggle.org'],
+  proxy: {
+    '/api': {
+      target: 'http://localhost:3000', // or https://localhost:3000 if backend runs TLS
+      changeOrigin: true,
+      secure: false, // accept self-signed TLS
+    },
+    '/ws': {
+      target: 'ws://localhost:3000',
+      rewriteWsOrigin: true,
+      ws: true,
+      secure: false, // accept self-signed TLS
+    },
+    '/geo': {
+      target: 'http://ifconfig.co/',
+      changeOrigin: true,
+      secure: false, // accept self-signed TLS
+      rewrite: (path: any) => path.replace(/^\/geo/, '/json'),
+    },
+  },
+  https: {
+    key: fs.readFileSync(path.resolve(__dirname, '../../certs/key.pem')),
+    cert: fs.readFileSync(path.resolve(__dirname, '../../certs/cert.pem')),
+  },
+}
+
+
 process.env.DEBUG = 'vite:*' // Add this to force verbose output
 // https://vite.dev/config/
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
@@ -29,32 +57,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         GEOIP_URL: rootEnv.GEOIP_URL
       }),
     },
-    server: {
-      allowedHosts: ['localhost', 'oc.dev.froggle.org'],
-      proxy: {
-        '/api': {
-          target: 'http://localhost:3000', // or https://localhost:3000 if backend runs TLS
-          changeOrigin: true,
-          secure: false, // accept self-signed TLS
-        },
-        '/ws': {
-          target: 'ws://localhost:3000',
-          rewriteWsOrigin: true,
-          ws: true,
-          secure: false, // accept self-signed TLS
-        },
-        '/geo': {
-          target: 'http://ifconfig.froggle.org/',
-          changeOrigin: true,
-          secure: false, // accept self-signed TLS
-          rewrite: (path) => path.replace(/^\/geo/, '/json'),
-        },
-      },
-      https: {
-        key: fs.readFileSync(path.resolve(__dirname, '../../certs/key.pem')),
-        cert: fs.readFileSync(path.resolve(__dirname, '../../certs/cert.pem')),
-      },
-    },
+    ...server,
     build: {
       rollupOptions: {
         external: (id) => id.includes('__tests__')
