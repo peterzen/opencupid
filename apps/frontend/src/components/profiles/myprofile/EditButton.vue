@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ViewState } from './types'
+import { type ViewState } from './types'
 import IconTick from '@/assets/icons/interface/tick.svg'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import IconPencil2 from '@/assets/icons/interface/pencil-2.svg'

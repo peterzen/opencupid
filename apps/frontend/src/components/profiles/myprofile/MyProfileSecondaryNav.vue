@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { ViewState } from './types'
 import { useI18nStore } from '@/store/i18nStore'
+
+import { type ViewState } from './types'
 import IconGlobe from '@/assets/icons/interface/globe.svg'
 import ScopeViewToggler from '../ScopeViewToggler.vue'
 
@@ -34,7 +35,7 @@ const currentLanguage = computed(() => {
         <BDropdownItem
           v-for="lang in languagePreviewOptions"
           :key="lang.value"
-					:active="lang.value === model.previewLanguage"
+          :active="lang.value === model.previewLanguage"
           @click="model.previewLanguage = lang.value"
         >
           {{ lang.label }}

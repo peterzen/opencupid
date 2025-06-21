@@ -1,4 +1,3 @@
-// TODO: review usage; copied for both db and dto layers
 import { Prisma } from '@prisma/client'
 import { z } from 'zod'
 import { ProfileSummarySchema } from '../profile/profile.dto'

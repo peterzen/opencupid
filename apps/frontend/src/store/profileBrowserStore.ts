@@ -18,7 +18,7 @@ import {
   type StoreResponse,
   type StoreError
 } from './helpers'
-import { DatingPreferencesDTO, DatingPreferencesDTOSchema } from '@zod/profile/datingPreference.dto'
+import { type DatingPreferencesDTO, DatingPreferencesDTOSchema } from '@zod/profile/datingPreference.dto'
 
 export const useProfileBrowserStore = defineStore('profileBrowser', {
   state: () => ({

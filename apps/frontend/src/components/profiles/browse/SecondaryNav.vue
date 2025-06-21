@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { DatingPreferencesDTO } from '@zod/profile/datingPreference.dto'
+import { type DatingPreferencesDTO } from '@zod/profile/datingPreference.dto'
 import { ref } from 'vue'
-import { OwnerProfile } from '@zod/profile/profile.dto'
+import { type OwnerProfile } from '@zod/profile/profile.dto'
 
 import IconSetting from '@/assets/icons/interface/setting.svg'
 import ScopeViewToggler from '../ScopeViewToggler.vue'

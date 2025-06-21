@@ -7,16 +7,12 @@ import type {
 } from '@zod/profile/profile.dto'
 import {
   OwnerProfileSchema,
-  PublicProfileArraySchema,
   PublicProfileSchema,
   PublicProfileWithConversationSchema,
 } from '@zod/profile/profile.dto'
 import type {
-  GetDatingPreferenceseResponse,
   GetMyProfileResponse,
-  GetProfilesResponse,
   GetPublicProfileResponse,
-  UpdateDatingPreferencesResponse,
   UpdateProfileResponse,
 } from '@shared/dto/apiResponse.dto'
 import {
@@ -27,7 +23,6 @@ import {
   type StoreError
 } from './helpers'
 import { type EditProfileForm, ProfileFormToPayloadTransform, type EditFieldProfileFormWithImages } from '@zod/profile/profile.form'
-import { DatingPreferencesDTO, DatingPreferencesDTOSchema } from '@zod/profile/datingPreference.dto'
 
 export const useProfileStore = defineStore('profile', {
   state: () => ({
@@ -110,12 +105,12 @@ export const useProfileStore = defineStore('profile', {
      * @returns 
      */
 
-    async getProfilePreview(profileId: string, locale:string): Promise<StoreResponse<PublicProfile>> {
+    async getProfilePreview(profileId: string, locale: string): Promise<StoreResponse<PublicProfile>> {
       try {
         this.isLoading = true // Set loading state
         const res = await api.get<GetPublicProfileResponse>(`/profiles/preview/${locale}/${profileId}`)
         const fetched = PublicProfileSchema.parse(res.data.profile)
-        console.log('Fetched profile preview:', fetched )
+        console.log('Fetched profile preview:', fetched)
         return storeSuccess(fetched)
       } catch (error: any) {
         return storeError(error, 'Failed to fetch profile')

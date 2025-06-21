@@ -2,12 +2,14 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import VueSlider from 'vue-3-slider-component'
+import { type OwnerProfile } from '@zod/profile/profile.dto'
+import { type DatingPreferencesDTO } from '@zod/profile/datingPreference.dto'
+
+
 import { useAgeFields } from '@/components/profiles/composables/useAgeFields'
 import { DatingPreferencesFormSchema } from '@zod/profile/datingPreference.form'
-import { DatingPreferencesDTO } from '@zod/profile/datingPreference.dto'
 import GenderPreferenceSelector from './GenderPreferenceSelector.vue'
 import HasKidsPreferenceSelector from './HaskidsPreferenceSelector.vue'
-import { OwnerProfile } from '@zod/profile/profile.dto'
 
 // https://github.com/s-sasaki-0529/vue-slider-component
 
