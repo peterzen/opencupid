@@ -20,7 +20,7 @@ const { relationshipStatus, hasKids } = useDatingFields(profileRef, t)
 <template>
   <ul
     v-if="props.profile.isDatingActive"
-    class="list-unstyled d-inline-flex flex-wrap align-items-center"
+    class="list-unstyled d-inline-flex flex-wrap align-items-center dating-field"
   >
     <li v-if="props.profile.relationship" class="me-2">
       <span class="badge text-bg-dating">{{ relationshipStatus }}</span>
@@ -42,7 +42,7 @@ const { relationshipStatus, hasKids } = useDatingFields(profileRef, t)
           {{   }}
           <span
             v-if="props.profile.hasKids === 'unspecified'"
-            class="badge text-bg-dating opacity-25 me-2"
+            class="editable-placeholder me-2"
           >
             {{ $t('profiles.haskids_unspecified_label') }}</span
           >

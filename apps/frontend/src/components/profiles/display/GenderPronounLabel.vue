@@ -19,13 +19,21 @@ const { age, gender, pronouns } = useDatingFields(profileRef, t)
 </script>
 
 <template>
-  <div v-if="props.profile.isDatingActive" class="text-muted">
+  <div
+    v-if="props.profile.isDatingActive"
+    class="text-muted dating-field d-flex align-items-center"
+  >
     <span class="me-1">{{ age }}</span>
     <span class="me-1 d-inline-flex align-items-center">
-      <GenderSymbol v-if="gender" :gender  />
-      <EditField fieldName="gender" :editComponent="GenderSelector" >
-      <template #display>({{ props.profile.gender }})</template>
-    </EditField>
+      <GenderSymbol v-if="gender && gender != 'unspecified'" :gender />
+      <EditField fieldName="gender" :editComponent="GenderSelector">
+        <template #display>
+          <span class="d-inline-flex align-items-center editable-placeholder pe-4">
+            <span v-if="gender !== 'unspecified'">({{ props.profile.gender }})</span>
+            <span v-else class=""> gender</span>
+          </span>
+        </template>
+      </EditField>
     </span>
 
     <span v-if="props.profile.pronouns && pronouns" class="d-inline-flex align-items-center">
@@ -33,7 +41,11 @@ const { age, gender, pronouns } = useDatingFields(profileRef, t)
     </span>
     <EditField fieldName="pronouns" :editComponent="PronounSelector">
       <template #display>
-        <span v-if="!pronouns || props.profile.pronouns==='unspecified'">{{ $t('profile.pronouns') }} </span>
+        <span
+          v-if="!pronouns || props.profile.pronouns === 'unspecified'"
+          class="editable-placeholder"
+          >{{ $t('profile.pronouns') }}
+        </span>
       </template>
     </EditField>
   </div>

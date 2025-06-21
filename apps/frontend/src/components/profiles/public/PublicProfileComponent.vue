@@ -25,7 +25,8 @@ const { t } = useI18n()
 
 const props = defineProps<{
   profile: PublicProfileWithConversation
-  isLoading: boolean
+  isLoading: boolean,
+  wrapperClass?: string
 }>()
 
 const emit = defineEmits<{
@@ -36,7 +37,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div>
+  <div v-bind:class="props.wrapperClass">
     <div class="row justify-content-center">
       <div class="col-12 col-md-8 col-lg-6 position-relative user-select-none">
         <div class="overflow-hidden rounded">
@@ -109,7 +110,7 @@ const emit = defineEmits<{
         </div>
 
         <div class="mb-3">
-          <div class="mb-3" v-if="props.profile.isDatingActive">
+          <div class="mb-3 dating-field" v-if="props.profile.isDatingActive">
             <span class="opacity-25">
               <hr  />
             </span>
@@ -157,25 +158,4 @@ const emit = defineEmits<{
   /* background-color: rgba(255, 255, 255, 0.8); */
 }
 
-.editable-textarea {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  :deep(.edit-button) {
-    position: absolute;
-    right: 0;
-    bottom: 0.5rem;
-  }
-
-  .editable-placeholder {
-    border: 2px dashed var(--bs-secondary);
-    border-radius: 5px;
-    height: 4rem;
-    opacity: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-  }
-}
 </style>

@@ -24,7 +24,7 @@ const profileStore = useProfileStore()
 
 const showModal = ref(false)
 const error = ref('')
-const selectedLocale = ref('en')
+const selectedLocale = ref(useI18nStore().currentLanguage)
 const formData: EditFieldProfileFormWithImages = reactive({} as EditFieldProfileFormWithImages)
 
 // const profilePreview = reactive({} as PublicProfile)
@@ -36,7 +36,6 @@ const profilePreview = computed((): PublicProfileWithConversation => {
     isDatingActive: previewState.value === 'dating',
   } as PublicProfileWithConversation
 })
-
 
 const fetchProfilePreview = async () => {
   if (!profileStore.profile) {
@@ -52,7 +51,6 @@ const fetchProfilePreview = async () => {
   Object.assign(publicProfile, res.data)
 }
 // const publicProfile = computed(() => ownerToPublicProfile(profileStore.profile))
-
 
 onMounted(async () => {
   await profileStore.fetchOwnerProfile()
@@ -86,8 +84,7 @@ watch(
   () => selectedLocale.value,
   () => {
     fetchProfilePreview()
-  },
- 
+  }
 )
 
 const isEditable = ref(false)
@@ -114,7 +111,7 @@ const toggleDating = async () => {
 }
 
 const handleOkClick = async () => {
-  console.log('Dating popup OK clicked formData',formData)
+  console.log('Dating popup OK clicked formData', formData)
   const res = await profileStore.updateOwnerProfile(formData)
   if (res.success) {
     await fetchProfilePreview()
@@ -158,7 +155,7 @@ const { current, isFirst, goToNext, goToPrevious, goTo, isCurrent } = useStepper
 
 const languagePreviewOptions = useI18nStore().getAvailableLocalesWithLabels()
 const currentLanguage = computed(() => {
-  return languagePreviewOptions.find(lang => lang.value === selectedLocale.value) 
+  return languagePreviewOptions.find(lang => lang.value === selectedLocale.value)
 })
 
 // const saveProfile = async () => {
@@ -201,15 +198,13 @@ const currentLanguage = computed(() => {
 // }
 
 const update = (value: EditFieldProfileFormWithImages) => {}
-
-
 </script>
 
 <template>
   <main class="container">
     <ErrorOverlay v-if="error" :error />
     <div v-else class="d-flex flex-row justify-content-between align-items-center mb-2">
-      <div style="height:3rem;">
+      <div style="height: 3rem">
         <div v-if="isEditable" class="d-flex">
           <span
             class="btn-social-toggle px-4 py-1 rounded-4 me-2"
@@ -235,16 +230,16 @@ const update = (value: EditFieldProfileFormWithImages) => {}
               <IconDate class="svg-icon-lg" />
             </BNavItem>
             <BNavItemDropdown
-            size="sm"
+              size="sm"
               id="my-nav-dropdown"
               text="Dropdown"
               toggle-class="nav-link-custom"
               right
             >
-            <template #button-content>
-              <IconGlobe class="svg-icon" />
-              {{ currentLanguage?.label }}  
-            </template>
+              <template #button-content>
+                <IconGlobe class="svg-icon" />
+                {{ currentLanguage?.label }}
+              </template>
               <BDropdownItem
                 v-for="lang in languagePreviewOptions"
                 :key="lang.value"
@@ -265,7 +260,7 @@ const update = (value: EditFieldProfileFormWithImages) => {}
           @click="handleFinishEditing"
           variant="success"
         >
-        <IconTick class="svg-icon-lg me-1" />
+          <IconTick class="svg-icon-lg me-1" />
           Done
         </BButton>
         <BButton
@@ -284,6 +279,7 @@ const update = (value: EditFieldProfileFormWithImages) => {}
     <PublicProfileComponent
       v-if="profilePreview"
       :isLoading="profileStore.isLoading"
+      :wrapperClass="isEditable ? 'editable' : ''"
       @intent:field:edit="showModal = true"
       :profile="profilePreview"
     />
@@ -333,3 +329,45 @@ const update = (value: EditFieldProfileFormWithImages) => {}
     </Teleport>
   </main>
 </template>
+
+<style scoped>
+:deep(.editable-textarea) {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  :deep(.editable-placeholder) {
+    height: 4rem;
+  }
+}
+
+:deep(.editable-textarea .edit-button) {
+  position: absolute;
+  right: 0;
+  bottom: 0.5rem;
+}
+:deep(.editable-placeholder + .edit-button) {
+  position: absolute;
+  right: 0;
+  bottom: 0.25rem;
+}
+
+:deep(.editable-placeholder) {
+  border: 2px dashed var(--bs-secondary);
+  border-radius: 5px;
+  opacity: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+:deep(.editable .dating-field .editable-placeholder) {
+  background-color: var(--bs-dating-light);
+}
+:deep(.editable-field) {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+}
+</style>
