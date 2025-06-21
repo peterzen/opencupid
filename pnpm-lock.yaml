@@ -223,9 +223,6 @@ importers:
       '@fontsource/rubik':
         specifier: ^5.2.5
         version: 5.2.6
-      '@formkit/auto-animate':
-        specifier: ^0.8.2
-        version: 0.8.2
       altcha:
         specifier: ^2.0.2
         version: 2.0.3
@@ -1280,9 +1277,6 @@ packages:
 
   '@fontsource/rubik@5.2.6':
     resolution: {integrity: sha512-KNY87CIXAzmKMfL8gnQV0nbePn9g/kG3tF4GJoUEASSz+ECFWYoPir8TSySblYfXTInDL/kHJm6CMrrEW/U/ZA==}
-
-  '@formkit/auto-animate@0.8.2':
-    resolution: {integrity: sha512-SwPWfeRa5veb1hOIBMdzI+73te5puUBHmqqaF1Bu7FjvxlYSz/kJcZKSa9Cg60zL0uRNeJL2SbRxV6Jp6Q1nFQ==}
 
   '@fortawesome/fontawesome-common-types@6.7.2':
     resolution: {integrity: sha512-Zs+YeHUC5fkt7Mg1l6XTniei3k4bwG/yo3iFUtZWd/pMx9g3fdvkSK9E0FOC+++phXOka78uJcYb8JaFkW52Xg==}
@@ -7893,8 +7887,6 @@ snapshots:
   '@fontsource/nunito@5.2.6': {}
 
   '@fontsource/rubik@5.2.6': {}
-
-  '@formkit/auto-animate@0.8.2': {}
 
   '@fortawesome/fontawesome-common-types@6.7.2': {}
 
