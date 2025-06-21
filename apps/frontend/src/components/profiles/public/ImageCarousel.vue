@@ -71,10 +71,5 @@ const handleCloseClick = () => (showModal.value = false)
   width: 100%;
   height: 100%;
 }
-:deep(.carousel-item) {
-  background-color: transparent !important;
-}
-:deep(.wrapper) {
-  background-color: red;
-}
+
 </style>

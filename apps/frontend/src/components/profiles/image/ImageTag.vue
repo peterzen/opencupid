@@ -31,7 +31,6 @@ const props = defineProps({
       :src="`${props.image.url}-original.jpg`"
       class="w-100 h-100"
       :class="className"
-      loading="lazy"
     />
   </picture>
 </template>
