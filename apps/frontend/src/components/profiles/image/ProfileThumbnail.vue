@@ -10,18 +10,10 @@ defineProps<{
 </script>
 
 <template>
-  <span class="thumbnail d-inline-flex">
+  <span class="profile-thumbnail d-inline-flex">
     <ProfileImage :profile="profile" />
   </span>
 </template>
 
 <style scoped>
-.thumbnail {
-  width: 40px;
-  height: 40px;
-}
-
-:deep(img) {
-  border-radius: 50% !important;
-}
 </style>

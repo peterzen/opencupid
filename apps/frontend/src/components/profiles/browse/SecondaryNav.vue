@@ -1,32 +1,49 @@
 <script setup lang="ts">
 import { DatingPreferencesDTO } from '@zod/profile/datingPreference.dto'
 import { ref } from 'vue'
+import { OwnerProfile } from '@zod/profile/profile.dto'
 
+import IconSetting from '@/assets/icons/interface/setting.svg'
+import ScopeViewToggler from '../ScopeViewToggler.vue'
+import DatingPreferencesForm from './DatingPreferencesForm.vue'
 
 const model = defineModel<DatingPreferencesDTO>()
 
+const props = defineProps<{
+  profile: OwnerProfile
+}>()
+
 defineEmits({
   'update:datingPrefs': () => true,
-  
 })
+
 const showModal = ref(false)
 
 const handlePrefsClick = () => {
   showModal.value = true
 }
 
-
+const viewState = ref('social')
 </script>
 
-
 <template>
-  <div
-    v-if="profileStore.datingPrefs && profileStore.profile"
-    class="d-flex justify-content-end align-items-center mb-3 w-100 bg-light"
-  >
-    <BButton variant="primary" @click="handlePrefsClick">
-      <IconSetting class="svg-icon" />
-    </BButton>
+  <div class="d-flex justify-content-end align-items-center w-100">
+    <ScopeViewToggler v-model="viewState">
+      <template #items-left>
+        <!-- <BButton
+          variant="primary"
+          class="me-2"
+          @click="$emit('update:datingPrefs')"
+        >
+          <IconRefresh class="svg-icon" />
+        </BButton> -->
+      </template>
+      <template #items-right>
+        <BButton variant="primary" class="ms-2" @click="handlePrefsClick">
+          <IconSetting class="svg-icon" />
+        </BButton>
+      </template>
+    </ScopeViewToggler>
 
     <BModal
       v-model="showModal"
@@ -43,7 +60,7 @@ const handlePrefsClick = () => {
       title="Add a photo"
       @ok="$emit('update:datingPrefs')"
     >
-      <DatingPreferencesForm v-model="profileStore.datingPrefs" :profile="profileStore.profile" />
+      <DatingPreferencesForm v-model="model" :profile />
     </BModal>
   </div>
 </template>

@@ -117,8 +117,8 @@ watch(
 <template>
   <div class="d-flex flex-column">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <div>
-        <IconGlobe class="svg-icon me-2" />
+      <div class="d-flex align-items-center justify-content-center" style="width:1.5rem; height: 1.5rem">
+        <IconGlobe class="svg-icon svg-icon-100 me-2" />
       </div>
       <ul class="nav nav-pills flex-grow-1">
         <li class="nav-item me-2" v-for="lang in props.languages" :key="lang">
@@ -141,7 +141,6 @@ watch(
           <BFormTextarea
             v-model="model[lang]"
             id="content-input"
-            max-rows="15"
             rows="5"
             no-resize
             size="lg"
@@ -152,10 +151,10 @@ watch(
       </div>
     </div>
       <div class="align-self-end">
-        <BButton variant="secondary" size="sm" pill @click="toggleListening">
+        <BButton variant="secondary" class="btn-icon" size="sm" @click="toggleListening">
           <IconMic2 class="svg-icon" />
           <i class="fas fa-microphone"></i>
-          {{ isListening ? t('profiles.forms.dictate_listening') : t('profiles.forms.dictate') }}
+          <!-- {{ isListening ? t('profiles.forms.dictate_listening') : t('profiles.forms.dictate') }} -->
         </BButton>
       </div>
 
@@ -188,5 +187,12 @@ watch(
 <style scoped lang="scss">
 .nav-link {
   padding: 0.15rem 1rem;
+}
+textarea {
+  height: 50vh !important;
+}
+.svg-icon-100 {
+  width: 100%;
+  height: 100%;
 }
 </style>

@@ -23,8 +23,11 @@ $social : #003049;
 $dating: #D62828; // Custom dating color
 $dating-light: transparentize($dating, 0.75);
 
-$theme-colors: map-merge($theme-colors,
-    ('dating': $dating, 'dating-light': $dating-light ));
+$theme-colors: map-merge($theme-colors,    (
+    'dating': $dating, 
+    'dating-light': $dating-light ,
+    'social': $social,
+    ));
 
 
 

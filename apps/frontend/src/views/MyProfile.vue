@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, onMounted, ref, provide, watch, computed, watchEffect } from 'vue'
+import { reactive, onMounted, ref, provide, watch, computed, watchEffect, toRef } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
 
 import PublicProfileComponent from '@/components/profiles/public/PublicProfileComponent.vue'
@@ -16,24 +16,31 @@ import { useRouter } from 'vue-router'
 import ErrorOverlay from '@/components/ErrorOverlay.vue'
 import { type PublicProfileWithConversation } from '@zod/profile/profile.dto'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import ScopeViewToggler from '@/components/profiles/ScopeViewToggler.vue'
+import EditButton from '@/components/profiles/myprofile/EditButton.vue'
 
 import { useI18nStore } from '@/store/i18nStore'
+import MyProfileSecondaryNav from '../components/profiles/myprofile/MyProfileSecondaryNav.vue'
+import { type ViewState } from '@/components/profiles/myprofile/types'
 
 const router = useRouter()
 const profileStore = useProfileStore()
 
 const showModal = ref(false)
 const error = ref('')
-const selectedLocale = ref(useI18nStore().currentLanguage)
 const formData: EditFieldProfileFormWithImages = reactive({} as EditFieldProfileFormWithImages)
 
-// const profilePreview = reactive({} as PublicProfile)
-const previewState = ref('social')
+const viewState = reactive<ViewState>({
+  isEditable: false,
+  previewLanguage: useI18nStore().currentLanguage,
+  previewScope: 'social',
+})
+
 const publicProfile = reactive({} as PublicProfileWithConversation)
 const profilePreview = computed((): PublicProfileWithConversation => {
   return {
     ...publicProfile,
-    isDatingActive: previewState.value === 'dating',
+    isDatingActive: viewState.previewScope === 'dating',
   } as PublicProfileWithConversation
 })
 
@@ -42,7 +49,10 @@ const fetchProfilePreview = async () => {
     error.value = 'Profile not found'
     return
   }
-  const res = await profileStore.getProfilePreview(profileStore.profile.id, selectedLocale.value)
+  const res = await profileStore.getProfilePreview(
+    profileStore.profile.id,
+    viewState.previewLanguage
+  )
   if (!res.success || !res.data) {
     error.value = 'Something went wrong (public profile)'
     return
@@ -50,11 +60,10 @@ const fetchProfilePreview = async () => {
   console.log('Public profile fetched:', res.data)
   Object.assign(publicProfile, res.data)
 }
-// const publicProfile = computed(() => ownerToPublicProfile(profileStore.profile))
 
 onMounted(async () => {
   await profileStore.fetchOwnerProfile()
-  console.log('Profile fetched:', profileStore.profile)
+  // console.log('Profile fetched:', profileStore.profile)
   if (!profileStore.profile) {
     error.value = 'Something went wrong (owner profile)'
     return
@@ -68,46 +77,35 @@ onMounted(async () => {
 })
 
 watch(
-  () => profileStore.profile,
-  newProfile => {
-    if (newProfile) {
-      // Object.assign(profilePreview, newProfile)
-      // fetchPublicProfile()
-    }
-  },
-  {
-    immediate: true,
-  }
-)
-
-watch(
-  () => selectedLocale.value,
+  () => viewState.previewLanguage,
   () => {
     fetchProfilePreview()
+  },
+  {
+    deep: true,
   }
 )
-
-const isEditable = ref(false)
-
 provide('isOwner', true)
-provide('isEditable', isEditable)
+provide('isEditable', toRef(viewState, 'isEditable'))
 provide('editableModel', formData)
 
-const toggleSocial = () => {
+const toggleSocial = async () => {
+  // if (!profileStore.profile) return
   formData.isSocialActive = !formData.isSocialActive
+  const res = await profileStore.updateOwnerProfile(formData)
 }
 
 const datingPopup = ref(false)
 const toggleDating = async () => {
-  if (!profileStore.profile) return
-  profileStore.profile.isDatingActive = !profileStore.profile.isDatingActive
-  if (profileStore.profile.isDatingActive && !profileStore.profile.birthday) {
+  // if (!profileStore.profile) return
+  formData.isDatingActive = !formData.isDatingActive
+  if (formData.isDatingActive && !formData.birthday) {
     datingPopup.value = true
     profileStore.currentField = null
     profileStore.open()
     return
   }
-  await profileStore.persistOwnerProfile()
+  const res = await profileStore.updateOwnerProfile(formData)
 }
 
 const handleOkClick = async () => {
@@ -132,31 +130,8 @@ const handleCancelClick = () => {
   }
 }
 
-const handleStartEditing = async () => {
-  isEditable.value = !isEditable.value
-}
-
-const handleFinishEditing = async () => {
-  isEditable.value = !isEditable.value
-}
-
-const handleEditProfile = () => {
-  router.push({ name: 'EditProfile' })
-}
-
-const handleSetView = (socialOrDating: string) => {
-  previewState.value = socialOrDating
-}
-
-const isComplete = ref(false)
-
 const { datingWizard } = useOnboardingWizard(formData)
 const { current, isFirst, goToNext, goToPrevious, goTo, isCurrent } = useStepper(datingWizard)
-
-const languagePreviewOptions = useI18nStore().getAvailableLocalesWithLabels()
-const currentLanguage = computed(() => {
-  return languagePreviewOptions.find(lang => lang.value === selectedLocale.value)
-})
 
 // const saveProfile = async () => {
 //   const res = await profileStore.createOwnerProfile(formData)
@@ -201,88 +176,44 @@ const update = (value: EditFieldProfileFormWithImages) => {}
 </script>
 
 <template>
-  <main class="container">
+  <main class="container" :class="[viewState.previewScope, {editable: viewState.isEditable}]">
     <ErrorOverlay v-if="error" :error />
-    <div v-else class="d-flex flex-row justify-content-between align-items-center mb-2">
-      <div style="height: 3rem">
-        <div v-if="isEditable" class="d-flex">
-          <span
-            class="btn-social-toggle px-4 py-1 rounded-4 me-2"
-            @click="toggleSocial"
-            :class="{ active: formData.isSocialActive }"
-          >
-            <IconSocialize class="svg-icon-lg" />
-          </span>
-          <span
-            class="btn-dating-toggle px-4 py-1 rounded-4"
-            @click="toggleDating"
-            :class="{ active: formData.isDatingActive }"
-          >
-            <IconDate class="svg-icon-lg" />
-          </span>
-        </div>
-        <div v-else>
-          <BNav pills>
-            <BNavItem @click="handleSetView('social')" :active="previewState === 'social'">
-              <IconSocialize class="svg-icon-lg" />
-            </BNavItem>
-            <BNavItem @click="handleSetView('dating')" :active="previewState === 'dating'">
-              <IconDate class="svg-icon-lg" />
-            </BNavItem>
-            <BNavItemDropdown
-              size="sm"
-              id="my-nav-dropdown"
-              text="Dropdown"
-              toggle-class="nav-link-custom"
-              right
-            >
-              <template #button-content>
-                <IconGlobe class="svg-icon" />
-                {{ currentLanguage?.label }}
-              </template>
-              <BDropdownItem
-                v-for="lang in languagePreviewOptions"
-                :key="lang.value"
-                @click="selectedLocale = lang.value"
+    <div v-else class="row justify-content-center mt-3">
+      <div class="col-12 col-md-8 col-lg-6 position-relative user-select-none">
+        <div class="d-flex flex-row justify-content-between align-items-center mb-2">
+          <div style="height: 3rem" class="w-100">
+            <div v-if="viewState.isEditable" class="d-flex">
+              <span
+                class="btn-social-toggle px-4 py-1 rounded-4 me-2"
+                @click="toggleSocial"
+                :class="{ active: formData.isSocialActive }"
               >
-                {{ lang.label }}
-              </BDropdownItem>
-            </BNavItemDropdown>
-          </BNav>
+                <IconSocialize class="svg-icon-lg" />
+              </span>
+              <span
+                class="btn-dating-toggle px-4 py-1 rounded-4"
+                @click="toggleDating"
+                :class="{ active: formData.isDatingActive }"
+              >
+                <IconDate class="svg-icon-lg" />
+              </span>
+            </div>
+            <div v-else>
+              <MyProfileSecondaryNav v-model="viewState" />
+            </div>
+          </div>
         </div>
-      </div>
-      <div>
-        <BButton
-          v-if="isEditable"
-          pill
-          class="btn btn-primary mt-1 d-flex align-items-center justify-content-center"
-          size="sm"
-          @click="handleFinishEditing"
-          variant="success"
-        >
-          <IconTick class="svg-icon-lg me-1" />
-          Done
-        </BButton>
-        <BButton
-          v-else
-          pill
-          class="btn btn-primary mt-1"
-          @click="handleStartEditing"
-          variant="primary"
-        >
-          <FontAwesomeIcon icon="fa-solid fa-pen-to-square" />
-          <!-- <IconPencil2 class="svg-icon" /> -->
-          Edit
-        </BButton>
+        <div class="main-edit-button">
+          <EditButton v-model="viewState" />
+        </div>
+        <PublicProfileComponent
+          v-if="profilePreview"
+          :isLoading="profileStore.isLoading"
+          @intent:field:edit="showModal = true"
+          :profile="profilePreview"
+        />
       </div>
     </div>
-    <PublicProfileComponent
-      v-if="profilePreview"
-      :isLoading="profileStore.isLoading"
-      :wrapperClass="isEditable ? 'editable' : ''"
-      @intent:field:edit="showModal = true"
-      :profile="profilePreview"
-    />
     <BModal
       v-model="profileStore.fieldEditModal"
       title=""
@@ -297,7 +228,7 @@ const update = (value: EditFieldProfileFormWithImages) => {}
       :ok-title="'OK'"
       :ok-class="'btn btn-primary px-5'"
       cancel-title="Nevermind"
-      initial-animation
+      :initial-animation="false"
       body-class="d-flex flex-row align-items-center justify-content-center overflow-hidden"
       @ok="handleOkClick"
       @cancel="handleCancelClick"
@@ -330,7 +261,28 @@ const update = (value: EditFieldProfileFormWithImages) => {}
   </main>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
+
+
+@import '@/css/theme.scss';
+
+.main-edit-button {
+  position: fixed;
+  z-index: 5;
+  bottom: 1rem;
+  right: 1rem;
+}
+
+.editable {
+  background-color: var(--bs-light);
+}
+.dating {
+  background-color: transparentize($dating,0.9);
+}
+.social {
+  background-color: transparentize($social,0.9);
+}
+
 :deep(.editable-textarea) {
   position: relative;
   display: flex;

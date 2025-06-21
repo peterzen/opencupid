@@ -4,6 +4,8 @@ import AppNotifier from '@/components/AppNotifier.vue'
 import { useI18nStore } from './store/i18nStore'
 import { useCountries } from './components/composables/useCountries'
 import { useLanguages } from './components/composables/useLanguages'
+import { useProfileStore } from './store/profileStore'
+import { profile } from 'console'
 
 // FIXME
 // This is a workaround to ensure the page scrolls down

@@ -20,7 +20,7 @@ import {
 } from './helpers'
 import { DatingPreferencesDTO, DatingPreferencesDTOSchema } from '@zod/profile/datingPreference.dto'
 
-export const useProfileStore = defineStore('profile', {
+export const useProfileBrowserStore = defineStore('profileBrowser', {
   state: () => ({
     profileList: [] as PublicProfile[], // List of public profiles
     datingPrefs: null as DatingPreferencesDTO | null, // Current user's dating preferences  
@@ -29,9 +29,6 @@ export const useProfileStore = defineStore('profile', {
   }),
 
   actions: {
-
-
-
     async findProfiles(): Promise<StoreResponse<StoreVoidSuccess | StoreError>> {
       try {
         this.isLoading = true // Set loading state

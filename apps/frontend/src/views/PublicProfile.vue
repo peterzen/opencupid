@@ -47,16 +47,16 @@ const handleOpenConversation = (conversationId: string) => {
         <IconArrowSingleLeft class="svg-icon" />
       </a>
     </div>
-    <BPlaceholderWrapper :loading="profileStore.isLoading">
+    <!-- <BPlaceholderWrapper :loading="profileStore.isLoading">
       <template #loading>
         <BPlaceholderCard class="w-100 opacity-50" img-height="250" animation="glow" no-button />
-      </template>
+      </template> -->
 
       <PublicProfileComponent
         :profile
         :isLoading="profileStore.isLoading"
         @intent:conversation:open="handleOpenConversation"
       />
-    </BPlaceholderWrapper>
+    <!-- </BPlaceholderWrapper> -->
   </main>
 </template>

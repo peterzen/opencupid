@@ -75,7 +75,7 @@ async function handleSendMessage() {
 <template>
   <div class="send-message-wrapper w-100">
     <div class="mb-2">
-      <div class="mb-2">
+      <div class="mb-2 opacity-50">
         <div class="d-inline-block">
           <TagList :profile="props.recipientProfile" class="d-inline-block" />
         </div>

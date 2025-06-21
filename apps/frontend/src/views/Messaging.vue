@@ -34,7 +34,8 @@ watch(
         isLoading.value = false
       }
     }
-  }
+  },
+  { immediate: true }
 )
 
 onMounted(async () => {
@@ -65,7 +66,7 @@ const handleSelectConvo = async (convo: ConversationSummary) => {
 }
 
 const handleDeselectConvo = async () => {
-  router.push({ name: 'Messaging' })
+  router.back()
   await messageStore.setActiveConversation(null)
 }
 
@@ -77,8 +78,8 @@ const handleProfileSelect = (profile: ProfileSummary) => {
 <template>
   <main class="d-flex flex-column h-100">
     <!-- <h1 class="px-3 mb-2" v-if="!detailVisible">{{  $t('messaging.page_title') }}</h1> -->
-    <div class="flex-grow-1 d-flex flex-row overflow-hidden">
-      <div class="col-12 col-md-3 d-md-block" :class="{ 'd-none': detailVisible }">
+    <div class="flex-grow-1 d-flex flex-row overflow-hidden pt-5">
+      <div class="col-12 col-md-4 d-md-block" :class="{ 'd-none': detailVisible }">
         <div class="mx-3">
           <ConversationSummaries
             :conversations="messageStore.conversations"
@@ -87,7 +88,7 @@ const handleProfileSelect = (profile: ProfileSummary) => {
           />
         </div>
       </div>
-      <div class="col-md-9 flex-grow-1 d-flex flex-column overflow-hidden" v-if="detailVisible">
+      <div class="col-md-8 flex-grow-1 d-flex flex-column overflow-hidden" v-if="detailVisible">
         <ConversationDetail
           :conversation="messageStore.activeConversation"
           @deselect:convo="handleDeselectConvo"

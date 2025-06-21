@@ -25,7 +25,7 @@ const { t } = useI18n()
 
 const props = defineProps<{
   profile: PublicProfileWithConversation
-  isLoading: boolean,
+  isLoading: boolean
   wrapperClass?: string
 }>()
 
@@ -37,125 +37,117 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div v-bind:class="props.wrapperClass">
-    <div class="row justify-content-center">
-      <div class="col-12 col-md-8 col-lg-6 position-relative user-select-none">
-        <div class="overflow-hidden rounded">
-          <ImageCarousel :profile />
-        </div>
+  <div v-bind:class="props.wrapperClass" class="position-relative full-profile">
+    <div class="overflow-hidden rounded">
+      <ImageCarousel :profile />
+    </div>
 
-        <div class="icons">
-          <DatingIcon :profile />
-        </div>
+    <div class="icons">
+      <DatingIcon :profile />
+    </div>
 
-        <div class="action-buttons">
-          <ActionButtons
-            :profile
-            @intent:profile:edit="emit('intent:profile:edit')"
-            @intent:conversation:open="
-              conversationId => emit('intent:conversation:open', conversationId)
-            "
-          />
-          <EditField
-            fieldName="profileImages"
-            :editComponent="ImageEditor"
-            buttonClass="btn btn-overlay rounded-4"
-          >
-            <IconPhoto class="svg-icon" />
-          </EditField>
-        </div>
+    <div class="action-buttons">
+      <ActionButtons
+        :profile
+        @intent:profile:edit="emit('intent:profile:edit')"
+        @intent:conversation:open="
+          conversationId => emit('intent:conversation:open', conversationId)
+        "
+      />
+      <EditField
+        fieldName="profileImages"
+        :editComponent="ImageEditor"
+        buttonClass="btn-icon-lg btn-overlay photo-edit-button"
+      >
+        <IconPhoto class="svg-icon" />
+      </EditField>
+    </div>
 
-        <div class="d-flex flex-row align-items-center mt-2">
-          <div class="flex-grow-1 d-inline-flex align-items-center">
-            <span class="fw-bolder fs-2 me-1"> {{ props.profile.publicName }}</span>
-            <EditField fieldName="publicName" :editComponent="PublicNameInput" />
-          </div>
-          <GenderPronounLabel :profile="props.profile" />
-        </div>
-        <div class="mb-2 text-muted d-inline-flex align-items-center">
-          <span class="me-1">
-            <LocationLabel :location="profile.location" />
-          </span>
-          <EditField fieldName="location" :editComponent="LocationSelector" />
-        </div>
-
-        <div class="mb-3">
-          <div class="d-inline-block">
-            <TagList :profile />
-            <EditField fieldName="tags" :editComponent="TagSelectComponent" />
-          </div>
-
-          <div class="d-inline-flex align-items-center">
-            <LanguageList :languages="profile.languages" />
-            <EditField fieldName="languages" :editComponent="LanguageSelector" />
-          </div>
-        </div>
-        <div class="mb-3">
-          {{ props.profile.introSocial }}
-          <EditField
-            fieldName="introSocialLocalized"
-            :editComponent="IntrotextEditor"
-            wrapper-class="editable-textarea"
-            :editProps="{
-              languages: profile.languages,
-              placeholder: t('profiles.forms.intro_placeholder'),
-            }"
-          >
-            <template #display>
-              <div class="editable-placeholder" v-if="!props.profile.introSocial">
-                {{ t('profiles.forms.intro_placeholder') }}
-              </div>
-            </template>
-          </EditField>
-        </div>
-
-        <div class="mb-3">
-          <div class="mb-3 dating-field" v-if="props.profile.isDatingActive">
-            <span class="opacity-25">
-              <hr  />
-            </span>
-            {{ props.profile.introDating }}
-            <EditField
-              fieldName="introDatingLocalized"
-              :editComponent="IntrotextEditor"
-              wrapper-class="editable-textarea"
-              :editProps="{
-                languages: profile.languages,
-                placeholder: t('profiles.forms.intro_who_placeholder'),
-              }"
-            >
-              <template #display>
-                <div class="editable-placeholder" v-if="!props.profile.introDating">
-                  {{ t('profiles.forms.intro_who_placeholder') }}
-                </div>
-              </template>
-            </EditField>
-          </div>
-        </div>
-        <div class="mb-3">
-          <RelationshipTags :profile="props.profile" />
-        </div>
+    <div class="d-flex flex-row align-items-center mt-2">
+      <div class="flex-grow-1 d-inline-flex align-items-center">
+        <span class="fw-bolder fs-2 me-1"> {{ props.profile.publicName }}</span>
+        <EditField fieldName="publicName" :editComponent="PublicNameInput" />
       </div>
+      <GenderPronounLabel :profile="props.profile" />
+    </div>
+    <div class="mb-2 text-muted d-inline-flex align-items-center">
+      <span class="me-1">
+        <LocationLabel :location="profile.location" />
+      </span>
+      <EditField fieldName="location" :editComponent="LocationSelector" />
+    </div>
+
+    <div class="mb-3">
+      <div class="d-inline-block">
+        <TagList :profile />
+        <EditField fieldName="tags" :editComponent="TagSelectComponent" />
+      </div>
+
+      <div class="d-inline-flex align-items-center">
+        <LanguageList :languages="profile.languages" />
+        <EditField fieldName="languages" :editComponent="LanguageSelector" />
+      </div>
+    </div>
+    <div class="mb-3">
+      {{ props.profile.introSocial }}
+      <EditField
+        fieldName="introSocialLocalized"
+        :editComponent="IntrotextEditor"
+        wrapper-class="editable-textarea"
+        :editProps="{
+          languages: profile.languages,
+          placeholder: t('profiles.forms.intro_placeholder'),
+        }"
+      >
+        <template #display>
+          <div class="editable-placeholder" v-if="!props.profile.introSocial">
+            {{ t('profiles.forms.intro_placeholder') }}
+          </div>
+        </template>
+      </EditField>
+    </div>
+
+    <div class="mb-3">
+      <div class="mb-3 dating-field" v-if="props.profile.isDatingActive">
+        <span class="opacity-25">
+          <hr />
+        </span>
+        {{ props.profile.introDating }}
+        <EditField
+          fieldName="introDatingLocalized"
+          :editComponent="IntrotextEditor"
+          wrapper-class="editable-textarea"
+          :editProps="{
+            languages: profile.languages,
+            placeholder: t('profiles.forms.intro_who_placeholder'),
+          }"
+        >
+          <template #display>
+            <div class="editable-placeholder" v-if="!props.profile.introDating">
+              {{ t('profiles.forms.intro_who_placeholder') }}
+            </div>
+          </template>
+        </EditField>
+      </div>
+    </div>
+    <div class="mb-3">
+      <RelationshipTags :profile="props.profile" />
     </div>
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 .icons {
   position: absolute;
   top: 0.5rem;
-  right: 1.5rem;
-  z-index: 10;
+  right: 1rem;
+  z-index: 5;
 }
 
 .action-buttons {
   position: absolute;
-  /* top: 10px; */
-  /* bottom:2rem; */
-  margin-top: -3rem;
+  margin-top: -4rem;
   right: 1rem;
-  z-index: 10;
-  /* background-color: rgba(255, 255, 255, 0.8); */
+  z-index: 5;
 }
-
 </style>
