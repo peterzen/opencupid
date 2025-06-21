@@ -21,6 +21,8 @@ jobs:
           cache: 'pnpm'
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - name: Generate Prisma
+        run: pnpm --filter backend exec npx prisma generate
       - name: Build frontend
         run: pnpm --filter frontend exec pnpm build
       - name: Backend tests
