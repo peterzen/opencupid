@@ -127,10 +127,6 @@ watch(inputState, state => {
 </template>
 
 <style scoped>
-:deep(ul.formkit-messages) {
-  display: none;
-}
-
 .suffix-icon {
   position: absolute;
   top: 0.75em;

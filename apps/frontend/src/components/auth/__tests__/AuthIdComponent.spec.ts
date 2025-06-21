@@ -18,7 +18,7 @@ describe('AuthIdComponent', () => {
   it('validates identifier input', () => {
     const wrapper = mount(AuthIdComponent, {
       props: { isLoading: false },
-      global: { stubs: { FormKit: stubFormKit, CaptchaWidget } }
+      global: { stubs: {  CaptchaWidget } }
     })
     ;(wrapper.vm as any).authIdInput = 'bad'
     expect((wrapper.vm as any).inputState).toBe(false)
@@ -31,7 +31,7 @@ describe('AuthIdComponent', () => {
   it('emits otp:send with computed identifier', async () => {
     const wrapper = mount(AuthIdComponent, {
       props: { isLoading: false },
-      global: { stubs: { FormKit: stubFormKit, CaptchaWidget } }
+      global: { stubs: {  CaptchaWidget } }
     })
     ;(wrapper.vm as any).authIdInput = 'test@example.com'
     await (wrapper.vm as any).handleSendLoginLink()
@@ -46,7 +46,7 @@ describe('AuthIdComponent', () => {
   it('sets error when identifier empty', async () => {
     const wrapper = mount(AuthIdComponent, {
       props: { isLoading: false },
-      global: { stubs: { FormKit: stubFormKit, CaptchaWidget } }
+      global: { stubs: {  CaptchaWidget } }
     })
     await (wrapper.vm as any).handleSendLoginLink()
     expect((wrapper.vm as any).error).toBe('auth.auth_id_input_empty')
