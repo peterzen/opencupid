@@ -23,6 +23,7 @@ import {
   type StoreError
 } from './helpers'
 import { type EditProfileForm, ProfileFormToPayloadTransform, type EditFieldProfileFormWithImages } from '@zod/profile/profile.form'
+import { bus } from '@/lib/bus'
 
 export const useProfileStore = defineStore('profile', {
   state: () => ({
@@ -120,6 +121,10 @@ export const useProfileStore = defineStore('profile', {
     },
 
 
+    reset() {
+      this.profile = null // Reset profile
+      this.isLoading = false // Reset loading state
+    },
 
     // async findProfiles(): Promise<StoreResponse<StoreVoidSuccess | StoreError>> {
     //   try {
@@ -176,4 +181,8 @@ export const useProfileStore = defineStore('profile', {
       this.fieldEditModal = false
     }
   },
+})
+
+bus.on('auth:logout', () => {
+  useProfileStore().reset()
 })

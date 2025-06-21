@@ -64,7 +64,7 @@ const updateDatingPrefs = async () => {
   <main class="container">
     <ErrorOverlay v-if="error" :error />
 
-    <div v-else class="row justify-content-center mt-5">
+    <div v-else class="mt-5">
       <div class="px-4">
         <SecondaryNav
           v-if="profileBrowserStore.datingPrefs && profileStore.profile"

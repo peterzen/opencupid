@@ -135,6 +135,7 @@ onMounted(async () => {
 
 <template>
   <main class="container pb-5 h-100 d-flex flex-column justify-content-center align-items-center">
+    <!-- {{ formData }} -->
     <div class="w-100 d-flex justify-content-between align-items-center">
       <BButton
         @click="handlePrevious"

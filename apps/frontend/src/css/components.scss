@@ -143,14 +143,14 @@
 }
 
 @mixin nav-link-theme($color) {
-  color: $color;
-  background-color:transparentize($color, 0.9);
+  color: var(--bs-body-color);
+  background-color: transparentize($color, 0.9);
   border-color: transparent;
   border-radius: 0.5rem;
 
   &:hover {
     color: darken($color, 10%);
-  background-color:transparentize($color, 0.75);
+    background-color: transparentize($color, 0.75);
     border-color: darken($color, 10%);
   }
 
@@ -168,10 +168,9 @@
     border-color: $color;
   }
 }
+
 .nav-link-social {
-
   @include nav-link-theme($social);
-
 }
 
 .nav-link-dating {
@@ -182,8 +181,9 @@
 .profile-thumbnail {
   width: 40px;
   height: 40px;
+
   img {
-  border-radius: 50% !important;
+    border-radius: 50% !important;
 
   }
 }

@@ -189,7 +189,7 @@ watch(
   padding: 0.15rem 1rem;
 }
 textarea {
-  height: 50vh !important;
+  height: 30vh !important;
 }
 .svg-icon-100 {
   width: 100%;

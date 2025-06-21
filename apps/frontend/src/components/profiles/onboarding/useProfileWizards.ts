@@ -76,7 +76,10 @@ export const useOnboardingWizard = (formData: EditProfileForm) => {
       isCompleted: false,
     },
     introSocial: {
-      state: computed(() => formData.introSocial.length > 0),
+      state: computed(() => {
+        console.log('introSocialLocalized', formData.introSocialLocalized)
+        return Object.values(formData.introSocialLocalized).some(val => val.trim() !== '')
+      }),
       flags: '',
       isCompleted: false,
     },
