@@ -109,7 +109,7 @@ const handleFileChange = (event: Event) => {
     <div v-if="preview" class="preview-container">
       <div class="mb-3">
         <LoadingComponent v-if="isLoading" />
-        <div class="ratio ratio-1x1">
+        <div class="ratio ratio-4x3">
           <img
             :src="preview"
             alt="Preview"
@@ -119,38 +119,24 @@ const handleFileChange = (event: Event) => {
           />
         </div>
       </div>
-      <!-- <div class="mb-3">
-        <FormKit
-          type="textarea"
-          input-class="form-control-sm"
-          placeholder="Caption this..."
-          v-model="captionText"
-          label=""
-          floating-label="false"
-          auto-height
-          :validation-messages="{
-            required: 'Please write a sentence or two about yourself',
-            min: 'Name must be at least 2 characters long',
-            max: 'Name must be less than 50 characters long',
-          }"
-        />
-      </div> -->
+
       <ErrorComponent :error="error" />
       <div class="mb-3 justify-content-center d-flex flex-column gap-2 align-items-center">
-        <FormKit
-          type="button"
-          wrapper-class=""
-          input-class="btn btn-primary btn-lg mb-3"
+        <BButton
+          variant="primary"
+          @click.prevent="handleUpload"
           :label="t('profiles.image_upload.looks_good')"
           :disabled="isLoading"
-          @click.prevent="handleUpload"
-        />
-        <a
-          href="#"
-          @click.prevent="closeModal"
-          class="text-secondary link-underline link-underline-opacity-0"
-          >{{ t('profiles.image_upload.nevermind') }}</a
+          >{{ t('profiles.image_upload.looks_good') }}</BButton
         >
+        <small>
+          <a
+            href="#"
+            @click.prevent="closeModal"
+            class="text-secondary link-underline link-underline-opacity-0"
+            >{{ t('profiles.image_upload.nevermind') }}</a
+          >
+        </small>
       </div>
     </div>
     <div

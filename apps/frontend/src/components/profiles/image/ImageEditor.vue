@@ -19,8 +19,13 @@ const error = ref<string>('')
 
 const { t } = useI18n()
 
-const model = computed(() => {
-  return imageStore.images
+const model = computed({
+  get() {
+    return imageStore.images
+  },
+  set(val) {
+    imageStore.images = val
+  }
 })
 
 /**
