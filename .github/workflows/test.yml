@@ -21,7 +21,10 @@ jobs:
           cache: 'pnpm'
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - name: Build frontend
+        run: pnpm --filter frontend exec pnpm build
       - name: Backend tests
         run: pnpm --filter backend exec vitest run
       - name: Frontend unit tests
-        run: pnpm --filter frontend exec vitest run
+        run: pnpm --filter frontend exec vitest run --mode test
+        
