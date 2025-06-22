@@ -1,11 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
-// import useToast from 'vue-toastification'
 
 import { useAuthStore } from '@/store/authStore'
 import { useLocalStore } from '@/store/localStore'
 
-import Login from '@/views/Login.vue'
+import AuthUserId from '@/views/AuthUserId.vue'
+import AuthOtp from '@/views/AuthOtp.vue'
 import UserHome from '@/views/UserHome.vue'
 import Settings from '@/views/Settings.vue'
 import MyProfile from '@/views/MyProfile.vue'
@@ -16,9 +16,15 @@ import OnboardWizard from '@/views/OnboardWizard.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/login',
+    path: '/auth',
     name: 'Login',
-    component: Login,
+    component: AuthUserId,
+    meta: { requiresAuth: false },
+  },
+  {
+    path: '/auth/otp',
+    name: 'LoginOTP',
+    component: AuthOtp,
     meta: { requiresAuth: false },
   },
   {
