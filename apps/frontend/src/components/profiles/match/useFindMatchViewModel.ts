@@ -37,10 +37,6 @@ export function useFindMatchViewModel() {
     await findProfilesStore.findSocial()
   }
 
-  const haveResults = computed(() => {
-    return findProfilesStore.profileList.length > 0
-  })
-
   watch(() => vm.currentScope, (newScope) => {
     if (newScope === 'social') {
       findProfilesStore.findSocial()
@@ -48,6 +44,21 @@ export function useFindMatchViewModel() {
       findProfilesStore.findDating()
     }
   })
+
+  const haveResults = computed(() => {
+    return findProfilesStore.profileList.length > 0
+  })
+
+  const haveAccess = computed(() => {
+    if (vm.currentScope === 'social') {
+      return me.isSocialActive
+    } else if (vm.currentScope === 'dating') {
+      return me.isDatingActive
+    }
+    return false
+  })
+
+
   // const results = computed(() => findProfilesStore.profileList)
   // const datingPrefs = computed(() => findProfilesStore.datingPrefs)
 
@@ -55,6 +66,7 @@ export function useFindMatchViewModel() {
     vm: vm,
     me: readonly(me),
     haveResults,
+    haveAccess,
     error,
     initialize,
     findProfilesStore,

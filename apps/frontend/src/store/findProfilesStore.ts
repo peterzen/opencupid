@@ -69,7 +69,7 @@ export const useFindProfilesStore = defineStore('findProfiles', {
         return storeSuccess()
       } catch (error: any) {
         this.datingPrefs = null // Reset profile on error
-        console.log('Error fetching datingPrefs:', error)
+        // console.log('Error fetching datingPrefs:', error)
         return storeError(error, 'Failed to fetch datingPrefs')
       } finally {
         this.isLoading = false // Reset loading state

@@ -82,7 +82,7 @@ const emit = defineEmits<{
         <TagList :profile />
         <EditField fieldName="tags" :editComponent="TagSelectComponent" >
           <template #display>
-            <div class="editable-placeholder" v-if="!props.profile.tags.length">
+            <div class="editable-placeholder" v-if="!props.profile.tags?.length">
               {{ t('profiles.forms.tags_placeholder') }}
             </div>
           </template>

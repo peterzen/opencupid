@@ -43,8 +43,7 @@ export class MatchQueryService {
 
     const myAge = calculateAge(profile.birthday)
 
-    return prisma.profile.findMany({
-      where: {
+    const where = {
         id: { not: profile.id },
         isDatingActive: true,
         birthday: {
@@ -57,7 +56,10 @@ export class MatchQueryService {
         prefAgeMax: { gte: myAge },
         prefGender: { hasSome: [profile.gender] },
         prefKids: profile.hasKids ? { hasSome: [profile.hasKids] } : undefined,
-      },
+      }
+
+    return prisma.profile.findMany({
+      where: where,
       include: {
         ...profileCompleteInclude(),  // shared with profile.service.ts - where to keep this?
       }

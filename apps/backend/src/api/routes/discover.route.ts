@@ -12,10 +12,10 @@ const matcherRoutes: FastifyPluginAsync = async fastify => {
   // instantiate services
   const matchQueryService = MatchQueryService.getInstance()
 
- 
+
   fastify.get('/social', { onRequest: [fastify.authenticate] }, async (req, reply) => {
 
-    if (!req.session.hasActiveProfile) return sendForbiddenError(reply)
+    if (!req.session.hasActiveProfile || !req.session.profile.isSocialActive) return sendForbiddenError(reply)
     const myProfileId = req.session.profileId
     const locale = req.session.lang
 
@@ -32,16 +32,15 @@ const matcherRoutes: FastifyPluginAsync = async fastify => {
   })
 
 
- fastify.get('/dating', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+  fastify.get('/dating', { onRequest: [fastify.authenticate] }, async (req, reply) => {
 
-    if (!req.session.hasActiveProfile) return sendForbiddenError(reply)
+    if (!req.session.hasActiveProfile || !req.session.profile.isDatingActive) return sendForbiddenError(reply)
     const myProfileId = req.session.profileId
     const locale = req.session.lang
 
     try {
       const profiles = await matchQueryService.findMutualMatchesFor(myProfileId)
-      const hasDatingPermission = req.session.profile.isDatingActive
-      const mappedProfiles = profiles.map(p => mapProfileToPublic(p, hasDatingPermission, locale))
+      const mappedProfiles = profiles.map(p => mapProfileToPublic(p, true /* hasDatingPermission*/, locale))
       const response: GetProfilesResponse = { success: true, profiles: mappedProfiles }
       return reply.code(200).send(response)
     } catch (err) {

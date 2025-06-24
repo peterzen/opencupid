@@ -3,7 +3,7 @@ import IconDate from '@/assets/icons/app/cupid.svg'
 import IconSocialize from '@/assets/icons/app/socialize.svg'
 import { type ScopeSelectModel } from '@/components/profiles/types'
 
-const model = defineModel<ScopeSelectModel>({
+const vm = defineModel<ScopeSelectModel>({
   default: () => {},
 })
 </script>
@@ -13,10 +13,9 @@ const model = defineModel<ScopeSelectModel>({
     href="#"
     class="link nav-link-social mx-2"
     :class="{
-      disabled: model.scopes.includes('social') === false,
-      active: model.currentScope === 'social',
+      active: vm.currentScope === 'social',
     }"
-    @click="model.currentScope = 'social'"
+    @click="vm.currentScope = 'social'"
   >
     <IconSocialize class="svg-icon-100" />
   </a>
@@ -24,10 +23,9 @@ const model = defineModel<ScopeSelectModel>({
     href="#"
     class="link nav-link-dating"
     :class="{
-      active: model.currentScope === 'dating',
-      disabled: model.scopes.includes('dating') === false,
+      active: vm.currentScope === 'dating',
     }"
-    @click="model.currentScope = 'dating'"
+    @click="vm.currentScope = 'dating'"
   >
     <IconDate class="svg-icon-100" />
   </a>

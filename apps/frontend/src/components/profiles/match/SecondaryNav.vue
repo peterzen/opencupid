@@ -4,11 +4,15 @@ import IconSetting from '@/assets/icons/interface/setting.svg'
 import ScopeViewToggler from '../ScopeViewToggler.vue'
 import { type FindMatchViewModel } from './types'
 
-const model = defineModel<FindMatchViewModel>()
+const vm = defineModel<FindMatchViewModel>()
 
 defineEmits({
   'edit:datingPrefs': () => true,
 })
+
+defineProps<{
+  prefsButtonDisabled?: boolean
+}>()
 
 </script>
 
@@ -20,11 +24,11 @@ defineEmits({
       </li>
 
       <li class="col-8 d-flex nav-item justify-content-center align-items-center">
-        <ScopeViewToggler v-model="model" v-if="model?.scopes?.length! > 0" />
+        <ScopeViewToggler v-model="vm"  />
       </li>
 
       <li class="col-2 d-flex justify-content-end">
-        <BButton variant="primary" class="ms-2" @click="$emit('edit:datingPrefs')">
+        <BButton variant="primary" class="ms-2" @click="$emit('edit:datingPrefs')" :disabled="prefsButtonDisabled">
           <IconSetting class="svg-icon" />
         </BButton>
       </li>

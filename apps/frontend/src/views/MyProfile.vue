@@ -26,12 +26,16 @@ import { type ViewState } from '@/components/profiles/myprofile/types'
 const router = useRouter()
 const profileStore = useProfileStore()
 
+const props = defineProps<{
+  editMode?: boolean
+}>()
+
 const showModal = ref(false)
 const error = ref('')
 const formData: EditFieldProfileFormWithImages = reactive({} as EditFieldProfileFormWithImages)
 
 const viewState = reactive<ViewState>({
-  isEditable: false,
+  isEditable: props.editMode ?? false,
   previewLanguage: useI18nStore().currentLanguage,
   scopes: ['dating', 'social'],
   currentScope: 'social',

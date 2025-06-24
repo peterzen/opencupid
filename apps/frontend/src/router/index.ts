@@ -41,6 +41,13 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true },
   },
   {
+    path: '/me/edit',
+    name: 'EditProfile',
+    component: MyProfile,
+    props: { editMode: true },
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/',
     name: 'UserHome',
     component: UserHome,
