@@ -18,21 +18,37 @@ import {
   type StoreResponse,
   type StoreError
 } from './helpers'
-import { type DatingPreferencesDTO, DatingPreferencesDTOSchema } from '@zod/profile/datingPreference.dto'
+import { type DatingPreferencesDTO, DatingPreferencesDTOSchema } from '@zod/match/datingPreference.dto'
+import type { SocialSearchQuery } from '@zod/match/socialSearch.dto'
 
-export const useProfileBrowserStore = defineStore('profileBrowser', {
+export const useFindProfilesStore = defineStore('findProfiles', {
   state: () => ({
     profileList: [] as PublicProfile[], // List of public profiles
     datingPrefs: null as DatingPreferencesDTO | null, // Current user's dating preferences  
+    socialSearch: null as SocialSearchQuery | null, // Current social search query
 
     isLoading: false, // Loading state
   }),
 
   actions: {
-    async findProfiles(): Promise<StoreResponse<StoreVoidSuccess | StoreError>> {
+    async findSocial(): Promise<StoreResponse<StoreVoidSuccess | StoreError>> {
       try {
         this.isLoading = true // Set loading state
-        const res = await api.get<GetProfilesResponse>('/profiles')
+        const res = await api.get<GetProfilesResponse>('/discover/social')
+        const fetched = PublicProfileArraySchema.parse(res.data.profiles)
+        this.profileList = fetched // Update local state
+        return storeSuccess()
+      } catch (error: any) {
+        this.profileList = [] // Reset profile list on error
+        return storeError(error, 'Failed to fetch profiles')
+      } finally {
+        this.isLoading = false // Reset loading state
+      }
+    },
+    async findDating(): Promise<StoreResponse<StoreVoidSuccess | StoreError>> {
+      try {
+        this.isLoading = true // Set loading state
+        const res = await api.get<GetProfilesResponse>('/discover/dating')
         const fetched = PublicProfileArraySchema.parse(res.data.profiles)
         this.profileList = fetched // Update local state
         return storeSuccess()

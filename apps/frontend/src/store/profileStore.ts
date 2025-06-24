@@ -3,12 +3,14 @@ import { api } from '@/lib/api'
 import type {
   OwnerProfile,
   PublicProfile,
-  PublicProfileWithConversation,
+  PublicProfileWithContext,
+  UpdateProfileScopePayload,
 } from '@zod/profile/profile.dto'
 import {
   OwnerProfileSchema,
   PublicProfileSchema,
-  PublicProfileWithConversationSchema,
+  PublicProfileWithContextSchema,
+  UpdateProfileScopeSchemaPayload,
 } from '@zod/profile/profile.dto'
 import type {
   GetMyProfileResponse,
@@ -57,6 +59,25 @@ export const useProfileStore = defineStore('profile', {
     },
 
     // Update the current user's social profile
+    async createOwnerProfile(profileData: EditProfileForm): Promise<StoreVoidSuccess | StoreError> {
+      const update = ProfileFormToPayloadTransform.parse(profileData)
+
+      if (!update) return storeError(new Error('Invalid profile data'), 'Failed to update profile')
+
+      try {
+        this.isLoading = true // Set loading state
+        const res = await api.post<UpdateProfileResponse>('/profiles/me', update)
+        const updated = OwnerProfileSchema.parse(res.data.profile)
+        this.profile = updated
+        return storeSuccess()
+      } catch (error: any) {
+        return storeError(error, 'Failed to create profile')
+      } finally {
+        this.isLoading = false // Reset loading state
+      }
+    },
+
+    // Update the current user's social profile
     async updateOwnerProfile(profileData: EditProfileForm): Promise<StoreVoidSuccess | StoreError> {
       const update = ProfileFormToPayloadTransform.parse(profileData)
 
@@ -67,6 +88,28 @@ export const useProfileStore = defineStore('profile', {
       }
       return this.persistOwnerProfile() // Persist dating preferences if they exist
     },
+
+    // Update the current user's social profile
+    async updateProfileScopes(profileFragment: UpdateProfileScopePayload): Promise<StoreVoidSuccess | StoreError> {
+      const parsed = UpdateProfileScopeSchemaPayload.safeParse(profileFragment)
+
+      if (!parsed.success) return storeError(new Error('Invalid profile data'), 'Failed to update profile')
+      try {
+        this.isLoading = true // Set loading state
+        const res = await api.patch<UpdateProfileResponse>('/profiles/scopes', parsed.data)
+        const fetched = OwnerProfileSchema.parse(res.data.profile)
+        if (this.profile)
+          Object.assign(this.profile, fetched) // Update local state with new data  
+        return storeSuccess()
+      } catch (error: any) {
+        this.profile = null // Reset profile on error
+        console.log('Error fetching profile:', error)
+        return storeError(error, 'Failed to fetch profile')
+      } finally {
+        this.isLoading = false // Reset loading state
+      }
+    },
+
 
     async persistOwnerProfile(): Promise<StoreVoidSuccess | StoreError> {
       try {
@@ -85,11 +128,11 @@ export const useProfileStore = defineStore('profile', {
 
 
     // Fetch a profile by ID
-    async getPublicProfile(profileId: string): Promise<StoreResponse<PublicProfileWithConversation>> {
+    async getPublicProfile(profileId: string): Promise<StoreResponse<PublicProfileWithContext>> {
       try {
         this.isLoading = true // Set loading state
         const res = await api.get<GetPublicProfileResponse>(`/profiles/${profileId}`)
-        const fetched = PublicProfileWithConversationSchema.parse(res.data.profile)
+        const fetched = PublicProfileWithContextSchema.parse(res.data.profile)
         return storeSuccess(fetched)
       } catch (error: any) {
         return storeError(error, 'Failed to fetch profile')

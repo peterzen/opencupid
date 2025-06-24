@@ -1,45 +1,27 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { reactive, onMounted, computed, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
 
-import { type PublicProfile, type PublicProfileWithConversation } from '@zod/profile/profile.dto'
 
-import LoadingComponent from '@/components/LoadingComponent.vue'
-import ProfileCardComponent from '@/components/profiles/public/ProfileCardComponent.vue'
-import NoProfileInfoCTAComponent from '@/components/profiles/NoProfileInfoCTA.vue'
 import InvitePeopleDialog from '@/components/profiles/public/InvitePeopleDialog.vue'
-import ErrorComponent from '@/components/ErrorComponent.vue'
-import IconSetting from '@/assets/icons/interface/setting.svg'
 import ErrorOverlay from '@/components/ErrorOverlay.vue'
-import DatingPreferencesForm from '@/components/profiles/browse/DatingPreferencesForm.vue'
-import { useAgeFields } from '@/components/profiles/composables/useAgeFields'
-import { useProfileBrowserStore } from '@/store/profileBrowserStore'
-import ScopeViewToggler from '@/components/profiles/ScopeViewToggler.vue'
-import SecondaryNav from '@/components/profiles/browse/SecondaryNav.vue'
+import DatingPreferencesForm from '@/components/profiles/match/DatingPreferencesForm.vue'
+import SecondaryNav from '@/components/profiles/match/SecondaryNav.vue'
+import ProfileCardGrid from '../components/profiles/match/ProfileCardGrid.vue'
+import { useFindMatchViewModel } from '@/components/profiles/match/useFindMatchViewModel'
 
 const router = useRouter()
 const profileStore = useProfileStore()
-const profileBrowserStore = useProfileBrowserStore()
+
 // state management
-const error = ref<string | null>('')
 const showModal = ref(false)
 const showPrefs = ref(false)
 
-const haveProfiles = computed(() => {
-  return profileBrowserStore.profileList.length > 0
-})
+const { vm, me, findProfilesStore, haveResults, error, initialize } = useFindMatchViewModel()
 
 onMounted(async () => {
-  const res = await profileBrowserStore.findProfiles()
-  // access issue
-  if (!res.success) {
-    error.value = res.message
-    showModal.value = true
-    return
-  }
-  const pres = await profileBrowserStore.fetchDatingPrefs()
-  const ppres = await profileStore.fetchOwnerProfile()
+  await initialize()
 })
 
 const handleCardClick = (profileId: string) => {
@@ -56,7 +38,7 @@ const handlePrefsClick = () => {
 }
 
 const updateDatingPrefs = async () => {
-  await profileBrowserStore.persistDatingPrefs()
+  await findProfilesStore.persistDatingPrefs()
 }
 </script>
 
@@ -64,30 +46,34 @@ const updateDatingPrefs = async () => {
   <main class="container">
     <ErrorOverlay v-if="error" :error />
 
-    <div v-else class="mt-5">
-      <div class="px-4">
-        <SecondaryNav
-          v-if="profileBrowserStore.datingPrefs && profileStore.profile"
-          v-model="profileBrowserStore.datingPrefs"
-          :profile="profileStore.profile"
+    <div v-else class="mt-2">
+      <SecondaryNav v-model="vm" @edit:datingPrefs="showModal = true" />
+
+      <div v-if="haveResults" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+        <ProfileCardGrid
+          :profiles="findProfilesStore.profileList"
+          @profile:select="handleCardClick"
         />
       </div>
 
-      <div v-if="haveProfiles" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
-        <div v-for="profile in profileBrowserStore.profileList" :key="profile.id" class="col">
-          <ProfileCardComponent :profile @click="handleCardClick(profile.id)" />
-        </div>
-      </div>
+      <InvitePeopleDialog v-else />
+
       <BModal
-        v-else
+        v-model="showModal"
         centered
-        :no-footer="true"
+        button-size="sm"
+        :focus="false"
+        :no-close-on-backdrop="true"
+        fullscreen="sm"
+        :no-footer="false"
         :no-header="true"
-        :backdrop-first="false"
-        no-animation
-        title="Help spread the word!"
+        cancel-title="Nevermind"
+        initial-animation
+        :body-scrolling="false"
+        title="Add a photo"
+        @ok="updateDatingPrefs"
       >
-        <InvitePeopleDialog />
+        <DatingPreferencesForm v-model="findProfilesStore.datingPrefs" v-if="findProfilesStore.datingPrefs" />
       </BModal>
     </div>
   </main>

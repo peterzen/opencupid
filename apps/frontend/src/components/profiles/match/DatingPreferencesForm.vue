@@ -2,14 +2,11 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import VueSlider from 'vue-3-slider-component'
-import { type OwnerProfile } from '@zod/profile/profile.dto'
-import { type DatingPreferencesDTO } from '@zod/profile/datingPreference.dto'
 
-
-import { useAgeFields } from '@/components/profiles/composables/useAgeFields'
-import { DatingPreferencesFormSchema } from '@zod/profile/datingPreference.form'
+import { DatingPreferencesFormSchema } from '@zod/match/datingPreference.form'
 import GenderPreferenceSelector from './GenderPreferenceSelector.vue'
 import HasKidsPreferenceSelector from './HaskidsPreferenceSelector.vue'
+import { type DatingPreferencesDTO } from '@zod/match/datingPreference.dto'
 
 // https://github.com/s-sasaki-0529/vue-slider-component
 
@@ -17,11 +14,8 @@ const model = defineModel<DatingPreferencesDTO>({
   default: () => DatingPreferencesFormSchema.parse({}),
 })
 
-const props = defineProps<{
-  profile: OwnerProfile | null
-}>()
 
-const { age } = useAgeFields(props.profile?.birthday ?? null)
+// const { age } = useAgeFields(props.profile?.birthday ?? null)
 
 const { t } = useI18n()
 
@@ -33,19 +27,19 @@ const prefAge = computed({
   },
 })
 
-const ageMaxMin = computed(() => {
-  if (age.value) {
-    return {
-      min: Math.max(18, age.value - 25),
-      max: age.value + 25,
-    }
-  } else {
-    return {
-      min: 18,
-      max: 100,
-    }
-  }
-})
+// const ageMaxMin = computed(() => {
+//   if (age.value) {
+//     return {
+//       min: Math.max(18, age.value - 25),
+//       max: age.value + 25,
+//     }
+//   } else {
+//     return {
+//       min: 18,
+//       max: 100,
+//     }
+//   }
+// })
 </script>
 
 <template>
@@ -67,15 +61,15 @@ const ageMaxMin = computed(() => {
               :contained="true"
               :tooltip="'none'"
               :enable-cross="false"
-              :min="ageMaxMin.min"
-              :max="ageMaxMin.max"
+              :min="18"
+              :max="100"
             ></vue-slider>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="mb-3"  style="min-height:0;flex:0 1 auto;">
+    <div class="mb-3" style="min-height: 0; flex: 0 1 auto">
       <GenderPreferenceSelector v-model="model.prefGender" />
     </div>
 

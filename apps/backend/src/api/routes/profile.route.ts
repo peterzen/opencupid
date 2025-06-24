@@ -4,12 +4,14 @@ import { z } from 'zod'
 
 import {
   type UpdateProfilePayload,
-  UpdateProfilePayloadSchema
+  UpdateProfilePayloadSchema,
+  UpdateProfileScopeSchemaPayload
 } from '@zod/profile/profile.dto'
 
 import { ProfileService } from 'src/services/profile.service'
 import { validateBody } from '@/utils/zodValidate'
 import {
+  rateLimitConfig,
   sendError,
   sendForbiddenError,
   sendUnauthorizedError
@@ -18,7 +20,7 @@ import {
   mapDbProfileToOwnerProfile,
   mapProfileToDatingPreferences,
   mapProfileToPublic,
-  mapProfileWithConversationToPublic,
+  mapProfileWithContext,
 } from '@/api/mappers/profile.mappers'
 import { UserService } from 'src/services/user.service'
 import type {
@@ -29,7 +31,8 @@ import type {
   GetDatingPreferenceseResponse,
   UpdateDatingPreferencesResponse,
 } from '@shared/dto/apiResponse.dto'
-import { DatingPreferencesDTOSchema, UpdateDatingPreferencesPayloadSchema } from '@zod/profile/datingPreference.dto'
+import { DatingPreferencesDTOSchema, UpdateDatingPreferencesPayloadSchema } from '@zod/match/datingPreference.dto'
+import { appConfig } from '@shared/config/appconfig'
 
 // Route params for ID lookups
 const IdLookupParamsSchema = z.object({
@@ -81,7 +84,7 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
 
     try {
       const { id } = IdLookupParamsSchema.parse(req.params)
-      const raw = await profileService.getProfileWithConversationsById(id, myProfileId)
+      const raw = await profileService.getProfileWithContextById(id, myProfileId)
       if (!raw) return sendError(reply, 404, 'Profile not found')
 
       if (raw.userId !== req.user.userId && !req.session.hasActiveProfile) {
@@ -89,7 +92,7 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
       }
       const hasDatingPermission = req.session.profile.isDatingActive
 
-      const profile = mapProfileWithConversationToPublic(raw, hasDatingPermission, locale)
+      const profile = mapProfileWithContext(raw, hasDatingPermission, locale)
       // const profile = publicProfileSchema.parse(raw)
       const response: GetPublicProfileResponse = { success: true, profile }
       return reply.code(200).send(response)
@@ -126,48 +129,61 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
   })
 
 
-  fastify.get('/', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+  // fastify.get('/', { onRequest: [fastify.authenticate] }, async (req, reply) => {
 
-    if (!req.session.hasActiveProfile) return sendForbiddenError(reply)
-    const myProfileId = req.session.profileId
-    const locale = req.session.lang
+  //   if (!req.session.hasActiveProfile) return sendForbiddenError(reply)
+  //   const myProfileId = req.session.profileId
+  //   const locale = req.session.lang
 
-    try {
-      const profiles = await profileService.findProfilesFor(locale, myProfileId)
-      const hasDatingPermission = req.session.profile.isDatingActive
-      const mappedProfiles = profiles.map(p => mapProfileWithConversationToPublic(p, hasDatingPermission, locale))
-      const response: GetProfilesResponse = { success: true, profiles: mappedProfiles }
-      return reply.code(200).send(response)
-    } catch (err) {
-      fastify.log.error(err)
-      return sendError(reply, 500, 'Failed to fetch profiles')
-    }
-  })
+  //   try {
+  //     const profiles = await profileService.findProfilesFor(locale, myProfileId)
+  //     const hasDatingPermission = req.session.profile.isDatingActive
+  //     const mappedProfiles = profiles.map(p => mapProfileWithContext(p, hasDatingPermission, locale))
+  //     const response: GetProfilesResponse = { success: true, profiles: mappedProfiles }
+  //     return reply.code(200).send(response)
+  //   } catch (err) {
+  //     fastify.log.error(err)
+  //     return sendError(reply, 500, 'Failed to fetch profiles')
+  //   }
+  // })
 
   /**
-   * Update the current user's profile
+   * Create a new profile for the current user
+   * @description This route is used to create a new profile for the current user.
+   * It sets the onboarding flag to true, indicating that the user has completed the onboarding process.
    */
-  fastify.patch('/me', { onRequest: [fastify.authenticate] }, async (req, reply) => {
-
+  fastify.post('/me', { onRequest: [fastify.authenticate] }, async (req, reply) => {
     const data = await validateBody(UpdateProfilePayloadSchema, req, reply) as UpdateProfilePayload
     if (!data) return
+
+    // check if the user already has an onboarded profile. Since we're allowing the setting of
+    // isDatingActive and isSocialActive here, we need to ensure that those flags can only be set once
+    // and later via the PATCH /scopes route which is rate limited
+    const existing = await profileService.getProfileByUserId(req.user.userId)
+    if(existing && existing.isOnboarded){
+      return sendError(reply, 403, 'Profile already exists and is onboarded')
+    }
     // @ts-expect-error - We are setting isOnboarded here, which is not part of CreateProfilePayload
     //  i'm not gonna bloody write a transform for this
     data.isOnboarded = true // Set the onboarding flag to true
     return updateProfile(data, req, reply)
   })
 
+  /**
+   * Update the current user's profile
+   */
+  fastify.patch('/me', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    const data = await validateBody(UpdateProfilePayloadSchema, req, reply) as UpdateProfilePayload
+    // destructure to remove isSocialActive and isDatingActive
+    if (!data) return
+    const { isSocialActive, isDatingActive, ...rest } = data
+    return updateProfile(rest, req, reply)
+  })
 
   async function updateProfile(profileData: UpdateProfilePayload, req: FastifyRequest, reply: FastifyReply) {
     const user = await userService.getUserById(req.user.userId)
     if (!user) return sendUnauthorizedError(reply)
 
-    // // set flags on user object (these are used in authorization)
-    // if (profileData.isDatingActive) {
-    //   userService.addRole(user, 'user_dating')
-    // } else {
-    //   userService.removeRole(user, 'user_dating')
-    // }
     user.hasActiveProfile = [profileData.isDatingActive, profileData.isSocialActive].some(Boolean)
     const locale = req.session.lang
 
@@ -224,7 +240,7 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
     if (!data) return
 
     try {
-      const updated = await profileService.updateProfile(req.user.userId, data)
+      const updated = await profileService.updateProfileScalars(req.user.userId, data)
       if (!updated) return sendError(reply, 404, 'Profile not found')
       const prefs = DatingPreferencesDTOSchema.parse(updated)
       const response: UpdateDatingPreferencesResponse = { success: true, prefs }
@@ -233,8 +249,52 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
       fastify.log.error(err)
       return sendError(reply, 500, 'Failed to update dating preferences')
     }
+  })
+
+
+  fastify.patch('/scopes', {
+    onRequest: [fastify.authenticate],
+    config: {
+      ...rateLimitConfig(fastify, '1 day', appConfig.RATE_LIMIT_PROFILE_SCOPES),
+    },
+
+  }, async (req, reply) => {
+
+    const data = await validateBody(UpdateProfileScopeSchemaPayload, req, reply) as UpdateProfilePayload
+    if (!data) return
+    return updateProfile(data, req, reply)
+  })
+
+
+
+  /*
+   fastify.patch('/scopes', {
+    onRequest: [fastify.authenticate],
+    config: {
+      ...rateLimitConfig(fastify, '1 day', appConfig.RATE_LIMIT_PROFILE_SCOPES),
+    },
+
+  }, async (req, reply) => {
+
+    const data = await validateBody(UpdateProfileScopeSchemaPayload, req, reply) as UpdateProfileScopePayload
+    if (!data) return
+    const locale = req.session.lang
+
+    try {
+      const updated = await profileService.updateScopes(req.user.userId, data)
+      if (!updated) return sendError(reply, 404, 'Profile not found')
+      await req.deleteSession()
+
+      const profile = mapDbProfileToOwnerProfile(locale, updated)
+      const response: UpdateProfileResponse = { success: true, profile }
+      return reply.code(200).send(response)
+    } catch (error) {
+      fastify.log.error(error)
+      return sendError(reply, 500, 'Failed to update profile scopes')
+    }
 
   })
+    */
 
 }
 

@@ -12,31 +12,7 @@ import {
   DbProfileWithImages
 } from '@zod/profile/profile.db'
 import { mapToLocalizedUpserts } from '@/api/mappers/profile.mappers'
-
-function profileCompleteInclude() {
-  const clause = {
-    profileImages: {
-      orderBy: { position: 'asc' },
-    },
-    tags: {
-      include: {
-        tag: {
-          include: {
-            translations: {
-              // where: { locale: 'de' },
-              select: { name: true, locale: true },
-            },
-          }
-        },
-      },
-    },
-    localized: true,
-
-  } satisfies Prisma.ProfileInclude
-
-  return clause
-}
-
+import { profileCompleteInclude } from '@/db/includes/profileCompleteInclude'
 
 
 const conversationWithMyProfileInclude = (myProfileId: string) => ({
@@ -71,7 +47,7 @@ export class ProfileService {
     return ProfileService.instance
   }
 
-  async getProfileWithConversationsById(profileId: string, myProfileId: string,): Promise<DbProfileComplete | null> {
+  async getProfileWithContextById(profileId: string, myProfileId: string,): Promise<DbProfileComplete | null> {
 
     return prisma.profile.findUnique({
       where: { id: profileId },
@@ -188,7 +164,7 @@ export class ProfileService {
   }
 
 
-  async updateProfile(userId: string, data: DbOwnerUpdateScalars) {
+  async updateProfileScalars(userId: string, data: DbOwnerUpdateScalars) {
     return await prisma.profile.update({
       where: { userId },
       data: data,
@@ -358,30 +334,27 @@ export class ProfileService {
       return profile
     }
 
-    const slug = cuid.slug()
-
     return prisma.profile.create({
       data: {
         userId,
-        slug,
         publicName: '',
         introSocial: '',
       },
     })
   }
 
-  async findProfilesFor(locale: string, profileId: string): Promise<DbProfileComplete[]> {
-    return await prisma.profile.findMany({
-      where: {
-        isActive: true,
-        id: {
-          not: profileId,
-        },
-      },
-      include: {
-        ...profileCompleteInclude(),
-        ...conversationWithMyProfileInclude(profileId),
-      },
-    })
-  }
+  // async findProfilesFor(locale: string, profileId: string): Promise<DbProfileComplete[]> {
+  //   return await prisma.profile.findMany({
+  //     where: {
+  //       isActive: true,
+  //       id: {
+  //         not: profileId,
+  //       },
+  //     },
+  //     include: {
+  //       ...profileCompleteInclude(),
+  //       ...conversationWithMyProfileInclude(profileId),
+  //     },
+  //   })
+  // }
 }

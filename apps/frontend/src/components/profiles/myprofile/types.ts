@@ -1,5 +1,6 @@
-export type ViewState = {
+import { type ScopeSelectModel } from "../types";
+
+export type ViewState = ScopeSelectModel & {
   isEditable: boolean,
-  previewScope: 'social' | 'dating',
   previewLanguage: string,
 }
