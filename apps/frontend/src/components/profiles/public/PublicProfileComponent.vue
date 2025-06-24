@@ -80,7 +80,13 @@ const emit = defineEmits<{
     <div class="mb-3">
       <div class="d-inline-block">
         <TagList :profile />
-        <EditField fieldName="tags" :editComponent="TagSelectComponent" />
+        <EditField fieldName="tags" :editComponent="TagSelectComponent" >
+          <template #display>
+            <div class="editable-placeholder" v-if="!props.profile.tags.length">
+              {{ t('profiles.forms.tags_placeholder') }}
+            </div>
+          </template>
+        </EditField>
       </div>
 
       <div class="d-inline-flex align-items-center">
