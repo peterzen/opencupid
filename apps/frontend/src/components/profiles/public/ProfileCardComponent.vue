@@ -12,11 +12,10 @@ defineProps<{
 </script>
 
 <template>
-  <div class="card h-100 profile-card cursor-pointer position-relative overflow-hidden d-flex flex-column user-select-none shadow"
-       @click="$emit('click', profile.id)">
-    <div class="icons">
-      <DatingIcon :profile />
-    </div>
+  <div
+    class="card h-100 profile-card cursor-pointer position-relative overflow-hidden d-flex flex-column user-select-none shadow"
+    @click="$emit('click', profile.id)"
+  >
     <div class="ratio ratio-1x1">
       <ProfileImage :profile="profile" className="" />
     </div>
@@ -24,11 +23,11 @@ defineProps<{
       <div class="card-title mb-0 pb-0 d-flex align-items-center justify-content-between flex-row">
         <h5 class="flex-grow-1 fw-bold m-0">{{ profile.publicName }}</h5>
         <small>
-          <LocationLabel :location="profile.location"/>
+          <LocationLabel :location="profile.location" />
         </small>
       </div>
       <div class="p-2 flex-grow-1">
-        <TagList :profile/>
+        <TagList :profile />
       </div>
       <!-- <p class="card-text" :class="{ 'truncated-text': profile.introSocial.length > 100 }">
         {{ profile.introSocial }}
@@ -52,7 +51,7 @@ defineProps<{
   }
 }
 .card-title {
-  text-shadow: 0 0 5px rgba(0,0,0,0.8);
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
   color: var(--bs-light);
   padding: 0.5rem;
   width: 100%;
@@ -63,7 +62,7 @@ defineProps<{
   position: absolute;
   bottom: 0rem;
   height: 7.25rem;
-  background-color: rgba(80,80,80, 0.5);
+  background-color: rgba(80, 80, 80, 0.5);
 }
 
 .truncated-text {

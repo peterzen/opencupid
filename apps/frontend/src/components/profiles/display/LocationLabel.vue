@@ -5,7 +5,8 @@ import { type LocationDTO } from '@zod/dto/location.dto';
 import { useCountries } from '@/components/composables/useCountries';
 
 const props = defineProps<{
-  location: LocationDTO
+  location: LocationDTO,
+  showCity?: boolean
 }>()
 
 const { countryCodeToName } = useCountries()
@@ -18,7 +19,7 @@ const countryName = computed(() => {
 
 <template>
   <span v-if="location">
-    <span v-if="location.cityName">{{ location.cityName }}, </span>
+    <span v-if="location.cityName && showCity">{{ location.cityName }}, </span>
     <span v-if="location.country">{{ countryName }}</span>
   </span>
 </template>

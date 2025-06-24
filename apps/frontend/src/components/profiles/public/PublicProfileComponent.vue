@@ -72,7 +72,7 @@ const emit = defineEmits<{
     </div>
     <div class="mb-2 text-muted d-inline-flex align-items-center">
       <span class="me-1">
-        <LocationLabel :location="profile.location" />
+        <LocationLabel :location="profile.location" :show-city="true"/>
       </span>
       <EditField fieldName="location" :editComponent="LocationSelector" />
     </div>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { FindMatchViewModel } from './types'
+import { type FindMatchViewModel } from './types'
 
 const vm = defineModel<FindMatchViewModel>()
 
