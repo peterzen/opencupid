@@ -15,15 +15,13 @@ function shuffle<T>(array: T[]): T[] {
 
 async function main() {
 
-
-
   const grouped = new Map<string, any[]>()
 
   shuffle(
     cities.filter(c => countries.includes(c.country))
   ).forEach(c => {
     const list = grouped.get(c.country) ?? []
-    if (list.length < 50) {
+    if (list.length < 150) {
       list.push(c)
       grouped.set(c.country, list)
     }
@@ -40,7 +38,7 @@ async function main() {
     }))
 
   const recordsToInsert = toUpsert.length
-  // await prisma.$executeRawUnsafe(`DELETE FROM City`);
+  await prisma.$executeRawUnsafe(`DELETE FROM "City"`);
   // Upsert all in batches
   for (let i = 0; i < recordsToInsert; i += 10) {
     const batch = toUpsert.slice(i, i + 10)
