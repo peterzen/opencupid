@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ProfileScope } from '@zod/profile/profile.dto'
+import { type ProfileScope } from '@zod/profile/profile.dto'
 
 const currentScope = defineModel<ProfileScope | null>()
 
