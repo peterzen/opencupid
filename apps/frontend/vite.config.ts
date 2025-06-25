@@ -26,6 +26,9 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         external: (id) => id.includes('__tests__')
       }
     },
+    optimizeDeps: {
+      include: ['qrcode']
+    },
     plugins: [
       {
         name: 'exclude-tests-from-build',

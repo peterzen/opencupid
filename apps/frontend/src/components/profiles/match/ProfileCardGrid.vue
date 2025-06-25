@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ProfileCardComponent from '@/components/profiles/public/ProfileCardComponent.vue'
+import ProfileCardComponent from './ProfileCardComponent.vue'
 import { type PublicProfile } from '@zod/profile/profile.dto'
 
 defineProps<{

@@ -61,7 +61,7 @@ defineProps<{
   width: 100%;
   position: absolute;
   bottom: 0rem;
-  height: 7.25rem;
+  max-height: 7.25rem;
   background-color: rgba(80, 80, 80, 0.5);
 }
 

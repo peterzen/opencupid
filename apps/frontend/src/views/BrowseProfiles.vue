@@ -3,13 +3,15 @@ import { useRouter } from 'vue-router'
 import { onMounted, ref } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
 
-import InvitePeopleDialog from '@/components/profiles/public/InvitePeopleDialog.vue'
+import { useFindMatchViewModel } from '@/components/profiles/match/useFindMatchViewModel'
+
 import ErrorOverlay from '@/components/ErrorOverlay.vue'
 import DatingPreferencesForm from '@/components/profiles/match/DatingPreferencesForm.vue'
 import SecondaryNav from '@/components/profiles/match/SecondaryNav.vue'
 import ProfileCardGrid from '../components/profiles/match/ProfileCardGrid.vue'
-import { useFindMatchViewModel } from '@/components/profiles/match/useFindMatchViewModel'
 import NoAccessCTA from '@/components/profiles/match/NoAccessCTA.vue'
+import NoResultsCTA from '@/components/profiles/match/NoResultsCTA.vue'
+import PlaceholdersGrid from '@/components/profiles/match/PlaceholdersGrid.vue'
 
 const router = useRouter()
 const profileStore = useProfileStore()
@@ -18,7 +20,7 @@ const profileStore = useProfileStore()
 const showModal = ref(false)
 const showPrefs = ref(false)
 
-const { vm, me, findProfilesStore, haveAccess, haveResults, error, initialize } =
+const { vm, me, haveAccess, haveResults, isLoading, findProfilesStore, error, initialize } =
   useFindMatchViewModel()
 
 onMounted(async () => {
@@ -48,22 +50,53 @@ const handleEditProfileIntent = () => {
 </script>
 
 <template>
-  <main class="container">
+  <main class="container h-100">
     <ErrorOverlay v-if="error" :error />
 
-    <div v-else class="mt-2 h-100 overflow-hidden">
-      <SecondaryNav v-model="vm" @edit:datingPrefs="showModal = true" :prefs-button-disabled="!haveAccess"/>
-
-      <NoAccessCTA v-if="!haveAccess" v-model="vm" @edit:profile="handleEditProfileIntent"/>
-
-      <div v-else-if="haveResults" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
-        <ProfileCardGrid
-          :profiles="findProfilesStore.profileList"
-          @profile:select="handleCardClick"
+    <div v-else class="mt-2 h-100 overflow-hidden position-relative d-flex flex-column">
+      <div class="mb-2">
+        <SecondaryNav
+          v-model="vm"
+          @edit:datingPrefs="showModal = true"
+          :prefs-button-disabled="!haveAccess"
         />
       </div>
+      <BPlaceholderWrapper :loading="!haveResults">
+        <template #loading>
+          <BOverlay
+            show
+            no-spinner
+            no-center
+            bg-color="var(--bs-body-bg)"
+            :blur="null"
+            opacity="0.85"
+            class="h-100 overlay"
+            spinner-variant="primary"
+            spinner-type="grow"
+          >
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-4 my-0 overflow-hidden">
+              <PlaceholdersGrid :howMany="6" :loading="isLoading" />
+            </div>
+            <template #overlay>
+              <div v-if="!isLoading" class="h-100 w-100 d-flex flex-column align-items-center justify-content-center p-2">
+                <NoAccessCTA
+                  v-if="!haveAccess"
+                  v-model="vm"
+                  @edit:profile="handleEditProfileIntent"
+                />
+                <NoResultsCTA v-else-if="!haveResults" />
+              </div>
+            </template>
+          </BOverlay>
+        </template>
 
-      <InvitePeopleDialog v-else />
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-4 my-0 overflow-auto h-100">
+          <ProfileCardGrid
+            :profiles="findProfilesStore.profileList"
+            @profile:select="handleCardClick"
+          />
+        </div>
+      </BPlaceholderWrapper>
 
       <BModal
         v-model="showModal"
@@ -88,3 +121,11 @@ const handleEditProfileIntent = () => {
     </div>
   </main>
 </template>
+
+<style scoped>
+.overlay-inner {
+  /* width: 90%;
+  margin-top: 50%;
+  transform: translateX(5%); */
+}
+</style>
