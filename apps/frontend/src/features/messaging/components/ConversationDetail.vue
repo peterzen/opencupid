@@ -17,6 +17,7 @@ const messageStore = useMessageStore()
 
 const props = defineProps<{
   conversation: ConversationSummary | null
+  loading: boolean
 }>()
 
 const emit = defineEmits<{
@@ -53,7 +54,17 @@ watchEffect(async () => {
   />
 
   <div class="flex-grow-1 overflow-hidden d-flex flex-column">
-    <MessageList :messages="messageStore.messages" />
+    <!-- <BPlaceholderWrapper :loading="loading" class="mb-3">
+      <template #loading>
+        <div class="h-10-0 bg-danger"></div>
+        <BPlaceholderCard
+          class="w-100 h-100"
+          :loading="loading"
+          :text="t('messaging.loading_conversation')"
+          :text-size="'sm'"/>
+        </template> 
+    </BPlaceholderWrapper> -->
+      <MessageList :messages="messageStore.messages" />
   </div>
 
   <div class="d-flex align-items-center w-100 py-2 px-2">
@@ -74,7 +85,11 @@ watchEffect(async () => {
     :focus="false"
     :no-close-on-backdrop="true"
     :no-header="true"
-    :ok-title="t('messaging.block_user_ok', { name: conversationPartner ? conversationPartner.publicName : '' })"
+    :ok-title="
+      t('messaging.block_user_ok', {
+        name: conversationPartner ? conversationPartner.publicName : '',
+      })
+    "
     :cancel-title="t('messaging.nevermind')"
     initial-animation
     body-class="d-flex flex-row align-items-center justify-content-center overflow-hidden"

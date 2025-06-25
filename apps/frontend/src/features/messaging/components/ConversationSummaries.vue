@@ -6,6 +6,7 @@ import { useI18n } from 'vue-i18n'
 defineProps<{
   conversations: ConversationSummary[]
   activeConversation: ConversationSummary | null
+  loading: boolean
 }>()
 
 defineEmits<{
