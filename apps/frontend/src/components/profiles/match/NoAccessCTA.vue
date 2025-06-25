@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { type FindMatchViewModel } from './types'
+import { ProfileScope } from '@zod/profile/profile.dto'
 
-const vm = defineModel<FindMatchViewModel>()
+const currentScope = defineModel<ProfileScope | null>()
 
 defineEmits({
   'edit:profile': () => true,
@@ -12,10 +12,10 @@ defineEmits({
   <div
     class="d-flex flex-column align-items-center shadow-lg bg-theme user-select-none justify-content-center px-4 py-4 text-center"
   >
-    <p v-if="vm?.currentScope === 'dating'">
+    <p v-if="currentScope === 'dating'">
       Your dating profile is currently private. To find matches, please make your profile public.
     </p>
-    <p v-else-if="vm?.currentScope === 'social'">
+    <p v-else-if="currentScope === 'social'">
       You need to create a dating profile to find matches. Please go to your profile and set it up.
     </p>
     <p v-else>Your profile is currently private.</p>

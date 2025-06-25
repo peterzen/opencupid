@@ -20,6 +20,9 @@ import {
 } from './helpers'
 import { type DatingPreferencesDTO, DatingPreferencesDTOSchema } from '@zod/match/datingPreference.dto'
 import type { SocialSearchQuery } from '@zod/match/socialSearch.dto'
+import type { ProfileScope, OwnerProfile } from '@zod/profile/profile.dto';
+import { bus } from '@/lib/bus'
+import { watch } from 'vue'
 
 export const useFindProfilesStore = defineStore('findProfiles', {
   state: () => ({
@@ -28,6 +31,8 @@ export const useFindProfilesStore = defineStore('findProfiles', {
     socialSearch: null as SocialSearchQuery | null, // Current social search query
 
     isLoading: false, // Loading state
+    currentScope: null as ProfileScope | null, // Current profile scope (social or dating)
+    scopes: [] as ProfileScope[], // Available scopes based on user profile
   }),
 
   actions: {
@@ -90,5 +95,42 @@ export const useFindProfilesStore = defineStore('findProfiles', {
         this.isLoading = false // Reset loading state
       }
     },
+    async initialize(me: OwnerProfile, defaultScope: ProfileScope | undefined) {
+      console.log('Initializing FindMatchViewModel with defaultScope:', defaultScope)
+
+      this.scopes = [
+        ...(me.isSocialActive ? (['social'] as const) : []),
+        ...(me.isDatingActive ? (['dating'] as const) : []),
+      ]
+      this.currentScope = defaultScope ?
+        defaultScope : this.scopes.length > 0 ? this.scopes[0] : null
+
+      await this.fetchDatingPrefs()
+
+      watch(() => this.currentScope, (newScope) => {
+        if (newScope === 'social') {
+          this.findSocial()
+        } else if (newScope === 'dating') {
+          this.findDating()
+        }
+      }, { immediate: true }) // Watch for scope changes immediately
+    },
+    setCurrentScope(scope: ProfileScope) {
+      this.currentScope = scope // Set current scope if valid
+    },
+    reset() {
+      this.profileList = [] // Reset profile list
+      this.datingPrefs = null // Reset dating preferences
+      this.socialSearch = null // Reset social search query
+      this.isLoading = false // Reset loading state
+      this.currentScope = null // Reset current scope
+      this.scopes = [] // Reset available scopes
+    }
   },
+})
+
+
+
+bus.on('auth:logout', () => {
+  useFindProfilesStore().reset()
 })

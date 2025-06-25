@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import LoadingComponent from '@/components/LoadingComponent.vue'
-import LogoutButton from '@/features/auth/components/LogoutButton.vue'
-import { useAuthStore } from '@/features/auth/stores/authStore'
-import { type LoginUser } from '@zod/user/user.types'
 import { computed, onMounted, reactive, ref } from 'vue'
+
 import { useColorMode } from 'bootstrap-vue-next'
+import { type LoginUser } from '@zod/user/user.types'
+
 import { useMessageStore } from '@/features/messaging/stores/messageStore'
-import LanguageSelectorDropdown from '../components/LanguageSelectorDropdown.vue'
+import { useAuthStore } from '@/features/auth/stores/authStore'
 
 import IconSetting2 from '@/assets/icons/interface/setting-2.svg'
+
+import LoadingComponent from '@/components/LoadingComponent.vue'
+import LogoutButton from '@/features/auth/components/LogoutButton.vue'
+import LanguageSelectorDropdown from '../components/LanguageSelectorDropdown.vue'
+import PushPermissions from '../components/PushPermissions.vue'
 
 const authStore = useAuthStore()
 

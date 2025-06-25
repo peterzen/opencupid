@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useProfileStore } from '@/store/profileStore'
 
 import { useFindMatchViewModel } from '@/components/profiles/match/useFindMatchViewModel'
@@ -12,21 +12,42 @@ import ProfileCardGrid from '../components/profiles/match/ProfileCardGrid.vue'
 import NoAccessCTA from '@/components/profiles/match/NoAccessCTA.vue'
 import NoResultsCTA from '@/components/profiles/match/NoResultsCTA.vue'
 import PlaceholdersGrid from '@/components/profiles/match/PlaceholdersGrid.vue'
+import { type ProfileScope, ProfileScopeSchema } from '@zod/profile/profile.dto'
 
 const router = useRouter()
 const profileStore = useProfileStore()
 
+const props = defineProps<{
+  scope?: string
+}>()
 // state management
 const showModal = ref(false)
-const showPrefs = ref(false)
 
-const { vm, me, haveAccess, haveResults, isLoading, findProfilesStore, error, initialize } =
+const {  me, haveAccess, haveResults, isLoading, findProfilesStore, error, initialize } =
   useFindMatchViewModel()
 
 onMounted(async () => {
-  await initialize()
+  const params = ProfileScopeSchema.safeParse(props.scope)
+  let defaultScope
+  if (params.success) {
+    defaultScope = params.data
+  }
+  await initialize(defaultScope)
 })
 
+watch(
+  () => findProfilesStore.currentScope,
+  (newScope: ProfileScope | null) => {
+    if (newScope) {
+      router.replace({
+        name: 'BrowseProfilesScope',
+        params: {
+          scope: newScope,
+        },
+      })
+    }
+  }
+)
 const handleCardClick = (profileId: string) => {
   router.push({
     name: 'PublicProfile',
@@ -56,8 +77,9 @@ const handleEditProfileIntent = () => {
     <div v-else class="mt-2 h-100 overflow-hidden position-relative d-flex flex-column">
       <div class="mb-2">
         <SecondaryNav
-          v-model="vm"
+          v-model="findProfilesStore.currentScope"
           @edit:datingPrefs="showModal = true"
+          @scope:change="findProfilesStore.setCurrentScope($event)"
           :prefs-button-disabled="!haveAccess"
         />
       </div>
@@ -78,10 +100,13 @@ const handleEditProfileIntent = () => {
               <PlaceholdersGrid :howMany="6" :loading="isLoading" />
             </div>
             <template #overlay>
-              <div v-if="!isLoading" class="h-100 w-100 d-flex flex-column align-items-center justify-content-center p-2">
+              <div
+                v-if="!isLoading"
+                class="h-100 w-100 d-flex flex-column align-items-center justify-content-center p-2"
+              >
                 <NoAccessCTA
                   v-if="!haveAccess"
-                  v-model="vm"
+                  v-model="findProfilesStore.currentScope"
                   @edit:profile="handleEditProfileIntent"
                 />
                 <NoResultsCTA v-else-if="!haveResults" />
@@ -123,9 +148,4 @@ const handleEditProfileIntent = () => {
 </template>
 
 <style scoped>
-.overlay-inner {
-  /* width: 90%;
-  margin-top: 50%;
-  transform: translateX(5%); */
-}
 </style>

@@ -117,6 +117,9 @@ export const ProfileSummarySchema = z.object({
 export type ProfileSummary = z.infer<typeof ProfileSummarySchema>;
 
 
+export const ProfileScopeSchema = z.enum(['social', 'dating'])
+
+export type ProfileScope = z.infer<typeof ProfileScopeSchema>
 
 
 export const UpdateProfileScopeSchemaPayload = z.object({

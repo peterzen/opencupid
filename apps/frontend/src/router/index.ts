@@ -70,6 +70,13 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true },
   },
   {
+    path: '/browse/:scope',
+    name: 'BrowseProfilesScope',
+    component: BrowseProfiles,
+    props: true,
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/inbox/:conversationId?',
     name: 'Messaging',
     component: MessagingView,

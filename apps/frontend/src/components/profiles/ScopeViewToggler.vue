@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import IconDate from '@/assets/icons/app/cupid.svg'
 import IconSocialize from '@/assets/icons/app/socialize.svg'
-import { type ScopeSelectModel } from '@/components/profiles/types'
+import { type ProfileScope } from '@zod/profile/profile.dto'
 
-const vm = defineModel<ScopeSelectModel>({
-  default: () => {},
-})
+const currentScope = defineModel<ProfileScope | null>()
+
+defineEmits<{
+  (event: 'change', scope: ProfileScope): void
+}>()
 </script>
 
 <template>
@@ -13,9 +15,9 @@ const vm = defineModel<ScopeSelectModel>({
     href="#"
     class="link nav-link-social mx-2"
     :class="{
-      active: vm.currentScope === 'social',
+      active: currentScope === 'social',
     }"
-    @click="vm.currentScope = 'social'"
+    @click="$emit('change', 'social')"
   >
     <IconSocialize class="svg-icon-100" />
   </a>
@@ -23,9 +25,9 @@ const vm = defineModel<ScopeSelectModel>({
     href="#"
     class="link nav-link-dating"
     :class="{
-      active: vm.currentScope === 'dating',
+      active: currentScope === 'dating',
     }"
-    @click="vm.currentScope = 'dating'"
+    @click="$emit('change', 'dating')"
   >
     <IconDate class="svg-icon-100" />
   </a>
