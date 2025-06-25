@@ -268,6 +268,9 @@ importers:
       vue-3-slider-component:
         specifier: ^1.0.2
         version: 1.0.2(vue@3.5.17(typescript@5.8.3))
+      vue-circle-flags:
+        specifier: ^1.0.9
+        version: 1.0.9(typescript@5.8.3)
       vue-draggable-next:
         specifier: ^2.2.1
         version: 2.2.1(sortablejs@1.15.6)(vue@3.5.17(typescript@5.8.3))
@@ -6599,6 +6602,9 @@ packages:
     resolution: {integrity: sha512-W2rRH/0Tye+As8IrJqjtbQQo+SY/4+Lm8OOiiKRyaU/LAqHcEwjLFicvcGf08Kgt+f9994DEqkecK2k0HSF2RQ==}
     peerDependencies:
       vue: ^3.0.0
+
+  vue-circle-flags@1.0.9:
+    resolution: {integrity: sha512-3s3n1mgiH+dVN8j/hckowGYAPZAv77YPuLlF8c2NXAUZ5FrxzUbhbUNh5EZXGz7ipEjie777glhIP6gUpQzzuw==}
 
   vue-component-type-helpers@2.2.10:
     resolution: {integrity: sha512-iDUO7uQK+Sab2tYuiP9D1oLujCWlhHELHMgV/cB13cuGbG4qwkLHvtfWb6FzvxrIOPDnU0oHsz2MlQjhYDeaHA==}
@@ -13707,6 +13713,13 @@ snapshots:
   vue-3-slider-component@1.0.2(vue@3.5.17(typescript@5.8.3)):
     dependencies:
       vue: 3.5.17(typescript@5.8.3)
+
+  vue-circle-flags@1.0.9(typescript@5.8.3):
+    dependencies:
+      tslib: 2.8.1
+      vue: 3.5.17(typescript@5.8.3)
+    transitivePeerDependencies:
+      - typescript
 
   vue-component-type-helpers@2.2.10: {}
 

@@ -23,7 +23,7 @@ defineProps<{
       <div class="card-title mb-0 pb-0 d-flex align-items-center justify-content-between flex-row">
         <h5 class="flex-grow-1 fw-bold m-0">{{ profile.publicName }}</h5>
         <small>
-          <LocationLabel :location="profile.location" />
+          <LocationLabel :location="profile.location" :showCity="false" :showCountryLabel="false" />
         </small>
       </div>
       <div class="p-2 flex-grow-1">

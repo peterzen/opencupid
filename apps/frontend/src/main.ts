@@ -51,6 +51,12 @@ useMessageStore()
 
 // toasts
 import registerToast from './lib/toast'
+
 registerToast(app)
+
+//@ts-expect-error no ts decl
+import CircleFlags from "vue-circle-flags";
+import "vue-circle-flags/dist/vue-circle-flags.css";
+app.use(CircleFlags)
 
 app.mount('#app')

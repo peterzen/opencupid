@@ -72,7 +72,11 @@ const emit = defineEmits<{
     </div>
     <div class="mb-2 text-muted d-inline-flex align-items-center">
       <span class="me-1">
-        <LocationLabel :location="profile.location" :show-city="true"/>
+        <LocationLabel 
+        :location="profile.location"
+         :showCity="true" 
+         :showCountryLabel="true"
+         :showIcon="false" />
       </span>
       <EditField fieldName="location" :editComponent="LocationSelector" />
     </div>
@@ -80,7 +84,7 @@ const emit = defineEmits<{
     <div class="mb-3">
       <div class="d-inline-block">
         <TagList :profile />
-        <EditField fieldName="tags" :editComponent="TagSelectComponent" >
+        <EditField fieldName="tags" :editComponent="TagSelectComponent">
           <template #display>
             <div class="editable-placeholder" v-if="!props.profile.tags?.length">
               {{ t('profiles.forms.tags_placeholder') }}
