@@ -6,6 +6,7 @@ import { type PublicProfileWithContext } from '@zod/profile/profile.dto'
 
 import SendMessage from '@/features/messaging/components/SendMessage.vue'
 import IconMessage from '@/assets/icons/interface/message.svg'
+import ProfileThumbnail from '@/features/images/components/ProfileThumbnail.vue'
 
 const props = defineProps<{
   profile: PublicProfileWithContext

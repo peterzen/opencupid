@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import IconPencil2 from '@/assets/icons/interface/pencil-2.svg'
 
 const model = defineModel<ViewState>({
-  default: {} as ViewState,
   required: true,
 })
 </script>
