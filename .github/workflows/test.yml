@@ -41,7 +41,7 @@ jobs:
       - name: Build frontend
         run: pnpm --filter frontend exec pnpm build
       - name: Backend tests
-        run: pnpm --filter backend exec vitest run
+        run: pnpm --filter backend exec vitest run  --mode test
       - name: Frontend unit tests
-        run: pnpm --filter frontend exec vitest run --mode test
+        run: pnpm --filter frontend exec vitest run
         
