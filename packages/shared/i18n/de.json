@@ -212,5 +212,15 @@
         "message": "Ein Fehler ist aufgetreten. Bitte versuche es erneut."
       }
     }
+  },
+  "emails": {
+    "loginLink": {
+      "subject": "Deine Login-Link",
+      "html": "<p>Hallo, willkommen an Bord!</p><h1>{{otp}}</h1><p>Bitte klicken Sie auf diesen Link, um direkt einzusteigen: <a href=\"{{link}}\">Bestätigungs-E-Mail</a></p>"
+    },
+    "welcome": {
+      "subject": "Willkommen bei Gaians!",
+      "html": "<p>Hallo, herzlich willkommen an Bord!</p><a href=\"{{link}}\">Mit Menschen in Verbindung treten</a></p>"
+    }
   }
 }
