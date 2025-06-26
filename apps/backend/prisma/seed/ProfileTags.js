@@ -1,12 +1,12 @@
-import { PrismaClient } from '@prisma/client';
-import slugify from 'slugify';
-import fs from 'fs';
-import path from 'path';
+const { PrismaClient } = require('@prisma/client');
+const slugify = require('slugify');
+const fs = require('fs');
+const path = require('path');
 
 const prisma = new PrismaClient();
-const dryRun = false; // 🔁 Toggle this to false to actually write to DB
+const dryRun = false; // 🔁 Toggle this to true to prevent DB writes
 
-const interestTagsPath = path.join(__dirname, './tags.json'); // adjust path
+const interestTagsPath = path.join(__dirname, 'tags.json'); // adjust if needed
 const interestTagsData = JSON.parse(fs.readFileSync(interestTagsPath, 'utf-8'));
 
 async function main() {
@@ -24,20 +24,19 @@ async function main() {
     const createdTag = dryRun
       ? { id: `dry-${slug}`, slug }
       : await prisma.tag.upsert({
-        where: { slug },
-        update: {},
-        create: {
-          name,
-          slug,
-          isApproved: true,
-        },
-      });
+          where: { slug },
+          update: {},
+          create: {
+            name,
+            slug,
+            isApproved: true,
+          },
+        });
 
     const tagId = createdTag.id;
     tagCount++;
 
-    for (const [locale, translationValue] of Object.entries(tagEntry.translations)) {
-      const translation = translationValue as string;
+    for (const [locale, translation] of Object.entries(tagEntry.translations)) {
       if (!translation.trim()) continue;
 
       if (dryRun) {

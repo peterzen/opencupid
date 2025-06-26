@@ -29,6 +29,7 @@
     "animate.css": "^4.1.1",
     "bootstrap-vue-next": "^0.30.0",
     "bootswatch": "^5.3.6",
+    "find-up": "^7.0.0",
     "i18n-iso-countries": "^7.14.0",
     "mitt": "^3.0.1",
     "mobile-detect": "^1.4.5",

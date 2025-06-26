@@ -4,7 +4,7 @@ WORKDIR /app
 # Copy root monorepo files
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/frontend/package.json ./apps/frontend/package.json
-
+COPY .env ./apps/frontend/.env
 RUN corepack enable && pnpm install --frozen-lockfile --filter ./apps/frontend...
 
 # Copy frontend source
@@ -18,5 +18,5 @@ FROM nginx:alpine
 COPY apps/frontend/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/apps/frontend/dist /var/www
 
-EXPOSE 8080
+EXPOSE 3001
 CMD ["nginx", "-g", "daemon off;"]

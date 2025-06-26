@@ -250,6 +250,9 @@ importers:
       bootswatch:
         specifier: ^5.3.6
         version: 5.3.6
+      find-up:
+        specifier: ^7.0.0
+        version: 7.0.0
       i18n-iso-countries:
         specifier: ^7.14.0
         version: 7.14.0

@@ -19,10 +19,24 @@ http {
   gzip_proxied any;
   gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript font/woff2;
 
+  # --- Upstreams ---
+  upstream backend {
+    server backend:3000;
+  }
+
+  upstream frontend {
+    server frontend:3001;
+  }
+
   # --- HTTP -> HTTPS Redirect ---
   server {
     listen 80;
     server_name _;
+
+    location /.well-known/acme-challenge/ {
+      root /var/www/html;
+      try_files $uri =404;
+    }
 
     location / {
       return 301 https://$host$request_uri;
@@ -34,14 +48,14 @@ http {
     listen 443 ssl;
     server_name _;
 
-    ssl_certificate /etc/nginx/certs/fullchain.pem;
-    ssl_certificate_key /etc/nginx/certs/privkey.pem;
+    ssl_certificate     /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${DOMAIN}/privkey.pem;
 
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
 
     location /api/ {
-      proxy_pass http://backend:3000/;
+      proxy_pass http://backend;
       proxy_http_version 1.1;
       proxy_set_header Upgrade $http_upgrade;
       proxy_set_header Connection "upgrade";
@@ -58,7 +72,7 @@ http {
     }
 
     location /ws/ {
-      proxy_pass http://backend:3000;
+      proxy_pass http://backend;
       proxy_http_version 1.1;
       proxy_set_header Upgrade $http_upgrade;
       proxy_set_header Connection "upgrade";
@@ -74,6 +88,10 @@ http {
       autoindex off;
       try_files $uri =404;
       add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    location /.well-known/acme-challenge/ {
+      root /var/www/html;
     }
 
     location / {

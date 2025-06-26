@@ -1,7 +1,7 @@
 import path from "path";
 import fs from 'fs'
 import { loadEnv } from "vite";
-
+import { findUpSync } from 'find-up'
 
 export const server = (mode: string) => {
   if (mode !== 'development') return {}
@@ -38,18 +38,29 @@ export const server = (mode: string) => {
 
 export const define = (mode: string) => {
 
-  const rootEnv = mode === 'production' ? process.env : loadEnv(mode, '../../', '')
+  const envFile = findUpSync('.env') ?? findUpSync('.env.example')
+
+  if(!envFile) {
+    console.error('Could not find a .env file')
+    process.exit(1)
+  }
+  const envDir = path.dirname(envFile)
+
+  const env = {
+    ...process.env,
+    ...loadEnv(mode, envDir, ''),
+  }
   return {
     envDir: '../../',
     define: {
       __APP_CONFIG__: JSON.stringify({
-        API_BASE_URL: rootEnv.API_BASE_URL,
-        WS_BASE_URL: rootEnv.WS_BASE_URL,
-        IMAGE_URL_BASE: rootEnv.IMAGE_URL_BASE,
-        FRONTEND_URL: rootEnv.FRONTEND_URL,
-        NODE_ENV: rootEnv.NODE_ENV,
-        VAPID_PUBLIC_KEY: rootEnv.VAPID_PUBLIC_KEY,
-        GEOIP_URL: rootEnv.GEOIP_URL
+        API_BASE_URL: env.API_BASE_URL,
+        WS_BASE_URL: env.WS_BASE_URL,
+        IMAGE_URL_BASE: env.IMAGE_URL_BASE,
+        FRONTEND_URL: env.FRONTEND_URL,
+        NODE_ENV: env.NODE_ENV,
+        VAPID_PUBLIC_KEY: env.VAPID_PUBLIC_KEY,
+        GEOIP_URL: env.GEOIP_URL
       }),
     }
   }
