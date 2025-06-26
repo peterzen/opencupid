@@ -9,6 +9,7 @@ pnpm-debug.log*
 
 # Env
 .env
+.env.production
 
 # Build output
 dist/
@@ -32,4 +33,4 @@ turbo/
 apps/backend/prisma/migrations/
 apps/frontend/dev-dist/
 secrets/
-.env.production
+.config-cache/
