@@ -10,7 +10,7 @@ import {
   mapProfileImagesToOwner,
 } from '@/api/mappers/profile.mappers'
 import { ReorderProfileImagesPayloadSchema } from '@zod/profile/profileimage.dto'
-import { appConfig } from '@shared/config/appconfig'
+import { appConfig } from '@/lib/appconfig'
 import type { ImageApiResponse } from '@zod/profile/profileimage.dto'
 
 

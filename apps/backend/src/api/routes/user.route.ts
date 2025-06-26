@@ -7,7 +7,7 @@ import { ProfileService } from 'src/services/profile.service'
 import { sendError, sendUnauthorizedError } from '../helpers'
 import { SmsService } from '@/services/sms.service'
 import { CaptchaService } from '@/services/captcha.service'
-import { appConfig } from '@shared/config/appconfig'
+import { appConfig } from '@/lib/appconfig'
 
 import { AuthIdentifierCaptchaInput, AuthIdentifierCaptchaInputSchema, OtpLoginInputSchema, OtpSendReturn } from '@zod/user/user.dto'
 import type { OtpLoginResponse, SendLoginLinkResponse, UserMeResponse } from '@shared/dto/apiResponse.dto'

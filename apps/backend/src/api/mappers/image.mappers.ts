@@ -1,5 +1,5 @@
 import { ProfileImage } from "@prisma/client"
-import { appConfig } from "@shared/config/appconfig"
+import { appConfig } from "@/lib/appconfig"
 import { PublicProfileImage, PublicProfileImageSchema, OwnerProfileImage, OwnerProfileImageSchema } from "@zod/profile/profileimage.dto"
 
 export interface MinimalProfileImage {

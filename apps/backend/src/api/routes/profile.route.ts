@@ -35,7 +35,7 @@ import type {
   UpdateDatingPreferencesResponse,
 } from '@shared/dto/apiResponse.dto'
 import { DatingPreferencesDTOSchema, UpdateDatingPreferencesPayloadSchema } from '@zod/match/datingPreference.dto'
-import { appConfig } from '@shared/config/appconfig'
+import { appConfig } from '@/lib/appconfig'
 import { GetProfileSummariesResponse } from '@zod/apiResponse.dto'
 
 // Route params for ID lookups

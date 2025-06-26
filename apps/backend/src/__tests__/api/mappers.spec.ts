@@ -1,6 +1,6 @@
 import { vi, describe, it, expect } from 'vitest'
 import { mapProfileImagesToOwner, mapToLocalizedUpserts } from '../../api/mappers/profile.mappers'
-vi.mock('@shared/config/appconfig', () => ({ appConfig: { IMAGE_URL_BASE: 'http://img' } }))
+vi.mock('@/lib/appconfig', () => ({ appConfig: { IMAGE_URL_BASE: 'http://img' } }))
 
 const image: any = {
   id: 'ckaaaaaaaaaaaaaab',

@@ -1,6 +1,6 @@
 import { UserRole } from '@prisma/client'
 import type { FastifyInstance, FastifyPluginAsync, FastifyRequest } from 'fastify'
-import { appConfig } from '@shared/config/appconfig'
+import { appConfig } from '@/lib/appconfig'
 
 // --- Helper to send uniform error responses ---
 export function sendError(

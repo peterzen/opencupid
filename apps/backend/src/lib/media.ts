@@ -4,7 +4,7 @@ import { createHash } from 'crypto'
 import fs from 'fs'
 
 import cuid from 'cuid'
-import { appConfig } from '@shared/config/appconfig'
+import { appConfig } from '@/lib/appconfig'
 
 export function uploadTmpDir() {
   return path.join(appConfig.MEDIA_UPLOAD_DIR, 'tmp')

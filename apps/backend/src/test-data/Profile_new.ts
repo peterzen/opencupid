@@ -15,7 +15,7 @@ import { Gender, HasKids, Prisma, PrismaClient, Pronouns, RelationshipStatus } f
 import { ImageService } from '@/services/image.service'
 import { ProfileService } from '@/services/profile.service'
 import { UserService } from '@/services/user.service'
-import { appConfig } from '@shared/config/appconfig'
+import { appConfig } from '@/lib/appconfig'
 import { UpdateProfilePayloadSchema } from '@zod/profile/profile.dto'
 
 const prisma = new PrismaClient({

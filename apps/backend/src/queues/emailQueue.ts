@@ -1,4 +1,4 @@
-import { appConfig } from '@shared/config/appconfig'
+import { appConfig } from '@/lib/appconfig'
 import { Queue } from 'bullmq'
 import IORedis from 'ioredis'
 

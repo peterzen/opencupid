@@ -1,7 +1,7 @@
 import fp from 'fastify-plugin'
 import fastifyJwt from '@fastify/jwt'
 import { sendUnauthorizedError } from 'src/api/helpers'
-import { appConfig } from '@shared/config/appconfig'
+import { appConfig } from '@/lib/appconfig'
 
 export default fp(async fastify => {
   if (!appConfig.JWT_SECRET) {

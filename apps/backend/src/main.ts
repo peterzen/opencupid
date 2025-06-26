@@ -1,7 +1,7 @@
 import Fastify from 'fastify'
 import websocket from '@fastify/websocket'
 import cors from '@fastify/cors'
-import { appConfig } from '@shared/config/appconfig'
+import { appConfig } from '@/lib/appconfig'
 
 import './workers/emailWorker' // ← side‐effect: starts the worker
 import { checkImageRoot } from '@/lib/media'

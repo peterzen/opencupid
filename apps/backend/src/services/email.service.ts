@@ -1,4 +1,4 @@
-import { appConfig } from '@shared/config/appconfig'
+import { appConfig } from '@/lib/appconfig'
 import nodemailer from 'nodemailer'
 
 export class EmailService {

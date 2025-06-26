@@ -7,7 +7,7 @@ import Redis from 'ioredis'
 import { UserService, type UserWithProfile } from 'src/services/user.service'
 import { SessionService } from '../services/session.service'
 import { sendUnauthorizedError } from 'src/api/helpers'
-import { appConfig } from '@shared/config/appconfig'
+import { appConfig } from '@/lib/appconfig'
 import { SessionData, SessionProfile, SessionProfileSchema } from '@zod/user/user.types'
 
 // Extend Fastify types
