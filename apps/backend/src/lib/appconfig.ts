@@ -12,7 +12,7 @@ export const configSchema = z.object({
   FRONTEND_URL: z.string(),
   API_BASE_URL: z.string(),
   WS_BASE_URL: z.string(),
-  
+
   JWT_SECRET: z.string().min(10),
 
   DATABASE_URL: z.string().url(),
@@ -45,16 +45,21 @@ export const configSchema = z.object({
   RATE_LIMIT_PROFILE_SCOPES: z.coerce.number().default(1),
 })
 
-// This will walk up from the current directory to find the first `.env` file
-// If not found, fall back to `.env.example` so tests run with defaults
-const envFile = findUpSync('.env') ?? findUpSync('.env.example')
-if (!envFile) {
-  console.error('Could not find a .env file')
-  process.exit(1)
-}
 
-const envConfig = dotenv.config({ path: envFile })
-dotenvExpand.expand(envConfig)
+
+if (process.env.NODE_ENV !== 'production') {
+
+  // This will walk up from the current directory to find the first `.env` file
+  // If not found, fall back to `.env.example` so tests run with defaults
+  const envFile = findUpSync('.env') ?? findUpSync('.env.example')
+  if (!envFile) {
+    console.error('Could not find a .env file')
+    process.exit(1)
+  }
+
+  const envConfig = dotenv.config({ path: envFile })
+  dotenvExpand.expand(envConfig)
+}
 
 // Directly parse and export
 const parsed = configSchema.safeParse(process.env)
