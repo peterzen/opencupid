@@ -16,7 +16,7 @@ RUN pnpm run build-only
 
 FROM nginx:alpine
 COPY apps/frontend/nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=builder /app/apps/frontend/dist /var/www/frontend
+COPY --from=builder /app/apps/frontend/dist /var/www
 
 EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]
