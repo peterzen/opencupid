@@ -1,34 +1,24 @@
 import Fastify from 'fastify'
-import websocket from '@fastify/websocket'
 import cors from '@fastify/cors'
 import { appConfig } from '@/lib/appconfig'
 
 import './workers/emailWorker' // ← side‐effect: starts the worker
 import { checkImageRoot } from '@/lib/media'
 
-import fs from 'fs'
-import path from 'path'
-
-// const key = fs.readFileSync(path.join(__dirname, '../../../certs/key.pem'))
-// const cert = fs.readFileSync(path.join(__dirname, '../../../certs/cert.pem'))
-
 const app = Fastify({
-  // https: {
-  //   key,
-  //   cert,
-  // },
+  trustProxy: true,
   logger: {
     transport:
       appConfig.NODE_ENV === 'production'
         ? undefined
         : {
-            target: 'pino-pretty',
-            options: {
-              colorize: true,
-              translateTime: 'HH:MM:ss Z',
-              ignore: 'pid,hostname',
-            },
+          target: 'pino-pretty',
+          options: {
+            colorize: true,
+            translateTime: 'HH:MM:ss Z',
+            ignore: 'pid,hostname',
           },
+        },
   },
 })
 
@@ -45,7 +35,7 @@ app.register(import('./plugins/prisma'))
 app.register(import('./plugins/session-auth'))
 app.register(import('./plugins/rate-limiter'))
 
-if(process.env.RECORD_API === 'true') {
+if (process.env.RECORD_API === 'true') {
   app.register(import('./plugins/api-recorder'))
 }
 
