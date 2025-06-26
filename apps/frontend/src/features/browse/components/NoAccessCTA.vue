@@ -16,7 +16,7 @@ defineEmits({
       Your dating profile is currently private. To find matches, please make your profile public.
     </p>
     <p v-else-if="currentScope === 'social'">
-      You need to create a dating profile to find matches. Please go to your profile and set it up.
+      Your social profile is currently private. Please go to your profile and turn it  on.
     </p>
     <p v-else>Your profile is currently private.</p>
     <BButton

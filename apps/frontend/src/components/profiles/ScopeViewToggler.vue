@@ -5,9 +5,6 @@ import { type ProfileScope } from '@zod/profile/profile.dto'
 
 const currentScope = defineModel<ProfileScope | null>()
 
-defineEmits<{
-  (event: 'change', scope: ProfileScope): void
-}>()
 </script>
 
 <template>
@@ -17,7 +14,7 @@ defineEmits<{
     :class="{
       active: currentScope === 'social',
     }"
-    @click="$emit('change', 'social')"
+    @click="currentScope= 'social'"
   >
     <IconSocialize class="svg-icon-100" />
   </a>
@@ -27,8 +24,7 @@ defineEmits<{
     :class="{
       active: currentScope === 'dating',
     }"
-    @click="$emit('change', 'dating')"
-  >
+    @click="currentScope= 'dating'"  >
     <IconDate class="svg-icon-100" />
   </a>
 </template>

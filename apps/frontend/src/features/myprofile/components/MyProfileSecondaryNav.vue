@@ -2,9 +2,10 @@
 import { computed } from 'vue'
 import { useI18nStore } from '@/store/i18nStore'
 
-import { type ViewState } from './types'
-import IconGlobe from '@/assets/icons/interface/globe.svg'
-import ScopeViewToggler from '../ScopeViewToggler.vue'
+import { type ViewState } from '../composables/types'
+import ScopeViewToggler from '@/components/profiles/ScopeViewToggler.vue'
+import LanguageIcon from '@/components/profiles/display/LanguageIcon.vue'
+import { type ProfileScope } from '@zod/profile/profile.dto'
 
 const model = defineModel<ViewState>({
   default: {
@@ -27,9 +28,8 @@ const currentLanguage = computed(() => {
       <li class="col-2">
         <slot name="items-left"></slot>
       </li>
-
       <li class="col-8 d-flex nav-item justify-content-center align-items-center">
-        <ScopeViewToggler v-model="model.currentScope"> </ScopeViewToggler>
+        <ScopeViewToggler v-model="model.currentScope" />
       </li>
 
       <li class="col-2 d-flex justify-content-end">
@@ -41,8 +41,7 @@ const currentLanguage = computed(() => {
           right
         >
           <template #button-content>
-            <IconGlobe class="svg-icon" />
-            <!-- {{ currentLanguage?.label }} -->
+            <LanguageIcon v-if="currentLanguage" :countryCode="currentLanguage.value" />
           </template>
           <BDropdownItem
             v-for="lang in languagePreviewOptions"
@@ -50,10 +49,28 @@ const currentLanguage = computed(() => {
             :active="lang.value === model.previewLanguage"
             @click="model.previewLanguage = lang.value"
           >
-            {{ lang.label }}
+            <span class="d-flex align-items-center">
+              <span class="flex-grow-1">{{ lang.label }}</span>
+              <LanguageIcon :countryCode="lang.value" />
+            </span>
           </BDropdownItem>
         </BNavItemDropdown>
       </li>
     </ul>
   </div>
 </template>
+
+<style scoped>
+:deep(button:after) {
+  content: none !important;
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.circle-flags {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  flex-shrink: 1;
+}
+</style>

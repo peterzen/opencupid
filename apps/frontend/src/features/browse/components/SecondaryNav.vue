@@ -22,7 +22,7 @@ defineProps<{
     </li>
 
     <li class="col-8 d-flex nav-item justify-content-center align-items-center">
-      <ScopeViewToggler v-model="currentScope" @change="(scope) => $emit('scope:change', scope)" />
+      <ScopeViewToggler v-model="currentScope"  />
     </li>
 
     <li class="col-2 d-flex justify-content-end">

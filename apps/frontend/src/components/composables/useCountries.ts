@@ -10,7 +10,7 @@ countries.registerLocale(enLocale)
 const loadedLocales = new Set(['en'])
 
 const localeLoaders: Record<string, () => Promise<any>> = {
-  en: () => import('i18n-iso-countries/langs/en.json'),
+  // en: () => import('i18n-iso-countries/langs/en.json'),
   hu: () => import('i18n-iso-countries/langs/hu.json'),
   fr: () => import('i18n-iso-countries/langs/fr.json'),
   de: () => import('i18n-iso-countries/langs/de.json'),

@@ -1,27 +1,14 @@
 <script setup lang="ts">
 import { type Component, inject, ref } from 'vue'
 import IconPencil2 from '@/assets/icons/interface/pencil-2.svg'
-import { useProfileStore } from '@/store/profileStore'
-import useEditFields from '../composables/useEditFields'
+import useEditFields from '../../../components/profiles/composables/useEditFields'
 import { type EditFieldProfileFormWithImages } from '@zod/profile/profile.form'
+import { type FieldEditState } from '../composables/types'
+import { type EditProfileForm } from "@zod/profile/profile.form"
 
 // Only allow field names that are accepted by getModelProxy
 type AllowedFieldKey = keyof EditFieldProfileFormWithImages
-// | 'isSocialActive'
-// | 'isDatingActive'
-// | 'gender'
-// | 'pronouns'
-// | 'relationship'
-// | 'hasKids'
-// | 'publicName'
-// | 'introSocial'
-// | 'languages'
-// | 'introDating'
-// | 'birthday'
-// | 'tags'
-// | 'location'
 
-const profileStore = useProfileStore()
 
 const props = defineProps<{
   fieldName: AllowedFieldKey
@@ -36,14 +23,18 @@ const editableModel = inject<EditFieldProfileFormWithImages>(
   'editableModel',
   {} as EditFieldProfileFormWithImages
 )
+const fieldEditState = inject<FieldEditState>('fieldEditState', {
+  currentField: null,
+  fieldEditModal: false,
+})
 
 const handleButtonClick = () => {
-  profileStore.currentField = props.fieldName
-  profileStore.open()
+  fieldEditState.currentField = props.fieldName
+  fieldEditState.fieldEditModal = true
 }
 
 const { getModelProxy } = useEditFields(editableModel)
-// @ts-expect-error - TypeScript does not know about the dynamic nature of the field name
+// @ts-expect-error // TypeScript doesn't know about the dynamic nature of field names
 const fieldProxy = getModelProxy(props.fieldName)
 </script>
 
@@ -60,12 +51,12 @@ const fieldProxy = getModelProxy(props.fieldName)
         <IconPencil2 class="svg-icon" />
       </slot>
     </a>
-    <Teleport to="#field-edit-modal" v-if="profileStore.fieldEditModal">
+    <Teleport to="#field-edit-modal" v-if="fieldEditState.fieldEditModal">
       <component
         :is="editComponent"
         v-bind="editProps"
         v-model="fieldProxy"
-        v-if="profileStore.currentField === fieldName"
+        v-if="fieldEditState.currentField === fieldName"
       />
     </Teleport>
   </span>
@@ -89,7 +80,6 @@ const fieldProxy = getModelProxy(props.fieldName)
 //   justify-content: center;
 //   width: 100%;
 // }
-
 
 // :deep(.editable-placeholder + .edit-button) {
 //   transform: translate(-12rem, 0%);

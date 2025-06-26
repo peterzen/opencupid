@@ -34,15 +34,7 @@ import z from 'zod'
 export const useProfileStore = defineStore('profile', {
   state: () => ({
     profile: null as OwnerProfile | null,// Current user's profile
-    // profileList: [] as PublicProfile[], // List of public profiles
-    // datingPrefs: null as DatingPreferencesDTO | null, // Current user's dating preferences  
-
     isLoading: false, // Loading state
-
-    // Modal state for editing profile fields. Bit of an abusal of this store and maybe should be
-    // moved to a more specific store, but for now it works.
-    fieldEditModal: false,
-    currentField: '' as keyof EditFieldProfileFormWithImages | null, // Field being edited
   }),
 
   actions: {
@@ -265,13 +257,13 @@ export const useProfileStore = defineStore('profile', {
     // },
 
 
-    open() {
-      this.fieldEditModal = true
-    },
+    // open() {
+    //   this.fieldEditModal = true
+    // },
 
-    close() {
-      this.fieldEditModal = false
-    }
+    // close() {
+    //   this.fieldEditModal = false
+    // }
   },
 })
 

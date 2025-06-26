@@ -4,7 +4,7 @@ import { useDatingFields } from '../composables/useDatingFields'
 import { useI18n } from 'vue-i18n'
 
 import RelationstatusSelector from '@/components/profiles/forms/RelationstatusSelector.vue'
-import EditField from '@/components/profiles/public/EditField.vue'
+import EditField from '@/features/myprofile/components/EditField.vue'
 import HaskidsSelector from '../forms/HaskidsSelector.vue'
 import { toRef } from 'vue'
 

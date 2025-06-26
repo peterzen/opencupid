@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import { type ViewState } from './types'
+import { type ViewState } from '../composables/types'
 import IconTick from '@/assets/icons/interface/tick.svg'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import IconPencil2 from '@/assets/icons/interface/pencil-2.svg'
 
-const model = defineModel<ViewState>({
-  required: true,
+const editState = defineModel<boolean>({
+  default: false,
 })
 </script>
 
 <template>
   <Transition name="scale" mode="out-in">
     <BButton
-      v-if="model.isEditable"
+      v-if="editState"
       size="lg"
       class="btn-icon-lg"
       key="edit"
-      @click="model.isEditable = false"
+      @click="editState = false"
       variant="success"
     >
       <IconTick class="svg-icon me-1" />
@@ -26,7 +26,7 @@ const model = defineModel<ViewState>({
       size="lg"
       class="btn-icon-lg"
       key="save"
-      @click="model.isEditable = true"
+      @click="editState = true"
       variant="primary"
     >
       <FontAwesomeIcon icon="fa-solid fa-pen-to-square" class="animate__animated animate__fadeIn" />

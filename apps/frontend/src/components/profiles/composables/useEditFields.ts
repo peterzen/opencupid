@@ -1,5 +1,6 @@
+import { computed, provide, reactive } from "vue"
+import { type FieldEditState } from "@/features/myprofile/composables/types"
 import { type EditProfileForm, type EditFieldProfileFormWithImages } from "@zod/profile/profile.form"
-import { computed } from "vue"
 
 function modelProxy<T extends object, K extends keyof T>(target: T, key: K) {
   return computed({
@@ -11,12 +12,13 @@ function modelProxy<T extends object, K extends keyof T>(target: T, key: K) {
 }
 
 
-export default function useEditFields(model: EditFieldProfileFormWithImages|EditProfileForm) {
+export default function useEditFields(model: EditFieldProfileFormWithImages | EditProfileForm) {
 
   function getModelProxy<K extends keyof typeof model>(key: K) {
     return modelProxy(model, key)
   }
 
+  
   const publicNameModel = modelProxy(model, 'publicName')
   const birthdayModel = modelProxy(model, 'birthday')
   const relationshipModel = modelProxy(model, 'relationship')
@@ -33,6 +35,7 @@ export default function useEditFields(model: EditFieldProfileFormWithImages|Edit
       model.pronouns = val.pronouns
     },
   })
+
 
   return {
     getModelProxy,

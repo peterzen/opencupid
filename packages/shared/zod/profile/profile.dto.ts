@@ -4,8 +4,6 @@ import { z } from "zod";
 import {
   ProfileSchema,
   ConversationSchema,
-  type LocalizedProfileField,
-  type Profile,
 } from "../generated";
 
 

@@ -2,7 +2,7 @@
 import { type PublicProfileWithContext } from '@zod/profile/profile.dto'
 import { useDatingFields } from '../composables/useDatingFields'
 import { useI18n } from 'vue-i18n'
-import EditField from '@/components/profiles/public/EditField.vue'
+import EditField from '@/features/myprofile/components/EditField.vue'
 import GenderSelector from '@/components/profiles/forms/GenderSelector.vue'
 import PronounSelector from '../forms/PronounSelector.vue'
 import GenderSymbol from './GenderSymbol.vue'

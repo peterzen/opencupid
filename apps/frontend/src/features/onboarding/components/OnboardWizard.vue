@@ -10,18 +10,13 @@ import ImageEditor from '@/features/images/components/ImageEditor.vue'
 import DatingSteps from '../components/DatingSteps.vue'
 import LocationSelectorComponent from '@/components/profiles/forms/LocationSelector.vue'
 import GoalsSelector from './GoalsSelector.vue'
+import BackButton from '../components/BackButton.vue'
 
 import { useStepper } from '@vueuse/core'
 
-import { useI18nStore } from '@/store/i18nStore'
-import { useProfileStore } from '@/store/profileStore'
-
 import { useWizardSteps } from '@/features/onboarding/composables/useWizardSteps'
-import BackButton from '../components/BackButton.vue'
 
 const { t } = useI18n()
-const profileStore = useProfileStore()
-const i18nStore = useI18nStore()
 
 const formData = defineModel<EditProfileForm>({
   default: () => ({}),

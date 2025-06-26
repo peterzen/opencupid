@@ -13,7 +13,7 @@ import GenderPronounLabel from '../display/GenderPronounLabel.vue'
 import RelationshipTags from '../display/RelationshipTags.vue'
 import IconPhoto from '@/assets/icons/interface/photo.svg'
 // Edit components
-import EditField from '@/components/profiles/public/EditField.vue'
+import EditField from '@/features/myprofile/components/EditField.vue'
 import PublicNameInput from '@/components/profiles/forms/PublicNameInput.vue'
 import LocationSelector from '../forms/LocationSelector.vue'
 import LanguageSelector from '@/components/profiles/forms/LanguageSelector.vue'
@@ -44,7 +44,7 @@ const emit = defineEmits<{
     </div>
 
     <div class="icons">
-      <DatingIcon :profile />
+      <!-- <DatingIcon :profile /> -->
     </div>
 
     <div class="action-buttons">
@@ -52,7 +52,7 @@ const emit = defineEmits<{
         :profile
         @intent:profile:edit="emit('intent:profile:edit')"
         @intent:conversation:open="
-          conversationId => emit('intent:conversation:open', conversationId)
+          (conversationId: string) => emit('intent:conversation:open', conversationId)
         "
       />
       <EditField
@@ -73,11 +73,12 @@ const emit = defineEmits<{
     </div>
     <div class="mb-2 text-muted d-inline-flex align-items-center">
       <span class="me-1">
-        <LocationLabel 
-        :location="profile.location"
-         :showCity="true" 
-         :showCountryLabel="true"
-         :showIcon="false" />
+        <LocationLabel
+          :location="profile.location"
+          :showCity="true"
+          :showCountryLabel="true"
+          :showIcon="false"
+        />
       </span>
       <EditField fieldName="location" :editComponent="LocationSelector" />
     </div>

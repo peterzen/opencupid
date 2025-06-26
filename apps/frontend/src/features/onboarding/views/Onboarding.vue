@@ -13,7 +13,6 @@ import OnboardWizard from '@/features/onboarding/components/OnboardWizard.vue'
 
 import { useI18nStore } from '@/store/i18nStore'
 import { useProfileStore } from '@/store/profileStore'
-import fetchGeoIpInfo from '@/lib/geoip'
 import { useAppStore } from '@/features/app/stores/appStore'
 
 const { t } = useI18n()
