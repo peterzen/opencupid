@@ -1,16 +1,10 @@
 import { PrismaClient } from '@prisma/client'
 import { v2 as Translate } from '@google-cloud/translate'
-import dotenv from 'dotenv'
-
-dotenv.config()
 
 const prisma = new PrismaClient()
 
 // Parse credentials JSON from env
-const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON)
-const translate = new Translate.Translate({
-  credentials,
-})
+const translate = new Translate.Translate()
 
 const TARGET_LOCALES = ['fr', 'de', 'hu', 'es']
 const dryRun = false // Toggle this

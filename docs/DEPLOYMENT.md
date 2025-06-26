@@ -11,16 +11,7 @@
 ### Issue certs
 
  ```bash
-  docker compose run --rm \
-    --env-file .env \
-    --entrypoint sh certbot -c "
-      certbot certonly \
-        --webroot -w /var/www/html \
-        -d \$DOMAIN \
-        --email \$EMAIL \
-        --agree-tos \
-        --non-interactive
-  "
+docker run -it  --rm -p 80:80   -v certbot-etc:/etc/letsencrypt   certbot/certbot certonly   --standalone
 ```
 
 ### Configure cron jobs

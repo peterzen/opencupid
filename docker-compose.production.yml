@@ -65,4 +65,5 @@ volumes:
   postgres_data:
     external: true
   certbot-etc:
+    external: true
   certbot-webroot:
