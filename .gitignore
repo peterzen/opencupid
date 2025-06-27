@@ -30,7 +30,6 @@ Thumbs.db
 turbo/
 .turbo/
 
-apps/backend/prisma/migrations/
 apps/frontend/dev-dist/
 secrets/
 .config-cache/
