@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { type MessageDTO } from '@zod/messaging/messaging.dto'
 import ProfileImage from '@/features/images/components/ProfileImage.vue'
 import { type InteractionEdge } from '@zod/datinginteraction/datinginteraction.dto'
 // import { useI18n } from 'vue-i18n';
