@@ -47,10 +47,6 @@ onMounted(async () => {
   isLoading.value = false
 })
 
-const wsConnected = computed(() => {
-  return !!useMessageStore().socket
-})
-const messageStore = useMessageStore()
 </script>
 
 <template>

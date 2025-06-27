@@ -8,30 +8,14 @@ import {
   type UpdateProfileScopePayload,
 } from '@zod/profile/profile.dto'
 import {
-  DbProfileComplete,
+  DbProfileWithContext,
   DbOwnerUpdateScalars,
   DbProfileWithImages
 } from '@zod/profile/profile.db'
 import { mapToLocalizedUpserts } from '@/api/mappers/profile.mappers'
-import { profileCompleteInclude, profileImageInclude } from '@/db/includes/profileCompleteInclude'
+import { conversationContextInclude, interactionContextInclude, profileImageInclude, tagsInclude } from '@/db/includes/profileIncludes'
 
 
-const conversationWithMyProfileInclude = (myProfileId: string) => ({
-  conversationParticipants: {
-    where: {
-      conversation: {
-        participants: {
-          some: {
-            profileId: myProfileId,
-          },
-        },
-      },
-    },
-    include: {
-      conversation: true,
-    },
-  },
-});
 
 
 export class ProfileService {
@@ -48,15 +32,36 @@ export class ProfileService {
     return ProfileService.instance
   }
 
-  async getProfileWithContextById(profileId: string, myProfileId: string,): Promise<DbProfileComplete | null> {
-
-    return prisma.profile.findUnique({
+  async getProfileWithContextById(profileId: string, myProfileId: string,): Promise<DbProfileWithContext | null> {
+    const query = {
       where: { id: profileId },
       include: {
-        ...profileCompleteInclude(),
-        ...conversationWithMyProfileInclude(myProfileId),
+        ...tagsInclude(),
+        ...profileImageInclude(),
+        ...interactionContextInclude(myProfileId),
+        ...conversationContextInclude(myProfileId),
       },
-    })
+    }
+    const result = await prisma.profile.findUnique(query)
+
+    if (!result) return null
+
+    const interactionContext = {
+      likedByMe: result.likesReceived.length > 0,
+      passedByMe: result.likesSent.length > 0,
+      isMatch: result.likesReceived.length > 0 && result.likesSent.length > 0,
+    }
+    // destructure to ensure all expected fields are explicitly present
+    const {
+      likesReceived, // remove from result to avoid schema mismatch
+      likesSent,
+      ...rest
+    } = result
+
+    return {
+      ...rest,
+      interactionContext,
+    } satisfies DbProfileWithContext
   }
 
   async getProfileByUserId(userId: string): Promise<Profile | null> {
@@ -76,7 +81,8 @@ export class ProfileService {
     return prisma.profile.findUnique({
       where: { userId },
       include: {
-        ...profileCompleteInclude(),
+        ...tagsInclude(),
+        ...profileImageInclude(),
       },
     })
   }
@@ -85,7 +91,8 @@ export class ProfileService {
     return prisma.profile.findUnique({
       where: { id: profileId },
       include: {
-        ...profileCompleteInclude(),
+        ...tagsInclude(),
+        ...profileImageInclude(),
       },
     })
   }
@@ -158,7 +165,8 @@ export class ProfileService {
         isActive: true, // TODO change this to isVisible when we have that field
       },
       include: {
-        ...profileCompleteInclude(),
+        ...tagsInclude(),
+        ...profileImageInclude(),
       },
     })
     return updated
@@ -218,7 +226,8 @@ export class ProfileService {
           where: { userId },
           data,
           include: {
-            ...profileCompleteInclude(),
+            ...tagsInclude(),
+            ...profileImageInclude(),
           },
         })
 

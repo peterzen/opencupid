@@ -11,6 +11,8 @@ import MyProfile from '@/features/myprofile/views/MyProfile.vue'
 import PublicProfile from '@/views/PublicProfile.vue'
 import BrowseProfiles from '@/features/browse/views/BrowseProfiles.vue'
 import OnboardingView from '@/features/onboarding/views/Onboarding.vue'
+import { connectWebSocket, disconnectWebSocket } from '@/lib/websocket'
+import { bus } from '@/lib/bus'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -97,6 +99,7 @@ const router = createRouter({
 
 // Register the navigation guard
 router.beforeEach(async (to, from, next) => {
+  // TODO refactor this. most of this logic should be lifted from here
   const authStore = useAuthStore()
 
   // Initialize auth state if not already done
@@ -115,6 +118,8 @@ router.beforeEach(async (to, from, next) => {
     // Otherwise, allow access
     next()
   }
+
+
 })
 
 // const toast = useToast()

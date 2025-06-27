@@ -21,6 +21,7 @@ import TagSelectComponent from '@/components/profiles/forms/TagSelectComponent.v
 import IntrotextEditor from '@/components/profiles/forms/IntrotextEditor.vue'
 
 import ImageEditor from '@/features/images/components/ImageEditor.vue'
+import DatingInteractions from '@/features/datinginteraction/components/DatingInteractions.vue'
 
 const { t } = useI18n()
 
@@ -34,6 +35,8 @@ const emit = defineEmits<{
   (e: 'intent:conversation:open', conversationId: string): void
   (e: 'intent:profile:edit'): void
   (e: 'intent:field:edit'): void
+  (e: 'intent:pass'): void
+  (e: 'intent:like'): void
 }>()
 </script>
 
@@ -144,6 +147,13 @@ const emit = defineEmits<{
     </div>
     <div class="mb-3">
       <RelationshipTags :profile="props.profile" />
+    </div>
+
+    <div>
+      <DatingInteractions v-if="props.profile.isDatingActive" :profile="props.profile"
+      @intent:pass="emit('intent:pass')"
+      @intent:like="emit('intent:like')"
+      />
     </div>
   </div>
 </template>

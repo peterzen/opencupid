@@ -1,8 +1,7 @@
 import type WebSocket from 'ws'
 import { FastifyPluginAsync } from 'fastify'
 
-import { verifyWsToken } from '@/lib/verifyWsToken'
-import { MessageService } from '@/services/messaging.service'
+import { verifyWsToken } from '@/utils/wsUtils'
 
 interface WsMessage {
   to: string // recipient userId

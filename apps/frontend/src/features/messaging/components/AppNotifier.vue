@@ -7,36 +7,92 @@ import { useToast } from 'vue-toastification'
 
 const router = useRouter()
 
-import MessageReceivedToast from './MessageReceivedToast.vue'
 import { type MessageDTO } from '@zod/messaging/messaging.dto'
+import { type InteractionEdge } from '@zod/datinginteraction/datinginteraction.dto'
+
+import MessageReceivedToast from './MessageReceivedToast.vue'
+import LikeReceivedToast from './LikeReceivedToast.vue'
+import MatchReceivedToast from './MatchReceivedToast.vue'
 
 const toast = useToast()
 
-function handleMessageReceived({ message }: { message: MessageDTO }) {
+function toastId(){
+  return new Date().getUTCMilliseconds()
+}
+
+function handleMessageReceived(message: MessageDTO) {
   toast(
     {
       component: MessageReceivedToast,
       props: {
-        toastId: `${message.id}`,
+        toastId: toastId(),
         message: message,
       },
     },
     {
       onClick: closeToast => {
-        console.log('Toast clicked:', message.id)
-        router.push({ name: 'Messaging', params: { conversationId: message.conversationId },force: true })
+        router.push({
+          name: 'Messaging',
+          params: { conversationId: message.conversationId },
+          force: true,
+        })
         closeToast()
       },
     }
   )
 }
+
+function handleLikeReceived() {
+  toast(
+    {
+      component: LikeReceivedToast,
+      props: {
+        toastId: toastId(),
+      },
+    },
+    {
+      onClick: closeToast => {
+        // router.push({ name: 'Messaging', params: { conversationId: message.conversationId },force: true })
+        closeToast()
+      },
+    }
+  )
+}
+
+function handleMatchReceived(edge: InteractionEdge) {
+  console.log('Match received:', edge)
+  toast(
+    {
+      component: MatchReceivedToast,
+      props: {
+        toastId: toastId(),
+        edge,
+      },
+    },
+    {
+      onClick: closeToast => {
+        router.push({
+          name: 'Matches',
+          params: { profileId: edge.profile.id },
+          force: true,
+        })
+        closeToast()
+      },
+    }
+  )
+}
+
 onMounted(() => {
-  bus.on('message:received', handleMessageReceived)
+  bus.on('ws:new_message', handleMessageReceived)
+  bus.on('ws:new_like', handleLikeReceived)
+  bus.on('ws:new_match', handleMatchReceived)
 })
+
 onUnmounted(() => {
-  bus.off('message:received', handleMessageReceived)
+  bus.off('ws:new_message', handleMessageReceived)
+  bus.off('ws:new_like', handleLikeReceived)
+  bus.off('ws:new_match', handleMatchReceived)
 })
 </script>
-<template>
-  <div></div>
-</template>
+
+<template><slot/></template>
