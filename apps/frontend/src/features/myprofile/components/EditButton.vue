@@ -3,7 +3,7 @@ import { type ViewState } from '../composables/types'
 import IconTick from '@/assets/icons/interface/tick.svg'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import IconPencil2 from '@/assets/icons/interface/pencil-2.svg'
-
+import { faPenToSquare } from '@fortawesome/free-solid-svg-icons'
 const editState = defineModel<boolean>({
   default: false,
 })
@@ -29,7 +29,7 @@ const editState = defineModel<boolean>({
       @click="editState = true"
       variant="primary"
     >
-      <FontAwesomeIcon icon="fa-solid fa-pen-to-square" class="animate__animated animate__fadeIn" />
+      <FontAwesomeIcon :icon="faPenToSquare" class="animate__animated animate__fadeIn" />
       <!-- <IconPencil2 class="svg-icon-lg" /> -->
     </BButton>
   </Transition>
