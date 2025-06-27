@@ -179,12 +179,12 @@ model User {
 }
 
 model Profile {
-  id          String  @id @default(cuid())
-  publicName  String
-  country     String  @default("")
-  cityName    String  @default("")
-  cityId      String?
-  city        City?   @relation(fields: [cityId], references: [id])
+  id         String  @id @default(cuid())
+  publicName String
+  country    String  @default("")
+  cityName   String  @default("")
+  cityId     String?
+  city       City?   @relation(fields: [cityId], references: [id])
 
   isSocialActive Boolean @default(false)
   isDatingActive Boolean @default(false)
@@ -232,6 +232,9 @@ model Profile {
 
   blockedProfiles   Profile[] @relation("BlockedProfiles")
   blockedByProfiles Profile[] @relation("BlockedProfiles")
+
+  likesSent     Like[] @relation("LikesSent")
+  likesReceived Like[] @relation("LikesReceived")
 }
 
 model DatingPreferences {
@@ -319,6 +322,17 @@ enum ConversationStatus {
   ACCEPTED // Bob replied
   BLOCKED // Either blocked
   ARCHIVED // Archived by both or system
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  from      Profile  @relation("LikesSent", fields: [fromId], references: [id])
+  fromId    String
+  to        Profile  @relation("LikesReceived", fields: [toId], references: [id])
+  toId      String
+  createdAt DateTime @default(now())
+
+  @@unique([fromId, toId]) // Prevent double-like
 }
 
 model Message {
