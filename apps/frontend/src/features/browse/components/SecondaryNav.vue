@@ -7,7 +7,6 @@ const currentScope = defineModel<ProfileScope | null>()
 
 defineEmits<{
   (event: 'edit:datingPrefs'):void,
-  (event: 'scope:change', scope: ProfileScope): void
 }>()
 
 defineProps<{
