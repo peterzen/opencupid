@@ -25,13 +25,13 @@ export type DbProfileWithImages = z.infer<typeof DbProfileWithImagesSchema>;
 
 
 
-export const LikeContextSchema = z.object({
+export const InteractionContextSchema = z.object({
   likedByMe: z.boolean().default(false),
-  likedMe: z.boolean().default(false),
   isMatch: z.boolean().default(false),
+  passedByMe: z.boolean().default(false),
 })
 
-export type LikeContext = z.infer<typeof LikeContextSchema>
+export type InteractionContext = z.infer<typeof InteractionContextSchema>
 
 export const DbProfileWithContextSchema = DbProfileWithImagesSchema.extend({
   conversationParticipants: z
@@ -39,7 +39,7 @@ export const DbProfileWithContextSchema = DbProfileWithImagesSchema.extend({
       conversation: ConversationSchema,
     }))
     .default([]),
-  likeContext: LikeContextSchema
+  interactionContext: InteractionContextSchema
 })
 
 export type DbProfileWithContext = z.infer<typeof DbProfileWithContextSchema>;

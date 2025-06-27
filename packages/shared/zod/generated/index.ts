@@ -36,7 +36,9 @@ export const ConversationScalarFieldEnumSchema = z.enum(['id','createdAt','updat
 
 export const ConversationParticipantScalarFieldEnumSchema = z.enum(['id','profileId','conversationId','lastReadAt','isMuted','isArchived']);
 
-export const LikeScalarFieldEnumSchema = z.enum(['id','fromId','toId','createdAt']);
+export const LikedProfileScalarFieldEnumSchema = z.enum(['id','fromId','toId','createdAt']);
+
+export const HiddenProfileScalarFieldEnumSchema = z.enum(['id','fromId','toId','createdAt']);
 
 export const MessageScalarFieldEnumSchema = z.enum(['id','conversationId','senderId','content','createdAt']);
 
@@ -307,17 +309,30 @@ export const ConversationParticipantSchema = z.object({
 export type ConversationParticipant = z.infer<typeof ConversationParticipantSchema>
 
 /////////////////////////////////////////
-// LIKE SCHEMA
+// LIKED PROFILE SCHEMA
 /////////////////////////////////////////
 
-export const LikeSchema = z.object({
+export const LikedProfileSchema = z.object({
   id: z.string().cuid(),
   fromId: z.string(),
   toId: z.string(),
   createdAt: z.coerce.date(),
 })
 
-export type Like = z.infer<typeof LikeSchema>
+export type LikedProfile = z.infer<typeof LikedProfileSchema>
+
+/////////////////////////////////////////
+// HIDDEN PROFILE SCHEMA
+/////////////////////////////////////////
+
+export const HiddenProfileSchema = z.object({
+  id: z.string().cuid(),
+  fromId: z.string(),
+  toId: z.string(),
+  createdAt: z.coerce.date(),
+})
+
+export type HiddenProfile = z.infer<typeof HiddenProfileSchema>
 
 /////////////////////////////////////////
 // MESSAGE SCHEMA
@@ -566,8 +581,10 @@ export const ProfileIncludeSchema: z.ZodType<Prisma.ProfileInclude> = z.object({
   localized: z.union([z.boolean(),z.lazy(() => LocalizedProfileFieldFindManyArgsSchema)]).optional(),
   blockedProfiles: z.union([z.boolean(),z.lazy(() => ProfileFindManyArgsSchema)]).optional(),
   blockedByProfiles: z.union([z.boolean(),z.lazy(() => ProfileFindManyArgsSchema)]).optional(),
-  likesSent: z.union([z.boolean(),z.lazy(() => LikeFindManyArgsSchema)]).optional(),
-  likesReceived: z.union([z.boolean(),z.lazy(() => LikeFindManyArgsSchema)]).optional(),
+  likesSent: z.union([z.boolean(),z.lazy(() => LikedProfileFindManyArgsSchema)]).optional(),
+  likesReceived: z.union([z.boolean(),z.lazy(() => LikedProfileFindManyArgsSchema)]).optional(),
+  hiddenProfiles: z.union([z.boolean(),z.lazy(() => HiddenProfileFindManyArgsSchema)]).optional(),
+  hiddenBy: z.union([z.boolean(),z.lazy(() => HiddenProfileFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => ProfileCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
@@ -593,6 +610,8 @@ export const ProfileCountOutputTypeSelectSchema: z.ZodType<Prisma.ProfileCountOu
   blockedByProfiles: z.boolean().optional(),
   likesSent: z.boolean().optional(),
   likesReceived: z.boolean().optional(),
+  hiddenProfiles: z.boolean().optional(),
+  hiddenBy: z.boolean().optional(),
 }).strict();
 
 export const ProfileSelectSchema: z.ZodType<Prisma.ProfileSelect> = z.object({
@@ -633,8 +652,10 @@ export const ProfileSelectSchema: z.ZodType<Prisma.ProfileSelect> = z.object({
   localized: z.union([z.boolean(),z.lazy(() => LocalizedProfileFieldFindManyArgsSchema)]).optional(),
   blockedProfiles: z.union([z.boolean(),z.lazy(() => ProfileFindManyArgsSchema)]).optional(),
   blockedByProfiles: z.union([z.boolean(),z.lazy(() => ProfileFindManyArgsSchema)]).optional(),
-  likesSent: z.union([z.boolean(),z.lazy(() => LikeFindManyArgsSchema)]).optional(),
-  likesReceived: z.union([z.boolean(),z.lazy(() => LikeFindManyArgsSchema)]).optional(),
+  likesSent: z.union([z.boolean(),z.lazy(() => LikedProfileFindManyArgsSchema)]).optional(),
+  likesReceived: z.union([z.boolean(),z.lazy(() => LikedProfileFindManyArgsSchema)]).optional(),
+  hiddenProfiles: z.union([z.boolean(),z.lazy(() => HiddenProfileFindManyArgsSchema)]).optional(),
+  hiddenBy: z.union([z.boolean(),z.lazy(() => HiddenProfileFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => ProfileCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
@@ -769,20 +790,42 @@ export const ConversationParticipantSelectSchema: z.ZodType<Prisma.ConversationP
   conversation: z.union([z.boolean(),z.lazy(() => ConversationArgsSchema)]).optional(),
 }).strict()
 
-// LIKE
+// LIKED PROFILE
 //------------------------------------------------------
 
-export const LikeIncludeSchema: z.ZodType<Prisma.LikeInclude> = z.object({
+export const LikedProfileIncludeSchema: z.ZodType<Prisma.LikedProfileInclude> = z.object({
   from: z.union([z.boolean(),z.lazy(() => ProfileArgsSchema)]).optional(),
   to: z.union([z.boolean(),z.lazy(() => ProfileArgsSchema)]).optional(),
 }).strict()
 
-export const LikeArgsSchema: z.ZodType<Prisma.LikeDefaultArgs> = z.object({
-  select: z.lazy(() => LikeSelectSchema).optional(),
-  include: z.lazy(() => LikeIncludeSchema).optional(),
+export const LikedProfileArgsSchema: z.ZodType<Prisma.LikedProfileDefaultArgs> = z.object({
+  select: z.lazy(() => LikedProfileSelectSchema).optional(),
+  include: z.lazy(() => LikedProfileIncludeSchema).optional(),
 }).strict();
 
-export const LikeSelectSchema: z.ZodType<Prisma.LikeSelect> = z.object({
+export const LikedProfileSelectSchema: z.ZodType<Prisma.LikedProfileSelect> = z.object({
+  id: z.boolean().optional(),
+  fromId: z.boolean().optional(),
+  toId: z.boolean().optional(),
+  createdAt: z.boolean().optional(),
+  from: z.union([z.boolean(),z.lazy(() => ProfileArgsSchema)]).optional(),
+  to: z.union([z.boolean(),z.lazy(() => ProfileArgsSchema)]).optional(),
+}).strict()
+
+// HIDDEN PROFILE
+//------------------------------------------------------
+
+export const HiddenProfileIncludeSchema: z.ZodType<Prisma.HiddenProfileInclude> = z.object({
+  from: z.union([z.boolean(),z.lazy(() => ProfileArgsSchema)]).optional(),
+  to: z.union([z.boolean(),z.lazy(() => ProfileArgsSchema)]).optional(),
+}).strict()
+
+export const HiddenProfileArgsSchema: z.ZodType<Prisma.HiddenProfileDefaultArgs> = z.object({
+  select: z.lazy(() => HiddenProfileSelectSchema).optional(),
+  include: z.lazy(() => HiddenProfileIncludeSchema).optional(),
+}).strict();
+
+export const HiddenProfileSelectSchema: z.ZodType<Prisma.HiddenProfileSelect> = z.object({
   id: z.boolean().optional(),
   fromId: z.boolean().optional(),
   toId: z.boolean().optional(),
@@ -1481,8 +1524,10 @@ export const ProfileWhereInputSchema: z.ZodType<Prisma.ProfileWhereInput> = z.ob
   localized: z.lazy(() => LocalizedProfileFieldListRelationFilterSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileListRelationFilterSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileListRelationFilterSchema).optional(),
-  likesSent: z.lazy(() => LikeListRelationFilterSchema).optional(),
-  likesReceived: z.lazy(() => LikeListRelationFilterSchema).optional()
+  likesSent: z.lazy(() => LikedProfileListRelationFilterSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileListRelationFilterSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileListRelationFilterSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileListRelationFilterSchema).optional()
 }).strict();
 
 export const ProfileOrderByWithRelationInputSchema: z.ZodType<Prisma.ProfileOrderByWithRelationInput> = z.object({
@@ -1523,8 +1568,10 @@ export const ProfileOrderByWithRelationInputSchema: z.ZodType<Prisma.ProfileOrde
   localized: z.lazy(() => LocalizedProfileFieldOrderByRelationAggregateInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileOrderByRelationAggregateInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileOrderByRelationAggregateInputSchema).optional(),
-  likesSent: z.lazy(() => LikeOrderByRelationAggregateInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeOrderByRelationAggregateInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileOrderByRelationAggregateInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileOrderByRelationAggregateInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileOrderByRelationAggregateInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileOrderByRelationAggregateInputSchema).optional()
 }).strict();
 
 export const ProfileWhereUniqueInputSchema: z.ZodType<Prisma.ProfileWhereUniqueInput> = z.union([
@@ -1580,8 +1627,10 @@ export const ProfileWhereUniqueInputSchema: z.ZodType<Prisma.ProfileWhereUniqueI
   localized: z.lazy(() => LocalizedProfileFieldListRelationFilterSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileListRelationFilterSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileListRelationFilterSchema).optional(),
-  likesSent: z.lazy(() => LikeListRelationFilterSchema).optional(),
-  likesReceived: z.lazy(() => LikeListRelationFilterSchema).optional()
+  likesSent: z.lazy(() => LikedProfileListRelationFilterSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileListRelationFilterSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileListRelationFilterSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileListRelationFilterSchema).optional()
 }).strict());
 
 export const ProfileOrderByWithAggregationInputSchema: z.ZodType<Prisma.ProfileOrderByWithAggregationInput> = z.object({
@@ -2061,10 +2110,10 @@ export const ConversationParticipantScalarWhereWithAggregatesInputSchema: z.ZodT
   isArchived: z.union([ z.lazy(() => BoolWithAggregatesFilterSchema),z.boolean() ]).optional(),
 }).strict();
 
-export const LikeWhereInputSchema: z.ZodType<Prisma.LikeWhereInput> = z.object({
-  AND: z.union([ z.lazy(() => LikeWhereInputSchema),z.lazy(() => LikeWhereInputSchema).array() ]).optional(),
-  OR: z.lazy(() => LikeWhereInputSchema).array().optional(),
-  NOT: z.union([ z.lazy(() => LikeWhereInputSchema),z.lazy(() => LikeWhereInputSchema).array() ]).optional(),
+export const LikedProfileWhereInputSchema: z.ZodType<Prisma.LikedProfileWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => LikedProfileWhereInputSchema),z.lazy(() => LikedProfileWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => LikedProfileWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => LikedProfileWhereInputSchema),z.lazy(() => LikedProfileWhereInputSchema).array() ]).optional(),
   id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   fromId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   toId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
@@ -2073,7 +2122,7 @@ export const LikeWhereInputSchema: z.ZodType<Prisma.LikeWhereInput> = z.object({
   to: z.union([ z.lazy(() => ProfileScalarRelationFilterSchema),z.lazy(() => ProfileWhereInputSchema) ]).optional(),
 }).strict();
 
-export const LikeOrderByWithRelationInputSchema: z.ZodType<Prisma.LikeOrderByWithRelationInput> = z.object({
+export const LikedProfileOrderByWithRelationInputSchema: z.ZodType<Prisma.LikedProfileOrderByWithRelationInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   fromId: z.lazy(() => SortOrderSchema).optional(),
   toId: z.lazy(() => SortOrderSchema).optional(),
@@ -2082,24 +2131,24 @@ export const LikeOrderByWithRelationInputSchema: z.ZodType<Prisma.LikeOrderByWit
   to: z.lazy(() => ProfileOrderByWithRelationInputSchema).optional()
 }).strict();
 
-export const LikeWhereUniqueInputSchema: z.ZodType<Prisma.LikeWhereUniqueInput> = z.union([
+export const LikedProfileWhereUniqueInputSchema: z.ZodType<Prisma.LikedProfileWhereUniqueInput> = z.union([
   z.object({
     id: z.string().cuid(),
-    fromId_toId: z.lazy(() => LikeFromIdToIdCompoundUniqueInputSchema)
+    fromId_toId: z.lazy(() => LikedProfileFromIdToIdCompoundUniqueInputSchema)
   }),
   z.object({
     id: z.string().cuid(),
   }),
   z.object({
-    fromId_toId: z.lazy(() => LikeFromIdToIdCompoundUniqueInputSchema),
+    fromId_toId: z.lazy(() => LikedProfileFromIdToIdCompoundUniqueInputSchema),
   }),
 ])
 .and(z.object({
   id: z.string().cuid().optional(),
-  fromId_toId: z.lazy(() => LikeFromIdToIdCompoundUniqueInputSchema).optional(),
-  AND: z.union([ z.lazy(() => LikeWhereInputSchema),z.lazy(() => LikeWhereInputSchema).array() ]).optional(),
-  OR: z.lazy(() => LikeWhereInputSchema).array().optional(),
-  NOT: z.union([ z.lazy(() => LikeWhereInputSchema),z.lazy(() => LikeWhereInputSchema).array() ]).optional(),
+  fromId_toId: z.lazy(() => LikedProfileFromIdToIdCompoundUniqueInputSchema).optional(),
+  AND: z.union([ z.lazy(() => LikedProfileWhereInputSchema),z.lazy(() => LikedProfileWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => LikedProfileWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => LikedProfileWhereInputSchema),z.lazy(() => LikedProfileWhereInputSchema).array() ]).optional(),
   fromId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   toId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
@@ -2107,20 +2156,86 @@ export const LikeWhereUniqueInputSchema: z.ZodType<Prisma.LikeWhereUniqueInput> 
   to: z.union([ z.lazy(() => ProfileScalarRelationFilterSchema),z.lazy(() => ProfileWhereInputSchema) ]).optional(),
 }).strict());
 
-export const LikeOrderByWithAggregationInputSchema: z.ZodType<Prisma.LikeOrderByWithAggregationInput> = z.object({
+export const LikedProfileOrderByWithAggregationInputSchema: z.ZodType<Prisma.LikedProfileOrderByWithAggregationInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   fromId: z.lazy(() => SortOrderSchema).optional(),
   toId: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional(),
-  _count: z.lazy(() => LikeCountOrderByAggregateInputSchema).optional(),
-  _max: z.lazy(() => LikeMaxOrderByAggregateInputSchema).optional(),
-  _min: z.lazy(() => LikeMinOrderByAggregateInputSchema).optional()
+  _count: z.lazy(() => LikedProfileCountOrderByAggregateInputSchema).optional(),
+  _max: z.lazy(() => LikedProfileMaxOrderByAggregateInputSchema).optional(),
+  _min: z.lazy(() => LikedProfileMinOrderByAggregateInputSchema).optional()
 }).strict();
 
-export const LikeScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.LikeScalarWhereWithAggregatesInput> = z.object({
-  AND: z.union([ z.lazy(() => LikeScalarWhereWithAggregatesInputSchema),z.lazy(() => LikeScalarWhereWithAggregatesInputSchema).array() ]).optional(),
-  OR: z.lazy(() => LikeScalarWhereWithAggregatesInputSchema).array().optional(),
-  NOT: z.union([ z.lazy(() => LikeScalarWhereWithAggregatesInputSchema),z.lazy(() => LikeScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+export const LikedProfileScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.LikedProfileScalarWhereWithAggregatesInput> = z.object({
+  AND: z.union([ z.lazy(() => LikedProfileScalarWhereWithAggregatesInputSchema),z.lazy(() => LikedProfileScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  OR: z.lazy(() => LikedProfileScalarWhereWithAggregatesInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => LikedProfileScalarWhereWithAggregatesInputSchema),z.lazy(() => LikedProfileScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  fromId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  toId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  createdAt: z.union([ z.lazy(() => DateTimeWithAggregatesFilterSchema),z.coerce.date() ]).optional(),
+}).strict();
+
+export const HiddenProfileWhereInputSchema: z.ZodType<Prisma.HiddenProfileWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => HiddenProfileWhereInputSchema),z.lazy(() => HiddenProfileWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => HiddenProfileWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => HiddenProfileWhereInputSchema),z.lazy(() => HiddenProfileWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  fromId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  toId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  from: z.union([ z.lazy(() => ProfileScalarRelationFilterSchema),z.lazy(() => ProfileWhereInputSchema) ]).optional(),
+  to: z.union([ z.lazy(() => ProfileScalarRelationFilterSchema),z.lazy(() => ProfileWhereInputSchema) ]).optional(),
+}).strict();
+
+export const HiddenProfileOrderByWithRelationInputSchema: z.ZodType<Prisma.HiddenProfileOrderByWithRelationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  fromId: z.lazy(() => SortOrderSchema).optional(),
+  toId: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  from: z.lazy(() => ProfileOrderByWithRelationInputSchema).optional(),
+  to: z.lazy(() => ProfileOrderByWithRelationInputSchema).optional()
+}).strict();
+
+export const HiddenProfileWhereUniqueInputSchema: z.ZodType<Prisma.HiddenProfileWhereUniqueInput> = z.union([
+  z.object({
+    id: z.string().cuid(),
+    fromId_toId: z.lazy(() => HiddenProfileFromIdToIdCompoundUniqueInputSchema)
+  }),
+  z.object({
+    id: z.string().cuid(),
+  }),
+  z.object({
+    fromId_toId: z.lazy(() => HiddenProfileFromIdToIdCompoundUniqueInputSchema),
+  }),
+])
+.and(z.object({
+  id: z.string().cuid().optional(),
+  fromId_toId: z.lazy(() => HiddenProfileFromIdToIdCompoundUniqueInputSchema).optional(),
+  AND: z.union([ z.lazy(() => HiddenProfileWhereInputSchema),z.lazy(() => HiddenProfileWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => HiddenProfileWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => HiddenProfileWhereInputSchema),z.lazy(() => HiddenProfileWhereInputSchema).array() ]).optional(),
+  fromId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  toId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+  from: z.union([ z.lazy(() => ProfileScalarRelationFilterSchema),z.lazy(() => ProfileWhereInputSchema) ]).optional(),
+  to: z.union([ z.lazy(() => ProfileScalarRelationFilterSchema),z.lazy(() => ProfileWhereInputSchema) ]).optional(),
+}).strict());
+
+export const HiddenProfileOrderByWithAggregationInputSchema: z.ZodType<Prisma.HiddenProfileOrderByWithAggregationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  fromId: z.lazy(() => SortOrderSchema).optional(),
+  toId: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional(),
+  _count: z.lazy(() => HiddenProfileCountOrderByAggregateInputSchema).optional(),
+  _max: z.lazy(() => HiddenProfileMaxOrderByAggregateInputSchema).optional(),
+  _min: z.lazy(() => HiddenProfileMinOrderByAggregateInputSchema).optional()
+}).strict();
+
+export const HiddenProfileScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.HiddenProfileScalarWhereWithAggregatesInput> = z.object({
+  AND: z.union([ z.lazy(() => HiddenProfileScalarWhereWithAggregatesInputSchema),z.lazy(() => HiddenProfileScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  OR: z.lazy(() => HiddenProfileScalarWhereWithAggregatesInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => HiddenProfileScalarWhereWithAggregatesInputSchema),z.lazy(() => HiddenProfileScalarWhereWithAggregatesInputSchema).array() ]).optional(),
   id: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   fromId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
   toId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
@@ -2818,8 +2933,10 @@ export const ProfileCreateInputSchema: z.ZodType<Prisma.ProfileCreateInput> = z.
   localized: z.lazy(() => LocalizedProfileFieldCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedCreateInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateInput> = z.object({
@@ -2858,8 +2975,10 @@ export const ProfileUncheckedCreateInputSchema: z.ZodType<Prisma.ProfileUnchecke
   localized: z.lazy(() => LocalizedProfileFieldUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileUpdateInputSchema: z.ZodType<Prisma.ProfileUpdateInput> = z.object({
@@ -2898,8 +3017,10 @@ export const ProfileUpdateInputSchema: z.ZodType<Prisma.ProfileUpdateInput> = z.
   localized: z.lazy(() => LocalizedProfileFieldUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedUpdateInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateInput> = z.object({
@@ -2938,8 +3059,10 @@ export const ProfileUncheckedUpdateInputSchema: z.ZodType<Prisma.ProfileUnchecke
   localized: z.lazy(() => LocalizedProfileFieldUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileCreateManyInputSchema: z.ZodType<Prisma.ProfileCreateManyInput> = z.object({
@@ -3395,47 +3518,94 @@ export const ConversationParticipantUncheckedUpdateManyInputSchema: z.ZodType<Pr
   isArchived: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
-export const LikeCreateInputSchema: z.ZodType<Prisma.LikeCreateInput> = z.object({
+export const LikedProfileCreateInputSchema: z.ZodType<Prisma.LikedProfileCreateInput> = z.object({
   id: z.string().cuid().optional(),
   createdAt: z.coerce.date().optional(),
   from: z.lazy(() => ProfileCreateNestedOneWithoutLikesSentInputSchema),
   to: z.lazy(() => ProfileCreateNestedOneWithoutLikesReceivedInputSchema)
 }).strict();
 
-export const LikeUncheckedCreateInputSchema: z.ZodType<Prisma.LikeUncheckedCreateInput> = z.object({
+export const LikedProfileUncheckedCreateInputSchema: z.ZodType<Prisma.LikedProfileUncheckedCreateInput> = z.object({
   id: z.string().cuid().optional(),
   fromId: z.string(),
   toId: z.string(),
   createdAt: z.coerce.date().optional()
 }).strict();
 
-export const LikeUpdateInputSchema: z.ZodType<Prisma.LikeUpdateInput> = z.object({
+export const LikedProfileUpdateInputSchema: z.ZodType<Prisma.LikedProfileUpdateInput> = z.object({
   id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   from: z.lazy(() => ProfileUpdateOneRequiredWithoutLikesSentNestedInputSchema).optional(),
   to: z.lazy(() => ProfileUpdateOneRequiredWithoutLikesReceivedNestedInputSchema).optional()
 }).strict();
 
-export const LikeUncheckedUpdateInputSchema: z.ZodType<Prisma.LikeUncheckedUpdateInput> = z.object({
+export const LikedProfileUncheckedUpdateInputSchema: z.ZodType<Prisma.LikedProfileUncheckedUpdateInput> = z.object({
   id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   fromId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   toId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
-export const LikeCreateManyInputSchema: z.ZodType<Prisma.LikeCreateManyInput> = z.object({
+export const LikedProfileCreateManyInputSchema: z.ZodType<Prisma.LikedProfileCreateManyInput> = z.object({
   id: z.string().cuid().optional(),
   fromId: z.string(),
   toId: z.string(),
   createdAt: z.coerce.date().optional()
 }).strict();
 
-export const LikeUpdateManyMutationInputSchema: z.ZodType<Prisma.LikeUpdateManyMutationInput> = z.object({
+export const LikedProfileUpdateManyMutationInputSchema: z.ZodType<Prisma.LikedProfileUpdateManyMutationInput> = z.object({
   id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
-export const LikeUncheckedUpdateManyInputSchema: z.ZodType<Prisma.LikeUncheckedUpdateManyInput> = z.object({
+export const LikedProfileUncheckedUpdateManyInputSchema: z.ZodType<Prisma.LikedProfileUncheckedUpdateManyInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  fromId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  toId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const HiddenProfileCreateInputSchema: z.ZodType<Prisma.HiddenProfileCreateInput> = z.object({
+  id: z.string().cuid().optional(),
+  createdAt: z.coerce.date().optional(),
+  from: z.lazy(() => ProfileCreateNestedOneWithoutHiddenProfilesInputSchema),
+  to: z.lazy(() => ProfileCreateNestedOneWithoutHiddenByInputSchema)
+}).strict();
+
+export const HiddenProfileUncheckedCreateInputSchema: z.ZodType<Prisma.HiddenProfileUncheckedCreateInput> = z.object({
+  id: z.string().cuid().optional(),
+  fromId: z.string(),
+  toId: z.string(),
+  createdAt: z.coerce.date().optional()
+}).strict();
+
+export const HiddenProfileUpdateInputSchema: z.ZodType<Prisma.HiddenProfileUpdateInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  from: z.lazy(() => ProfileUpdateOneRequiredWithoutHiddenProfilesNestedInputSchema).optional(),
+  to: z.lazy(() => ProfileUpdateOneRequiredWithoutHiddenByNestedInputSchema).optional()
+}).strict();
+
+export const HiddenProfileUncheckedUpdateInputSchema: z.ZodType<Prisma.HiddenProfileUncheckedUpdateInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  fromId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  toId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const HiddenProfileCreateManyInputSchema: z.ZodType<Prisma.HiddenProfileCreateManyInput> = z.object({
+  id: z.string().cuid().optional(),
+  fromId: z.string(),
+  toId: z.string(),
+  createdAt: z.coerce.date().optional()
+}).strict();
+
+export const HiddenProfileUpdateManyMutationInputSchema: z.ZodType<Prisma.HiddenProfileUpdateManyMutationInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const HiddenProfileUncheckedUpdateManyInputSchema: z.ZodType<Prisma.HiddenProfileUncheckedUpdateManyInput> = z.object({
   id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   fromId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   toId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
@@ -4223,10 +4393,16 @@ export const LocalizedProfileFieldListRelationFilterSchema: z.ZodType<Prisma.Loc
   none: z.lazy(() => LocalizedProfileFieldWhereInputSchema).optional()
 }).strict();
 
-export const LikeListRelationFilterSchema: z.ZodType<Prisma.LikeListRelationFilter> = z.object({
-  every: z.lazy(() => LikeWhereInputSchema).optional(),
-  some: z.lazy(() => LikeWhereInputSchema).optional(),
-  none: z.lazy(() => LikeWhereInputSchema).optional()
+export const LikedProfileListRelationFilterSchema: z.ZodType<Prisma.LikedProfileListRelationFilter> = z.object({
+  every: z.lazy(() => LikedProfileWhereInputSchema).optional(),
+  some: z.lazy(() => LikedProfileWhereInputSchema).optional(),
+  none: z.lazy(() => LikedProfileWhereInputSchema).optional()
+}).strict();
+
+export const HiddenProfileListRelationFilterSchema: z.ZodType<Prisma.HiddenProfileListRelationFilter> = z.object({
+  every: z.lazy(() => HiddenProfileWhereInputSchema).optional(),
+  some: z.lazy(() => HiddenProfileWhereInputSchema).optional(),
+  none: z.lazy(() => HiddenProfileWhereInputSchema).optional()
 }).strict();
 
 export const ConversationParticipantOrderByRelationAggregateInputSchema: z.ZodType<Prisma.ConversationParticipantOrderByRelationAggregateInput> = z.object({
@@ -4245,7 +4421,11 @@ export const LocalizedProfileFieldOrderByRelationAggregateInputSchema: z.ZodType
   _count: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
-export const LikeOrderByRelationAggregateInputSchema: z.ZodType<Prisma.LikeOrderByRelationAggregateInput> = z.object({
+export const LikedProfileOrderByRelationAggregateInputSchema: z.ZodType<Prisma.LikedProfileOrderByRelationAggregateInput> = z.object({
+  _count: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const HiddenProfileOrderByRelationAggregateInputSchema: z.ZodType<Prisma.HiddenProfileOrderByRelationAggregateInput> = z.object({
   _count: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
@@ -4613,26 +4793,52 @@ export const ConversationParticipantMinOrderByAggregateInputSchema: z.ZodType<Pr
   isArchived: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
-export const LikeFromIdToIdCompoundUniqueInputSchema: z.ZodType<Prisma.LikeFromIdToIdCompoundUniqueInput> = z.object({
+export const LikedProfileFromIdToIdCompoundUniqueInputSchema: z.ZodType<Prisma.LikedProfileFromIdToIdCompoundUniqueInput> = z.object({
   fromId: z.string(),
   toId: z.string()
 }).strict();
 
-export const LikeCountOrderByAggregateInputSchema: z.ZodType<Prisma.LikeCountOrderByAggregateInput> = z.object({
+export const LikedProfileCountOrderByAggregateInputSchema: z.ZodType<Prisma.LikedProfileCountOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   fromId: z.lazy(() => SortOrderSchema).optional(),
   toId: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
-export const LikeMaxOrderByAggregateInputSchema: z.ZodType<Prisma.LikeMaxOrderByAggregateInput> = z.object({
+export const LikedProfileMaxOrderByAggregateInputSchema: z.ZodType<Prisma.LikedProfileMaxOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   fromId: z.lazy(() => SortOrderSchema).optional(),
   toId: z.lazy(() => SortOrderSchema).optional(),
   createdAt: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
-export const LikeMinOrderByAggregateInputSchema: z.ZodType<Prisma.LikeMinOrderByAggregateInput> = z.object({
+export const LikedProfileMinOrderByAggregateInputSchema: z.ZodType<Prisma.LikedProfileMinOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  fromId: z.lazy(() => SortOrderSchema).optional(),
+  toId: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const HiddenProfileFromIdToIdCompoundUniqueInputSchema: z.ZodType<Prisma.HiddenProfileFromIdToIdCompoundUniqueInput> = z.object({
+  fromId: z.string(),
+  toId: z.string()
+}).strict();
+
+export const HiddenProfileCountOrderByAggregateInputSchema: z.ZodType<Prisma.HiddenProfileCountOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  fromId: z.lazy(() => SortOrderSchema).optional(),
+  toId: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const HiddenProfileMaxOrderByAggregateInputSchema: z.ZodType<Prisma.HiddenProfileMaxOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  fromId: z.lazy(() => SortOrderSchema).optional(),
+  toId: z.lazy(() => SortOrderSchema).optional(),
+  createdAt: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const HiddenProfileMinOrderByAggregateInputSchema: z.ZodType<Prisma.HiddenProfileMinOrderByAggregateInput> = z.object({
   id: z.lazy(() => SortOrderSchema).optional(),
   fromId: z.lazy(() => SortOrderSchema).optional(),
   toId: z.lazy(() => SortOrderSchema).optional(),
@@ -5242,18 +5448,32 @@ export const ProfileCreateNestedManyWithoutBlockedProfilesInputSchema: z.ZodType
   connect: z.union([ z.lazy(() => ProfileWhereUniqueInputSchema),z.lazy(() => ProfileWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
-export const LikeCreateNestedManyWithoutFromInputSchema: z.ZodType<Prisma.LikeCreateNestedManyWithoutFromInput> = z.object({
-  create: z.union([ z.lazy(() => LikeCreateWithoutFromInputSchema),z.lazy(() => LikeCreateWithoutFromInputSchema).array(),z.lazy(() => LikeUncheckedCreateWithoutFromInputSchema),z.lazy(() => LikeUncheckedCreateWithoutFromInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => LikeCreateOrConnectWithoutFromInputSchema),z.lazy(() => LikeCreateOrConnectWithoutFromInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => LikeCreateManyFromInputEnvelopeSchema).optional(),
-  connect: z.union([ z.lazy(() => LikeWhereUniqueInputSchema),z.lazy(() => LikeWhereUniqueInputSchema).array() ]).optional(),
+export const LikedProfileCreateNestedManyWithoutFromInputSchema: z.ZodType<Prisma.LikedProfileCreateNestedManyWithoutFromInput> = z.object({
+  create: z.union([ z.lazy(() => LikedProfileCreateWithoutFromInputSchema),z.lazy(() => LikedProfileCreateWithoutFromInputSchema).array(),z.lazy(() => LikedProfileUncheckedCreateWithoutFromInputSchema),z.lazy(() => LikedProfileUncheckedCreateWithoutFromInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => LikedProfileCreateOrConnectWithoutFromInputSchema),z.lazy(() => LikedProfileCreateOrConnectWithoutFromInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => LikedProfileCreateManyFromInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => LikedProfileWhereUniqueInputSchema),z.lazy(() => LikedProfileWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
-export const LikeCreateNestedManyWithoutToInputSchema: z.ZodType<Prisma.LikeCreateNestedManyWithoutToInput> = z.object({
-  create: z.union([ z.lazy(() => LikeCreateWithoutToInputSchema),z.lazy(() => LikeCreateWithoutToInputSchema).array(),z.lazy(() => LikeUncheckedCreateWithoutToInputSchema),z.lazy(() => LikeUncheckedCreateWithoutToInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => LikeCreateOrConnectWithoutToInputSchema),z.lazy(() => LikeCreateOrConnectWithoutToInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => LikeCreateManyToInputEnvelopeSchema).optional(),
-  connect: z.union([ z.lazy(() => LikeWhereUniqueInputSchema),z.lazy(() => LikeWhereUniqueInputSchema).array() ]).optional(),
+export const LikedProfileCreateNestedManyWithoutToInputSchema: z.ZodType<Prisma.LikedProfileCreateNestedManyWithoutToInput> = z.object({
+  create: z.union([ z.lazy(() => LikedProfileCreateWithoutToInputSchema),z.lazy(() => LikedProfileCreateWithoutToInputSchema).array(),z.lazy(() => LikedProfileUncheckedCreateWithoutToInputSchema),z.lazy(() => LikedProfileUncheckedCreateWithoutToInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => LikedProfileCreateOrConnectWithoutToInputSchema),z.lazy(() => LikedProfileCreateOrConnectWithoutToInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => LikedProfileCreateManyToInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => LikedProfileWhereUniqueInputSchema),z.lazy(() => LikedProfileWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
+export const HiddenProfileCreateNestedManyWithoutFromInputSchema: z.ZodType<Prisma.HiddenProfileCreateNestedManyWithoutFromInput> = z.object({
+  create: z.union([ z.lazy(() => HiddenProfileCreateWithoutFromInputSchema),z.lazy(() => HiddenProfileCreateWithoutFromInputSchema).array(),z.lazy(() => HiddenProfileUncheckedCreateWithoutFromInputSchema),z.lazy(() => HiddenProfileUncheckedCreateWithoutFromInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => HiddenProfileCreateOrConnectWithoutFromInputSchema),z.lazy(() => HiddenProfileCreateOrConnectWithoutFromInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => HiddenProfileCreateManyFromInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => HiddenProfileWhereUniqueInputSchema),z.lazy(() => HiddenProfileWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
+export const HiddenProfileCreateNestedManyWithoutToInputSchema: z.ZodType<Prisma.HiddenProfileCreateNestedManyWithoutToInput> = z.object({
+  create: z.union([ z.lazy(() => HiddenProfileCreateWithoutToInputSchema),z.lazy(() => HiddenProfileCreateWithoutToInputSchema).array(),z.lazy(() => HiddenProfileUncheckedCreateWithoutToInputSchema),z.lazy(() => HiddenProfileUncheckedCreateWithoutToInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => HiddenProfileCreateOrConnectWithoutToInputSchema),z.lazy(() => HiddenProfileCreateOrConnectWithoutToInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => HiddenProfileCreateManyToInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => HiddenProfileWhereUniqueInputSchema),z.lazy(() => HiddenProfileWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
 export const ProfileTagUncheckedCreateNestedManyWithoutProfileInputSchema: z.ZodType<Prisma.ProfileTagUncheckedCreateNestedManyWithoutProfileInput> = z.object({
@@ -5324,18 +5544,32 @@ export const ProfileUncheckedCreateNestedManyWithoutBlockedProfilesInputSchema: 
   connect: z.union([ z.lazy(() => ProfileWhereUniqueInputSchema),z.lazy(() => ProfileWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
-export const LikeUncheckedCreateNestedManyWithoutFromInputSchema: z.ZodType<Prisma.LikeUncheckedCreateNestedManyWithoutFromInput> = z.object({
-  create: z.union([ z.lazy(() => LikeCreateWithoutFromInputSchema),z.lazy(() => LikeCreateWithoutFromInputSchema).array(),z.lazy(() => LikeUncheckedCreateWithoutFromInputSchema),z.lazy(() => LikeUncheckedCreateWithoutFromInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => LikeCreateOrConnectWithoutFromInputSchema),z.lazy(() => LikeCreateOrConnectWithoutFromInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => LikeCreateManyFromInputEnvelopeSchema).optional(),
-  connect: z.union([ z.lazy(() => LikeWhereUniqueInputSchema),z.lazy(() => LikeWhereUniqueInputSchema).array() ]).optional(),
+export const LikedProfileUncheckedCreateNestedManyWithoutFromInputSchema: z.ZodType<Prisma.LikedProfileUncheckedCreateNestedManyWithoutFromInput> = z.object({
+  create: z.union([ z.lazy(() => LikedProfileCreateWithoutFromInputSchema),z.lazy(() => LikedProfileCreateWithoutFromInputSchema).array(),z.lazy(() => LikedProfileUncheckedCreateWithoutFromInputSchema),z.lazy(() => LikedProfileUncheckedCreateWithoutFromInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => LikedProfileCreateOrConnectWithoutFromInputSchema),z.lazy(() => LikedProfileCreateOrConnectWithoutFromInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => LikedProfileCreateManyFromInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => LikedProfileWhereUniqueInputSchema),z.lazy(() => LikedProfileWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
-export const LikeUncheckedCreateNestedManyWithoutToInputSchema: z.ZodType<Prisma.LikeUncheckedCreateNestedManyWithoutToInput> = z.object({
-  create: z.union([ z.lazy(() => LikeCreateWithoutToInputSchema),z.lazy(() => LikeCreateWithoutToInputSchema).array(),z.lazy(() => LikeUncheckedCreateWithoutToInputSchema),z.lazy(() => LikeUncheckedCreateWithoutToInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => LikeCreateOrConnectWithoutToInputSchema),z.lazy(() => LikeCreateOrConnectWithoutToInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => LikeCreateManyToInputEnvelopeSchema).optional(),
-  connect: z.union([ z.lazy(() => LikeWhereUniqueInputSchema),z.lazy(() => LikeWhereUniqueInputSchema).array() ]).optional(),
+export const LikedProfileUncheckedCreateNestedManyWithoutToInputSchema: z.ZodType<Prisma.LikedProfileUncheckedCreateNestedManyWithoutToInput> = z.object({
+  create: z.union([ z.lazy(() => LikedProfileCreateWithoutToInputSchema),z.lazy(() => LikedProfileCreateWithoutToInputSchema).array(),z.lazy(() => LikedProfileUncheckedCreateWithoutToInputSchema),z.lazy(() => LikedProfileUncheckedCreateWithoutToInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => LikedProfileCreateOrConnectWithoutToInputSchema),z.lazy(() => LikedProfileCreateOrConnectWithoutToInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => LikedProfileCreateManyToInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => LikedProfileWhereUniqueInputSchema),z.lazy(() => LikedProfileWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
+export const HiddenProfileUncheckedCreateNestedManyWithoutFromInputSchema: z.ZodType<Prisma.HiddenProfileUncheckedCreateNestedManyWithoutFromInput> = z.object({
+  create: z.union([ z.lazy(() => HiddenProfileCreateWithoutFromInputSchema),z.lazy(() => HiddenProfileCreateWithoutFromInputSchema).array(),z.lazy(() => HiddenProfileUncheckedCreateWithoutFromInputSchema),z.lazy(() => HiddenProfileUncheckedCreateWithoutFromInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => HiddenProfileCreateOrConnectWithoutFromInputSchema),z.lazy(() => HiddenProfileCreateOrConnectWithoutFromInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => HiddenProfileCreateManyFromInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => HiddenProfileWhereUniqueInputSchema),z.lazy(() => HiddenProfileWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
+export const HiddenProfileUncheckedCreateNestedManyWithoutToInputSchema: z.ZodType<Prisma.HiddenProfileUncheckedCreateNestedManyWithoutToInput> = z.object({
+  create: z.union([ z.lazy(() => HiddenProfileCreateWithoutToInputSchema),z.lazy(() => HiddenProfileCreateWithoutToInputSchema).array(),z.lazy(() => HiddenProfileUncheckedCreateWithoutToInputSchema),z.lazy(() => HiddenProfileUncheckedCreateWithoutToInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => HiddenProfileCreateOrConnectWithoutToInputSchema),z.lazy(() => HiddenProfileCreateOrConnectWithoutToInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => HiddenProfileCreateManyToInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => HiddenProfileWhereUniqueInputSchema),z.lazy(() => HiddenProfileWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
 export const ProfileUpdatelanguagesInputSchema: z.ZodType<Prisma.ProfileUpdatelanguagesInput> = z.object({
@@ -5533,32 +5767,60 @@ export const ProfileUpdateManyWithoutBlockedProfilesNestedInputSchema: z.ZodType
   deleteMany: z.union([ z.lazy(() => ProfileScalarWhereInputSchema),z.lazy(() => ProfileScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
-export const LikeUpdateManyWithoutFromNestedInputSchema: z.ZodType<Prisma.LikeUpdateManyWithoutFromNestedInput> = z.object({
-  create: z.union([ z.lazy(() => LikeCreateWithoutFromInputSchema),z.lazy(() => LikeCreateWithoutFromInputSchema).array(),z.lazy(() => LikeUncheckedCreateWithoutFromInputSchema),z.lazy(() => LikeUncheckedCreateWithoutFromInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => LikeCreateOrConnectWithoutFromInputSchema),z.lazy(() => LikeCreateOrConnectWithoutFromInputSchema).array() ]).optional(),
-  upsert: z.union([ z.lazy(() => LikeUpsertWithWhereUniqueWithoutFromInputSchema),z.lazy(() => LikeUpsertWithWhereUniqueWithoutFromInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => LikeCreateManyFromInputEnvelopeSchema).optional(),
-  set: z.union([ z.lazy(() => LikeWhereUniqueInputSchema),z.lazy(() => LikeWhereUniqueInputSchema).array() ]).optional(),
-  disconnect: z.union([ z.lazy(() => LikeWhereUniqueInputSchema),z.lazy(() => LikeWhereUniqueInputSchema).array() ]).optional(),
-  delete: z.union([ z.lazy(() => LikeWhereUniqueInputSchema),z.lazy(() => LikeWhereUniqueInputSchema).array() ]).optional(),
-  connect: z.union([ z.lazy(() => LikeWhereUniqueInputSchema),z.lazy(() => LikeWhereUniqueInputSchema).array() ]).optional(),
-  update: z.union([ z.lazy(() => LikeUpdateWithWhereUniqueWithoutFromInputSchema),z.lazy(() => LikeUpdateWithWhereUniqueWithoutFromInputSchema).array() ]).optional(),
-  updateMany: z.union([ z.lazy(() => LikeUpdateManyWithWhereWithoutFromInputSchema),z.lazy(() => LikeUpdateManyWithWhereWithoutFromInputSchema).array() ]).optional(),
-  deleteMany: z.union([ z.lazy(() => LikeScalarWhereInputSchema),z.lazy(() => LikeScalarWhereInputSchema).array() ]).optional(),
+export const LikedProfileUpdateManyWithoutFromNestedInputSchema: z.ZodType<Prisma.LikedProfileUpdateManyWithoutFromNestedInput> = z.object({
+  create: z.union([ z.lazy(() => LikedProfileCreateWithoutFromInputSchema),z.lazy(() => LikedProfileCreateWithoutFromInputSchema).array(),z.lazy(() => LikedProfileUncheckedCreateWithoutFromInputSchema),z.lazy(() => LikedProfileUncheckedCreateWithoutFromInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => LikedProfileCreateOrConnectWithoutFromInputSchema),z.lazy(() => LikedProfileCreateOrConnectWithoutFromInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => LikedProfileUpsertWithWhereUniqueWithoutFromInputSchema),z.lazy(() => LikedProfileUpsertWithWhereUniqueWithoutFromInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => LikedProfileCreateManyFromInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => LikedProfileWhereUniqueInputSchema),z.lazy(() => LikedProfileWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => LikedProfileWhereUniqueInputSchema),z.lazy(() => LikedProfileWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => LikedProfileWhereUniqueInputSchema),z.lazy(() => LikedProfileWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => LikedProfileWhereUniqueInputSchema),z.lazy(() => LikedProfileWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => LikedProfileUpdateWithWhereUniqueWithoutFromInputSchema),z.lazy(() => LikedProfileUpdateWithWhereUniqueWithoutFromInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => LikedProfileUpdateManyWithWhereWithoutFromInputSchema),z.lazy(() => LikedProfileUpdateManyWithWhereWithoutFromInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => LikedProfileScalarWhereInputSchema),z.lazy(() => LikedProfileScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
-export const LikeUpdateManyWithoutToNestedInputSchema: z.ZodType<Prisma.LikeUpdateManyWithoutToNestedInput> = z.object({
-  create: z.union([ z.lazy(() => LikeCreateWithoutToInputSchema),z.lazy(() => LikeCreateWithoutToInputSchema).array(),z.lazy(() => LikeUncheckedCreateWithoutToInputSchema),z.lazy(() => LikeUncheckedCreateWithoutToInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => LikeCreateOrConnectWithoutToInputSchema),z.lazy(() => LikeCreateOrConnectWithoutToInputSchema).array() ]).optional(),
-  upsert: z.union([ z.lazy(() => LikeUpsertWithWhereUniqueWithoutToInputSchema),z.lazy(() => LikeUpsertWithWhereUniqueWithoutToInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => LikeCreateManyToInputEnvelopeSchema).optional(),
-  set: z.union([ z.lazy(() => LikeWhereUniqueInputSchema),z.lazy(() => LikeWhereUniqueInputSchema).array() ]).optional(),
-  disconnect: z.union([ z.lazy(() => LikeWhereUniqueInputSchema),z.lazy(() => LikeWhereUniqueInputSchema).array() ]).optional(),
-  delete: z.union([ z.lazy(() => LikeWhereUniqueInputSchema),z.lazy(() => LikeWhereUniqueInputSchema).array() ]).optional(),
-  connect: z.union([ z.lazy(() => LikeWhereUniqueInputSchema),z.lazy(() => LikeWhereUniqueInputSchema).array() ]).optional(),
-  update: z.union([ z.lazy(() => LikeUpdateWithWhereUniqueWithoutToInputSchema),z.lazy(() => LikeUpdateWithWhereUniqueWithoutToInputSchema).array() ]).optional(),
-  updateMany: z.union([ z.lazy(() => LikeUpdateManyWithWhereWithoutToInputSchema),z.lazy(() => LikeUpdateManyWithWhereWithoutToInputSchema).array() ]).optional(),
-  deleteMany: z.union([ z.lazy(() => LikeScalarWhereInputSchema),z.lazy(() => LikeScalarWhereInputSchema).array() ]).optional(),
+export const LikedProfileUpdateManyWithoutToNestedInputSchema: z.ZodType<Prisma.LikedProfileUpdateManyWithoutToNestedInput> = z.object({
+  create: z.union([ z.lazy(() => LikedProfileCreateWithoutToInputSchema),z.lazy(() => LikedProfileCreateWithoutToInputSchema).array(),z.lazy(() => LikedProfileUncheckedCreateWithoutToInputSchema),z.lazy(() => LikedProfileUncheckedCreateWithoutToInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => LikedProfileCreateOrConnectWithoutToInputSchema),z.lazy(() => LikedProfileCreateOrConnectWithoutToInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => LikedProfileUpsertWithWhereUniqueWithoutToInputSchema),z.lazy(() => LikedProfileUpsertWithWhereUniqueWithoutToInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => LikedProfileCreateManyToInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => LikedProfileWhereUniqueInputSchema),z.lazy(() => LikedProfileWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => LikedProfileWhereUniqueInputSchema),z.lazy(() => LikedProfileWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => LikedProfileWhereUniqueInputSchema),z.lazy(() => LikedProfileWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => LikedProfileWhereUniqueInputSchema),z.lazy(() => LikedProfileWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => LikedProfileUpdateWithWhereUniqueWithoutToInputSchema),z.lazy(() => LikedProfileUpdateWithWhereUniqueWithoutToInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => LikedProfileUpdateManyWithWhereWithoutToInputSchema),z.lazy(() => LikedProfileUpdateManyWithWhereWithoutToInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => LikedProfileScalarWhereInputSchema),z.lazy(() => LikedProfileScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const HiddenProfileUpdateManyWithoutFromNestedInputSchema: z.ZodType<Prisma.HiddenProfileUpdateManyWithoutFromNestedInput> = z.object({
+  create: z.union([ z.lazy(() => HiddenProfileCreateWithoutFromInputSchema),z.lazy(() => HiddenProfileCreateWithoutFromInputSchema).array(),z.lazy(() => HiddenProfileUncheckedCreateWithoutFromInputSchema),z.lazy(() => HiddenProfileUncheckedCreateWithoutFromInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => HiddenProfileCreateOrConnectWithoutFromInputSchema),z.lazy(() => HiddenProfileCreateOrConnectWithoutFromInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => HiddenProfileUpsertWithWhereUniqueWithoutFromInputSchema),z.lazy(() => HiddenProfileUpsertWithWhereUniqueWithoutFromInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => HiddenProfileCreateManyFromInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => HiddenProfileWhereUniqueInputSchema),z.lazy(() => HiddenProfileWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => HiddenProfileWhereUniqueInputSchema),z.lazy(() => HiddenProfileWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => HiddenProfileWhereUniqueInputSchema),z.lazy(() => HiddenProfileWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => HiddenProfileWhereUniqueInputSchema),z.lazy(() => HiddenProfileWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => HiddenProfileUpdateWithWhereUniqueWithoutFromInputSchema),z.lazy(() => HiddenProfileUpdateWithWhereUniqueWithoutFromInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => HiddenProfileUpdateManyWithWhereWithoutFromInputSchema),z.lazy(() => HiddenProfileUpdateManyWithWhereWithoutFromInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => HiddenProfileScalarWhereInputSchema),z.lazy(() => HiddenProfileScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const HiddenProfileUpdateManyWithoutToNestedInputSchema: z.ZodType<Prisma.HiddenProfileUpdateManyWithoutToNestedInput> = z.object({
+  create: z.union([ z.lazy(() => HiddenProfileCreateWithoutToInputSchema),z.lazy(() => HiddenProfileCreateWithoutToInputSchema).array(),z.lazy(() => HiddenProfileUncheckedCreateWithoutToInputSchema),z.lazy(() => HiddenProfileUncheckedCreateWithoutToInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => HiddenProfileCreateOrConnectWithoutToInputSchema),z.lazy(() => HiddenProfileCreateOrConnectWithoutToInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => HiddenProfileUpsertWithWhereUniqueWithoutToInputSchema),z.lazy(() => HiddenProfileUpsertWithWhereUniqueWithoutToInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => HiddenProfileCreateManyToInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => HiddenProfileWhereUniqueInputSchema),z.lazy(() => HiddenProfileWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => HiddenProfileWhereUniqueInputSchema),z.lazy(() => HiddenProfileWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => HiddenProfileWhereUniqueInputSchema),z.lazy(() => HiddenProfileWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => HiddenProfileWhereUniqueInputSchema),z.lazy(() => HiddenProfileWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => HiddenProfileUpdateWithWhereUniqueWithoutToInputSchema),z.lazy(() => HiddenProfileUpdateWithWhereUniqueWithoutToInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => HiddenProfileUpdateManyWithWhereWithoutToInputSchema),z.lazy(() => HiddenProfileUpdateManyWithWhereWithoutToInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => HiddenProfileScalarWhereInputSchema),z.lazy(() => HiddenProfileScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
 export const ProfileTagUncheckedUpdateManyWithoutProfileNestedInputSchema: z.ZodType<Prisma.ProfileTagUncheckedUpdateManyWithoutProfileNestedInput> = z.object({
@@ -5699,32 +5961,60 @@ export const ProfileUncheckedUpdateManyWithoutBlockedProfilesNestedInputSchema: 
   deleteMany: z.union([ z.lazy(() => ProfileScalarWhereInputSchema),z.lazy(() => ProfileScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
-export const LikeUncheckedUpdateManyWithoutFromNestedInputSchema: z.ZodType<Prisma.LikeUncheckedUpdateManyWithoutFromNestedInput> = z.object({
-  create: z.union([ z.lazy(() => LikeCreateWithoutFromInputSchema),z.lazy(() => LikeCreateWithoutFromInputSchema).array(),z.lazy(() => LikeUncheckedCreateWithoutFromInputSchema),z.lazy(() => LikeUncheckedCreateWithoutFromInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => LikeCreateOrConnectWithoutFromInputSchema),z.lazy(() => LikeCreateOrConnectWithoutFromInputSchema).array() ]).optional(),
-  upsert: z.union([ z.lazy(() => LikeUpsertWithWhereUniqueWithoutFromInputSchema),z.lazy(() => LikeUpsertWithWhereUniqueWithoutFromInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => LikeCreateManyFromInputEnvelopeSchema).optional(),
-  set: z.union([ z.lazy(() => LikeWhereUniqueInputSchema),z.lazy(() => LikeWhereUniqueInputSchema).array() ]).optional(),
-  disconnect: z.union([ z.lazy(() => LikeWhereUniqueInputSchema),z.lazy(() => LikeWhereUniqueInputSchema).array() ]).optional(),
-  delete: z.union([ z.lazy(() => LikeWhereUniqueInputSchema),z.lazy(() => LikeWhereUniqueInputSchema).array() ]).optional(),
-  connect: z.union([ z.lazy(() => LikeWhereUniqueInputSchema),z.lazy(() => LikeWhereUniqueInputSchema).array() ]).optional(),
-  update: z.union([ z.lazy(() => LikeUpdateWithWhereUniqueWithoutFromInputSchema),z.lazy(() => LikeUpdateWithWhereUniqueWithoutFromInputSchema).array() ]).optional(),
-  updateMany: z.union([ z.lazy(() => LikeUpdateManyWithWhereWithoutFromInputSchema),z.lazy(() => LikeUpdateManyWithWhereWithoutFromInputSchema).array() ]).optional(),
-  deleteMany: z.union([ z.lazy(() => LikeScalarWhereInputSchema),z.lazy(() => LikeScalarWhereInputSchema).array() ]).optional(),
+export const LikedProfileUncheckedUpdateManyWithoutFromNestedInputSchema: z.ZodType<Prisma.LikedProfileUncheckedUpdateManyWithoutFromNestedInput> = z.object({
+  create: z.union([ z.lazy(() => LikedProfileCreateWithoutFromInputSchema),z.lazy(() => LikedProfileCreateWithoutFromInputSchema).array(),z.lazy(() => LikedProfileUncheckedCreateWithoutFromInputSchema),z.lazy(() => LikedProfileUncheckedCreateWithoutFromInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => LikedProfileCreateOrConnectWithoutFromInputSchema),z.lazy(() => LikedProfileCreateOrConnectWithoutFromInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => LikedProfileUpsertWithWhereUniqueWithoutFromInputSchema),z.lazy(() => LikedProfileUpsertWithWhereUniqueWithoutFromInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => LikedProfileCreateManyFromInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => LikedProfileWhereUniqueInputSchema),z.lazy(() => LikedProfileWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => LikedProfileWhereUniqueInputSchema),z.lazy(() => LikedProfileWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => LikedProfileWhereUniqueInputSchema),z.lazy(() => LikedProfileWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => LikedProfileWhereUniqueInputSchema),z.lazy(() => LikedProfileWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => LikedProfileUpdateWithWhereUniqueWithoutFromInputSchema),z.lazy(() => LikedProfileUpdateWithWhereUniqueWithoutFromInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => LikedProfileUpdateManyWithWhereWithoutFromInputSchema),z.lazy(() => LikedProfileUpdateManyWithWhereWithoutFromInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => LikedProfileScalarWhereInputSchema),z.lazy(() => LikedProfileScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
-export const LikeUncheckedUpdateManyWithoutToNestedInputSchema: z.ZodType<Prisma.LikeUncheckedUpdateManyWithoutToNestedInput> = z.object({
-  create: z.union([ z.lazy(() => LikeCreateWithoutToInputSchema),z.lazy(() => LikeCreateWithoutToInputSchema).array(),z.lazy(() => LikeUncheckedCreateWithoutToInputSchema),z.lazy(() => LikeUncheckedCreateWithoutToInputSchema).array() ]).optional(),
-  connectOrCreate: z.union([ z.lazy(() => LikeCreateOrConnectWithoutToInputSchema),z.lazy(() => LikeCreateOrConnectWithoutToInputSchema).array() ]).optional(),
-  upsert: z.union([ z.lazy(() => LikeUpsertWithWhereUniqueWithoutToInputSchema),z.lazy(() => LikeUpsertWithWhereUniqueWithoutToInputSchema).array() ]).optional(),
-  createMany: z.lazy(() => LikeCreateManyToInputEnvelopeSchema).optional(),
-  set: z.union([ z.lazy(() => LikeWhereUniqueInputSchema),z.lazy(() => LikeWhereUniqueInputSchema).array() ]).optional(),
-  disconnect: z.union([ z.lazy(() => LikeWhereUniqueInputSchema),z.lazy(() => LikeWhereUniqueInputSchema).array() ]).optional(),
-  delete: z.union([ z.lazy(() => LikeWhereUniqueInputSchema),z.lazy(() => LikeWhereUniqueInputSchema).array() ]).optional(),
-  connect: z.union([ z.lazy(() => LikeWhereUniqueInputSchema),z.lazy(() => LikeWhereUniqueInputSchema).array() ]).optional(),
-  update: z.union([ z.lazy(() => LikeUpdateWithWhereUniqueWithoutToInputSchema),z.lazy(() => LikeUpdateWithWhereUniqueWithoutToInputSchema).array() ]).optional(),
-  updateMany: z.union([ z.lazy(() => LikeUpdateManyWithWhereWithoutToInputSchema),z.lazy(() => LikeUpdateManyWithWhereWithoutToInputSchema).array() ]).optional(),
-  deleteMany: z.union([ z.lazy(() => LikeScalarWhereInputSchema),z.lazy(() => LikeScalarWhereInputSchema).array() ]).optional(),
+export const LikedProfileUncheckedUpdateManyWithoutToNestedInputSchema: z.ZodType<Prisma.LikedProfileUncheckedUpdateManyWithoutToNestedInput> = z.object({
+  create: z.union([ z.lazy(() => LikedProfileCreateWithoutToInputSchema),z.lazy(() => LikedProfileCreateWithoutToInputSchema).array(),z.lazy(() => LikedProfileUncheckedCreateWithoutToInputSchema),z.lazy(() => LikedProfileUncheckedCreateWithoutToInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => LikedProfileCreateOrConnectWithoutToInputSchema),z.lazy(() => LikedProfileCreateOrConnectWithoutToInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => LikedProfileUpsertWithWhereUniqueWithoutToInputSchema),z.lazy(() => LikedProfileUpsertWithWhereUniqueWithoutToInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => LikedProfileCreateManyToInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => LikedProfileWhereUniqueInputSchema),z.lazy(() => LikedProfileWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => LikedProfileWhereUniqueInputSchema),z.lazy(() => LikedProfileWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => LikedProfileWhereUniqueInputSchema),z.lazy(() => LikedProfileWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => LikedProfileWhereUniqueInputSchema),z.lazy(() => LikedProfileWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => LikedProfileUpdateWithWhereUniqueWithoutToInputSchema),z.lazy(() => LikedProfileUpdateWithWhereUniqueWithoutToInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => LikedProfileUpdateManyWithWhereWithoutToInputSchema),z.lazy(() => LikedProfileUpdateManyWithWhereWithoutToInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => LikedProfileScalarWhereInputSchema),z.lazy(() => LikedProfileScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const HiddenProfileUncheckedUpdateManyWithoutFromNestedInputSchema: z.ZodType<Prisma.HiddenProfileUncheckedUpdateManyWithoutFromNestedInput> = z.object({
+  create: z.union([ z.lazy(() => HiddenProfileCreateWithoutFromInputSchema),z.lazy(() => HiddenProfileCreateWithoutFromInputSchema).array(),z.lazy(() => HiddenProfileUncheckedCreateWithoutFromInputSchema),z.lazy(() => HiddenProfileUncheckedCreateWithoutFromInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => HiddenProfileCreateOrConnectWithoutFromInputSchema),z.lazy(() => HiddenProfileCreateOrConnectWithoutFromInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => HiddenProfileUpsertWithWhereUniqueWithoutFromInputSchema),z.lazy(() => HiddenProfileUpsertWithWhereUniqueWithoutFromInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => HiddenProfileCreateManyFromInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => HiddenProfileWhereUniqueInputSchema),z.lazy(() => HiddenProfileWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => HiddenProfileWhereUniqueInputSchema),z.lazy(() => HiddenProfileWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => HiddenProfileWhereUniqueInputSchema),z.lazy(() => HiddenProfileWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => HiddenProfileWhereUniqueInputSchema),z.lazy(() => HiddenProfileWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => HiddenProfileUpdateWithWhereUniqueWithoutFromInputSchema),z.lazy(() => HiddenProfileUpdateWithWhereUniqueWithoutFromInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => HiddenProfileUpdateManyWithWhereWithoutFromInputSchema),z.lazy(() => HiddenProfileUpdateManyWithWhereWithoutFromInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => HiddenProfileScalarWhereInputSchema),z.lazy(() => HiddenProfileScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const HiddenProfileUncheckedUpdateManyWithoutToNestedInputSchema: z.ZodType<Prisma.HiddenProfileUncheckedUpdateManyWithoutToNestedInput> = z.object({
+  create: z.union([ z.lazy(() => HiddenProfileCreateWithoutToInputSchema),z.lazy(() => HiddenProfileCreateWithoutToInputSchema).array(),z.lazy(() => HiddenProfileUncheckedCreateWithoutToInputSchema),z.lazy(() => HiddenProfileUncheckedCreateWithoutToInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => HiddenProfileCreateOrConnectWithoutToInputSchema),z.lazy(() => HiddenProfileCreateOrConnectWithoutToInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => HiddenProfileUpsertWithWhereUniqueWithoutToInputSchema),z.lazy(() => HiddenProfileUpsertWithWhereUniqueWithoutToInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => HiddenProfileCreateManyToInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => HiddenProfileWhereUniqueInputSchema),z.lazy(() => HiddenProfileWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => HiddenProfileWhereUniqueInputSchema),z.lazy(() => HiddenProfileWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => HiddenProfileWhereUniqueInputSchema),z.lazy(() => HiddenProfileWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => HiddenProfileWhereUniqueInputSchema),z.lazy(() => HiddenProfileWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => HiddenProfileUpdateWithWhereUniqueWithoutToInputSchema),z.lazy(() => HiddenProfileUpdateWithWhereUniqueWithoutToInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => HiddenProfileUpdateManyWithWhereWithoutToInputSchema),z.lazy(() => HiddenProfileUpdateManyWithWhereWithoutToInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => HiddenProfileScalarWhereInputSchema),z.lazy(() => HiddenProfileScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
 export const DatingPreferencesCreateprefGenderInputSchema: z.ZodType<Prisma.DatingPreferencesCreateprefGenderInput> = z.object({
@@ -5973,6 +6263,34 @@ export const ProfileUpdateOneRequiredWithoutLikesReceivedNestedInputSchema: z.Zo
   upsert: z.lazy(() => ProfileUpsertWithoutLikesReceivedInputSchema).optional(),
   connect: z.lazy(() => ProfileWhereUniqueInputSchema).optional(),
   update: z.union([ z.lazy(() => ProfileUpdateToOneWithWhereWithoutLikesReceivedInputSchema),z.lazy(() => ProfileUpdateWithoutLikesReceivedInputSchema),z.lazy(() => ProfileUncheckedUpdateWithoutLikesReceivedInputSchema) ]).optional(),
+}).strict();
+
+export const ProfileCreateNestedOneWithoutHiddenProfilesInputSchema: z.ZodType<Prisma.ProfileCreateNestedOneWithoutHiddenProfilesInput> = z.object({
+  create: z.union([ z.lazy(() => ProfileCreateWithoutHiddenProfilesInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutHiddenProfilesInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => ProfileCreateOrConnectWithoutHiddenProfilesInputSchema).optional(),
+  connect: z.lazy(() => ProfileWhereUniqueInputSchema).optional()
+}).strict();
+
+export const ProfileCreateNestedOneWithoutHiddenByInputSchema: z.ZodType<Prisma.ProfileCreateNestedOneWithoutHiddenByInput> = z.object({
+  create: z.union([ z.lazy(() => ProfileCreateWithoutHiddenByInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutHiddenByInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => ProfileCreateOrConnectWithoutHiddenByInputSchema).optional(),
+  connect: z.lazy(() => ProfileWhereUniqueInputSchema).optional()
+}).strict();
+
+export const ProfileUpdateOneRequiredWithoutHiddenProfilesNestedInputSchema: z.ZodType<Prisma.ProfileUpdateOneRequiredWithoutHiddenProfilesNestedInput> = z.object({
+  create: z.union([ z.lazy(() => ProfileCreateWithoutHiddenProfilesInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutHiddenProfilesInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => ProfileCreateOrConnectWithoutHiddenProfilesInputSchema).optional(),
+  upsert: z.lazy(() => ProfileUpsertWithoutHiddenProfilesInputSchema).optional(),
+  connect: z.lazy(() => ProfileWhereUniqueInputSchema).optional(),
+  update: z.union([ z.lazy(() => ProfileUpdateToOneWithWhereWithoutHiddenProfilesInputSchema),z.lazy(() => ProfileUpdateWithoutHiddenProfilesInputSchema),z.lazy(() => ProfileUncheckedUpdateWithoutHiddenProfilesInputSchema) ]).optional(),
+}).strict();
+
+export const ProfileUpdateOneRequiredWithoutHiddenByNestedInputSchema: z.ZodType<Prisma.ProfileUpdateOneRequiredWithoutHiddenByNestedInput> = z.object({
+  create: z.union([ z.lazy(() => ProfileCreateWithoutHiddenByInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutHiddenByInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => ProfileCreateOrConnectWithoutHiddenByInputSchema).optional(),
+  upsert: z.lazy(() => ProfileUpsertWithoutHiddenByInputSchema).optional(),
+  connect: z.lazy(() => ProfileWhereUniqueInputSchema).optional(),
+  update: z.union([ z.lazy(() => ProfileUpdateToOneWithWhereWithoutHiddenByInputSchema),z.lazy(() => ProfileUpdateWithoutHiddenByInputSchema),z.lazy(() => ProfileUncheckedUpdateWithoutHiddenByInputSchema) ]).optional(),
 }).strict();
 
 export const ConversationCreateNestedOneWithoutMessagesInputSchema: z.ZodType<Prisma.ConversationCreateNestedOneWithoutMessagesInput> = z.object({
@@ -6388,8 +6706,10 @@ export const ProfileCreateWithoutCityInputSchema: z.ZodType<Prisma.ProfileCreate
   localized: z.lazy(() => LocalizedProfileFieldCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedCreateWithoutCityInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateWithoutCityInput> = z.object({
@@ -6427,8 +6747,10 @@ export const ProfileUncheckedCreateWithoutCityInputSchema: z.ZodType<Prisma.Prof
   localized: z.lazy(() => LocalizedProfileFieldUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileCreateOrConnectWithoutCityInputSchema: z.ZodType<Prisma.ProfileCreateOrConnectWithoutCityInput> = z.object({
@@ -6720,8 +7042,10 @@ export const ProfileCreateWithoutTagsInputSchema: z.ZodType<Prisma.ProfileCreate
   localized: z.lazy(() => LocalizedProfileFieldCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedCreateWithoutTagsInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateWithoutTagsInput> = z.object({
@@ -6759,8 +7083,10 @@ export const ProfileUncheckedCreateWithoutTagsInputSchema: z.ZodType<Prisma.Prof
   localized: z.lazy(() => LocalizedProfileFieldUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileCreateOrConnectWithoutTagsInputSchema: z.ZodType<Prisma.ProfileCreateOrConnectWithoutTagsInput> = z.object({
@@ -6853,8 +7179,10 @@ export const ProfileUpdateWithoutTagsInputSchema: z.ZodType<Prisma.ProfileUpdate
   localized: z.lazy(() => LocalizedProfileFieldUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedUpdateWithoutTagsInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateWithoutTagsInput> = z.object({
@@ -6892,8 +7220,10 @@ export const ProfileUncheckedUpdateWithoutTagsInputSchema: z.ZodType<Prisma.Prof
   localized: z.lazy(() => LocalizedProfileFieldUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const UserCreateWithoutRequestsSentInputSchema: z.ZodType<Prisma.UserCreateWithoutRequestsSentInput> = z.object({
@@ -7147,8 +7477,10 @@ export const ProfileCreateWithoutUserInputSchema: z.ZodType<Prisma.ProfileCreate
   localized: z.lazy(() => LocalizedProfileFieldCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedCreateWithoutUserInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateWithoutUserInput> = z.object({
@@ -7186,8 +7518,10 @@ export const ProfileUncheckedCreateWithoutUserInputSchema: z.ZodType<Prisma.Prof
   localized: z.lazy(() => LocalizedProfileFieldUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileCreateOrConnectWithoutUserInputSchema: z.ZodType<Prisma.ProfileCreateOrConnectWithoutUserInput> = z.object({
@@ -7369,8 +7703,10 @@ export const ProfileUpdateWithoutUserInputSchema: z.ZodType<Prisma.ProfileUpdate
   localized: z.lazy(() => LocalizedProfileFieldUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateWithoutUserInput> = z.object({
@@ -7408,8 +7744,10 @@ export const ProfileUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prisma.Prof
   localized: z.lazy(() => LocalizedProfileFieldUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileImageUpsertWithWhereUniqueWithoutUserInputSchema: z.ZodType<Prisma.ProfileImageUpsertWithWhereUniqueWithoutUserInput> = z.object({
@@ -7879,8 +8217,10 @@ export const ProfileCreateWithoutBlockedByProfilesInputSchema: z.ZodType<Prisma.
   Conversation: z.lazy(() => ConversationCreateNestedManyWithoutInitiatorInputSchema).optional(),
   localized: z.lazy(() => LocalizedProfileFieldCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedCreateWithoutBlockedByProfilesInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateWithoutBlockedByProfilesInput> = z.object({
@@ -7918,8 +8258,10 @@ export const ProfileUncheckedCreateWithoutBlockedByProfilesInputSchema: z.ZodTyp
   Conversation: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutInitiatorInputSchema).optional(),
   localized: z.lazy(() => LocalizedProfileFieldUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileCreateOrConnectWithoutBlockedByProfilesInputSchema: z.ZodType<Prisma.ProfileCreateOrConnectWithoutBlockedByProfilesInput> = z.object({
@@ -7962,8 +8304,10 @@ export const ProfileCreateWithoutBlockedProfilesInputSchema: z.ZodType<Prisma.Pr
   Conversation: z.lazy(() => ConversationCreateNestedManyWithoutInitiatorInputSchema).optional(),
   localized: z.lazy(() => LocalizedProfileFieldCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedCreateWithoutBlockedProfilesInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateWithoutBlockedProfilesInput> = z.object({
@@ -8001,8 +8345,10 @@ export const ProfileUncheckedCreateWithoutBlockedProfilesInputSchema: z.ZodType<
   Conversation: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutInitiatorInputSchema).optional(),
   localized: z.lazy(() => LocalizedProfileFieldUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileCreateOrConnectWithoutBlockedProfilesInputSchema: z.ZodType<Prisma.ProfileCreateOrConnectWithoutBlockedProfilesInput> = z.object({
@@ -8010,47 +8356,91 @@ export const ProfileCreateOrConnectWithoutBlockedProfilesInputSchema: z.ZodType<
   create: z.union([ z.lazy(() => ProfileCreateWithoutBlockedProfilesInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutBlockedProfilesInputSchema) ]),
 }).strict();
 
-export const LikeCreateWithoutFromInputSchema: z.ZodType<Prisma.LikeCreateWithoutFromInput> = z.object({
+export const LikedProfileCreateWithoutFromInputSchema: z.ZodType<Prisma.LikedProfileCreateWithoutFromInput> = z.object({
   id: z.string().cuid().optional(),
   createdAt: z.coerce.date().optional(),
   to: z.lazy(() => ProfileCreateNestedOneWithoutLikesReceivedInputSchema)
 }).strict();
 
-export const LikeUncheckedCreateWithoutFromInputSchema: z.ZodType<Prisma.LikeUncheckedCreateWithoutFromInput> = z.object({
+export const LikedProfileUncheckedCreateWithoutFromInputSchema: z.ZodType<Prisma.LikedProfileUncheckedCreateWithoutFromInput> = z.object({
   id: z.string().cuid().optional(),
   toId: z.string(),
   createdAt: z.coerce.date().optional()
 }).strict();
 
-export const LikeCreateOrConnectWithoutFromInputSchema: z.ZodType<Prisma.LikeCreateOrConnectWithoutFromInput> = z.object({
-  where: z.lazy(() => LikeWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => LikeCreateWithoutFromInputSchema),z.lazy(() => LikeUncheckedCreateWithoutFromInputSchema) ]),
+export const LikedProfileCreateOrConnectWithoutFromInputSchema: z.ZodType<Prisma.LikedProfileCreateOrConnectWithoutFromInput> = z.object({
+  where: z.lazy(() => LikedProfileWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => LikedProfileCreateWithoutFromInputSchema),z.lazy(() => LikedProfileUncheckedCreateWithoutFromInputSchema) ]),
 }).strict();
 
-export const LikeCreateManyFromInputEnvelopeSchema: z.ZodType<Prisma.LikeCreateManyFromInputEnvelope> = z.object({
-  data: z.union([ z.lazy(() => LikeCreateManyFromInputSchema),z.lazy(() => LikeCreateManyFromInputSchema).array() ]),
+export const LikedProfileCreateManyFromInputEnvelopeSchema: z.ZodType<Prisma.LikedProfileCreateManyFromInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => LikedProfileCreateManyFromInputSchema),z.lazy(() => LikedProfileCreateManyFromInputSchema).array() ]),
   skipDuplicates: z.boolean().optional()
 }).strict();
 
-export const LikeCreateWithoutToInputSchema: z.ZodType<Prisma.LikeCreateWithoutToInput> = z.object({
+export const LikedProfileCreateWithoutToInputSchema: z.ZodType<Prisma.LikedProfileCreateWithoutToInput> = z.object({
   id: z.string().cuid().optional(),
   createdAt: z.coerce.date().optional(),
   from: z.lazy(() => ProfileCreateNestedOneWithoutLikesSentInputSchema)
 }).strict();
 
-export const LikeUncheckedCreateWithoutToInputSchema: z.ZodType<Prisma.LikeUncheckedCreateWithoutToInput> = z.object({
+export const LikedProfileUncheckedCreateWithoutToInputSchema: z.ZodType<Prisma.LikedProfileUncheckedCreateWithoutToInput> = z.object({
   id: z.string().cuid().optional(),
   fromId: z.string(),
   createdAt: z.coerce.date().optional()
 }).strict();
 
-export const LikeCreateOrConnectWithoutToInputSchema: z.ZodType<Prisma.LikeCreateOrConnectWithoutToInput> = z.object({
-  where: z.lazy(() => LikeWhereUniqueInputSchema),
-  create: z.union([ z.lazy(() => LikeCreateWithoutToInputSchema),z.lazy(() => LikeUncheckedCreateWithoutToInputSchema) ]),
+export const LikedProfileCreateOrConnectWithoutToInputSchema: z.ZodType<Prisma.LikedProfileCreateOrConnectWithoutToInput> = z.object({
+  where: z.lazy(() => LikedProfileWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => LikedProfileCreateWithoutToInputSchema),z.lazy(() => LikedProfileUncheckedCreateWithoutToInputSchema) ]),
 }).strict();
 
-export const LikeCreateManyToInputEnvelopeSchema: z.ZodType<Prisma.LikeCreateManyToInputEnvelope> = z.object({
-  data: z.union([ z.lazy(() => LikeCreateManyToInputSchema),z.lazy(() => LikeCreateManyToInputSchema).array() ]),
+export const LikedProfileCreateManyToInputEnvelopeSchema: z.ZodType<Prisma.LikedProfileCreateManyToInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => LikedProfileCreateManyToInputSchema),z.lazy(() => LikedProfileCreateManyToInputSchema).array() ]),
+  skipDuplicates: z.boolean().optional()
+}).strict();
+
+export const HiddenProfileCreateWithoutFromInputSchema: z.ZodType<Prisma.HiddenProfileCreateWithoutFromInput> = z.object({
+  id: z.string().cuid().optional(),
+  createdAt: z.coerce.date().optional(),
+  to: z.lazy(() => ProfileCreateNestedOneWithoutHiddenByInputSchema)
+}).strict();
+
+export const HiddenProfileUncheckedCreateWithoutFromInputSchema: z.ZodType<Prisma.HiddenProfileUncheckedCreateWithoutFromInput> = z.object({
+  id: z.string().cuid().optional(),
+  toId: z.string(),
+  createdAt: z.coerce.date().optional()
+}).strict();
+
+export const HiddenProfileCreateOrConnectWithoutFromInputSchema: z.ZodType<Prisma.HiddenProfileCreateOrConnectWithoutFromInput> = z.object({
+  where: z.lazy(() => HiddenProfileWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => HiddenProfileCreateWithoutFromInputSchema),z.lazy(() => HiddenProfileUncheckedCreateWithoutFromInputSchema) ]),
+}).strict();
+
+export const HiddenProfileCreateManyFromInputEnvelopeSchema: z.ZodType<Prisma.HiddenProfileCreateManyFromInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => HiddenProfileCreateManyFromInputSchema),z.lazy(() => HiddenProfileCreateManyFromInputSchema).array() ]),
+  skipDuplicates: z.boolean().optional()
+}).strict();
+
+export const HiddenProfileCreateWithoutToInputSchema: z.ZodType<Prisma.HiddenProfileCreateWithoutToInput> = z.object({
+  id: z.string().cuid().optional(),
+  createdAt: z.coerce.date().optional(),
+  from: z.lazy(() => ProfileCreateNestedOneWithoutHiddenProfilesInputSchema)
+}).strict();
+
+export const HiddenProfileUncheckedCreateWithoutToInputSchema: z.ZodType<Prisma.HiddenProfileUncheckedCreateWithoutToInput> = z.object({
+  id: z.string().cuid().optional(),
+  fromId: z.string(),
+  createdAt: z.coerce.date().optional()
+}).strict();
+
+export const HiddenProfileCreateOrConnectWithoutToInputSchema: z.ZodType<Prisma.HiddenProfileCreateOrConnectWithoutToInput> = z.object({
+  where: z.lazy(() => HiddenProfileWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => HiddenProfileCreateWithoutToInputSchema),z.lazy(() => HiddenProfileUncheckedCreateWithoutToInputSchema) ]),
+}).strict();
+
+export const HiddenProfileCreateManyToInputEnvelopeSchema: z.ZodType<Prisma.HiddenProfileCreateManyToInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => HiddenProfileCreateManyToInputSchema),z.lazy(() => HiddenProfileCreateManyToInputSchema).array() ]),
   skipDuplicates: z.boolean().optional()
 }).strict();
 
@@ -8359,46 +8749,88 @@ export const ProfileUpdateManyWithWhereWithoutBlockedProfilesInputSchema: z.ZodT
   data: z.union([ z.lazy(() => ProfileUpdateManyMutationInputSchema),z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedProfilesInputSchema) ]),
 }).strict();
 
-export const LikeUpsertWithWhereUniqueWithoutFromInputSchema: z.ZodType<Prisma.LikeUpsertWithWhereUniqueWithoutFromInput> = z.object({
-  where: z.lazy(() => LikeWhereUniqueInputSchema),
-  update: z.union([ z.lazy(() => LikeUpdateWithoutFromInputSchema),z.lazy(() => LikeUncheckedUpdateWithoutFromInputSchema) ]),
-  create: z.union([ z.lazy(() => LikeCreateWithoutFromInputSchema),z.lazy(() => LikeUncheckedCreateWithoutFromInputSchema) ]),
+export const LikedProfileUpsertWithWhereUniqueWithoutFromInputSchema: z.ZodType<Prisma.LikedProfileUpsertWithWhereUniqueWithoutFromInput> = z.object({
+  where: z.lazy(() => LikedProfileWhereUniqueInputSchema),
+  update: z.union([ z.lazy(() => LikedProfileUpdateWithoutFromInputSchema),z.lazy(() => LikedProfileUncheckedUpdateWithoutFromInputSchema) ]),
+  create: z.union([ z.lazy(() => LikedProfileCreateWithoutFromInputSchema),z.lazy(() => LikedProfileUncheckedCreateWithoutFromInputSchema) ]),
 }).strict();
 
-export const LikeUpdateWithWhereUniqueWithoutFromInputSchema: z.ZodType<Prisma.LikeUpdateWithWhereUniqueWithoutFromInput> = z.object({
-  where: z.lazy(() => LikeWhereUniqueInputSchema),
-  data: z.union([ z.lazy(() => LikeUpdateWithoutFromInputSchema),z.lazy(() => LikeUncheckedUpdateWithoutFromInputSchema) ]),
+export const LikedProfileUpdateWithWhereUniqueWithoutFromInputSchema: z.ZodType<Prisma.LikedProfileUpdateWithWhereUniqueWithoutFromInput> = z.object({
+  where: z.lazy(() => LikedProfileWhereUniqueInputSchema),
+  data: z.union([ z.lazy(() => LikedProfileUpdateWithoutFromInputSchema),z.lazy(() => LikedProfileUncheckedUpdateWithoutFromInputSchema) ]),
 }).strict();
 
-export const LikeUpdateManyWithWhereWithoutFromInputSchema: z.ZodType<Prisma.LikeUpdateManyWithWhereWithoutFromInput> = z.object({
-  where: z.lazy(() => LikeScalarWhereInputSchema),
-  data: z.union([ z.lazy(() => LikeUpdateManyMutationInputSchema),z.lazy(() => LikeUncheckedUpdateManyWithoutFromInputSchema) ]),
+export const LikedProfileUpdateManyWithWhereWithoutFromInputSchema: z.ZodType<Prisma.LikedProfileUpdateManyWithWhereWithoutFromInput> = z.object({
+  where: z.lazy(() => LikedProfileScalarWhereInputSchema),
+  data: z.union([ z.lazy(() => LikedProfileUpdateManyMutationInputSchema),z.lazy(() => LikedProfileUncheckedUpdateManyWithoutFromInputSchema) ]),
 }).strict();
 
-export const LikeScalarWhereInputSchema: z.ZodType<Prisma.LikeScalarWhereInput> = z.object({
-  AND: z.union([ z.lazy(() => LikeScalarWhereInputSchema),z.lazy(() => LikeScalarWhereInputSchema).array() ]).optional(),
-  OR: z.lazy(() => LikeScalarWhereInputSchema).array().optional(),
-  NOT: z.union([ z.lazy(() => LikeScalarWhereInputSchema),z.lazy(() => LikeScalarWhereInputSchema).array() ]).optional(),
+export const LikedProfileScalarWhereInputSchema: z.ZodType<Prisma.LikedProfileScalarWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => LikedProfileScalarWhereInputSchema),z.lazy(() => LikedProfileScalarWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => LikedProfileScalarWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => LikedProfileScalarWhereInputSchema),z.lazy(() => LikedProfileScalarWhereInputSchema).array() ]).optional(),
   id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   fromId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   toId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
   createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
 }).strict();
 
-export const LikeUpsertWithWhereUniqueWithoutToInputSchema: z.ZodType<Prisma.LikeUpsertWithWhereUniqueWithoutToInput> = z.object({
-  where: z.lazy(() => LikeWhereUniqueInputSchema),
-  update: z.union([ z.lazy(() => LikeUpdateWithoutToInputSchema),z.lazy(() => LikeUncheckedUpdateWithoutToInputSchema) ]),
-  create: z.union([ z.lazy(() => LikeCreateWithoutToInputSchema),z.lazy(() => LikeUncheckedCreateWithoutToInputSchema) ]),
+export const LikedProfileUpsertWithWhereUniqueWithoutToInputSchema: z.ZodType<Prisma.LikedProfileUpsertWithWhereUniqueWithoutToInput> = z.object({
+  where: z.lazy(() => LikedProfileWhereUniqueInputSchema),
+  update: z.union([ z.lazy(() => LikedProfileUpdateWithoutToInputSchema),z.lazy(() => LikedProfileUncheckedUpdateWithoutToInputSchema) ]),
+  create: z.union([ z.lazy(() => LikedProfileCreateWithoutToInputSchema),z.lazy(() => LikedProfileUncheckedCreateWithoutToInputSchema) ]),
 }).strict();
 
-export const LikeUpdateWithWhereUniqueWithoutToInputSchema: z.ZodType<Prisma.LikeUpdateWithWhereUniqueWithoutToInput> = z.object({
-  where: z.lazy(() => LikeWhereUniqueInputSchema),
-  data: z.union([ z.lazy(() => LikeUpdateWithoutToInputSchema),z.lazy(() => LikeUncheckedUpdateWithoutToInputSchema) ]),
+export const LikedProfileUpdateWithWhereUniqueWithoutToInputSchema: z.ZodType<Prisma.LikedProfileUpdateWithWhereUniqueWithoutToInput> = z.object({
+  where: z.lazy(() => LikedProfileWhereUniqueInputSchema),
+  data: z.union([ z.lazy(() => LikedProfileUpdateWithoutToInputSchema),z.lazy(() => LikedProfileUncheckedUpdateWithoutToInputSchema) ]),
 }).strict();
 
-export const LikeUpdateManyWithWhereWithoutToInputSchema: z.ZodType<Prisma.LikeUpdateManyWithWhereWithoutToInput> = z.object({
-  where: z.lazy(() => LikeScalarWhereInputSchema),
-  data: z.union([ z.lazy(() => LikeUpdateManyMutationInputSchema),z.lazy(() => LikeUncheckedUpdateManyWithoutToInputSchema) ]),
+export const LikedProfileUpdateManyWithWhereWithoutToInputSchema: z.ZodType<Prisma.LikedProfileUpdateManyWithWhereWithoutToInput> = z.object({
+  where: z.lazy(() => LikedProfileScalarWhereInputSchema),
+  data: z.union([ z.lazy(() => LikedProfileUpdateManyMutationInputSchema),z.lazy(() => LikedProfileUncheckedUpdateManyWithoutToInputSchema) ]),
+}).strict();
+
+export const HiddenProfileUpsertWithWhereUniqueWithoutFromInputSchema: z.ZodType<Prisma.HiddenProfileUpsertWithWhereUniqueWithoutFromInput> = z.object({
+  where: z.lazy(() => HiddenProfileWhereUniqueInputSchema),
+  update: z.union([ z.lazy(() => HiddenProfileUpdateWithoutFromInputSchema),z.lazy(() => HiddenProfileUncheckedUpdateWithoutFromInputSchema) ]),
+  create: z.union([ z.lazy(() => HiddenProfileCreateWithoutFromInputSchema),z.lazy(() => HiddenProfileUncheckedCreateWithoutFromInputSchema) ]),
+}).strict();
+
+export const HiddenProfileUpdateWithWhereUniqueWithoutFromInputSchema: z.ZodType<Prisma.HiddenProfileUpdateWithWhereUniqueWithoutFromInput> = z.object({
+  where: z.lazy(() => HiddenProfileWhereUniqueInputSchema),
+  data: z.union([ z.lazy(() => HiddenProfileUpdateWithoutFromInputSchema),z.lazy(() => HiddenProfileUncheckedUpdateWithoutFromInputSchema) ]),
+}).strict();
+
+export const HiddenProfileUpdateManyWithWhereWithoutFromInputSchema: z.ZodType<Prisma.HiddenProfileUpdateManyWithWhereWithoutFromInput> = z.object({
+  where: z.lazy(() => HiddenProfileScalarWhereInputSchema),
+  data: z.union([ z.lazy(() => HiddenProfileUpdateManyMutationInputSchema),z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutFromInputSchema) ]),
+}).strict();
+
+export const HiddenProfileScalarWhereInputSchema: z.ZodType<Prisma.HiddenProfileScalarWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => HiddenProfileScalarWhereInputSchema),z.lazy(() => HiddenProfileScalarWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => HiddenProfileScalarWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => HiddenProfileScalarWhereInputSchema),z.lazy(() => HiddenProfileScalarWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  fromId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  toId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  createdAt: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
+}).strict();
+
+export const HiddenProfileUpsertWithWhereUniqueWithoutToInputSchema: z.ZodType<Prisma.HiddenProfileUpsertWithWhereUniqueWithoutToInput> = z.object({
+  where: z.lazy(() => HiddenProfileWhereUniqueInputSchema),
+  update: z.union([ z.lazy(() => HiddenProfileUpdateWithoutToInputSchema),z.lazy(() => HiddenProfileUncheckedUpdateWithoutToInputSchema) ]),
+  create: z.union([ z.lazy(() => HiddenProfileCreateWithoutToInputSchema),z.lazy(() => HiddenProfileUncheckedCreateWithoutToInputSchema) ]),
+}).strict();
+
+export const HiddenProfileUpdateWithWhereUniqueWithoutToInputSchema: z.ZodType<Prisma.HiddenProfileUpdateWithWhereUniqueWithoutToInput> = z.object({
+  where: z.lazy(() => HiddenProfileWhereUniqueInputSchema),
+  data: z.union([ z.lazy(() => HiddenProfileUpdateWithoutToInputSchema),z.lazy(() => HiddenProfileUncheckedUpdateWithoutToInputSchema) ]),
+}).strict();
+
+export const HiddenProfileUpdateManyWithWhereWithoutToInputSchema: z.ZodType<Prisma.HiddenProfileUpdateManyWithWhereWithoutToInput> = z.object({
+  where: z.lazy(() => HiddenProfileScalarWhereInputSchema),
+  data: z.union([ z.lazy(() => HiddenProfileUpdateManyMutationInputSchema),z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutToInputSchema) ]),
 }).strict();
 
 export const ProfileCreateWithoutLocalizedInputSchema: z.ZodType<Prisma.ProfileCreateWithoutLocalizedInput> = z.object({
@@ -8436,8 +8868,10 @@ export const ProfileCreateWithoutLocalizedInputSchema: z.ZodType<Prisma.ProfileC
   Conversation: z.lazy(() => ConversationCreateNestedManyWithoutInitiatorInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedCreateWithoutLocalizedInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateWithoutLocalizedInput> = z.object({
@@ -8475,8 +8909,10 @@ export const ProfileUncheckedCreateWithoutLocalizedInputSchema: z.ZodType<Prisma
   Conversation: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutInitiatorInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileCreateOrConnectWithoutLocalizedInputSchema: z.ZodType<Prisma.ProfileCreateOrConnectWithoutLocalizedInput> = z.object({
@@ -8530,8 +8966,10 @@ export const ProfileUpdateWithoutLocalizedInputSchema: z.ZodType<Prisma.ProfileU
   Conversation: z.lazy(() => ConversationUpdateManyWithoutInitiatorNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedUpdateWithoutLocalizedInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateWithoutLocalizedInput> = z.object({
@@ -8569,8 +9007,10 @@ export const ProfileUncheckedUpdateWithoutLocalizedInputSchema: z.ZodType<Prisma
   Conversation: z.lazy(() => ConversationUncheckedUpdateManyWithoutInitiatorNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const UserCreateWithoutProfileImageInputSchema: z.ZodType<Prisma.UserCreateWithoutProfileImageInput> = z.object({
@@ -8659,8 +9099,10 @@ export const ProfileCreateWithoutProfileImagesInputSchema: z.ZodType<Prisma.Prof
   localized: z.lazy(() => LocalizedProfileFieldCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedCreateWithoutProfileImagesInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateWithoutProfileImagesInput> = z.object({
@@ -8698,8 +9140,10 @@ export const ProfileUncheckedCreateWithoutProfileImagesInputSchema: z.ZodType<Pr
   localized: z.lazy(() => LocalizedProfileFieldUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileCreateOrConnectWithoutProfileImagesInputSchema: z.ZodType<Prisma.ProfileCreateOrConnectWithoutProfileImagesInput> = z.object({
@@ -8810,8 +9254,10 @@ export const ProfileUpdateWithoutProfileImagesInputSchema: z.ZodType<Prisma.Prof
   localized: z.lazy(() => LocalizedProfileFieldUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedUpdateWithoutProfileImagesInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateWithoutProfileImagesInput> = z.object({
@@ -8849,8 +9295,10 @@ export const ProfileUncheckedUpdateWithoutProfileImagesInputSchema: z.ZodType<Pr
   localized: z.lazy(() => LocalizedProfileFieldUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileCreateWithoutConversationAsAInputSchema: z.ZodType<Prisma.ProfileCreateWithoutConversationAsAInput> = z.object({
@@ -8888,8 +9336,10 @@ export const ProfileCreateWithoutConversationAsAInputSchema: z.ZodType<Prisma.Pr
   localized: z.lazy(() => LocalizedProfileFieldCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedCreateWithoutConversationAsAInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateWithoutConversationAsAInput> = z.object({
@@ -8927,8 +9377,10 @@ export const ProfileUncheckedCreateWithoutConversationAsAInputSchema: z.ZodType<
   localized: z.lazy(() => LocalizedProfileFieldUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileCreateOrConnectWithoutConversationAsAInputSchema: z.ZodType<Prisma.ProfileCreateOrConnectWithoutConversationAsAInput> = z.object({
@@ -8971,8 +9423,10 @@ export const ProfileCreateWithoutConversationAsBInputSchema: z.ZodType<Prisma.Pr
   localized: z.lazy(() => LocalizedProfileFieldCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedCreateWithoutConversationAsBInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateWithoutConversationAsBInput> = z.object({
@@ -9010,8 +9464,10 @@ export const ProfileUncheckedCreateWithoutConversationAsBInputSchema: z.ZodType<
   localized: z.lazy(() => LocalizedProfileFieldUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileCreateOrConnectWithoutConversationAsBInputSchema: z.ZodType<Prisma.ProfileCreateOrConnectWithoutConversationAsBInput> = z.object({
@@ -9104,8 +9560,10 @@ export const ProfileCreateWithoutConversationInputSchema: z.ZodType<Prisma.Profi
   localized: z.lazy(() => LocalizedProfileFieldCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedCreateWithoutConversationInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateWithoutConversationInput> = z.object({
@@ -9143,8 +9601,10 @@ export const ProfileUncheckedCreateWithoutConversationInputSchema: z.ZodType<Pri
   localized: z.lazy(() => LocalizedProfileFieldUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileCreateOrConnectWithoutConversationInputSchema: z.ZodType<Prisma.ProfileCreateOrConnectWithoutConversationInput> = z.object({
@@ -9198,8 +9658,10 @@ export const ProfileUpdateWithoutConversationAsAInputSchema: z.ZodType<Prisma.Pr
   localized: z.lazy(() => LocalizedProfileFieldUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedUpdateWithoutConversationAsAInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateWithoutConversationAsAInput> = z.object({
@@ -9237,8 +9699,10 @@ export const ProfileUncheckedUpdateWithoutConversationAsAInputSchema: z.ZodType<
   localized: z.lazy(() => LocalizedProfileFieldUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileUpsertWithoutConversationAsBInputSchema: z.ZodType<Prisma.ProfileUpsertWithoutConversationAsBInput> = z.object({
@@ -9287,8 +9751,10 @@ export const ProfileUpdateWithoutConversationAsBInputSchema: z.ZodType<Prisma.Pr
   localized: z.lazy(() => LocalizedProfileFieldUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedUpdateWithoutConversationAsBInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateWithoutConversationAsBInput> = z.object({
@@ -9326,8 +9792,10 @@ export const ProfileUncheckedUpdateWithoutConversationAsBInputSchema: z.ZodType<
   localized: z.lazy(() => LocalizedProfileFieldUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ConversationParticipantUpsertWithWhereUniqueWithoutConversationInputSchema: z.ZodType<Prisma.ConversationParticipantUpsertWithWhereUniqueWithoutConversationInput> = z.object({
@@ -9408,8 +9876,10 @@ export const ProfileUpdateWithoutConversationInputSchema: z.ZodType<Prisma.Profi
   localized: z.lazy(() => LocalizedProfileFieldUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedUpdateWithoutConversationInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateWithoutConversationInput> = z.object({
@@ -9447,8 +9917,10 @@ export const ProfileUncheckedUpdateWithoutConversationInputSchema: z.ZodType<Pri
   localized: z.lazy(() => LocalizedProfileFieldUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileCreateWithoutConversationParticipantsInputSchema: z.ZodType<Prisma.ProfileCreateWithoutConversationParticipantsInput> = z.object({
@@ -9486,8 +9958,10 @@ export const ProfileCreateWithoutConversationParticipantsInputSchema: z.ZodType<
   localized: z.lazy(() => LocalizedProfileFieldCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedCreateWithoutConversationParticipantsInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateWithoutConversationParticipantsInput> = z.object({
@@ -9525,8 +9999,10 @@ export const ProfileUncheckedCreateWithoutConversationParticipantsInputSchema: z
   localized: z.lazy(() => LocalizedProfileFieldUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileCreateOrConnectWithoutConversationParticipantsInputSchema: z.ZodType<Prisma.ProfileCreateOrConnectWithoutConversationParticipantsInput> = z.object({
@@ -9607,8 +10083,10 @@ export const ProfileUpdateWithoutConversationParticipantsInputSchema: z.ZodType<
   localized: z.lazy(() => LocalizedProfileFieldUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedUpdateWithoutConversationParticipantsInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateWithoutConversationParticipantsInput> = z.object({
@@ -9646,8 +10124,10 @@ export const ProfileUncheckedUpdateWithoutConversationParticipantsInputSchema: z
   localized: z.lazy(() => LocalizedProfileFieldUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ConversationUpsertWithoutParticipantsInputSchema: z.ZodType<Prisma.ConversationUpsertWithoutParticipantsInput> = z.object({
@@ -9719,7 +10199,9 @@ export const ProfileCreateWithoutLikesSentInputSchema: z.ZodType<Prisma.ProfileC
   localized: z.lazy(() => LocalizedProfileFieldCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeCreateNestedManyWithoutToInputSchema).optional()
+  likesReceived: z.lazy(() => LikedProfileCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedCreateWithoutLikesSentInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateWithoutLikesSentInput> = z.object({
@@ -9758,7 +10240,9 @@ export const ProfileUncheckedCreateWithoutLikesSentInputSchema: z.ZodType<Prisma
   localized: z.lazy(() => LocalizedProfileFieldUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedCreateNestedManyWithoutToInputSchema).optional()
+  likesReceived: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileCreateOrConnectWithoutLikesSentInputSchema: z.ZodType<Prisma.ProfileCreateOrConnectWithoutLikesSentInput> = z.object({
@@ -9802,7 +10286,9 @@ export const ProfileCreateWithoutLikesReceivedInputSchema: z.ZodType<Prisma.Prof
   localized: z.lazy(() => LocalizedProfileFieldCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeCreateNestedManyWithoutFromInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedCreateWithoutLikesReceivedInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateWithoutLikesReceivedInput> = z.object({
@@ -9841,7 +10327,9 @@ export const ProfileUncheckedCreateWithoutLikesReceivedInputSchema: z.ZodType<Pr
   localized: z.lazy(() => LocalizedProfileFieldUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedCreateNestedManyWithoutFromInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileCreateOrConnectWithoutLikesReceivedInputSchema: z.ZodType<Prisma.ProfileCreateOrConnectWithoutLikesReceivedInput> = z.object({
@@ -9896,7 +10384,9 @@ export const ProfileUpdateWithoutLikesSentInputSchema: z.ZodType<Prisma.ProfileU
   localized: z.lazy(() => LocalizedProfileFieldUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUpdateManyWithoutToNestedInputSchema).optional()
+  likesReceived: z.lazy(() => LikedProfileUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedUpdateWithoutLikesSentInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateWithoutLikesSentInput> = z.object({
@@ -9935,7 +10425,9 @@ export const ProfileUncheckedUpdateWithoutLikesSentInputSchema: z.ZodType<Prisma
   localized: z.lazy(() => LocalizedProfileFieldUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedUpdateManyWithoutToNestedInputSchema).optional()
+  likesReceived: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileUpsertWithoutLikesReceivedInputSchema: z.ZodType<Prisma.ProfileUpsertWithoutLikesReceivedInput> = z.object({
@@ -9985,7 +10477,9 @@ export const ProfileUpdateWithoutLikesReceivedInputSchema: z.ZodType<Prisma.Prof
   localized: z.lazy(() => LocalizedProfileFieldUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUpdateManyWithoutFromNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedUpdateWithoutLikesReceivedInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateWithoutLikesReceivedInput> = z.object({
@@ -10024,7 +10518,369 @@ export const ProfileUncheckedUpdateWithoutLikesReceivedInputSchema: z.ZodType<Pr
   localized: z.lazy(() => LocalizedProfileFieldUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedUpdateManyWithoutFromNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional()
+}).strict();
+
+export const ProfileCreateWithoutHiddenProfilesInputSchema: z.ZodType<Prisma.ProfileCreateWithoutHiddenProfilesInput> = z.object({
+  id: z.string().cuid().optional(),
+  publicName: z.string(),
+  country: z.string().optional(),
+  cityName: z.string().optional(),
+  isSocialActive: z.boolean().optional(),
+  isDatingActive: z.boolean().optional(),
+  isActive: z.boolean().optional(),
+  isReported: z.boolean().optional(),
+  isBlocked: z.boolean().optional(),
+  isOnboarded: z.boolean().optional(),
+  work: z.string().optional(),
+  languages: z.union([ z.lazy(() => ProfileCreatelanguagesInputSchema),z.string().array() ]).optional(),
+  birthday: z.coerce.date().optional().nullable(),
+  gender: z.lazy(() => GenderSchema).optional().nullable(),
+  pronouns: z.lazy(() => PronounsSchema).optional().nullable(),
+  relationship: z.lazy(() => RelationshipStatusSchema).optional().nullable(),
+  hasKids: z.lazy(() => HasKidsSchema).optional().nullable(),
+  prefAgeMin: z.number().int().optional().nullable(),
+  prefAgeMax: z.number().int().optional().nullable(),
+  prefGender: z.union([ z.lazy(() => ProfileCreateprefGenderInputSchema),z.lazy(() => GenderSchema).array() ]).optional(),
+  prefKids: z.union([ z.lazy(() => ProfileCreateprefKidsInputSchema),z.lazy(() => HasKidsSchema).array() ]).optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  city: z.lazy(() => CityCreateNestedOneWithoutProfilesInputSchema).optional(),
+  user: z.lazy(() => UserCreateNestedOneWithoutProfileInputSchema),
+  tags: z.lazy(() => ProfileTagCreateNestedManyWithoutProfileInputSchema).optional(),
+  profileImages: z.lazy(() => ProfileImageCreateNestedManyWithoutProfileInputSchema).optional(),
+  conversationParticipants: z.lazy(() => ConversationParticipantCreateNestedManyWithoutProfileInputSchema).optional(),
+  conversationAsA: z.lazy(() => ConversationCreateNestedManyWithoutProfileAInputSchema).optional(),
+  conversationAsB: z.lazy(() => ConversationCreateNestedManyWithoutProfileBInputSchema).optional(),
+  Message: z.lazy(() => MessageCreateNestedManyWithoutSenderInputSchema).optional(),
+  Conversation: z.lazy(() => ConversationCreateNestedManyWithoutInitiatorInputSchema).optional(),
+  localized: z.lazy(() => LocalizedProfileFieldCreateNestedManyWithoutProfileInputSchema).optional(),
+  blockedProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
+  blockedByProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
+  likesSent: z.lazy(() => LikedProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileCreateNestedManyWithoutToInputSchema).optional()
+}).strict();
+
+export const ProfileUncheckedCreateWithoutHiddenProfilesInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateWithoutHiddenProfilesInput> = z.object({
+  id: z.string().cuid().optional(),
+  publicName: z.string(),
+  country: z.string().optional(),
+  cityName: z.string().optional(),
+  cityId: z.string().optional().nullable(),
+  isSocialActive: z.boolean().optional(),
+  isDatingActive: z.boolean().optional(),
+  isActive: z.boolean().optional(),
+  isReported: z.boolean().optional(),
+  isBlocked: z.boolean().optional(),
+  isOnboarded: z.boolean().optional(),
+  userId: z.string(),
+  work: z.string().optional(),
+  languages: z.union([ z.lazy(() => ProfileCreatelanguagesInputSchema),z.string().array() ]).optional(),
+  birthday: z.coerce.date().optional().nullable(),
+  gender: z.lazy(() => GenderSchema).optional().nullable(),
+  pronouns: z.lazy(() => PronounsSchema).optional().nullable(),
+  relationship: z.lazy(() => RelationshipStatusSchema).optional().nullable(),
+  hasKids: z.lazy(() => HasKidsSchema).optional().nullable(),
+  prefAgeMin: z.number().int().optional().nullable(),
+  prefAgeMax: z.number().int().optional().nullable(),
+  prefGender: z.union([ z.lazy(() => ProfileCreateprefGenderInputSchema),z.lazy(() => GenderSchema).array() ]).optional(),
+  prefKids: z.union([ z.lazy(() => ProfileCreateprefKidsInputSchema),z.lazy(() => HasKidsSchema).array() ]).optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  tags: z.lazy(() => ProfileTagUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
+  profileImages: z.lazy(() => ProfileImageUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
+  conversationParticipants: z.lazy(() => ConversationParticipantUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
+  conversationAsA: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutProfileAInputSchema).optional(),
+  conversationAsB: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutProfileBInputSchema).optional(),
+  Message: z.lazy(() => MessageUncheckedCreateNestedManyWithoutSenderInputSchema).optional(),
+  Conversation: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutInitiatorInputSchema).optional(),
+  localized: z.lazy(() => LocalizedProfileFieldUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
+  blockedProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
+  blockedByProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
+  likesSent: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutToInputSchema).optional()
+}).strict();
+
+export const ProfileCreateOrConnectWithoutHiddenProfilesInputSchema: z.ZodType<Prisma.ProfileCreateOrConnectWithoutHiddenProfilesInput> = z.object({
+  where: z.lazy(() => ProfileWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => ProfileCreateWithoutHiddenProfilesInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutHiddenProfilesInputSchema) ]),
+}).strict();
+
+export const ProfileCreateWithoutHiddenByInputSchema: z.ZodType<Prisma.ProfileCreateWithoutHiddenByInput> = z.object({
+  id: z.string().cuid().optional(),
+  publicName: z.string(),
+  country: z.string().optional(),
+  cityName: z.string().optional(),
+  isSocialActive: z.boolean().optional(),
+  isDatingActive: z.boolean().optional(),
+  isActive: z.boolean().optional(),
+  isReported: z.boolean().optional(),
+  isBlocked: z.boolean().optional(),
+  isOnboarded: z.boolean().optional(),
+  work: z.string().optional(),
+  languages: z.union([ z.lazy(() => ProfileCreatelanguagesInputSchema),z.string().array() ]).optional(),
+  birthday: z.coerce.date().optional().nullable(),
+  gender: z.lazy(() => GenderSchema).optional().nullable(),
+  pronouns: z.lazy(() => PronounsSchema).optional().nullable(),
+  relationship: z.lazy(() => RelationshipStatusSchema).optional().nullable(),
+  hasKids: z.lazy(() => HasKidsSchema).optional().nullable(),
+  prefAgeMin: z.number().int().optional().nullable(),
+  prefAgeMax: z.number().int().optional().nullable(),
+  prefGender: z.union([ z.lazy(() => ProfileCreateprefGenderInputSchema),z.lazy(() => GenderSchema).array() ]).optional(),
+  prefKids: z.union([ z.lazy(() => ProfileCreateprefKidsInputSchema),z.lazy(() => HasKidsSchema).array() ]).optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  city: z.lazy(() => CityCreateNestedOneWithoutProfilesInputSchema).optional(),
+  user: z.lazy(() => UserCreateNestedOneWithoutProfileInputSchema),
+  tags: z.lazy(() => ProfileTagCreateNestedManyWithoutProfileInputSchema).optional(),
+  profileImages: z.lazy(() => ProfileImageCreateNestedManyWithoutProfileInputSchema).optional(),
+  conversationParticipants: z.lazy(() => ConversationParticipantCreateNestedManyWithoutProfileInputSchema).optional(),
+  conversationAsA: z.lazy(() => ConversationCreateNestedManyWithoutProfileAInputSchema).optional(),
+  conversationAsB: z.lazy(() => ConversationCreateNestedManyWithoutProfileBInputSchema).optional(),
+  Message: z.lazy(() => MessageCreateNestedManyWithoutSenderInputSchema).optional(),
+  Conversation: z.lazy(() => ConversationCreateNestedManyWithoutInitiatorInputSchema).optional(),
+  localized: z.lazy(() => LocalizedProfileFieldCreateNestedManyWithoutProfileInputSchema).optional(),
+  blockedProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
+  blockedByProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
+  likesSent: z.lazy(() => LikedProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileCreateNestedManyWithoutFromInputSchema).optional()
+}).strict();
+
+export const ProfileUncheckedCreateWithoutHiddenByInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateWithoutHiddenByInput> = z.object({
+  id: z.string().cuid().optional(),
+  publicName: z.string(),
+  country: z.string().optional(),
+  cityName: z.string().optional(),
+  cityId: z.string().optional().nullable(),
+  isSocialActive: z.boolean().optional(),
+  isDatingActive: z.boolean().optional(),
+  isActive: z.boolean().optional(),
+  isReported: z.boolean().optional(),
+  isBlocked: z.boolean().optional(),
+  isOnboarded: z.boolean().optional(),
+  userId: z.string(),
+  work: z.string().optional(),
+  languages: z.union([ z.lazy(() => ProfileCreatelanguagesInputSchema),z.string().array() ]).optional(),
+  birthday: z.coerce.date().optional().nullable(),
+  gender: z.lazy(() => GenderSchema).optional().nullable(),
+  pronouns: z.lazy(() => PronounsSchema).optional().nullable(),
+  relationship: z.lazy(() => RelationshipStatusSchema).optional().nullable(),
+  hasKids: z.lazy(() => HasKidsSchema).optional().nullable(),
+  prefAgeMin: z.number().int().optional().nullable(),
+  prefAgeMax: z.number().int().optional().nullable(),
+  prefGender: z.union([ z.lazy(() => ProfileCreateprefGenderInputSchema),z.lazy(() => GenderSchema).array() ]).optional(),
+  prefKids: z.union([ z.lazy(() => ProfileCreateprefKidsInputSchema),z.lazy(() => HasKidsSchema).array() ]).optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+  tags: z.lazy(() => ProfileTagUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
+  profileImages: z.lazy(() => ProfileImageUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
+  conversationParticipants: z.lazy(() => ConversationParticipantUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
+  conversationAsA: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutProfileAInputSchema).optional(),
+  conversationAsB: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutProfileBInputSchema).optional(),
+  Message: z.lazy(() => MessageUncheckedCreateNestedManyWithoutSenderInputSchema).optional(),
+  Conversation: z.lazy(() => ConversationUncheckedCreateNestedManyWithoutInitiatorInputSchema).optional(),
+  localized: z.lazy(() => LocalizedProfileFieldUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
+  blockedProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
+  blockedByProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
+  likesSent: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional()
+}).strict();
+
+export const ProfileCreateOrConnectWithoutHiddenByInputSchema: z.ZodType<Prisma.ProfileCreateOrConnectWithoutHiddenByInput> = z.object({
+  where: z.lazy(() => ProfileWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => ProfileCreateWithoutHiddenByInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutHiddenByInputSchema) ]),
+}).strict();
+
+export const ProfileUpsertWithoutHiddenProfilesInputSchema: z.ZodType<Prisma.ProfileUpsertWithoutHiddenProfilesInput> = z.object({
+  update: z.union([ z.lazy(() => ProfileUpdateWithoutHiddenProfilesInputSchema),z.lazy(() => ProfileUncheckedUpdateWithoutHiddenProfilesInputSchema) ]),
+  create: z.union([ z.lazy(() => ProfileCreateWithoutHiddenProfilesInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutHiddenProfilesInputSchema) ]),
+  where: z.lazy(() => ProfileWhereInputSchema).optional()
+}).strict();
+
+export const ProfileUpdateToOneWithWhereWithoutHiddenProfilesInputSchema: z.ZodType<Prisma.ProfileUpdateToOneWithWhereWithoutHiddenProfilesInput> = z.object({
+  where: z.lazy(() => ProfileWhereInputSchema).optional(),
+  data: z.union([ z.lazy(() => ProfileUpdateWithoutHiddenProfilesInputSchema),z.lazy(() => ProfileUncheckedUpdateWithoutHiddenProfilesInputSchema) ]),
+}).strict();
+
+export const ProfileUpdateWithoutHiddenProfilesInputSchema: z.ZodType<Prisma.ProfileUpdateWithoutHiddenProfilesInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  publicName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  country: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  cityName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  isSocialActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  isDatingActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  isBlocked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  isOnboarded: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  work: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  languages: z.union([ z.lazy(() => ProfileUpdatelanguagesInputSchema),z.string().array() ]).optional(),
+  birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => NullableEnumGenderFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  pronouns: z.union([ z.lazy(() => PronounsSchema),z.lazy(() => NullableEnumPronounsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => NullableEnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => NullableEnumHasKidsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  prefAgeMin: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  prefAgeMax: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  prefGender: z.union([ z.lazy(() => ProfileUpdateprefGenderInputSchema),z.lazy(() => GenderSchema).array() ]).optional(),
+  prefKids: z.union([ z.lazy(() => ProfileUpdateprefKidsInputSchema),z.lazy(() => HasKidsSchema).array() ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  city: z.lazy(() => CityUpdateOneWithoutProfilesNestedInputSchema).optional(),
+  user: z.lazy(() => UserUpdateOneRequiredWithoutProfileNestedInputSchema).optional(),
+  tags: z.lazy(() => ProfileTagUpdateManyWithoutProfileNestedInputSchema).optional(),
+  profileImages: z.lazy(() => ProfileImageUpdateManyWithoutProfileNestedInputSchema).optional(),
+  conversationParticipants: z.lazy(() => ConversationParticipantUpdateManyWithoutProfileNestedInputSchema).optional(),
+  conversationAsA: z.lazy(() => ConversationUpdateManyWithoutProfileANestedInputSchema).optional(),
+  conversationAsB: z.lazy(() => ConversationUpdateManyWithoutProfileBNestedInputSchema).optional(),
+  Message: z.lazy(() => MessageUpdateManyWithoutSenderNestedInputSchema).optional(),
+  Conversation: z.lazy(() => ConversationUpdateManyWithoutInitiatorNestedInputSchema).optional(),
+  localized: z.lazy(() => LocalizedProfileFieldUpdateManyWithoutProfileNestedInputSchema).optional(),
+  blockedProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
+  blockedByProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
+  likesSent: z.lazy(() => LikedProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUpdateManyWithoutToNestedInputSchema).optional()
+}).strict();
+
+export const ProfileUncheckedUpdateWithoutHiddenProfilesInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateWithoutHiddenProfilesInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  publicName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  country: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  cityName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  cityId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  isSocialActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  isDatingActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  isBlocked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  isOnboarded: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  work: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  languages: z.union([ z.lazy(() => ProfileUpdatelanguagesInputSchema),z.string().array() ]).optional(),
+  birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => NullableEnumGenderFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  pronouns: z.union([ z.lazy(() => PronounsSchema),z.lazy(() => NullableEnumPronounsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => NullableEnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => NullableEnumHasKidsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  prefAgeMin: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  prefAgeMax: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  prefGender: z.union([ z.lazy(() => ProfileUpdateprefGenderInputSchema),z.lazy(() => GenderSchema).array() ]).optional(),
+  prefKids: z.union([ z.lazy(() => ProfileUpdateprefKidsInputSchema),z.lazy(() => HasKidsSchema).array() ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  tags: z.lazy(() => ProfileTagUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
+  profileImages: z.lazy(() => ProfileImageUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
+  conversationParticipants: z.lazy(() => ConversationParticipantUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
+  conversationAsA: z.lazy(() => ConversationUncheckedUpdateManyWithoutProfileANestedInputSchema).optional(),
+  conversationAsB: z.lazy(() => ConversationUncheckedUpdateManyWithoutProfileBNestedInputSchema).optional(),
+  Message: z.lazy(() => MessageUncheckedUpdateManyWithoutSenderNestedInputSchema).optional(),
+  Conversation: z.lazy(() => ConversationUncheckedUpdateManyWithoutInitiatorNestedInputSchema).optional(),
+  localized: z.lazy(() => LocalizedProfileFieldUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
+  blockedProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
+  blockedByProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
+  likesSent: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional()
+}).strict();
+
+export const ProfileUpsertWithoutHiddenByInputSchema: z.ZodType<Prisma.ProfileUpsertWithoutHiddenByInput> = z.object({
+  update: z.union([ z.lazy(() => ProfileUpdateWithoutHiddenByInputSchema),z.lazy(() => ProfileUncheckedUpdateWithoutHiddenByInputSchema) ]),
+  create: z.union([ z.lazy(() => ProfileCreateWithoutHiddenByInputSchema),z.lazy(() => ProfileUncheckedCreateWithoutHiddenByInputSchema) ]),
+  where: z.lazy(() => ProfileWhereInputSchema).optional()
+}).strict();
+
+export const ProfileUpdateToOneWithWhereWithoutHiddenByInputSchema: z.ZodType<Prisma.ProfileUpdateToOneWithWhereWithoutHiddenByInput> = z.object({
+  where: z.lazy(() => ProfileWhereInputSchema).optional(),
+  data: z.union([ z.lazy(() => ProfileUpdateWithoutHiddenByInputSchema),z.lazy(() => ProfileUncheckedUpdateWithoutHiddenByInputSchema) ]),
+}).strict();
+
+export const ProfileUpdateWithoutHiddenByInputSchema: z.ZodType<Prisma.ProfileUpdateWithoutHiddenByInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  publicName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  country: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  cityName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  isSocialActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  isDatingActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  isBlocked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  isOnboarded: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  work: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  languages: z.union([ z.lazy(() => ProfileUpdatelanguagesInputSchema),z.string().array() ]).optional(),
+  birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => NullableEnumGenderFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  pronouns: z.union([ z.lazy(() => PronounsSchema),z.lazy(() => NullableEnumPronounsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => NullableEnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => NullableEnumHasKidsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  prefAgeMin: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  prefAgeMax: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  prefGender: z.union([ z.lazy(() => ProfileUpdateprefGenderInputSchema),z.lazy(() => GenderSchema).array() ]).optional(),
+  prefKids: z.union([ z.lazy(() => ProfileUpdateprefKidsInputSchema),z.lazy(() => HasKidsSchema).array() ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  city: z.lazy(() => CityUpdateOneWithoutProfilesNestedInputSchema).optional(),
+  user: z.lazy(() => UserUpdateOneRequiredWithoutProfileNestedInputSchema).optional(),
+  tags: z.lazy(() => ProfileTagUpdateManyWithoutProfileNestedInputSchema).optional(),
+  profileImages: z.lazy(() => ProfileImageUpdateManyWithoutProfileNestedInputSchema).optional(),
+  conversationParticipants: z.lazy(() => ConversationParticipantUpdateManyWithoutProfileNestedInputSchema).optional(),
+  conversationAsA: z.lazy(() => ConversationUpdateManyWithoutProfileANestedInputSchema).optional(),
+  conversationAsB: z.lazy(() => ConversationUpdateManyWithoutProfileBNestedInputSchema).optional(),
+  Message: z.lazy(() => MessageUpdateManyWithoutSenderNestedInputSchema).optional(),
+  Conversation: z.lazy(() => ConversationUpdateManyWithoutInitiatorNestedInputSchema).optional(),
+  localized: z.lazy(() => LocalizedProfileFieldUpdateManyWithoutProfileNestedInputSchema).optional(),
+  blockedProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
+  blockedByProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
+  likesSent: z.lazy(() => LikedProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUpdateManyWithoutFromNestedInputSchema).optional()
+}).strict();
+
+export const ProfileUncheckedUpdateWithoutHiddenByInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateWithoutHiddenByInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  publicName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  country: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  cityName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  cityId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  isSocialActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  isDatingActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  isActive: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  isReported: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  isBlocked: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  isOnboarded: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+  userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  work: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  languages: z.union([ z.lazy(() => ProfileUpdatelanguagesInputSchema),z.string().array() ]).optional(),
+  birthday: z.union([ z.coerce.date(),z.lazy(() => NullableDateTimeFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  gender: z.union([ z.lazy(() => GenderSchema),z.lazy(() => NullableEnumGenderFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  pronouns: z.union([ z.lazy(() => PronounsSchema),z.lazy(() => NullableEnumPronounsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  relationship: z.union([ z.lazy(() => RelationshipStatusSchema),z.lazy(() => NullableEnumRelationshipStatusFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  hasKids: z.union([ z.lazy(() => HasKidsSchema),z.lazy(() => NullableEnumHasKidsFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  prefAgeMin: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  prefAgeMax: z.union([ z.number().int(),z.lazy(() => NullableIntFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  prefGender: z.union([ z.lazy(() => ProfileUpdateprefGenderInputSchema),z.lazy(() => GenderSchema).array() ]).optional(),
+  prefKids: z.union([ z.lazy(() => ProfileUpdateprefKidsInputSchema),z.lazy(() => HasKidsSchema).array() ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  tags: z.lazy(() => ProfileTagUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
+  profileImages: z.lazy(() => ProfileImageUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
+  conversationParticipants: z.lazy(() => ConversationParticipantUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
+  conversationAsA: z.lazy(() => ConversationUncheckedUpdateManyWithoutProfileANestedInputSchema).optional(),
+  conversationAsB: z.lazy(() => ConversationUncheckedUpdateManyWithoutProfileBNestedInputSchema).optional(),
+  Message: z.lazy(() => MessageUncheckedUpdateManyWithoutSenderNestedInputSchema).optional(),
+  Conversation: z.lazy(() => ConversationUncheckedUpdateManyWithoutInitiatorNestedInputSchema).optional(),
+  localized: z.lazy(() => LocalizedProfileFieldUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
+  blockedProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
+  blockedByProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
+  likesSent: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional()
 }).strict();
 
 export const ConversationCreateWithoutMessagesInputSchema: z.ZodType<Prisma.ConversationCreateWithoutMessagesInput> = z.object({
@@ -10089,8 +10945,10 @@ export const ProfileCreateWithoutMessageInputSchema: z.ZodType<Prisma.ProfileCre
   localized: z.lazy(() => LocalizedProfileFieldCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedCreateWithoutMessageInputSchema: z.ZodType<Prisma.ProfileUncheckedCreateWithoutMessageInput> = z.object({
@@ -10128,8 +10986,10 @@ export const ProfileUncheckedCreateWithoutMessageInputSchema: z.ZodType<Prisma.P
   localized: z.lazy(() => LocalizedProfileFieldUncheckedCreateNestedManyWithoutProfileInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedByProfilesInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedCreateNestedManyWithoutBlockedProfilesInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedCreateNestedManyWithoutToInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedCreateNestedManyWithoutToInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutFromInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedCreateNestedManyWithoutToInputSchema).optional()
 }).strict();
 
 export const ProfileCreateOrConnectWithoutMessageInputSchema: z.ZodType<Prisma.ProfileCreateOrConnectWithoutMessageInput> = z.object({
@@ -10216,8 +11076,10 @@ export const ProfileUpdateWithoutMessageInputSchema: z.ZodType<Prisma.ProfileUpd
   localized: z.lazy(() => LocalizedProfileFieldUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedUpdateWithoutMessageInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateWithoutMessageInput> = z.object({
@@ -10255,8 +11117,10 @@ export const ProfileUncheckedUpdateWithoutMessageInputSchema: z.ZodType<Prisma.P
   localized: z.lazy(() => LocalizedProfileFieldUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const UserCreateWithoutPushSubscriptionInputSchema: z.ZodType<Prisma.UserCreateWithoutPushSubscriptionInput> = z.object({
@@ -10429,8 +11293,10 @@ export const ProfileUpdateWithoutCityInputSchema: z.ZodType<Prisma.ProfileUpdate
   localized: z.lazy(() => LocalizedProfileFieldUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedUpdateWithoutCityInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateWithoutCityInput> = z.object({
@@ -10468,8 +11334,10 @@ export const ProfileUncheckedUpdateWithoutCityInputSchema: z.ZodType<Prisma.Prof
   localized: z.lazy(() => LocalizedProfileFieldUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedUpdateManyWithoutCityInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateManyWithoutCityInput> = z.object({
@@ -10789,13 +11657,25 @@ export const LocalizedProfileFieldCreateManyProfileInputSchema: z.ZodType<Prisma
   value: z.string()
 }).strict();
 
-export const LikeCreateManyFromInputSchema: z.ZodType<Prisma.LikeCreateManyFromInput> = z.object({
+export const LikedProfileCreateManyFromInputSchema: z.ZodType<Prisma.LikedProfileCreateManyFromInput> = z.object({
   id: z.string().cuid().optional(),
   toId: z.string(),
   createdAt: z.coerce.date().optional()
 }).strict();
 
-export const LikeCreateManyToInputSchema: z.ZodType<Prisma.LikeCreateManyToInput> = z.object({
+export const LikedProfileCreateManyToInputSchema: z.ZodType<Prisma.LikedProfileCreateManyToInput> = z.object({
+  id: z.string().cuid().optional(),
+  fromId: z.string(),
+  createdAt: z.coerce.date().optional()
+}).strict();
+
+export const HiddenProfileCreateManyFromInputSchema: z.ZodType<Prisma.HiddenProfileCreateManyFromInput> = z.object({
+  id: z.string().cuid().optional(),
+  toId: z.string(),
+  createdAt: z.coerce.date().optional()
+}).strict();
+
+export const HiddenProfileCreateManyToInputSchema: z.ZodType<Prisma.HiddenProfileCreateManyToInput> = z.object({
   id: z.string().cuid().optional(),
   fromId: z.string(),
   createdAt: z.coerce.date().optional()
@@ -11061,8 +11941,10 @@ export const ProfileUpdateWithoutBlockedByProfilesInputSchema: z.ZodType<Prisma.
   Conversation: z.lazy(() => ConversationUpdateManyWithoutInitiatorNestedInputSchema).optional(),
   localized: z.lazy(() => LocalizedProfileFieldUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedUpdateWithoutBlockedByProfilesInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateWithoutBlockedByProfilesInput> = z.object({
@@ -11100,8 +11982,10 @@ export const ProfileUncheckedUpdateWithoutBlockedByProfilesInputSchema: z.ZodTyp
   Conversation: z.lazy(() => ConversationUncheckedUpdateManyWithoutInitiatorNestedInputSchema).optional(),
   localized: z.lazy(() => LocalizedProfileFieldUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedByProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedUpdateManyWithoutBlockedByProfilesInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateManyWithoutBlockedByProfilesInput> = z.object({
@@ -11167,8 +12051,10 @@ export const ProfileUpdateWithoutBlockedProfilesInputSchema: z.ZodType<Prisma.Pr
   Conversation: z.lazy(() => ConversationUpdateManyWithoutInitiatorNestedInputSchema).optional(),
   localized: z.lazy(() => LocalizedProfileFieldUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedUpdateWithoutBlockedProfilesInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateWithoutBlockedProfilesInput> = z.object({
@@ -11206,8 +12092,10 @@ export const ProfileUncheckedUpdateWithoutBlockedProfilesInputSchema: z.ZodType<
   Conversation: z.lazy(() => ConversationUncheckedUpdateManyWithoutInitiatorNestedInputSchema).optional(),
   localized: z.lazy(() => LocalizedProfileFieldUncheckedUpdateManyWithoutProfileNestedInputSchema).optional(),
   blockedByProfiles: z.lazy(() => ProfileUncheckedUpdateManyWithoutBlockedProfilesNestedInputSchema).optional(),
-  likesSent: z.lazy(() => LikeUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
-  likesReceived: z.lazy(() => LikeUncheckedUpdateManyWithoutToNestedInputSchema).optional()
+  likesSent: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  likesReceived: z.lazy(() => LikedProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional(),
+  hiddenProfiles: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutFromNestedInputSchema).optional(),
+  hiddenBy: z.lazy(() => HiddenProfileUncheckedUpdateManyWithoutToNestedInputSchema).optional()
 }).strict();
 
 export const ProfileUncheckedUpdateManyWithoutBlockedProfilesInputSchema: z.ZodType<Prisma.ProfileUncheckedUpdateManyWithoutBlockedProfilesInput> = z.object({
@@ -11238,37 +12126,73 @@ export const ProfileUncheckedUpdateManyWithoutBlockedProfilesInputSchema: z.ZodT
   updatedAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
-export const LikeUpdateWithoutFromInputSchema: z.ZodType<Prisma.LikeUpdateWithoutFromInput> = z.object({
+export const LikedProfileUpdateWithoutFromInputSchema: z.ZodType<Prisma.LikedProfileUpdateWithoutFromInput> = z.object({
   id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   to: z.lazy(() => ProfileUpdateOneRequiredWithoutLikesReceivedNestedInputSchema).optional()
 }).strict();
 
-export const LikeUncheckedUpdateWithoutFromInputSchema: z.ZodType<Prisma.LikeUncheckedUpdateWithoutFromInput> = z.object({
+export const LikedProfileUncheckedUpdateWithoutFromInputSchema: z.ZodType<Prisma.LikedProfileUncheckedUpdateWithoutFromInput> = z.object({
   id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   toId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
-export const LikeUncheckedUpdateManyWithoutFromInputSchema: z.ZodType<Prisma.LikeUncheckedUpdateManyWithoutFromInput> = z.object({
+export const LikedProfileUncheckedUpdateManyWithoutFromInputSchema: z.ZodType<Prisma.LikedProfileUncheckedUpdateManyWithoutFromInput> = z.object({
   id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   toId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
-export const LikeUpdateWithoutToInputSchema: z.ZodType<Prisma.LikeUpdateWithoutToInput> = z.object({
+export const LikedProfileUpdateWithoutToInputSchema: z.ZodType<Prisma.LikedProfileUpdateWithoutToInput> = z.object({
   id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   from: z.lazy(() => ProfileUpdateOneRequiredWithoutLikesSentNestedInputSchema).optional()
 }).strict();
 
-export const LikeUncheckedUpdateWithoutToInputSchema: z.ZodType<Prisma.LikeUncheckedUpdateWithoutToInput> = z.object({
+export const LikedProfileUncheckedUpdateWithoutToInputSchema: z.ZodType<Prisma.LikedProfileUncheckedUpdateWithoutToInput> = z.object({
   id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   fromId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
-export const LikeUncheckedUpdateManyWithoutToInputSchema: z.ZodType<Prisma.LikeUncheckedUpdateManyWithoutToInput> = z.object({
+export const LikedProfileUncheckedUpdateManyWithoutToInputSchema: z.ZodType<Prisma.LikedProfileUncheckedUpdateManyWithoutToInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  fromId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const HiddenProfileUpdateWithoutFromInputSchema: z.ZodType<Prisma.HiddenProfileUpdateWithoutFromInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  to: z.lazy(() => ProfileUpdateOneRequiredWithoutHiddenByNestedInputSchema).optional()
+}).strict();
+
+export const HiddenProfileUncheckedUpdateWithoutFromInputSchema: z.ZodType<Prisma.HiddenProfileUncheckedUpdateWithoutFromInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  toId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const HiddenProfileUncheckedUpdateManyWithoutFromInputSchema: z.ZodType<Prisma.HiddenProfileUncheckedUpdateManyWithoutFromInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  toId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const HiddenProfileUpdateWithoutToInputSchema: z.ZodType<Prisma.HiddenProfileUpdateWithoutToInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  from: z.lazy(() => ProfileUpdateOneRequiredWithoutHiddenProfilesNestedInputSchema).optional()
+}).strict();
+
+export const HiddenProfileUncheckedUpdateWithoutToInputSchema: z.ZodType<Prisma.HiddenProfileUncheckedUpdateWithoutToInput> = z.object({
+  id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  fromId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const HiddenProfileUncheckedUpdateManyWithoutToInputSchema: z.ZodType<Prisma.HiddenProfileUncheckedUpdateManyWithoutToInput> = z.object({
   id: z.union([ z.string().cuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   fromId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   createdAt: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
@@ -12077,66 +13001,128 @@ export const ConversationParticipantFindUniqueOrThrowArgsSchema: z.ZodType<Prism
   where: ConversationParticipantWhereUniqueInputSchema,
 }).strict() ;
 
-export const LikeFindFirstArgsSchema: z.ZodType<Prisma.LikeFindFirstArgs> = z.object({
-  select: LikeSelectSchema.optional(),
-  include: LikeIncludeSchema.optional(),
-  where: LikeWhereInputSchema.optional(),
-  orderBy: z.union([ LikeOrderByWithRelationInputSchema.array(),LikeOrderByWithRelationInputSchema ]).optional(),
-  cursor: LikeWhereUniqueInputSchema.optional(),
+export const LikedProfileFindFirstArgsSchema: z.ZodType<Prisma.LikedProfileFindFirstArgs> = z.object({
+  select: LikedProfileSelectSchema.optional(),
+  include: LikedProfileIncludeSchema.optional(),
+  where: LikedProfileWhereInputSchema.optional(),
+  orderBy: z.union([ LikedProfileOrderByWithRelationInputSchema.array(),LikedProfileOrderByWithRelationInputSchema ]).optional(),
+  cursor: LikedProfileWhereUniqueInputSchema.optional(),
   take: z.number().optional(),
   skip: z.number().optional(),
-  distinct: z.union([ LikeScalarFieldEnumSchema,LikeScalarFieldEnumSchema.array() ]).optional(),
+  distinct: z.union([ LikedProfileScalarFieldEnumSchema,LikedProfileScalarFieldEnumSchema.array() ]).optional(),
 }).strict() ;
 
-export const LikeFindFirstOrThrowArgsSchema: z.ZodType<Prisma.LikeFindFirstOrThrowArgs> = z.object({
-  select: LikeSelectSchema.optional(),
-  include: LikeIncludeSchema.optional(),
-  where: LikeWhereInputSchema.optional(),
-  orderBy: z.union([ LikeOrderByWithRelationInputSchema.array(),LikeOrderByWithRelationInputSchema ]).optional(),
-  cursor: LikeWhereUniqueInputSchema.optional(),
+export const LikedProfileFindFirstOrThrowArgsSchema: z.ZodType<Prisma.LikedProfileFindFirstOrThrowArgs> = z.object({
+  select: LikedProfileSelectSchema.optional(),
+  include: LikedProfileIncludeSchema.optional(),
+  where: LikedProfileWhereInputSchema.optional(),
+  orderBy: z.union([ LikedProfileOrderByWithRelationInputSchema.array(),LikedProfileOrderByWithRelationInputSchema ]).optional(),
+  cursor: LikedProfileWhereUniqueInputSchema.optional(),
   take: z.number().optional(),
   skip: z.number().optional(),
-  distinct: z.union([ LikeScalarFieldEnumSchema,LikeScalarFieldEnumSchema.array() ]).optional(),
+  distinct: z.union([ LikedProfileScalarFieldEnumSchema,LikedProfileScalarFieldEnumSchema.array() ]).optional(),
 }).strict() ;
 
-export const LikeFindManyArgsSchema: z.ZodType<Prisma.LikeFindManyArgs> = z.object({
-  select: LikeSelectSchema.optional(),
-  include: LikeIncludeSchema.optional(),
-  where: LikeWhereInputSchema.optional(),
-  orderBy: z.union([ LikeOrderByWithRelationInputSchema.array(),LikeOrderByWithRelationInputSchema ]).optional(),
-  cursor: LikeWhereUniqueInputSchema.optional(),
+export const LikedProfileFindManyArgsSchema: z.ZodType<Prisma.LikedProfileFindManyArgs> = z.object({
+  select: LikedProfileSelectSchema.optional(),
+  include: LikedProfileIncludeSchema.optional(),
+  where: LikedProfileWhereInputSchema.optional(),
+  orderBy: z.union([ LikedProfileOrderByWithRelationInputSchema.array(),LikedProfileOrderByWithRelationInputSchema ]).optional(),
+  cursor: LikedProfileWhereUniqueInputSchema.optional(),
   take: z.number().optional(),
   skip: z.number().optional(),
-  distinct: z.union([ LikeScalarFieldEnumSchema,LikeScalarFieldEnumSchema.array() ]).optional(),
+  distinct: z.union([ LikedProfileScalarFieldEnumSchema,LikedProfileScalarFieldEnumSchema.array() ]).optional(),
 }).strict() ;
 
-export const LikeAggregateArgsSchema: z.ZodType<Prisma.LikeAggregateArgs> = z.object({
-  where: LikeWhereInputSchema.optional(),
-  orderBy: z.union([ LikeOrderByWithRelationInputSchema.array(),LikeOrderByWithRelationInputSchema ]).optional(),
-  cursor: LikeWhereUniqueInputSchema.optional(),
-  take: z.number().optional(),
-  skip: z.number().optional(),
-}).strict() ;
-
-export const LikeGroupByArgsSchema: z.ZodType<Prisma.LikeGroupByArgs> = z.object({
-  where: LikeWhereInputSchema.optional(),
-  orderBy: z.union([ LikeOrderByWithAggregationInputSchema.array(),LikeOrderByWithAggregationInputSchema ]).optional(),
-  by: LikeScalarFieldEnumSchema.array(),
-  having: LikeScalarWhereWithAggregatesInputSchema.optional(),
+export const LikedProfileAggregateArgsSchema: z.ZodType<Prisma.LikedProfileAggregateArgs> = z.object({
+  where: LikedProfileWhereInputSchema.optional(),
+  orderBy: z.union([ LikedProfileOrderByWithRelationInputSchema.array(),LikedProfileOrderByWithRelationInputSchema ]).optional(),
+  cursor: LikedProfileWhereUniqueInputSchema.optional(),
   take: z.number().optional(),
   skip: z.number().optional(),
 }).strict() ;
 
-export const LikeFindUniqueArgsSchema: z.ZodType<Prisma.LikeFindUniqueArgs> = z.object({
-  select: LikeSelectSchema.optional(),
-  include: LikeIncludeSchema.optional(),
-  where: LikeWhereUniqueInputSchema,
+export const LikedProfileGroupByArgsSchema: z.ZodType<Prisma.LikedProfileGroupByArgs> = z.object({
+  where: LikedProfileWhereInputSchema.optional(),
+  orderBy: z.union([ LikedProfileOrderByWithAggregationInputSchema.array(),LikedProfileOrderByWithAggregationInputSchema ]).optional(),
+  by: LikedProfileScalarFieldEnumSchema.array(),
+  having: LikedProfileScalarWhereWithAggregatesInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
 }).strict() ;
 
-export const LikeFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.LikeFindUniqueOrThrowArgs> = z.object({
-  select: LikeSelectSchema.optional(),
-  include: LikeIncludeSchema.optional(),
-  where: LikeWhereUniqueInputSchema,
+export const LikedProfileFindUniqueArgsSchema: z.ZodType<Prisma.LikedProfileFindUniqueArgs> = z.object({
+  select: LikedProfileSelectSchema.optional(),
+  include: LikedProfileIncludeSchema.optional(),
+  where: LikedProfileWhereUniqueInputSchema,
+}).strict() ;
+
+export const LikedProfileFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.LikedProfileFindUniqueOrThrowArgs> = z.object({
+  select: LikedProfileSelectSchema.optional(),
+  include: LikedProfileIncludeSchema.optional(),
+  where: LikedProfileWhereUniqueInputSchema,
+}).strict() ;
+
+export const HiddenProfileFindFirstArgsSchema: z.ZodType<Prisma.HiddenProfileFindFirstArgs> = z.object({
+  select: HiddenProfileSelectSchema.optional(),
+  include: HiddenProfileIncludeSchema.optional(),
+  where: HiddenProfileWhereInputSchema.optional(),
+  orderBy: z.union([ HiddenProfileOrderByWithRelationInputSchema.array(),HiddenProfileOrderByWithRelationInputSchema ]).optional(),
+  cursor: HiddenProfileWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ HiddenProfileScalarFieldEnumSchema,HiddenProfileScalarFieldEnumSchema.array() ]).optional(),
+}).strict() ;
+
+export const HiddenProfileFindFirstOrThrowArgsSchema: z.ZodType<Prisma.HiddenProfileFindFirstOrThrowArgs> = z.object({
+  select: HiddenProfileSelectSchema.optional(),
+  include: HiddenProfileIncludeSchema.optional(),
+  where: HiddenProfileWhereInputSchema.optional(),
+  orderBy: z.union([ HiddenProfileOrderByWithRelationInputSchema.array(),HiddenProfileOrderByWithRelationInputSchema ]).optional(),
+  cursor: HiddenProfileWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ HiddenProfileScalarFieldEnumSchema,HiddenProfileScalarFieldEnumSchema.array() ]).optional(),
+}).strict() ;
+
+export const HiddenProfileFindManyArgsSchema: z.ZodType<Prisma.HiddenProfileFindManyArgs> = z.object({
+  select: HiddenProfileSelectSchema.optional(),
+  include: HiddenProfileIncludeSchema.optional(),
+  where: HiddenProfileWhereInputSchema.optional(),
+  orderBy: z.union([ HiddenProfileOrderByWithRelationInputSchema.array(),HiddenProfileOrderByWithRelationInputSchema ]).optional(),
+  cursor: HiddenProfileWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: z.union([ HiddenProfileScalarFieldEnumSchema,HiddenProfileScalarFieldEnumSchema.array() ]).optional(),
+}).strict() ;
+
+export const HiddenProfileAggregateArgsSchema: z.ZodType<Prisma.HiddenProfileAggregateArgs> = z.object({
+  where: HiddenProfileWhereInputSchema.optional(),
+  orderBy: z.union([ HiddenProfileOrderByWithRelationInputSchema.array(),HiddenProfileOrderByWithRelationInputSchema ]).optional(),
+  cursor: HiddenProfileWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict() ;
+
+export const HiddenProfileGroupByArgsSchema: z.ZodType<Prisma.HiddenProfileGroupByArgs> = z.object({
+  where: HiddenProfileWhereInputSchema.optional(),
+  orderBy: z.union([ HiddenProfileOrderByWithAggregationInputSchema.array(),HiddenProfileOrderByWithAggregationInputSchema ]).optional(),
+  by: HiddenProfileScalarFieldEnumSchema.array(),
+  having: HiddenProfileScalarWhereWithAggregatesInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict() ;
+
+export const HiddenProfileFindUniqueArgsSchema: z.ZodType<Prisma.HiddenProfileFindUniqueArgs> = z.object({
+  select: HiddenProfileSelectSchema.optional(),
+  include: HiddenProfileIncludeSchema.optional(),
+  where: HiddenProfileWhereUniqueInputSchema,
+}).strict() ;
+
+export const HiddenProfileFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.HiddenProfileFindUniqueOrThrowArgs> = z.object({
+  select: HiddenProfileSelectSchema.optional(),
+  include: HiddenProfileIncludeSchema.optional(),
+  where: HiddenProfileWhereUniqueInputSchema,
 }).strict() ;
 
 export const MessageFindFirstArgsSchema: z.ZodType<Prisma.MessageFindFirstArgs> = z.object({
@@ -12907,57 +13893,111 @@ export const ConversationParticipantDeleteManyArgsSchema: z.ZodType<Prisma.Conve
   limit: z.number().optional(),
 }).strict() ;
 
-export const LikeCreateArgsSchema: z.ZodType<Prisma.LikeCreateArgs> = z.object({
-  select: LikeSelectSchema.optional(),
-  include: LikeIncludeSchema.optional(),
-  data: z.union([ LikeCreateInputSchema,LikeUncheckedCreateInputSchema ]),
+export const LikedProfileCreateArgsSchema: z.ZodType<Prisma.LikedProfileCreateArgs> = z.object({
+  select: LikedProfileSelectSchema.optional(),
+  include: LikedProfileIncludeSchema.optional(),
+  data: z.union([ LikedProfileCreateInputSchema,LikedProfileUncheckedCreateInputSchema ]),
 }).strict() ;
 
-export const LikeUpsertArgsSchema: z.ZodType<Prisma.LikeUpsertArgs> = z.object({
-  select: LikeSelectSchema.optional(),
-  include: LikeIncludeSchema.optional(),
-  where: LikeWhereUniqueInputSchema,
-  create: z.union([ LikeCreateInputSchema,LikeUncheckedCreateInputSchema ]),
-  update: z.union([ LikeUpdateInputSchema,LikeUncheckedUpdateInputSchema ]),
+export const LikedProfileUpsertArgsSchema: z.ZodType<Prisma.LikedProfileUpsertArgs> = z.object({
+  select: LikedProfileSelectSchema.optional(),
+  include: LikedProfileIncludeSchema.optional(),
+  where: LikedProfileWhereUniqueInputSchema,
+  create: z.union([ LikedProfileCreateInputSchema,LikedProfileUncheckedCreateInputSchema ]),
+  update: z.union([ LikedProfileUpdateInputSchema,LikedProfileUncheckedUpdateInputSchema ]),
 }).strict() ;
 
-export const LikeCreateManyArgsSchema: z.ZodType<Prisma.LikeCreateManyArgs> = z.object({
-  data: z.union([ LikeCreateManyInputSchema,LikeCreateManyInputSchema.array() ]),
+export const LikedProfileCreateManyArgsSchema: z.ZodType<Prisma.LikedProfileCreateManyArgs> = z.object({
+  data: z.union([ LikedProfileCreateManyInputSchema,LikedProfileCreateManyInputSchema.array() ]),
   skipDuplicates: z.boolean().optional(),
 }).strict() ;
 
-export const LikeCreateManyAndReturnArgsSchema: z.ZodType<Prisma.LikeCreateManyAndReturnArgs> = z.object({
-  data: z.union([ LikeCreateManyInputSchema,LikeCreateManyInputSchema.array() ]),
+export const LikedProfileCreateManyAndReturnArgsSchema: z.ZodType<Prisma.LikedProfileCreateManyAndReturnArgs> = z.object({
+  data: z.union([ LikedProfileCreateManyInputSchema,LikedProfileCreateManyInputSchema.array() ]),
   skipDuplicates: z.boolean().optional(),
 }).strict() ;
 
-export const LikeDeleteArgsSchema: z.ZodType<Prisma.LikeDeleteArgs> = z.object({
-  select: LikeSelectSchema.optional(),
-  include: LikeIncludeSchema.optional(),
-  where: LikeWhereUniqueInputSchema,
+export const LikedProfileDeleteArgsSchema: z.ZodType<Prisma.LikedProfileDeleteArgs> = z.object({
+  select: LikedProfileSelectSchema.optional(),
+  include: LikedProfileIncludeSchema.optional(),
+  where: LikedProfileWhereUniqueInputSchema,
 }).strict() ;
 
-export const LikeUpdateArgsSchema: z.ZodType<Prisma.LikeUpdateArgs> = z.object({
-  select: LikeSelectSchema.optional(),
-  include: LikeIncludeSchema.optional(),
-  data: z.union([ LikeUpdateInputSchema,LikeUncheckedUpdateInputSchema ]),
-  where: LikeWhereUniqueInputSchema,
+export const LikedProfileUpdateArgsSchema: z.ZodType<Prisma.LikedProfileUpdateArgs> = z.object({
+  select: LikedProfileSelectSchema.optional(),
+  include: LikedProfileIncludeSchema.optional(),
+  data: z.union([ LikedProfileUpdateInputSchema,LikedProfileUncheckedUpdateInputSchema ]),
+  where: LikedProfileWhereUniqueInputSchema,
 }).strict() ;
 
-export const LikeUpdateManyArgsSchema: z.ZodType<Prisma.LikeUpdateManyArgs> = z.object({
-  data: z.union([ LikeUpdateManyMutationInputSchema,LikeUncheckedUpdateManyInputSchema ]),
-  where: LikeWhereInputSchema.optional(),
+export const LikedProfileUpdateManyArgsSchema: z.ZodType<Prisma.LikedProfileUpdateManyArgs> = z.object({
+  data: z.union([ LikedProfileUpdateManyMutationInputSchema,LikedProfileUncheckedUpdateManyInputSchema ]),
+  where: LikedProfileWhereInputSchema.optional(),
   limit: z.number().optional(),
 }).strict() ;
 
-export const LikeUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.LikeUpdateManyAndReturnArgs> = z.object({
-  data: z.union([ LikeUpdateManyMutationInputSchema,LikeUncheckedUpdateManyInputSchema ]),
-  where: LikeWhereInputSchema.optional(),
+export const LikedProfileUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.LikedProfileUpdateManyAndReturnArgs> = z.object({
+  data: z.union([ LikedProfileUpdateManyMutationInputSchema,LikedProfileUncheckedUpdateManyInputSchema ]),
+  where: LikedProfileWhereInputSchema.optional(),
   limit: z.number().optional(),
 }).strict() ;
 
-export const LikeDeleteManyArgsSchema: z.ZodType<Prisma.LikeDeleteManyArgs> = z.object({
-  where: LikeWhereInputSchema.optional(),
+export const LikedProfileDeleteManyArgsSchema: z.ZodType<Prisma.LikedProfileDeleteManyArgs> = z.object({
+  where: LikedProfileWhereInputSchema.optional(),
+  limit: z.number().optional(),
+}).strict() ;
+
+export const HiddenProfileCreateArgsSchema: z.ZodType<Prisma.HiddenProfileCreateArgs> = z.object({
+  select: HiddenProfileSelectSchema.optional(),
+  include: HiddenProfileIncludeSchema.optional(),
+  data: z.union([ HiddenProfileCreateInputSchema,HiddenProfileUncheckedCreateInputSchema ]),
+}).strict() ;
+
+export const HiddenProfileUpsertArgsSchema: z.ZodType<Prisma.HiddenProfileUpsertArgs> = z.object({
+  select: HiddenProfileSelectSchema.optional(),
+  include: HiddenProfileIncludeSchema.optional(),
+  where: HiddenProfileWhereUniqueInputSchema,
+  create: z.union([ HiddenProfileCreateInputSchema,HiddenProfileUncheckedCreateInputSchema ]),
+  update: z.union([ HiddenProfileUpdateInputSchema,HiddenProfileUncheckedUpdateInputSchema ]),
+}).strict() ;
+
+export const HiddenProfileCreateManyArgsSchema: z.ZodType<Prisma.HiddenProfileCreateManyArgs> = z.object({
+  data: z.union([ HiddenProfileCreateManyInputSchema,HiddenProfileCreateManyInputSchema.array() ]),
+  skipDuplicates: z.boolean().optional(),
+}).strict() ;
+
+export const HiddenProfileCreateManyAndReturnArgsSchema: z.ZodType<Prisma.HiddenProfileCreateManyAndReturnArgs> = z.object({
+  data: z.union([ HiddenProfileCreateManyInputSchema,HiddenProfileCreateManyInputSchema.array() ]),
+  skipDuplicates: z.boolean().optional(),
+}).strict() ;
+
+export const HiddenProfileDeleteArgsSchema: z.ZodType<Prisma.HiddenProfileDeleteArgs> = z.object({
+  select: HiddenProfileSelectSchema.optional(),
+  include: HiddenProfileIncludeSchema.optional(),
+  where: HiddenProfileWhereUniqueInputSchema,
+}).strict() ;
+
+export const HiddenProfileUpdateArgsSchema: z.ZodType<Prisma.HiddenProfileUpdateArgs> = z.object({
+  select: HiddenProfileSelectSchema.optional(),
+  include: HiddenProfileIncludeSchema.optional(),
+  data: z.union([ HiddenProfileUpdateInputSchema,HiddenProfileUncheckedUpdateInputSchema ]),
+  where: HiddenProfileWhereUniqueInputSchema,
+}).strict() ;
+
+export const HiddenProfileUpdateManyArgsSchema: z.ZodType<Prisma.HiddenProfileUpdateManyArgs> = z.object({
+  data: z.union([ HiddenProfileUpdateManyMutationInputSchema,HiddenProfileUncheckedUpdateManyInputSchema ]),
+  where: HiddenProfileWhereInputSchema.optional(),
+  limit: z.number().optional(),
+}).strict() ;
+
+export const HiddenProfileUpdateManyAndReturnArgsSchema: z.ZodType<Prisma.HiddenProfileUpdateManyAndReturnArgs> = z.object({
+  data: z.union([ HiddenProfileUpdateManyMutationInputSchema,HiddenProfileUncheckedUpdateManyInputSchema ]),
+  where: HiddenProfileWhereInputSchema.optional(),
+  limit: z.number().optional(),
+}).strict() ;
+
+export const HiddenProfileDeleteManyArgsSchema: z.ZodType<Prisma.HiddenProfileDeleteManyArgs> = z.object({
+  where: HiddenProfileWhereInputSchema.optional(),
   limit: z.number().optional(),
 }).strict() ;
 

@@ -70,7 +70,7 @@ export const conversationContextInclude = (myProfileId: string) => ({
 });
 
 
-export const likeContextInclude = (myProfileId: string) => {
+export const interactionContextInclude = (myProfileId: string) => {
   return {
     likesReceived: {
       where: { fromId: myProfileId }, // Did I like them?
@@ -78,6 +78,10 @@ export const likeContextInclude = (myProfileId: string) => {
     },
     likesSent: {
       where: { toId: myProfileId },   // Did they like me?
+      select: { id: true },
+    },
+    hiddenProfiles: {
+      where: { fromId: myProfileId }, // Did I pass them?
       select: { id: true },
     },
   }

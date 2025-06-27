@@ -230,11 +230,16 @@ model Profile {
 
   localized LocalizedProfileField[]
 
+  // Blocklist
   blockedProfiles   Profile[] @relation("BlockedProfiles")
   blockedByProfiles Profile[] @relation("BlockedProfiles")
 
-  likesSent     Like[] @relation("LikesSent")
-  likesReceived Like[] @relation("LikesReceived")
+  // Dating interactions
+  likesSent     LikedProfile[] @relation("LikesSent")
+  likesReceived LikedProfile[] @relation("LikesReceived")
+
+  hiddenProfiles HiddenProfile[] @relation("HiddenProfiles")
+  hiddenBy       HiddenProfile[] @relation("HiddenBy")
 }
 
 model DatingPreferences {
@@ -324,7 +329,7 @@ enum ConversationStatus {
   ARCHIVED // Archived by both or system
 }
 
-model Like {
+model LikedProfile {
   id        String   @id @default(cuid())
   from      Profile  @relation("LikesSent", fields: [fromId], references: [id])
   fromId    String
@@ -333,6 +338,17 @@ model Like {
   createdAt DateTime @default(now())
 
   @@unique([fromId, toId]) // Prevent double-like
+}
+
+model HiddenProfile {
+  id        String   @id @default(cuid())
+  from      Profile  @relation("HiddenProfiles", fields: [fromId], references: [id])
+  fromId    String
+  to        Profile  @relation("HiddenBy", fields: [toId], references: [id])
+  toId      String
+  createdAt DateTime @default(now())
+
+  @@unique([fromId, toId])
 }
 
 model Message {

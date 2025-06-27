@@ -8,7 +8,7 @@ import { useToast } from 'vue-toastification'
 const router = useRouter()
 
 import { type MessageDTO } from '@zod/messaging/messaging.dto'
-import { type LikeEdge } from '@zod/like/like.dto'
+import { type InteractionEdge } from '@zod/datinginteraction/datinginteraction.dto'
 
 import MessageReceivedToast from './MessageReceivedToast.vue'
 import LikeReceivedToast from './LikeReceivedToast.vue'
@@ -59,7 +59,8 @@ function handleLikeReceived() {
   )
 }
 
-function handleMatchReceived(edge: LikeEdge) {
+function handleMatchReceived(edge: InteractionEdge) {
+  console.log('Match received:', edge)
   toast(
     {
       component: MatchReceivedToast,
@@ -93,3 +94,5 @@ onUnmounted(() => {
   bus.off('ws:new_match', handleMatchReceived)
 })
 </script>
+
+<template><slot/></template>

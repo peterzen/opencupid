@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { type MessageDTO } from '@zod/messaging/messaging.dto'
 import ProfileImage from '@/features/images/components/ProfileImage.vue'
-import { type LikeEdge } from '@zod/like/like.dto'
+import { type InteractionEdge } from '@zod/datinginteraction/datinginteraction.dto'
 // import { useI18n } from 'vue-i18n';
 // const { t } = useI18n()
 

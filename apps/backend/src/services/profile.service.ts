@@ -13,7 +13,7 @@ import {
   DbProfileWithImages
 } from '@zod/profile/profile.db'
 import { mapToLocalizedUpserts } from '@/api/mappers/profile.mappers'
-import { conversationContextInclude, likeContextInclude, profileImageInclude, tagsInclude } from '@/db/includes/profileIncludes'
+import { conversationContextInclude, interactionContextInclude, profileImageInclude, tagsInclude } from '@/db/includes/profileIncludes'
 
 
 
@@ -38,7 +38,7 @@ export class ProfileService {
       include: {
         ...tagsInclude(),
         ...profileImageInclude(),
-        ...likeContextInclude(myProfileId),
+        ...interactionContextInclude(myProfileId),
         ...conversationContextInclude(myProfileId),
       },
     }
@@ -46,9 +46,9 @@ export class ProfileService {
 
     if (!result) return null
 
-    const likeContext = {
+    const interactionContext = {
       likedByMe: result.likesReceived.length > 0,
-      likedMe: result.likesSent.length > 0,
+      passedByMe: result.likesSent.length > 0,
       isMatch: result.likesReceived.length > 0 && result.likesSent.length > 0,
     }
     // destructure to ensure all expected fields are explicitly present
@@ -60,7 +60,7 @@ export class ProfileService {
 
     return {
       ...rest,
-      likeContext,
+      interactionContext,
     } satisfies DbProfileWithContext
   }
 

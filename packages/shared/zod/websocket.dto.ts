@@ -1,10 +1,10 @@
-import { LikeEdge } from "./like/like.dto";
-import { MessageDTO } from "./messaging/messaging.dto";
+import { type InteractionEdge } from "./datinginteraction/datinginteraction.dto";
+import { type MessageDTO } from "./messaging/messaging.dto";
 
 export type WSMessage =
   | { type: 'ws:new_message'; payload: MessageDTO }
-  | { type: 'ws:new_like'; payload: LikeEdge }
-  | { type: 'ws:new_match'; payload: LikeEdge }
+  | { type: 'ws:new_like'; payload: InteractionEdge }
+  | { type: 'ws:new_match'; payload: InteractionEdge }
   | { type: 'ws:app_notification'; payload: { title: string; body: string } }
 
 export type WSEventType = WSMessage['type']

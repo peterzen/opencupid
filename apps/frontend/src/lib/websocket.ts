@@ -24,10 +24,10 @@ export function connectWebSocket(token: string): void {
   socket.ws.value?.addEventListener('message', (event: MessageEvent) => {
     try {
       const data: WSMessage = JSON.parse(event.data)
-
+      console.log('[WS] Received message:', data)
       switch (data.type) {
         case 'ws:new_like':
-          bus.emit('ws:new_like') 
+          bus.emit('ws:new_like')
           break
         case 'ws:new_message':
         case 'ws:new_match':

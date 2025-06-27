@@ -9,13 +9,13 @@ import pushRoutes from './routes/push.routes'
 import imageRoutes from './routes/image.route'
 import discoverRoutes from './routes/discover.route'
 import appRoutes from './routes/app.route'
-import likeRoutes from './routes/like.route'
+import datingInteractionRoutes from './routes/datingInteraction.route'
 
 const api: FastifyPluginAsync = async fastify => {
   fastify.register(userRoutes, { prefix: '/users' })
   fastify.register(tagsRoutes, { prefix: '/tags' })
   fastify.register(profileRoutes, { prefix: '/profiles' })
-  fastify.register(likeRoutes, { prefix: '/likes' })
+  fastify.register(datingInteractionRoutes, { prefix: '/interactions' })
   fastify.register(messageRoutes, { prefix: '/messages' })
   fastify.register(citiesRoutes, { prefix: '/cities' })
   fastify.register(captchaRoutes, { prefix: '/captcha' })

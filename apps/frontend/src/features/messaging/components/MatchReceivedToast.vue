@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ProfileImage from '@/features/images/components/ProfileImage.vue'
-import { type LikeEdge } from '@zod/like/like.dto'
+import { type InteractionEdge } from '@zod/datinginteraction/datinginteraction.dto'
 // import { useI18n } from 'vue-i18n';
 // const { t } = useI18n()
 
@@ -9,7 +9,7 @@ defineEmits<{
 }>()
 
 defineProps<{
-  edge: LikeEdge
+  edge: InteractionEdge
   toastId: number | string
 }>()
 </script>

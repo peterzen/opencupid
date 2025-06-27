@@ -80,7 +80,7 @@ export function mapProfileWithContext(dbProfile: DbProfileWithContext, hasDating
   return {
     ...mapped,
     conversation: conversation || null,
-    likeContext: dbProfile.likeContext 
+    interactionContext: dbProfile.interactionContext
   } as PublicProfileWithContext
 }
 

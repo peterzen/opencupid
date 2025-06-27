@@ -12,7 +12,7 @@ import { PublicTagSchema } from "../tag/tag.dto";
 import { PublicProfileImageSchema } from "./profileimage.dto";
 import { LocationSchema } from "@zod/dto/location.dto";
 import { baseFields, socialFields, datingFields, ownerFields } from "./profile.fields";
-import { LikeContextSchema } from "./profile.db";
+import { InteractionContextSchema } from "./profile.db";
 
 const PublicScalarsSchema = ProfileSchema.pick({
   ...baseFields,
@@ -55,7 +55,7 @@ export const PublicProfileWithContextSchema = ProfileUnionSchema.and(
     introSocial: z.string().default(''),
     introDating: z.string().default(''),
     conversation: ConversationSchema.nullable(),
-    likeContext: LikeContextSchema
+    interactionContext: InteractionContextSchema
   })
 );
 export const PublicProfileArraySchema = z.array(PublicProfileSchema);

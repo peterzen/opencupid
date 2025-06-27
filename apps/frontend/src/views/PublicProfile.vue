@@ -22,6 +22,9 @@ const props = defineProps<{
 const profile = reactive<PublicProfileWithContext>({} as PublicProfileWithContext)
 const error = ref<string | null>(null)
 const showModal = ref(false)
+import { useDatingInteractions } from '@/features/datinginteraction/composables/useDatingInteractions'
+
+const { like, unlike, pass, unpass, refreshLikes, loadingLikes } = useDatingInteractions()
 
 onMounted(async () => {
   const profileId = props.id
@@ -51,6 +54,16 @@ const handleBlock = async () => {
     error.value = res.message
   }
 }
+
+const handleLike = async () => {
+  await like(profile.id)
+  toast('Successfully liked profile')
+}
+
+const handlePass = async () => {
+  await pass(profile.id)
+  toast('Successfully passed profile')
+}
 </script>
 
 <template>
@@ -72,6 +85,8 @@ const handleBlock = async () => {
           :profile
           :isLoading="profileStore.isLoading"
           @intent:conversation:open="handleOpenConversation"
+          @intent:pass="handlePass"
+          @intent:like="handleLike"
         />
         <!-- </BPlaceholderWrapper> -->
       </div>

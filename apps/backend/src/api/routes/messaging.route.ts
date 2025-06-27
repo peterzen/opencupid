@@ -1,5 +1,5 @@
 import type WebSocket from 'ws'
-import { FastifyPluginAsync } from 'fastify'
+import { FastifyInstance, FastifyPluginAsync } from 'fastify'
 import { sendError } from '../helpers'
 import { MessageService } from '@/services/messaging.service'
 import { WebPushService } from '@/services/webpush.service'
@@ -17,6 +17,7 @@ import type {
   SendMessageResponse,
   InitiateConversationResponse,
 } from '@shared/dto/apiResponse.dto'
+import { broadcastToProfile } from '@/utils/wsUtils'
 
 // Route params for ID lookups
 const IdLookupParamsSchema = z.object({
@@ -31,26 +32,6 @@ const InitiateConversationParamsSchema = z.object({
   profileId: z.string().cuid(),
   content: z.string().min(1),
 })
-
-function broadcastToProfile(
-  fastify: any,
-  recipientProfileId: string,
-  payload: Record<string, any>
-) {
-  const sockets = fastify.connections?.get(recipientProfileId)
-  if (!sockets || sockets.size === 0) {
-    fastify.log.warn(`No active WebSocket connections for recipient ${recipientProfileId}`)
-    return false
-  }
-  sockets.forEach((socket: WebSocket) => {
-    if (socket?.readyState === socket.OPEN) {
-      socket.send(JSON.stringify(payload))
-    }
-  })
-  return true
-}
-
-
 
 
 const messageRoutes: FastifyPluginAsync = async fastify => {

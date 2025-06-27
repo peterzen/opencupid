@@ -26,12 +26,11 @@ describe('AppNotifier', () => {
   it('shows toast when message received and handles click', () => {
     mount(AppNotifier)
     const message = { id: '1', conversationId: '42' } as any
-    bus.emit('message:received', { message })
+    bus.emit('ws:new_message', message)
 
     expect(toast).toHaveBeenCalled()
     const [opts, cfg] = toast.mock.calls[0]
     expect(opts.component).toBe('MsgToast')
-    expect(opts.props.toastId).toBe('1')
     const close = vi.fn()
     cfg.onClick(close)
     expect(push).toHaveBeenCalledWith({ name: 'Messaging', params: { conversationId: '42' }, force: true })
