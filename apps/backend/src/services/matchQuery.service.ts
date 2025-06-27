@@ -1,8 +1,8 @@
-import { DbProfileWithImages } from '@zod/profile/profile.db';
 import { prisma } from '../lib/prisma'
 
-import { profileCompleteInclude } from '@/db/includes/profileCompleteInclude';
+import { type DbProfileWithImages } from '@zod/profile/profile.db';
 import { blocklistWhereClause } from '@/db/includes/blocklistWhereClause';
+import { profileImageInclude, tagsInclude } from '@/db/includes/profileIncludes';
 
 
 export class MatchQueryService {
@@ -29,7 +29,8 @@ export class MatchQueryService {
         ...blocklistWhereClause(profileId), // shared with blocklistWhereClause.ts
       },
       include: {
-        ...profileCompleteInclude(),
+        ...tagsInclude(),
+        ...profileImageInclude(),
       },
     })
   }
@@ -63,7 +64,8 @@ export class MatchQueryService {
     return prisma.profile.findMany({
       where: where,
       include: {
-        ...profileCompleteInclude(),  // shared with profile.service.ts - where to keep this?
+        ...tagsInclude(),  // shared with profile.service.ts - where to keep this?
+        ...profileImageInclude(),
       }
     })
   }

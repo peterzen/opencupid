@@ -3,7 +3,7 @@ import { prisma } from '../lib/prisma'
 import { Tag } from '@zod/generated'
 import { CreateTagInput } from '@zod/tag/tag.dto'
 import { TagWithTranslations } from '@zod/tag/tag.db'
-import { tagTranslationsInclude, translationWhereClause } from '@/db/includes/tagTranslationsInclude'
+import { tagTranslationsInclude, translationWhereClause } from '@/db/includes/profileIncludes'
 
 
 export class TagService {

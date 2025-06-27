@@ -1,5 +1,5 @@
 import { mapProfileSummary } from '@/api/mappers/profile.mappers'
-import { profileImageInclude } from '@/db/includes/profileCompleteInclude'
+import { profileImageInclude } from '@/db/includes/profileIncludes'
 import { prisma } from '@/lib/prisma'
 import { Prisma } from '@prisma/client'
 import { type LikeEdge } from '@zod/like/like.dto'

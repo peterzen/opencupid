@@ -7,38 +7,16 @@ import {
   OwnerScalarsSchema,
 } from '@zod/profile/profile.dto'
 import { DatingPreferencesDTOSchema, type DatingPreferencesDTO } from '@zod/match/datingPreference.dto'
-import { DbProfile, type DbProfileComplete, DbProfileWithImages, DbProfileWithImagesSchema } from '@zod/profile/profile.db'
+import { DbProfile, type DbProfileWithContext, DbProfileWithImages, DbProfileWithImagesSchema } from '@zod/profile/profile.db'
 import { LocationSchema } from '@zod/dto/location.dto'
 
 import {
   type OwnerProfileImage,
   type PublicProfileImage,
 } from '@zod/profile/profileimage.dto'
-import {  mapProfileTagsTranslated } from './tag.mappers'
+import { mapProfileTagsTranslated } from './tag.mappers'
 import { Profile, ProfileImage } from '@zod/generated'
 import { toOwnerProfileImage, toPublicProfileImage } from './image.mappers'
-
-// export const DbProfileToOwnerProfileTransform = DbProfileWithImagesSchema.transform((db): OwnerProfile => {
-//   const scalars = OwnerScalarsSchema.parse(db)
-//   const tags = mapProfileTags(db.tags)
-//   const images = db.profileImages ? mapProfileImagesToOwner(db.profileImages) : []
-//   const location = LocationSchema.parse(db)
-
-//   const localizedMap = db.localized.reduce((acc, l) => {
-//     if (!acc[l.field]) acc[l.field] = {}
-//     acc[l.field][l.locale] = l.value
-//     return acc
-//   }, {} as Record<string, Record<string, string>>)
-
-//   return {
-//     ...scalars,
-//     introSocialLocalized: localizedMap['introSocial'] || {},
-//     introDatingLocalized: localizedMap['introDating'] || {},
-//     profileImages: images,
-//     location: location,
-//     tags,
-//   }
-// })
 
 
 export function mapDbProfileToOwnerProfile(locale: string, db: DbProfileWithImages): OwnerProfile {
@@ -62,21 +40,6 @@ export function mapDbProfileToOwnerProfile(locale: string, db: DbProfileWithImag
     tags,
   }
 }
-
-
-
-
-export function ownerToPublicProfile(profile: OwnerProfile | null): PublicProfileWithContext | null {
-  if (!profile) return null
-  // const { location, ...rest } = profile
-
-  return {
-    ...profile,
-    conversation: null, // or keep if present
-  }
-}
-
-
 
 
 export function mapProfileToPublic(dbProfile: DbProfileWithImages, hasDatingPermission: boolean, locale: string): PublicProfileWithContext {
@@ -109,14 +72,15 @@ export function mapProfileToPublic(dbProfile: DbProfileWithImages, hasDatingPerm
 }
 
 
-export function mapProfileWithContext(dbProfile: DbProfileComplete, hasDatingPermission: boolean, locale: string): PublicProfileWithContext {
+export function mapProfileWithContext(dbProfile: DbProfileWithContext, hasDatingPermission: boolean, locale: string): PublicProfileWithContext {
 
   const mapped = mapProfileToPublic(dbProfile, hasDatingPermission, locale)
   const conversation = dbProfile.conversationParticipants?.[0]?.conversation ?? null
 
   return {
     ...mapped,
-    conversation: conversation|| null
+    conversation: conversation || null,
+    likeContext: dbProfile.likeContext 
   } as PublicProfileWithContext
 }
 

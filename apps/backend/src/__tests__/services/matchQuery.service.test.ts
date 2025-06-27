@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { createMockPrisma } from '../../test-utils/prisma'
-import { profileCompleteInclude } from '../../db/includes/profileCompleteInclude'
+import { tagsInclude } from '../../db/includes/profileCompleteInclude'
 import { block } from 'sharp'
 import { blocklistWhereClause } from '@/db/includes/blocklistWhereClause'
 
@@ -28,7 +28,7 @@ describe('MatchQueryService.findSocialProfilesFor', () => {
         ...blocklistWhereClause('p1'), // Ensure blocklist is applied
       },
       include: {
-        ...profileCompleteInclude(),
+        ...tagsInclude(),
       },
     })
     expect(res[0].id).toBe('p2')
@@ -88,7 +88,7 @@ describe('MatchQueryService.findMutualMatchesFor', () => {
         ...blocklistWhereClause('p1'), // Ensure blocklist is applied
       },
       include: {
-        ...profileCompleteInclude(),
+        ...tagsInclude(),
       },
     })
     expect(res[0].id).toBe('p2')
@@ -129,7 +129,7 @@ describe('MatchQueryService.findMutualMatchesFor', () => {
         ...blocklistWhereClause('p1'), // Ensure blocklist is applied
       },
       include: {
-        ...profileCompleteInclude(),
+        ...tagsInclude(),
       },
     })
   })

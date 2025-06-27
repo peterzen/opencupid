@@ -23,15 +23,26 @@ export const DbProfileWithImagesSchema = DbProfileSchema.extend({
 })
 export type DbProfileWithImages = z.infer<typeof DbProfileWithImagesSchema>;
 
-export const DbProfileCompleteSchema = DbProfileWithImagesSchema.extend({
+
+
+export const LikeContextSchema = z.object({
+  likedByMe: z.boolean().default(false),
+  likedMe: z.boolean().default(false),
+  isMatch: z.boolean().default(false),
+})
+
+export type LikeContext = z.infer<typeof LikeContextSchema>
+
+export const DbProfileWithContextSchema = DbProfileWithImagesSchema.extend({
   conversationParticipants: z
     .array(ConversationParticipantSchema.extend({
       conversation: ConversationSchema,
     }))
     .default([]),
+  likeContext: LikeContextSchema
 })
 
-export type DbProfileComplete = z.infer<typeof DbProfileCompleteSchema>;
+export type DbProfileWithContext = z.infer<typeof DbProfileWithContextSchema>;
 
 
 export const DbOwnerUpdateScalarsSchema = ProfileSchema.pick({
