@@ -150,7 +150,7 @@ const messageRoutes: FastifyPluginAsync = async fastify => {
 
       // Broadcast the new message to the recipient's WebSocket connections
       const ok = broadcastToProfile(fastify, profileId, {
-        type: 'new_message',
+        type: 'ws:new_message',
         payload: messageDTO,
       })
 
@@ -193,7 +193,7 @@ const messageRoutes: FastifyPluginAsync = async fastify => {
 
       // Broadcast the new message to the recipient's WebSocket connections
       const ok = broadcastToProfile(fastify, convoSummary.partnerProfile.id, {
-        type: 'new_message',
+        type: 'ws:new_message',
         payload: messageDTO,
       })
 

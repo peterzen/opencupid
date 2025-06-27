@@ -13,6 +13,7 @@ import { computed } from 'vue'
 import { useMessageStore } from '@/features/messaging/stores/messageStore'
 import { useProfileStore } from '@/store/profileStore'
 import ProfileImage from '@/features/images/components/ProfileImage.vue'
+import { faCircle } from '@fortawesome/free-solid-svg-icons'
 
 const { t } = useI18n()
 const authStore = useAuthStore()
@@ -40,7 +41,7 @@ function handleLogoutClick() {
           <IconMessage class="svg-icon-lg" />
           <FontAwesomeIcon
             v-if="hasUnreadMessages"
-            icon="fa-solid fa-circle"
+            :icon="faCircle"
             class="text-danger position-absolute top-0 start-55 translate-middle"
             style="font-size: 0.75rem"
           />

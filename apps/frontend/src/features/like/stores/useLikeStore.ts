@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
 import type { LikeEdge } from '@zod/like/like.dto'
 import { api } from '@/lib/api'
+import { bus } from '@/lib/bus'
 
 interface LikeState {
   sent: LikeEdge[]
-  received: LikeEdge[]
   matches: LikeEdge[]
   loading: boolean
 }
@@ -12,24 +12,28 @@ interface LikeState {
 export const useLikeStore = defineStore('like', {
   state: (): LikeState => ({
     sent: [],
-    received: [],
     matches: [],
     loading: false,
   }),
 
   actions: {
+    initialize() {
+    },
+
+    onNewLike(payload: LikeEdge) {
+      // this.received.unshift(payload)
+    },
+
     async fetchLikes() {
       this.loading = true
 
       try {
-        const [sentRes, receivedRes, matchRes] = await Promise.all([
+        const [sentRes,  matchRes] = await Promise.all([
           api.get('/like/sent'),
-          api.get('/like/received'),
           api.get('/like/matches'),
         ])
 
         this.sent = sentRes.data.edges
-        this.received = receivedRes.data.edges
         this.matches = matchRes.data.edges
       } catch (err) {
         console.error('Failed to fetch likes:', err)

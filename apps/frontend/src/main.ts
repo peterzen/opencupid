@@ -59,4 +59,6 @@ import CircleFlags from "vue-circle-flags";
 import "vue-circle-flags/dist/vue-circle-flags.css";
 app.use(CircleFlags)
 
+import '@/lib/websocket' // Initialize WebSocket connection
+
 app.mount('#app')
