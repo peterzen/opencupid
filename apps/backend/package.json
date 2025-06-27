@@ -6,7 +6,7 @@
     "build": "tsup",
     "start": "node dist/main.js",
     "generate": "prisma generate --no-hints",
-    "migrate": "prisma migrate dev",
+    "migrate": "prisma migrate --no-hints dev",
     "seed": "prisma db seed",
     "watch": "tsc-watch",
     "lint": "eslint . --ext .ts",
@@ -16,7 +16,7 @@
     "redis:sessions": "docker compose exec redis  redis-cli KEYS '*'",
     "tags:translate": "ts-node -r tsconfig-paths/register  scripts/translate-tags.ts",
     "db:psql": "docker compose exec db psql -U appuser app",
-    "db:dump": "docker compose exec db pg_dump -U appuser app",
+    "db:dump": "docker compose exec db pg_dump --clean -U appuser app",
     "test": "vitest",
     "test:integration": "vitest --config vitest.integration.config.ts"
   },
