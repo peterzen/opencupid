@@ -13,7 +13,7 @@ import {
   DbProfileWithImages
 } from '@zod/profile/profile.db'
 import { mapToLocalizedUpserts } from '@/api/mappers/profile.mappers'
-import { conversationContextInclude, interactionContextInclude, profileImageInclude, tagsInclude } from '@/db/includes/profileIncludes'
+import { blockedContextInclude, conversationContextInclude, interactionContextInclude, profileImageInclude, tagsInclude } from '@/db/includes/profileIncludes'
 
 
 
@@ -40,28 +40,10 @@ export class ProfileService {
         ...profileImageInclude(),
         ...interactionContextInclude(myProfileId),
         ...conversationContextInclude(myProfileId),
+        ...blockedContextInclude(myProfileId),
       },
     }
-    const result = await prisma.profile.findUnique(query)
-
-    if (!result) return null
-
-    const interactionContext = {
-      likedByMe: result.likesReceived.length > 0,
-      passedByMe: result.likesSent.length > 0,
-      isMatch: result.likesReceived.length > 0 && result.likesSent.length > 0,
-    }
-    // destructure to ensure all expected fields are explicitly present
-    const {
-      likesReceived, // remove from result to avoid schema mismatch
-      likesSent,
-      ...rest
-    } = result
-
-    return {
-      ...rest,
-      interactionContext,
-    } satisfies DbProfileWithContext
+    return await prisma.profile.findUnique(query) 
   }
 
   async getProfileByUserId(userId: string): Promise<Profile | null> {
