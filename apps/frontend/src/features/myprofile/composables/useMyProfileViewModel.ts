@@ -6,11 +6,10 @@ import { type EditFieldProfileFormWithImages } from "@zod/profile/profile.form"
 
 import { useOwnerProfileStore } from "@/features/myprofile/stores/ownerProfileStore"
 
-import { type ViewState } from '../composables/types'
-import { type StoreError } from "@/store/helpers"
+import { type ViewState } from './types'
 
 
-export function useMyProfile(isEditMode: boolean) {
+export function useMyProfileViewModel(isEditMode: boolean) {
 
   const profileStore = useOwnerProfileStore()
   const formData: EditFieldProfileFormWithImages = reactive({} as EditFieldProfileFormWithImages)
@@ -98,6 +97,19 @@ export function useMyProfile(isEditMode: boolean) {
     },
     {}
   )
+
+  // switch to dating scope when editable is turned on,
+  // in order to show all of the fields
+  watch(
+    () => viewState.isEditable,
+    () => {
+      if (viewState.scopes.includes('dating'))
+        viewState.currentScope = 'dating'
+    },
+    {}
+  )
+
+
   return {
     error: profileStore.error,
     isLoading,

@@ -80,10 +80,6 @@ const handleCardClick = async (profileId: string) => {
   })
 }
 
-// const handlePrefsClick = () => {
-//   showModal.value = true
-// }
-
 const handleEditProfileIntent = () => {
   router.push({ name: 'EditProfile' })
 }
@@ -111,15 +107,16 @@ provide('viewerProfile', viewerProfile.value)
 </script>
 
 <template>
-  <main class="container h-100">
+  <main class="w-100">
     <div
       v-if="selectedProfileId"
-      class="profile-view overflow-auto row"
+      class="profile-view overflow-auto position-absolute w-100"
       :class="{ active: selectedProfileId }"
     >
-      <div class="col-12 col-md-6 mx-auto position-relative">
+      <div class="col-12 col-sm-8 mx-auto position-relative h-100 pt-md-3">
         <PublicProfile
           :id="selectedProfileId"
+          class="shadow-lg"
           @intent:back="handleCloseProfileView"
           @intent:message="handleOpenConversation"
           @hidden="(id: string) => handleHidden(id)"
@@ -138,90 +135,116 @@ provide('viewerProfile', viewerProfile.value)
       </template>
     </StoreErrorOverlay>
 
-    <div v-else class="row d-flex justify-content-center h-100" :class="currentScope">
-      <div class="col-12 col-md-6 mx-auto h-100 position-relative overflow-hidden">
-        <div
-          class="h-100 overflow-hidden position-relative d-flex flex-column"
-          :class="{ inactive: selectedProfileId }"
-        >
-          <div class="my-3">
-            <SecondaryNav
-              v-model="currentScope"
-              @edit:datingPrefs="showModal = true"
-              @scope:change="(scope: ProfileScope) => (currentScope = scope)"
-              :prefs-button-disabled="!haveAccess"
-            />
-          </div>
-          <BPlaceholderWrapper :loading="isLoading">
-            <template #loading>
-              <BOverlay
-                show
-                no-spinner
-                no-center
-                :blur="null"
-                bg-color="inherit"
-                class="h-100 overlay"
-                spinner-variant="primary"
-                spinner-type="grow"
-              >
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-4 my-0 overflow-hidden">
-                  <PlaceholdersGrid :howMany="6" :loading="isLoading" />
-                </div>
-                <template #overlay>
-                  <div
-                    v-if="!isLoading"
-                    class="h-100 w-100 d-flex flex-column align-items-center justify-content-center p-2"
-                  >
-                    <NoAccessCTA
-                      v-if="!haveAccess"
-                      v-model="currentScope"
-                      @edit:profile="handleEditProfileIntent"
-                    />
-                    <NoResultsCTA v-else-if="!haveResults" />
+    <div
+      v-else
+      class="grid-view d-flex flex-column justify-content-center"
+      :class="[currentScope, { inactive: selectedProfileId }]"
+    >
+      <div class="col-12 col-sm-8 mx-auto my-2">
+        <div class="container d-flex flex-column">
+          <SecondaryNav
+            v-model="currentScope"
+            @edit:datingPrefs="showModal = true"
+            @scope:change="(scope: ProfileScope) => (currentScope = scope)"
+            :prefs-button-disabled="!haveAccess"
+          />
+        </div>
+      </div>
+      <div class="overflow-auto">
+        <div class="col-12 col-sm-8 mx-auto h-100">
+          <div class="container d-flex flex-column">
+            <BPlaceholderWrapper :loading="isLoading">
+              <template #loading>
+                <BOverlay
+                  show
+                  no-spinner
+                  no-center
+                  :blur="null"
+                  bg-color="inherit"
+                  class="h-100 overlay"
+                  spinner-variant="primary"
+                  spinner-type="grow"
+                >
+                  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-4 my-0 overflow-hidden">
+                    <PlaceholdersGrid :howMany="6" :loading="isLoading" />
                   </div>
-                </template>
-              </BOverlay>
-            </template>
+                  <template #overlay>
+                    <div
+                      v-if="!isLoading"
+                      class="h-100 w-100 d-flex flex-column align-items-center justify-content-center p-2"
+                    >
+                      <NoAccessCTA
+                        v-if="!haveAccess"
+                        v-model="currentScope"
+                        @edit:profile="handleEditProfileIntent"
+                      />
+                      <NoResultsCTA v-else-if="!haveResults" />
+                    </div>
+                  </template>
+                </BOverlay>
+              </template>
 
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-4 my-0 overflow-auto h-100">
-              <ProfileCardGrid :profiles="profileList" @profile:select="handleCardClick" />
-            </div>
-          </BPlaceholderWrapper>
+              <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-4 my-0">
+                <ProfileCardGrid :profiles="profileList" @profile:select="handleCardClick" />
+              </div>
+            </BPlaceholderWrapper>
 
-          <BModal
-            v-model="showModal"
-            centered
-            button-size="sm"
-            :focus="false"
-            :no-close-on-backdrop="true"
-            fullscreen="sm"
-            :no-footer="false"
-            :no-header="true"
-            cancel-title="Nevermind"
-            initial-animation
-            :body-scrolling="false"
-            title="Add a photo"
-            @ok="updateDatingPrefs"
-          >
-            <DatingPreferencesForm v-model="datingPrefs" v-if="datingPrefs" />
-          </BModal>
+            <BModal
+              v-model="showModal"
+              centered
+              button-size="sm"
+              :focus="false"
+              :no-close-on-backdrop="true"
+              fullscreen="sm"
+              :no-footer="false"
+              :no-header="true"
+              cancel-title="Nevermind"
+              initial-animation
+              :body-scrolling="false"
+              title="Add a photo"
+              @ok="updateDatingPrefs"
+            >
+              <DatingPreferencesForm v-model="datingPrefs" v-if="datingPrefs" />
+            </BModal>
+          </div>
         </div>
       </div>
     </div>
   </main>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins';
+@import '@/css/app-vars.scss';
+
 .profile-view {
-  position: absolute;
   top: 0;
   left: 0;
-  z-index: 1035;
-  height: 100%;
-  width: 100%;
+  // nav.fixed is on 1030 - on screens < md we put this above the navbar
+  z-index: 1050;
+  height: 100vh;
+
+  @include media-breakpoint-up(sm) {
+    // on screens > sm navbar stays visible
+    top: $navbar-height;
+    height: calc(100vh - $navbar-height);
+    z-index: 900;
+  }
 }
+
+.grid-view {
+  height: calc(100vh - $navbar-height);
+}
+
 .inactive {
   pointer-events: none;
   visibility: hidden;
+  display: none;
+}
+main {
+  width: 100%;
+  // height: 100vh;
 }
 </style>

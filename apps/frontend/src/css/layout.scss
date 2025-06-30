@@ -1,0 +1,13 @@
+@import '@/css/app-vars.scss';
+
+body {
+  overflow: hidden;
+  height: 101vh;
+}
+
+main {
+  padding-top: $navbar-height;
+    height: calc(100vh - $navbar-height);
+
+  flex-grow: 1;
+}

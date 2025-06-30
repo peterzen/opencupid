@@ -80,7 +80,9 @@ function handleLogoutClick() {
   </BNavbar>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
+@import '@/css/app-vars.scss';
+
 :deep(.nav-link .label) {
   vertical-align: sub;
   margin-left: 0.25rem;
@@ -102,6 +104,6 @@ function handleLogoutClick() {
   padding: 0 !important;
 }
 .navbar {
-  height: 4rem;
+  height: $navbar-height;
 }
 </style>

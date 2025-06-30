@@ -7,10 +7,11 @@ import IconSocialize from '@/assets/icons/app/socialize.svg'
 
 import StoreErrorOverlay from '@/features/shared/ui/StoreErrorOverlay.vue'
 import EditButton from '@/features/myprofile/components/EditButton.vue'
+import ProfileContent from '@/features/publicprofile/components/ProfileContent.vue'
+
+import { useMyProfileViewModel } from '../composables/useMyProfileViewModel'
 import DatingWizard from '../../onboarding/components/DatingWizard.vue'
 import MyProfileSecondaryNav from '../components/MyProfileSecondaryNav.vue'
-import PublicProfileComponent from '@/features/publicprofile/components/ProfileContent.vue'
-import { useMyProfile } from '../composables/useMyProfile'
 import EditableFields from '../components/EditableFields.vue'
 
 const router = useRouter()
@@ -31,7 +32,7 @@ const {
   initialize,
   updateScopes,
   updateProfile,
-} = useMyProfile(props.editMode)
+} = useMyProfileViewModel(props.editMode)
 
 const isDatingWizardActive = ref(false)
 const toggleDating = async () => {
@@ -74,13 +75,16 @@ provide('isOwner', true)
 </script>
 
 <template>
-  <main class="container" :class="[viewState.currentScope, { editable: viewState.isEditable }]">
+  <main class="w-100" :class="[viewState.currentScope, { editable: viewState.isEditable }]">
     <EditableFields v-model="formData" :editState="viewState.isEditable" @updated="updateProfile">
       <StoreErrorOverlay v-if="error" :error />
-      <div v-else class="row justify-content-center mt-3">
-        <div class="col-12 col-md-8 col-lg-6 position-relative user-select-none">
-          <div class="d-flex flex-row justify-content-between align-items-center mb-2">
-            <div style="height: 3rem" class="w-100">
+      <div v-else class="d-flex flex-column justify-content-center h-100">
+        <div class="col-12 col-sm-8 mx-auto position-relative">
+          <div class="d-flex flex-row justify-content-between align-items-center my-2">
+            <div
+              style="height: 3rem"
+              class="w-100 d-flex align-items-center justify-content-center"
+            >
               <div v-if="viewState.isEditable" class="d-flex">
                 <span
                   class="btn-social-toggle px-4 py-1 rounded-4 me-2"
@@ -102,19 +106,23 @@ provide('isOwner', true)
               </div>
             </div>
           </div>
-          <div class="main-edit-button">
-            <EditButton v-model="viewState.isEditable" />
+        </div>
+        <div class="overflow-auto h-100">
+          <div class="col-12 col-sm-8 mx-auto position-relative h-100">
+            <ProfileContent
+              v-if="profilePreview"
+              :isLoading="isLoading"
+              @intent:field:edit="showModal = true"
+              class="shadow-lg"
+              :profile="profilePreview"
+            />
           </div>
-          <PublicProfileComponent
-            v-if="profilePreview"
-            :isLoading="isLoading"
-            @intent:field:edit="showModal = true"
-            :profile="profilePreview"
-          />
         </div>
       </div>
+      <div class="main-edit-button">
+        <EditButton v-model="viewState.isEditable" />
+      </div>
     </EditableFields>
-
     <BModal
       title=""
       v-if="isDatingWizardActive"
