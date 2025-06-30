@@ -33,3 +33,6 @@ $theme-colors: map-merge($theme-colors,    (
 
 $aspect-ratios: map-merge($aspect-ratios, 
 ("3x4": calc(4 / 3 * 100%)));
+
+// Enable negative margins for Bootstrap
+$enable-negative-margins: true;
