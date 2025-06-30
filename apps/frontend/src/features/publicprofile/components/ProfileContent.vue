@@ -2,7 +2,7 @@
 import { inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { OwnerProfile, type PublicProfileWithContext } from '@zod/profile/profile.dto'
+import { type OwnerProfile, type PublicProfileWithContext } from '@zod/profile/profile.dto'
 
 import ImageCarousel from './ImageCarousel.vue'
 import IconPhoto from '@/assets/icons/interface/photo.svg'
