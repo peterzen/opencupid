@@ -37,7 +37,7 @@ const handleBlock = async () => {
   const ok = await blockProfile()
   showModal.value = false
   if (ok) {
-    toast('Successfully blocked profile')
+    toast.warning("You won't see them again.")
   }
   emit('hidden', profile.value.id)
 }

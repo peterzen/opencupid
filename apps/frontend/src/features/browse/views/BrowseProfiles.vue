@@ -98,6 +98,12 @@ const handleOpenConversation = (conversationId: string) => {
     params: { conversationId },
   })
 }
+
+const handleHidden = (id: string) => {
+  hideProfile(id)
+  selectedProfileId.value = null
+  canGoBack.value = false
+}
 </script>
 
 <template>
@@ -112,7 +118,7 @@ const handleOpenConversation = (conversationId: string) => {
         :id="selectedProfileId"
         @intent:back="handleCloseProfileView"
         @intent:message="handleOpenConversation"
-        @hidden="(id: string) => hideProfile(id)"
+        @hidden="(id: string) => handleHidden(id)"
       />
     </div>
     <StoreErrorOverlay v-if="storeError" :error="storeError">
