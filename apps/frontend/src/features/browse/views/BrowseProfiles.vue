@@ -109,9 +109,8 @@ const handleHidden = (id: string) => {
 <template>
   <main class="container h-100">
     <div
-      id="profile-view"
       v-if="selectedProfileId"
-      class="overflow-auto"
+      class="profile-view overflow-auto"
       :class="{ active: selectedProfileId }"
     >
       <PublicProfile
@@ -207,7 +206,7 @@ const handleHidden = (id: string) => {
 </template>
 
 <style scoped>
-#profile-view {
+.profile-view {
   position: absolute;
   top: 0;
   left: 0;
