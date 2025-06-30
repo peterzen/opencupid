@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import IconArrowSingleLeft from '@/assets/icons/arrows/arrow-single-left.svg'
+
+
 defineProps<{
   show: boolean
 }>()
@@ -17,6 +20,6 @@ defineEmits<{
     class="d-flex align-items-center mt-2"
     size="lg"
   >
-    <FontAwesomeIcon icon="fa-solid fa-chevron-left" class="" />
+  <IconArrowSingleLeft class="svg-icon-lg" />
   </BButton>
 </template>

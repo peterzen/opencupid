@@ -11,7 +11,7 @@ import DatingSteps from '../components/DatingSteps.vue'
 import LocationSelectorComponent from '@/features/shared/profileform/LocationSelector.vue'
 import GoalsSelector from './GoalsSelector.vue'
 import BackButton from '../components/BackButton.vue'
-
+import PublicNameInput from '@/features/shared/profileform/PublicNameInput.vue'
 import { useStepper } from '@vueuse/core'
 
 import { useWizardSteps } from '@/features/onboarding/composables/useWizardSteps'

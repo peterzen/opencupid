@@ -72,6 +72,7 @@ onMounted(async () => {
 })
 
 provide('isOwner', true)
+provide('viewerProfile', formData)
 </script>
 
 <template>
