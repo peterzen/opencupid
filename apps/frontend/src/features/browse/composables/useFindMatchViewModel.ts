@@ -20,7 +20,6 @@ export function useFindMatchViewModel() {
 
   const initialize = async (defaultScope?: ProfileScope) => {
 
-    console.log('Initializing FindMatchViewModel with defaultScope:', defaultScope)
     const meRes = await ownerStore.fetchOwnerProfile()
     if (!meRes.success) {
       storeError.value = meRes
@@ -37,15 +36,22 @@ export function useFindMatchViewModel() {
 
   const fetchResults = async () => {
     switch (currentScope.value) {
-      case 'social':
-        await findProfileStore.findSocial()
+      case 'social': {
+        const res = await findProfileStore.findSocial()
+        if (!res.success) {
+          storeError.value = res
+          return
+        }
         break
-      case 'dating':
+      }
+      case 'dating': {
         await findProfileStore.findDating()
         break
-      default:
+      }
+      default: {
         console.warn('No valid scope selected, cannot fetch results')
         return
+      }
     }
   }
 
@@ -73,21 +79,19 @@ export function useFindMatchViewModel() {
   const viewerProfile = computed(() => ownerStore.profile)
 
   const haveAccess = computed(() => {
-    if (!viewerProfile.value) return false // Ensure me is loaded
-    if (currentScope.value === 'social') {
-      return viewerProfile.value.isSocialActive
-    } else if (currentScope.value === 'dating') {
-      return viewerProfile.value.isDatingActive
+    if (!viewerProfile.value) return false // Ensure viewerProfile is loaded
+    switch(currentScope.value) {
+      case 'social':
+        return viewerProfile.value.isSocialActive
+      case 'dating':
+        return viewerProfile.value.isDatingActive
+      default:
+        return false
     }
-    return false
   })
 
   const haveResults = computed(() => {
     return findProfileStore.profileList.length > 0 && haveAccess.value
-  })
-
-  const isLoading = computed(() => {
-    return findProfileStore.isLoading
   })
 
   const hideProfile = (profileId: string) => {
@@ -115,12 +119,12 @@ export function useFindMatchViewModel() {
     viewerProfile,
     haveResults,
     haveAccess,
-    isLoading,
+    isLoading: computed(() => findProfileStore.isLoading),
     storeError,
     initialize,
     hideProfile,
     reset,
-    availableScopes: ownerStore.scopes,
+    availableScopes: computed(() => ownerStore.scopes),
     currentScope,
     selectedProfileId,
     datingPrefs: toRef(ownerStore, 'datingPrefs'),

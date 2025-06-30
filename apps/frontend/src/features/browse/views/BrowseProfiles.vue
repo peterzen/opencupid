@@ -5,6 +5,8 @@ import { onMounted, onUnmounted, provide, ref } from 'vue'
 
 import { type ProfileScope, ProfileScopeSchema } from '@zod/profile/profile.dto'
 
+import PublicProfile from '@/features/publicprofile/components/PublicProfile.vue'
+
 import { useFindMatchViewModel } from '../composables/useFindMatchViewModel'
 import DatingPreferencesForm from '../components/DatingPreferencesForm.vue'
 import SecondaryNav from '../components/SecondaryNav.vue'
@@ -12,8 +14,7 @@ import ProfileCardGrid from '../components/ProfileCardGrid.vue'
 import NoAccessCTA from '../components/NoAccessCTA.vue'
 import NoResultsCTA from '../components/NoResultsCTA.vue'
 import PlaceholdersGrid from '../components/PlaceholdersGrid.vue'
-import PublicProfile from '@/features/publicprofile/components/PublicProfile.vue'
-
+import MiddleColumn from '../components/MiddleColumn.vue'
 import StoreErrorOverlay from '@/features/shared/ui/StoreErrorOverlay.vue'
 
 const router = useRouter()
@@ -110,37 +111,27 @@ provide('viewerProfile', viewerProfile.value)
   <main class="w-100">
     <div
       v-if="selectedProfileId"
-      class="profile-view overflow-auto position-absolute w-100"
+      class="profile-view position-absolute w-100"
       :class="{ active: selectedProfileId }"
     >
-      <div class="col-12 col-sm-8 mx-auto position-relative h-100 pt-md-3">
-        <PublicProfile
-          :id="selectedProfileId"
-          class="shadow-lg"
-          @intent:back="handleCloseProfileView"
-          @intent:message="handleOpenConversation"
-          @hidden="(id: string) => handleHidden(id)"
-        />
+      <div class="overflow-auto h-100">
+        <MiddleColumn class="pt-md-3 position-relative pb-5">
+          <PublicProfile
+            :id="selectedProfileId"
+            class="shadow-lg"
+            @intent:back="handleCloseProfileView"
+            @intent:message="handleOpenConversation"
+            @hidden="(id: string) => handleHidden(id)"
+          />
+        </MiddleColumn>
       </div>
     </div>
-    <StoreErrorOverlay v-if="storeError" :error="storeError">
-      <template #default="{ error }">
-        <BButton
-          v-if="error.status"
-          variant="primary"
-          @click="$router.push({ name: 'BrowseProfiles' })"
-        >
-          Keep browsing though!
-        </BButton>
-      </template>
-    </StoreErrorOverlay>
 
     <div
-      v-else
-      class="grid-view d-flex flex-column justify-content-center"
+      class="grid-view d-flex flex-column justify-content-start"
       :class="[currentScope, { inactive: selectedProfileId }]"
     >
-      <div class="col-12 col-sm-8 mx-auto my-2">
+      <MiddleColumn class="my-2">
         <div class="container d-flex flex-column">
           <SecondaryNav
             v-model="currentScope"
@@ -149,66 +140,90 @@ provide('viewerProfile', viewerProfile.value)
             :prefs-button-disabled="!haveAccess"
           />
         </div>
-      </div>
-      <div class="overflow-auto">
-        <div class="col-12 col-sm-8 mx-auto h-100">
-          <div class="container d-flex flex-column">
-            <BPlaceholderWrapper :loading="isLoading">
-              <template #loading>
-                <BOverlay
-                  show
-                  no-spinner
-                  no-center
-                  :blur="null"
-                  bg-color="inherit"
-                  class="h-100 overlay"
-                  spinner-variant="primary"
-                  spinner-type="grow"
+      </MiddleColumn>
+      <BPlaceholderWrapper :loading="isLoading">
+        <template #loading>
+          <BOverlay
+            show
+            no-spinner
+            no-center
+            :blur="null"
+            bg-color="inherit"
+            class="h-100 overlay"
+            spinner-variant="primary"
+            spinner-type="grow"
+          >
+            <!-- Placeholders while loading -->
+            <MiddleColumn class="overflow-hidden">
+              <PlaceholdersGrid :howMany="6" :loading="true" />
+            </MiddleColumn>
+          </BOverlay>
+        </template>
+
+        <!-- After loading -->
+        <template v-if="!haveAccess || !haveResults">
+          <BOverlay show no-spinner no-center :blur="null" bg-color="inherit" class="h-100 overlay">
+            <!-- Keep placeholders in background -->
+            <MiddleColumn class="overflow-hidden">
+              <PlaceholdersGrid :howMany="6" :loading="false" />
+            </MiddleColumn>
+
+            <!-- CTA overlay -->
+            <template #overlay>
+              <MiddleColumn class="h-100">
+                <div
+                  class="h-100 w-100 d-flex flex-column align-items-center justify-content-center p-2"
                 >
-                  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-4 my-0 overflow-hidden">
-                    <PlaceholdersGrid :howMany="6" :loading="isLoading" />
-                  </div>
-                  <template #overlay>
-                    <div
-                      v-if="!isLoading"
-                      class="h-100 w-100 d-flex flex-column align-items-center justify-content-center p-2"
-                    >
-                      <NoAccessCTA
-                        v-if="!haveAccess"
-                        v-model="currentScope"
-                        @edit:profile="handleEditProfileIntent"
-                      />
-                      <NoResultsCTA v-else-if="!haveResults" />
-                    </div>
-                  </template>
-                </BOverlay>
-              </template>
+                  <NoAccessCTA
+                    v-if="!haveAccess"
+                    v-model="currentScope"
+                    @edit:profile="handleEditProfileIntent"
+                  />
+                  <NoResultsCTA v-else-if="!haveResults" />
+                  <!-- <StoreErrorOverlay v-else-if="storeError" :error="storeError">
+                    <template #default="{ error }">
+                      <BButton
+                        v-if="error.status"
+                        variant="primary"
+                        @click="$router.push({ name: 'BrowseProfiles' })"
+                      >
+                        Keep browsing though!
+                      </BButton>
+                    </template>
+                  </StoreErrorOverlay> -->
+                </div>
+              </MiddleColumn>
+            </template>
+          </BOverlay>
+        </template>
 
-              <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-4 my-0">
-                <ProfileCardGrid :profiles="profileList" @profile:select="handleCardClick" />
-              </div>
-            </BPlaceholderWrapper>
-
-            <BModal
-              v-model="showModal"
-              centered
-              button-size="sm"
-              :focus="false"
-              :no-close-on-backdrop="true"
-              fullscreen="sm"
-              :no-footer="false"
-              :no-header="true"
-              cancel-title="Nevermind"
-              initial-animation
-              :body-scrolling="false"
-              title="Add a photo"
-              @ok="updateDatingPrefs"
-            >
-              <DatingPreferencesForm v-model="datingPrefs" v-if="datingPrefs" />
-            </BModal>
+        <!-- Main profile results -->
+        <template v-else>
+          <div class="overflow-auto">
+            <MiddleColumn>
+              <ProfileCardGrid :profiles="profileList" @profile:select="handleCardClick" />
+            </MiddleColumn>
           </div>
-        </div>
-      </div>
+        </template>
+      </BPlaceholderWrapper>
+
+      <BModal
+        v-model="showModal"
+        centered
+        button-size="sm"
+        :focus="false"
+        :no-close-on-backdrop="true"
+        fullscreen="sm"
+        :no-footer="false"
+        :no-header="true"
+        cancel-title="Nevermind"
+        initial-animation
+        :body-scrolling="false"
+        title="Add a photo"
+        @ok="updateDatingPrefs"
+      >
+        <DatingPreferencesForm v-model="datingPrefs" v-if="datingPrefs" />
+      </BModal>
     </div>
   </main>
 </template>

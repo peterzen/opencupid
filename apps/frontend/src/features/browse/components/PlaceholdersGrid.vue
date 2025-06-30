@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { BContainer, BRow } from 'bootstrap-vue-next'
+
 const props = withDefaults(
   defineProps<{
     howMany: number
@@ -11,15 +13,19 @@ const props = withDefaults(
 </script>
 
 <template>
-  <div v-for="n in howMany" :key="n" class="col">
-    <BPlaceholderCard
-      no-footer
-      no-button
-      no-header
-      size="sm"
-      :animation="loading ? 'glow' : undefined"
-    />
-  </div>
+  <BContainer>
+    <BRow cols="1" cols-sm="2">
+      <BCol v-for="n in howMany" :key="n" class="col">
+        <BPlaceholderCard
+          no-footer
+          no-button
+          no-header
+          size="sm"
+          :animation="loading ? 'glow' : undefined"
+        />
+      </BCol>
+    </BRow>
+  </BContainer>
 </template>
 
 <style scoped>

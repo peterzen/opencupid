@@ -12,7 +12,11 @@ defineEmits<{
 </script>
 
 <template>
-  <div v-for="profile in profiles" :key="profile.id" class="col">
-    <ProfileCardComponent :profile @click="$emit('profile:select', profile.id)" />
-  </div>
+  <BContainer>
+    <BRow cols="1" cols-sm="2" gutter-y="4">
+      <BCol v-for="profile in profiles" :key="profile.id" class="col">
+        <ProfileCardComponent :profile @click="$emit('profile:select', profile.id)" />
+      </BCol>
+    </BRow>
+  </BContainer>
 </template>

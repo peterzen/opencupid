@@ -34,7 +34,7 @@ const viewerLocation = viewerProfile?.location
 </script>
 
 <template>
-  <div v-bind:class="props.wrapperClass" class="profile-content position-relative">
+  <div v-bind:class="props.wrapperClass" class="profile-content position-relative rounded-top overflow-hidden">
     <div class="overflow-hidden carousel-wrapper">
       <ImageCarousel :profile />
     </div>
