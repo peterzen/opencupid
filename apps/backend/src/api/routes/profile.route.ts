@@ -215,8 +215,6 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
         return profile
       })
 
-      // Clear session to force re-fetch on next request, we need the roles updated
-      await req.deleteSession()
       const response: UpdateProfileResponse = { success: true, profile: updated }
       return reply.code(200).send(response)
     } catch (err) {
@@ -282,6 +280,7 @@ const profileRoutes: FastifyPluginAsync = async fastify => {
     try {
       const updated = await profileService.updateScopes(req.user.userId, data)
       if (!updated) return sendError(reply, 404, 'Profile not found')
+      // Clear session to force re-fetch on next request, we need the roles updated
       await req.deleteSession()
 
       const profile = mapDbProfileToOwnerProfile(locale, updated)
