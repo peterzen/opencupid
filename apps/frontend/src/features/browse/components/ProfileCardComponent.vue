@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { PublicProfile } from '@zod/profile/profile.dto'
+import { inject } from 'vue'
+import type { OwnerProfile, PublicProfile } from '@zod/profile/profile.dto'
 import ProfileImage from '@/features/images/components/ProfileImage.vue'
 import TagList from '@/features/shared/profiledisplay/TagList.vue'
 import LocationLabel from '@/features/shared/profiledisplay/LocationLabel.vue'
@@ -7,6 +8,9 @@ import LocationLabel from '@/features/shared/profiledisplay/LocationLabel.vue'
 defineProps<{
   profile: PublicProfile
 }>()
+
+const viewerProfile = inject('viewerProfile') as OwnerProfile
+const viewerLocation = viewerProfile?.location
 </script>
 
 <template>
@@ -21,7 +25,12 @@ defineProps<{
       <div class="card-title mb-0 pb-0 d-flex align-items-center justify-content-between flex-row">
         <h5 class="flex-grow-1 fw-bold m-0">{{ profile.publicName }}</h5>
         <small>
-          <LocationLabel :location="profile.location" :showCity="false" :showCountryLabel="false" />
+          <LocationLabel
+            :viewerLocation="viewerLocation"
+            :location="profile.location"
+            :showCountryLabel="false"
+            :showCity="false"
+          />
         </small>
       </div>
       <div class="p-2 flex-grow-1">

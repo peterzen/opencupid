@@ -14,8 +14,6 @@ export function useFindMatchViewModel() {
   const ownerStore = useOwnerProfileStore()
   const findProfileStore = useFindProfileStore()
 
-  const me = computed(() => ownerStore.profile)
-
   const storeError = ref<StoreError | null>(null)
   const currentScope = ref(null as ProfileScope | null)
   const selectedProfileId = ref<string | null>(null)
@@ -28,7 +26,7 @@ export function useFindMatchViewModel() {
       storeError.value = meRes
       return
     }
-    if (!me.value)
+    if (!ownerStore.profile)
       throw new Error('Owner profile is not loaded')
 
     await ownerStore.fetchDatingPrefs()
@@ -72,13 +70,14 @@ export function useFindMatchViewModel() {
     })
   })
 
+  const viewerProfile = computed(() => ownerStore.profile)
 
   const haveAccess = computed(() => {
-    if (!me.value) return false // Ensure me is loaded
+    if (!viewerProfile.value) return false // Ensure me is loaded
     if (currentScope.value === 'social') {
-      return me.value.isSocialActive
+      return viewerProfile.value.isSocialActive
     } else if (currentScope.value === 'dating') {
-      return me.value.isDatingActive
+      return viewerProfile.value.isDatingActive
     }
     return false
   })
@@ -113,6 +112,7 @@ export function useFindMatchViewModel() {
   }
 
   return {
+    viewerProfile,
     haveResults,
     haveAccess,
     isLoading,

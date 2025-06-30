@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import z from 'zod'
 import { useRouter } from 'vue-router'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, provide, ref } from 'vue'
 
 import { type ProfileScope, ProfileScopeSchema } from '@zod/profile/profile.dto'
 
@@ -28,6 +28,7 @@ const showModal = ref(false)
 const canGoBack = ref(false)
 
 const {
+  viewerProfile,
   haveAccess,
   haveResults,
   isLoading,
@@ -104,21 +105,26 @@ const handleHidden = (id: string) => {
   selectedProfileId.value = null
   canGoBack.value = false
 }
+
+// Provide the me object (current user's profile) to child components
+provide('viewerProfile', viewerProfile.value)
 </script>
 
 <template>
   <main class="container h-100">
     <div
       v-if="selectedProfileId"
-      class="profile-view overflow-auto"
+      class="profile-view overflow-auto row"
       :class="{ active: selectedProfileId }"
     >
-      <PublicProfile
-        :id="selectedProfileId"
-        @intent:back="handleCloseProfileView"
-        @intent:message="handleOpenConversation"
-        @hidden="(id: string) => handleHidden(id)"
-      />
+      <div class="col-12 col-md-6 mx-auto position-relative">
+        <PublicProfile
+          :id="selectedProfileId"
+          @intent:back="handleCloseProfileView"
+          @intent:message="handleOpenConversation"
+          @hidden="(id: string) => handleHidden(id)"
+        />
+      </div>
     </div>
     <StoreErrorOverlay v-if="storeError" :error="storeError">
       <template #default="{ error }">

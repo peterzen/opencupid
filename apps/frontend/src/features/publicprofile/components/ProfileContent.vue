@@ -1,7 +1,8 @@
 <script lang="ts" setup>
+import { inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { type PublicProfileWithContext } from '@zod/profile/profile.dto'
+import { OwnerProfile, type PublicProfileWithContext } from '@zod/profile/profile.dto'
 
 import ImageCarousel from './ImageCarousel.vue'
 import IconPhoto from '@/assets/icons/interface/photo.svg'
@@ -26,6 +27,10 @@ const props = defineProps<{
   isLoading: boolean
   wrapperClass?: string
 }>()
+
+const viewerProfile = inject('viewerProfile') as OwnerProfile
+console.log('viewerProfile', viewerProfile)
+const viewerLocation = viewerProfile?.location
 </script>
 
 <template>
@@ -59,10 +64,11 @@ const props = defineProps<{
       <div class="mb-2 text-muted d-inline-flex align-items-center">
         <span class="me-1">
           <LocationLabel
+            :viewerLocation="viewerLocation"
             :location="profile.location"
             :showCity="true"
             :showCountryLabel="true"
-            :showIcon="false"
+            :showCountryIcon="false"
           />
         </span>
         <EditField fieldName="location" :editComponent="LocationSelector" />
