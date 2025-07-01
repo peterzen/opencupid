@@ -4,9 +4,15 @@ import { useI18n } from 'vue-i18n'
 import IconConfusedEmoji from '@/assets/icons/emojis/confused-emoji.svg'
 import { type StoreError } from '@/store/helpers'
 
-defineProps<{
-  error: StoreError | null
-}>()
+withDefaults(
+  defineProps<{
+    error: StoreError | null
+    showIcon?: boolean
+  }>(),
+  {
+    showIcon: true,
+  }
+)
 
 const { t } = useI18n()
 </script>

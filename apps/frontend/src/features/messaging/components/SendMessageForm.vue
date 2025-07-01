@@ -9,8 +9,10 @@ import { type PublicProfileWithContext } from '@zod/profile/profile.dto'
 
 import TagList from '@/features/shared/profiledisplay/TagList.vue'
 import LanguageList from '@/features/shared/profiledisplay/LanguageList.vue'
+import StoreErrorOverlay from '@/features/shared/ui/StoreErrorOverlay.vue'
+import { useMessageStore } from '../stores/messageStore'
 
-import { useMessaging } from '../composables/useMessaging'
+const messageStore = useMessageStore()
 
 const props = defineProps<{
   recipientProfile: PublicProfileWithContext
@@ -22,8 +24,6 @@ const emit = defineEmits<{
 }>()
 
 const content = ref('')
-
-const { sendMessage, errorMsg } = useMessaging()
 
 // Local store for managing message drafts
 const localStore = useLocalStore()
@@ -58,15 +58,12 @@ defineExpose({
 async function handleSendMessage() {
   const trimmedContent = content.value.trim()
   if (trimmedContent === '') return
-  const result = await sendMessage(props.recipientProfile.id, trimmedContent)
+  const result = await messageStore.sendMessage(props.recipientProfile.id, trimmedContent)
   if (result.success) {
     console.log('Message sent successfully:', result.data)
     emit('message:sent', result.data!)
     content.value = '' // Clear the input after sending
     localStore.setMessageDraft(props.recipientProfile.id, '') // Clear the draft in local store
-  } else {
-    console.error('Failed to send message:', result.message)
-    errorMsg.value = result.message || 'Message not sent' // TODO i18n doesn't work in composables, this must be moved to parent
     return
   }
 }
@@ -74,6 +71,8 @@ async function handleSendMessage() {
 
 <template>
   <div class="send-message-wrapper w-100">
+    <StoreErrorOverlay v-if="messageStore.error" :error="messageStore.error" />
+
     <div class="mb-2">
       <div class="mb-2 opacity-50">
         <div class="d-inline-block">

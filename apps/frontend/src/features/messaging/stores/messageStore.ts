@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { defineStore, type Store } from 'pinia'
 
 import { api } from '@/lib/api'
 import { bus } from '@/lib/bus'
@@ -25,6 +25,8 @@ type MessageStoreState = {
   activeConversation: ConversationSummary | null,
   hasUnreadMessages: boolean,
   isSending: boolean,
+  isLoading: boolean,
+  error: StoreError | null,
 }
 
 export const useMessageStore = defineStore('message', {
@@ -35,6 +37,8 @@ export const useMessageStore = defineStore('message', {
     activeConversation: null as ConversationSummary | null,
     hasUnreadMessages: false,
     isSending: false,
+    isLoading: false,
+    error: null,
   }),
 
   actions: {
@@ -84,7 +88,9 @@ export const useMessageStore = defineStore('message', {
 
     async fetchMessagesForConversation(conversationId: string): Promise<MessageInConversation[]> {
       try {
-        console.log('Fetching messages for conversation:', conversationId)
+        // console.log('Fetching messages for conversation:', conversationId)
+        this.isLoading = true // Set loading state
+        this.error = null // Reset error state
         const res = await api.get<MessagesResponse>(`/messages/${conversationId}`)
         console.log('Fetched messages:', res.data)
         if (res.data.success) {
@@ -92,22 +98,28 @@ export const useMessageStore = defineStore('message', {
           return res.data.messages
         }
       } catch (error: any) {
-        console.error('Failed to fetch messages:', error)
+        this.error = storeError(error)
         this.messages = []
+      } finally {
+        this.isLoading = false // Reset loading state
       }
       return []
     },
 
     async fetchConversations(): Promise<ConversationSummary[]> {
       try {
+        this.isLoading = true
+        this.error = null
         const res = await api.get<ConversationsResponse>('/messages/conversations')
         if (res.data.success) {
           this.conversations = res.data.conversations
           this.updateUnreadFlag()
         }
       } catch (error: any) {
-        console.error('Failed to fetch conversations:', error)
+        this.error = storeError(error)
         this.conversations = []
+      } finally {
+        this.isLoading = false // Reset loading state
       }
       return this.conversations
     },
@@ -123,19 +135,7 @@ export const useMessageStore = defineStore('message', {
       } catch (error: any) {
         console.error('Failed to mark conversation as read:', error)
       }
-      // await this.fetchUnreadCount()
     },
-
-    // async sendOrInitiate(recipientId: string, content: string) {
-    //   if (conversationId) {
-    //     // If conversationId is provided, use it to send the message
-    //     const sentMessage = await this.sendMessage(conversationId, content)
-    //   } else {
-    //     console.log('No conversationId provided, starting a new conversation...')
-    //     // If no conversationId, create a new conversation and send the message
-    //     await this.initiateConversation(recipientId, content)
-    //   }
-    // },
 
     async sendMessage(
       recipientProfileId: string,
@@ -143,7 +143,8 @@ export const useMessageStore = defineStore('message', {
     ): Promise<StoreResponse<MessageDTO> | StoreError> {
       try {
         const payload: SendMessagePayload = { profileId: recipientProfileId, content }
-        this.isSending = true // Set sending state
+        this.isSending = true
+        this.error = null
         const res = await api.post<SendMessageResponse>(`/messages/message`, payload)
         const { conversation, message } = res.data
         if (!message)
@@ -158,7 +159,8 @@ export const useMessageStore = defineStore('message', {
         }
         return storeSuccess(message)
       } catch (error: any) {
-        return storeError(error)
+        this.error = storeError(error)
+        return this.error
       } finally {
         this.isSending = false // Reset sending state
       }
@@ -196,6 +198,9 @@ export const useMessageStore = defineStore('message', {
       this.messages = []
       this.activeConversation = null
       this.hasUnreadMessages = false
+      this.isSending = false
+      this.isLoading = false
+      this.error = null
     }
 
   },

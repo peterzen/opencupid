@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import z from 'zod'
 import { useRouter } from 'vue-router'
-import { onMounted, onUnmounted, provide, ref } from 'vue'
+import { computed, onMounted, onUnmounted, provide, ref } from 'vue'
 
 import { type ProfileScope, ProfileScopeSchema } from '@zod/profile/profile.dto'
 
@@ -15,7 +15,6 @@ import NoAccessCTA from '../components/NoAccessCTA.vue'
 import NoResultsCTA from '../components/NoResultsCTA.vue'
 import PlaceholdersGrid from '../components/PlaceholdersGrid.vue'
 import MiddleColumn from '../components/MiddleColumn.vue'
-import StoreErrorOverlay from '@/features/shared/ui/StoreErrorOverlay.vue'
 import ReceivedLikesCount from '@/features/interaction/components/ReceivedLikesCount.vue'
 
 const router = useRouter()
@@ -106,18 +105,22 @@ const handleHidden = (id: string) => {
 
 // Provide the me object (current user's profile) to child components
 provide('viewerProfile', viewerProfile.value)
+
+const isDetailView = computed(() => !!selectedProfileId.value)
 </script>
 
 <template>
   <main class="w-100">
+    <!-- this is the container for the detail view -->
     <div
-      v-if="selectedProfileId"
-      class="profile-view position-absolute w-100"
-      :class="{ active: selectedProfileId }"
+      v-if="isDetailView"
+      class="detail-view position-absolute w-100"
+      :class="{ active: isDetailView }"
     >
       <div class="overflow-auto h-100">
         <MiddleColumn class="pt-md-3 position-relative pb-5">
           <PublicProfile
+            v-if="selectedProfileId"
             :id="selectedProfileId"
             class="shadow-lg"
             @intent:back="handleCloseProfileView"
@@ -130,7 +133,7 @@ provide('viewerProfile', viewerProfile.value)
 
     <div
       class="grid-view d-flex flex-column justify-content-start"
-      :class="[currentScope, { inactive: selectedProfileId }]"
+      :class="[currentScope, { inactive: isDetailView }]"
     >
       <MiddleColumn class="my-2">
         <div class="container d-flex flex-column">
@@ -237,7 +240,7 @@ provide('viewerProfile', viewerProfile.value)
 @import 'bootstrap/scss/mixins';
 @import '@/css/app-vars.scss';
 
-.profile-view {
+.detail-view {
   top: 0;
   left: 0;
   // nav.fixed is on 1030 - on screens < md we put this above the navbar

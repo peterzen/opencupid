@@ -18,10 +18,6 @@ const props = defineProps<{
   conversationId?: string
 }>()
 
-const isLoading = ref(false)
-
-const detailVisible = computed(() => !!messageStore.activeConversation && !isLoading.value)
-
 // Watch for changes in conversationId router prop so we can update
 // the active conversation
 watch(
@@ -31,9 +27,7 @@ watch(
       if (!newId) {
         await messageStore.setActiveConversation(null)
       } else {
-        isLoading.value = true
         await messageStore.setActiveConversationById(newId)
-        isLoading.value = false
       }
     }
   },
@@ -41,12 +35,10 @@ watch(
 )
 
 onMounted(async () => {
-  isLoading.value = true
   await messageStore.fetchConversations()
   if (props.conversationId) {
     await messageStore.setActiveConversationById(props.conversationId)
   }
-  isLoading.value = false
 })
 
 onUnmounted(() => {
@@ -58,10 +50,8 @@ const handleSelectConvo = async (convo: ConversationSummary) => {
   if (messageStore.activeConversation?.conversationId === convo.conversationId) {
     return
   }
-  isLoading.value = true
   router.push({ name: 'Messaging', params: { conversationId: convo.conversationId } })
   await messageStore.setActiveConversation(convo)
-  isLoading.value = false
   setTimeout(async () => {
     await messageStore.markAsRead(convo.conversationId)
   }, 2000)
@@ -75,7 +65,12 @@ const handleDeselectConvo = async () => {
 const handleProfileSelect = (profile: ProfileSummary) => {
   router.push({ name: 'PublicProfile', params: { id: profile.id } })
 }
-const t = ref(true)
+
+const haveConversations = computed(() => {
+  return messageStore.conversations.length > 0
+})
+
+const isDetailView = computed(() => !!messageStore.activeConversation && !messageStore.isLoading)
 </script>
 
 <template>
@@ -83,7 +78,7 @@ const t = ref(true)
     <!-- <h1 class="px-3 mb-2" v-if="!detailVisible">{{  $t('messaging.page_title') }}</h1> -->
 
     <BOverlay
-      :show="messageStore.conversations.length === 0"
+      :show="!haveConversations"
       no-spinner
       bg-color="var(--bs-body-bg)"
       :blur="null"
@@ -106,10 +101,10 @@ const t = ref(true)
         </div>
       </template>
       <div class="flex-grow-1 d-flex flex-row overflow-hidden pt-5">
-        <div class="col-12 col-md-4 d-md-block" :class="{ 'd-none': detailVisible }">
+        <div class="col-12 col-md-4 d-md-block" :class="{ 'd-none': isDetailView }">
           <div class="mx-3">
             <ConversationSummaries
-              :loading="isLoading"
+              :loading="messageStore.isLoading"
               :conversations="messageStore.conversations"
               :activeConversation="messageStore.activeConversation"
               @convo:select="handleSelectConvo"
@@ -121,9 +116,9 @@ const t = ref(true)
           </BPlaceholderWrapper> -->
           </div>
         </div>
-        <div class="col-md-8 flex-grow-1 d-flex flex-column overflow-hidden" v-if="detailVisible">
+        <div class="col-md-8 flex-grow-1 d-flex flex-column overflow-hidden" v-if="isDetailView">
           <ConversationDetail
-            :loading="isLoading"
+            :loading="messageStore.isLoading"
             :conversation="messageStore.activeConversation"
             @deselect:convo="handleDeselectConvo"
             @profile:select="handleProfileSelect"
