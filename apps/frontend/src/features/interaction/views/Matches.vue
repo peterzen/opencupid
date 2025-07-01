@@ -8,8 +8,8 @@ import { useDatingInteractions } from '../composables/useDatingInteractions'
 
 const { matches, haveMatches, isLoading, refreshInteractions } = useDatingInteractions()
 
-onMounted(() => {
-  refreshInteractions()
+onMounted(async () => {
+  await refreshInteractions()
 })
 </script>
 

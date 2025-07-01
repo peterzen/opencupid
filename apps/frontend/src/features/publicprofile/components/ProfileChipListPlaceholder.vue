@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ProfileChipPlaceholder from '@/features/app/components/ProfileChipPlaceholder.vue'
+import ProfileChipPlaceholder from './ProfileChipPlaceholder.vue'
 
 const props = withDefaults(
   defineProps<{
