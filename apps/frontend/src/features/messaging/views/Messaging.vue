@@ -5,11 +5,14 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import type { ConversationSummary } from '@zod/messaging/messaging.dto'
 import type { ProfileSummary } from '@zod/profile/profile.dto'
 
+import MiddleColumn from '@/features/shared/ui/MiddleColumn.vue'
+import IconMessage from '@/assets/icons/interface/message.svg'
+import IconSearch from '@/assets/icons/interface/search.svg'
+
 import ConversationDetail from '../components/ConversationDetail.vue'
 import { useMessageStore } from '../stores/messageStore'
 import ConversationSummaries from '../components/ConversationSummaries.vue'
-import IconMessage from '@/assets/icons/interface/message.svg'
-import IconSearch from '@/assets/icons/interface/search.svg'
+import ViewTitle from '../../shared/ui/ViewTitle.vue'
 
 const router = useRouter()
 const messageStore = useMessageStore()
@@ -59,73 +62,103 @@ const handleSelectConvo = async (convo: ConversationSummary) => {
 
 const handleDeselectConvo = async () => {
   router.back()
-  await messageStore.setActiveConversation(null)
+  messageStore.resetActiveConversation()
 }
 
 const handleProfileSelect = (profile: ProfileSummary) => {
-  router.push({ name: 'PublicProfile', params: { id: profile.id } })
+  router.push({ name: 'PublicProfile', params: { profileId: profile.id } })
 }
 
 const haveConversations = computed(() => {
   return messageStore.conversations.length > 0
 })
 
-const isDetailView = computed(() => !!messageStore.activeConversation && !messageStore.isLoading)
+const isDetailView = computed(() => !!messageStore.activeConversation)
 </script>
 
 <template>
-  <main class="d-flex flex-column h-100">
-    <!-- <h1 class="px-3 mb-2" v-if="!detailVisible">{{  $t('messaging.page_title') }}</h1> -->
-
-    <BOverlay
-      :show="!haveConversations"
-      no-spinner
-      bg-color="var(--bs-body-bg)"
-      :blur="null"
-      opacity="0.85"
-      class="h-100 overlay"
+  <main class="w-100 position-relative">
+    <!-- Detail view overlay -->
+    <div
+      v-if="isDetailView"
+      class="detail-view position-absolute w-100"
+      style="z-index: 1050"
     >
-      <template #overlay>
-        <div class="d-flex flex-column align-items-center justify-content-center h-100">
-          <IconMessage class="svg-icon-100 opacity-25" />
-          <p class="text-muted mb-4 mt-4 text-center">Your conversations will take place here.</p>
-          <BButton
-            variant="primary"
-            size="lg"
-            pill
-            @click="router.push({ name: 'BrowseProfiles' })"
-          >
-            <!-- <IconSearch class="svg-icon me-2" /> -->
-            Find people to talk to
-          </BButton>
-        </div>
-      </template>
-      <div class="flex-grow-1 d-flex flex-row overflow-hidden pt-5">
-        <div class="col-12 col-md-4 d-md-block" :class="{ 'd-none': isDetailView }">
-          <div class="mx-3">
+      <MiddleColumn class="h-100">
+        <ConversationDetail
+          :loading="messageStore.isLoading"
+          :conversation="messageStore.activeConversation"
+          @deselect:convo="handleDeselectConvo"
+          @profile:select="handleProfileSelect"
+          @updated="messageStore.fetchConversations"
+        />
+      </MiddleColumn>
+    </div>
+
+    <!-- List view -->
+    <div class="d-flex flex-column h-100" :class="{ 'd-none': isDetailView }">
+      <ViewTitle :icon="IconMessage" title="Messages" class="text-primary" />
+      <BOverlay
+        :show="!haveConversations"
+        no-spinner
+        bg-color="inherit"
+        :blur="null"
+        opacity="0.85"
+        class="h-100 overlay"
+      >
+        <template #overlay>
+          <div class="d-flex flex-column align-items-center justify-content-center h-100">
+            <p class="text-muted mb-4 mt-4 text-center">Your conversations will take place here.</p>
+            <BButton
+              variant="primary"
+              size="lg"
+              pill
+              @click="router.push({ name: 'BrowseProfiles' })"
+            >
+              <IconSearch class="svg-icon" />
+              Find people to talk to
+            </BButton>
+          </div>
+        </template>
+
+        <!-- Conversation summaries -->
+        <div class="flex-grow-1 overflow-auto pt-5">
+          <MiddleColumn>
             <ConversationSummaries
               :loading="messageStore.isLoading"
               :conversations="messageStore.conversations"
               :activeConversation="messageStore.activeConversation"
               @convo:select="handleSelectConvo"
             />
-            <!-- <BPlaceholderWrapper :loading="isLoading" class="mb-3">
-            <template #loading>
-              <ConversationPlaceholder :howMany="5" />
-            </template>
-          </BPlaceholderWrapper> -->
-          </div>
+          </MiddleColumn>
         </div>
-        <div class="col-md-8 flex-grow-1 d-flex flex-column overflow-hidden" v-if="isDetailView">
-          <ConversationDetail
-            :loading="messageStore.isLoading"
-            :conversation="messageStore.activeConversation"
-            @deselect:convo="handleDeselectConvo"
-            @profile:select="handleProfileSelect"
-          />
-        </div>
-      </div>
-    </BOverlay>
+      </BOverlay>
+    </div>
   </main>
 </template>
-<style scoped></style>
+<style scoped lang="scss">
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins';
+@import '@/css/app-vars.scss';
+
+.detail-view {
+  left: 0;
+  // nav.fixed is on 1030 - on screens < md we put this above the navbar
+
+  // on screens > sm navbar stays visible
+  top: $navbar-height;
+  height: calc(100vh - $navbar-height);
+  z-index: 900;
+}
+
+.inactive {
+  pointer-events: none;
+  visibility: hidden;
+  display: none;
+}
+main {
+  width: 100%;
+  // height: 100vh;
+}
+</style>
