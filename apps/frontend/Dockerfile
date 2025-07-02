@@ -1,5 +1,8 @@
-FROM node:20-alpine AS builder
+FROM node:22-bookworm AS builder
 WORKDIR /app
+
+RUN apt-get update && apt-get -y install build-essential python3 && \
+  ln -sf /usr/bin/python3 /usr/bin/python
 
 # Copy root monorepo files
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
@@ -14,7 +17,7 @@ WORKDIR /app/apps/frontend
 
 RUN pnpm run build-only
 
-FROM nginx:alpine
+FROM nginx:bookworm
 COPY apps/frontend/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/apps/frontend/dist /var/www
 
