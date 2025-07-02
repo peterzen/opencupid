@@ -242,14 +242,6 @@ model Profile {
   hiddenBy       HiddenProfile[] @relation("HiddenBy")
 }
 
-model DatingPreferences {
-  profileId  String    @id @unique
-  prefAgeMin Int?
-  prefAgeMax Int?
-  prefGender Gender[]  @default([])
-  prefKids   HasKids[] @default([])
-}
-
 model LocalizedProfileField {
   id        String  @id @default(cuid())
   profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
