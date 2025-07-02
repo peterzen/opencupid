@@ -19,7 +19,7 @@ const vmState = {
   viewerProfile: ref({ isDatingActive: true }),
   haveAccess: ref(true),
   haveResults: ref(true),
-  isLoading: computed(() => vmState.findProfileStoreLoading.value || vmState.ownerStoreLoading.value || !vmState.isInitialized.value),
+  isLoading: computed((): boolean => vmState.findProfileStoreLoading.value || vmState.ownerStoreLoading.value || !vmState.isInitialized.value),
   findProfileStoreLoading: ref(false),
   ownerStoreLoading: ref(false),
   currentScope: ref('dating'),
