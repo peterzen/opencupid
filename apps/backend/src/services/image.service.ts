@@ -2,12 +2,12 @@ import path from 'path'
 import fs from 'fs'
 
 import { prisma } from '../lib/prisma'
-import { ProfileImage } from '@prisma/client'
 import { getImageRoot, makeImageLocation } from 'src/lib/media'
 
 import { generateContentHash } from '@/utils/hash'
 import { ProfileImagePosition } from '@zod/profile/profileimage.dto'
 import sharp from 'sharp'
+import type { ProfileImage } from '@zod/generated'
 
 const sizes = [
   { name: 'thumb', width: 150, height: 150, fit: sharp.fit.cover }, // square crop
