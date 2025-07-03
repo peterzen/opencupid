@@ -27,6 +27,9 @@ export const useBootstrap = defineStore('bootstrap', () => {
       const authStore = useAuthStore()
       authStore.initialize()
 
+      if (!authStore.isLoggedIn)
+        return
+
       const ownerProfileStore = useOwnerProfileStore()
       const messagingStore = useMessageStore()
       const interactionStore = useInteractionStore()
