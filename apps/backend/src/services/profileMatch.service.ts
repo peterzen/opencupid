@@ -99,7 +99,7 @@ export class ProfileMatchService {
       ...(userPrefs.tags?.length ? {
         tags: {
           some: {
-            tagId: { in: tagIds },
+            id: { in: tagIds },
           },
         },
       } : {}),
