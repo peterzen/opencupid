@@ -89,7 +89,6 @@ CREATE TABLE "User" (
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "isBlocked" BOOLEAN NOT NULL DEFAULT false,
     "isRegistrationConfirmed" BOOLEAN NOT NULL DEFAULT false,
-    "hasActiveProfile" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "lastLoginAt" TIMESTAMP(3),
@@ -390,6 +389,9 @@ ALTER TABLE "Message" ADD CONSTRAINT "Message_conversationId_fkey" FOREIGN KEY (
 
 -- AddForeignKey
 ALTER TABLE "Message" ADD CONSTRAINT "Message_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "Profile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SocialMatchFilter" ADD CONSTRAINT "SocialMatchFilter_cityId_fkey" FOREIGN KEY ("cityId") REFERENCES "City"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "PushSubscription" ADD CONSTRAINT "PushSubscription_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

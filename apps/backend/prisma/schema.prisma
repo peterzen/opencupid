@@ -86,7 +86,8 @@ model City {
   lat     Float?
   lon     Float?
 
-  profiles Profile[]
+  profiles      Profile[]
+  socialFilters SocialMatchFilter[]
 
   isUserCreated Boolean  @default(false)
   isApproved    Boolean  @default(false)
@@ -113,7 +114,7 @@ model Tag {
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
   translations  TagTranslation[]
-  profiles      Profile[]        @relation("ProfileTags")
+  profiles      Profile[]           @relation("ProfileTags")
   filters       SocialMatchFilter[]
 }
 
@@ -192,7 +193,7 @@ model Profile {
   relationship RelationshipStatus?
   hasKids      HasKids?
 
-  tags          Tag[] @relation("ProfileTags")
+  tags          Tag[]          @relation("ProfileTags")
   profileImages ProfileImage[] @relation("ProfileImages")
 
   // Dating preferences
@@ -348,6 +349,7 @@ model SocialMatchFilter {
   cityId    String?
   radius    Int?    @default(50) // in km
   tags      Tag[]
+  city      City?   @relation(fields: [cityId], references: [id])
 }
 
 model PushSubscription {
