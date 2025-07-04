@@ -67,15 +67,6 @@ CREATE TABLE "TagTranslation" (
 );
 
 -- CreateTable
-CREATE TABLE "ProfileTag" (
-    "id" TEXT NOT NULL,
-    "tagId" TEXT NOT NULL,
-    "profileId" TEXT,
-
-    CONSTRAINT "ProfileTag_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "ConnectionRequest" (
     "id" TEXT NOT NULL,
     "fromUserId" TEXT NOT NULL,
@@ -95,7 +86,6 @@ CREATE TABLE "User" (
     "tokenVersion" INTEGER NOT NULL DEFAULT 0,
     "loginToken" TEXT,
     "loginTokenExp" TIMESTAMP(3),
-    "isOnboarded" BOOLEAN NOT NULL DEFAULT false,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "isBlocked" BOOLEAN NOT NULL DEFAULT false,
     "isRegistrationConfirmed" BOOLEAN NOT NULL DEFAULT false,
@@ -138,17 +128,6 @@ CREATE TABLE "Profile" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Profile_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "DatingPreferences" (
-    "profileId" TEXT NOT NULL,
-    "prefAgeMin" INTEGER,
-    "prefAgeMax" INTEGER,
-    "prefGender" "Gender"[] DEFAULT ARRAY[]::"Gender"[],
-    "prefKids" "HasKids"[] DEFAULT ARRAY[]::"HasKids"[],
-
-    CONSTRAINT "DatingPreferences_pkey" PRIMARY KEY ("profileId")
 );
 
 -- CreateTable
@@ -240,6 +219,17 @@ CREATE TABLE "Message" (
 );
 
 -- CreateTable
+CREATE TABLE "SocialMatchFilter" (
+    "id" TEXT NOT NULL,
+    "profileId" TEXT NOT NULL,
+    "country" TEXT,
+    "cityId" TEXT,
+    "radius" INTEGER DEFAULT 50,
+
+    CONSTRAINT "SocialMatchFilter_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "PushSubscription" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
@@ -255,11 +245,27 @@ CREATE TABLE "PushSubscription" (
 );
 
 -- CreateTable
+CREATE TABLE "_ProfileTags" (
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL,
+
+    CONSTRAINT "_ProfileTags_AB_pkey" PRIMARY KEY ("A","B")
+);
+
+-- CreateTable
 CREATE TABLE "_BlockedProfiles" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL,
 
     CONSTRAINT "_BlockedProfiles_AB_pkey" PRIMARY KEY ("A","B")
+);
+
+-- CreateTable
+CREATE TABLE "_SocialMatchFilterToTag" (
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL,
+
+    CONSTRAINT "_SocialMatchFilterToTag_AB_pkey" PRIMARY KEY ("A","B")
 );
 
 -- CreateIndex
@@ -278,9 +284,6 @@ CREATE UNIQUE INDEX "Tag_name_key" ON "Tag"("name");
 CREATE UNIQUE INDEX "TagTranslation_tagId_locale_key" ON "TagTranslation"("tagId", "locale");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ProfileTag_profileId_tagId_key" ON "ProfileTag"("profileId", "tagId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "ConnectionRequest_fromUserId_toUserId_scope_key" ON "ConnectionRequest"("fromUserId", "toUserId", "scope");
 
 -- CreateIndex
@@ -294,9 +297,6 @@ CREATE UNIQUE INDEX "User_loginToken_key" ON "User"("loginToken");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Profile_userId_key" ON "Profile"("userId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "DatingPreferences_profileId_key" ON "DatingPreferences"("profileId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "LocalizedProfileField_profileId_field_locale_key" ON "LocalizedProfileField"("profileId", "field", "locale");
@@ -320,19 +320,22 @@ CREATE UNIQUE INDEX "LikedProfile_fromId_toId_key" ON "LikedProfile"("fromId", "
 CREATE UNIQUE INDEX "HiddenProfile_fromId_toId_key" ON "HiddenProfile"("fromId", "toId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "SocialMatchFilter_profileId_key" ON "SocialMatchFilter"("profileId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "PushSubscription_endpoint_key" ON "PushSubscription"("endpoint");
+
+-- CreateIndex
+CREATE INDEX "_ProfileTags_B_index" ON "_ProfileTags"("B");
 
 -- CreateIndex
 CREATE INDEX "_BlockedProfiles_B_index" ON "_BlockedProfiles"("B");
 
+-- CreateIndex
+CREATE INDEX "_SocialMatchFilterToTag_B_index" ON "_SocialMatchFilterToTag"("B");
+
 -- AddForeignKey
 ALTER TABLE "TagTranslation" ADD CONSTRAINT "TagTranslation_tagId_fkey" FOREIGN KEY ("tagId") REFERENCES "Tag"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "ProfileTag" ADD CONSTRAINT "ProfileTag_tagId_fkey" FOREIGN KEY ("tagId") REFERENCES "Tag"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "ProfileTag" ADD CONSTRAINT "ProfileTag_profileId_fkey" FOREIGN KEY ("profileId") REFERENCES "Profile"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ConnectionRequest" ADD CONSTRAINT "ConnectionRequest_fromUserId_fkey" FOREIGN KEY ("fromUserId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -392,7 +395,19 @@ ALTER TABLE "Message" ADD CONSTRAINT "Message_senderId_fkey" FOREIGN KEY ("sende
 ALTER TABLE "PushSubscription" ADD CONSTRAINT "PushSubscription_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "_ProfileTags" ADD CONSTRAINT "_ProfileTags_A_fkey" FOREIGN KEY ("A") REFERENCES "Profile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_ProfileTags" ADD CONSTRAINT "_ProfileTags_B_fkey" FOREIGN KEY ("B") REFERENCES "Tag"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "_BlockedProfiles" ADD CONSTRAINT "_BlockedProfiles_A_fkey" FOREIGN KEY ("A") REFERENCES "Profile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_BlockedProfiles" ADD CONSTRAINT "_BlockedProfiles_B_fkey" FOREIGN KEY ("B") REFERENCES "Profile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_SocialMatchFilterToTag" ADD CONSTRAINT "_SocialMatchFilterToTag_A_fkey" FOREIGN KEY ("A") REFERENCES "SocialMatchFilter"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_SocialMatchFilterToTag" ADD CONSTRAINT "_SocialMatchFilterToTag_B_fkey" FOREIGN KEY ("B") REFERENCES "Tag"("id") ON DELETE CASCADE ON UPDATE CASCADE;
