@@ -7,10 +7,10 @@ import { useImageStore } from '@/features/images/stores/imageStore'
 import type { OwnerProfileImage } from '@zod/profile/profileimage.dto'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 
-import LoadingComponent from '@/features/shared/ui/LoadingComponent.vue'
 import ImageUpload from './ImageUpload.vue'
 import ImageTag from './ImageTag.vue'
 import HelpScribble from '@/features/shared/ui/HelpScribble.vue'
+import IconPhoto from '@/assets/icons/interface/photo.svg'
 
 import { useI18n } from 'vue-i18n'
 
@@ -34,12 +34,7 @@ const model = computed({
   },
   set(val) {
     imageStore.images = val
-  }
-})
-
-const placeholderSlots = computed(() => {
-  const count = Math.max(0, props.maxImages - model.value.length)
-  return Array.from({ length: count })
+  },
 })
 
 /**
@@ -74,29 +69,27 @@ function checkMove(evt: any) {
   return el.futureIndex < model.value.length
 }
 
-
 onMounted(async () => {
   await imageStore.fetchImages()
+})
+
+const placeholderSlots = computed(() => {
+  const remaining = Math.max(0, props.maxImages - model.value.length - 1) // leave 1 for uploader
+  return Array.from({ length: remaining })
+})
+
+const remainingSlots = computed(() => {
+  return props.maxImages - model.value.length
 })
 </script>
 
 <template>
   <div class="image-editor">
-    <LoadingComponent v-if="imageStore.isLoading" />
-
-    <div v-else>
+    <BOverlay :show="imageStore.isLoading" spinner-type="grow" spinner-variant="primary">
       <div class="row">
-        <!-- <div class="col-sm-6 mb-3" v-if="model && model.length">
-          <div class="ratio ratio-1x1">
-            <ImageTag
-              v-if="profileImage"
-              :image="profileImage"
-              className="rounded"/>
-          </div>
-        </div> -->
         <div class="col-sm-12">
           <div v-if="!model || model.length === 0" class="position-absolute end-0 me-5">
-            <HelpScribble :text="t('profiles.image_editor_help')" direction="w"/>
+            <HelpScribble :text="t('profiles.image_editor_help')" direction="w" />
           </div>
           <VueDraggableNext
             class="row row-cols-2 row-cols-sm-3 row-cols-md-3 g-4 sortable-grid p-4"
@@ -108,40 +101,38 @@ onMounted(async () => {
             :move="checkMove"
             @change="handleReorder"
           >
-            <TransitionGroup name="fade">
-              <div v-for="img in model" :key="img.id" class="col thumbnail" :id="img.id">
-                <div class="actions nodrag">
-                  <button
-                    class="btn btn-sm btn-secondary rounded-circle"
-                    @mousedown.stop.prevent
-                    @click="handleDelete(img)"
-                    :disabled="isRemoving[img.id]"
-                  >
-                    <FontAwesomeIcon :icon="faXmark" />
-                  </button>
-                </div>
-                <div :class="{ removing: isRemoving[img.id] }">
-                  <div class="ratio ratio-1x1">
-                    <ImageTag :image="img" className="rounded" />
-                  </div>
+            <!-- <TransitionGroup name="fade"> -->
+            <div v-for="img in model" :key="img.id" class="col thumbnail" :id="img.id">
+              <div class="actions nodrag">
+                <button
+                  class="btn btn-sm btn-secondary rounded-circle"
+                  @mousedown.stop.prevent
+                  @click="handleDelete(img)"
+                  :disabled="isRemoving[img.id]"
+                >
+                  <FontAwesomeIcon :icon="faXmark" />
+                </button>
+              </div>
+              <div :class="{ removing: isRemoving[img.id] }">
+                <div class="ratio ratio-1x1">
+                  <ImageTag :image="img" className="rounded" />
                 </div>
               </div>
-              <div
-                v-for="(_, index) in placeholderSlots"
-                :key="'upload-' + index"
-                class="col nodrag"
-              >
-                <ImageUpload />
+            </div>
+            <div v-if="remainingSlots > 0" class="col nodrag">
+              <ImageUpload />
+            </div>
+
+            <div v-for="(_, i) in placeholderSlots" :key="'placeholder-' + i" class="col nodrag">
+              <div class="opacity-25 placeholder ratio ratio-1x1 bg-light rounded">
+                <IconPhoto class="svg-icon-100" />
               </div>
-            </TransitionGroup>
+            </div>
+            <!-- </TransitionGroup> -->
           </VueDraggableNext>
         </div>
-
-        <!-- <div v-if="images.length === 0"
-         class="mb-3 empty">No images uploaded yet.
-    </div> -->
       </div>
-    </div>
+    </BOverlay>
   </div>
 </template>
 
@@ -172,11 +163,6 @@ img {
     display: flex;
     align-items: center;
     justify-content: center;
-
-    // background-color: black;
-    // padding: 10px;
-    // font-size: 0.75rem;
-    // border-radius: 9999px;
   }
 }
 

@@ -4,7 +4,6 @@ import { useI18n } from 'vue-i18n'
 
 import { detectMobile } from '@/lib/mobile-detect'
 
-import LoadingComponent from '@/features/shared/ui/LoadingComponent.vue'
 import ErrorComponent from '@/features/shared/ui/ErrorComponent.vue'
 import UploadButton from './UploadButton.vue'
 import AvatarUploadIcon from '@/assets/icons/files/avatar-upload.svg'
@@ -28,7 +27,7 @@ const isMobile = computed(() => detectMobile())
 // Modal state
 type ModalState = 'closed' | 'chooser' | 'preview'
 const modalState = ref<ModalState>('closed')
-// const showModal = computed(() => modalState.value !== 'closed')
+
 const showModal = ref(false)
 
 const openModal = () => {
@@ -37,57 +36,51 @@ const openModal = () => {
 }
 
 const closeModal = () => {
-  showModal.value = false // this triggers @hidden
+  showModal.value = false
 }
 
-
-
-
 const handleUpload = async () => {
-  console.log('handleUpload:', selectedFile.value, captionText.value)
   if (!selectedFile.value) return
   isLoading.value = true
   error.value = null
 
- const res = await imageStore.uploadProfileImage(selectedFile.value, captionText.value)
+  const res = await imageStore.uploadProfileImage(selectedFile.value, captionText.value)
   if (!res.success) {
     error.value = res.message
     isLoading.value = false
     return
   }
-
-  // just hide the modal — cleanup happens after
-  modalState.value = 'closed'
+  closeModal()
 }
 
 const handleFileChange = (event: Event) => {
-  console.log('handleFileChange:', preview.value, selectedFile.value)
   const input = event.target as HTMLInputElement
   const file = input.files?.[0] ?? null
   selectedFile.value = file
 
   if (!file) {
-    console.log('No file selected')
     preview.value = null
     return
   }
 
   const reader = new FileReader()
   reader.onload = () => {
-    console.log('onload:')
     preview.value = typeof reader.result === 'string' ? reader.result : null
-       modalState.value = 'preview'
+    modalState.value = 'preview'
     showModal.value = true
   }
   reader.readAsDataURL(file)
 }
 
-watch(preview, newPreview => {
-  console.log('Preview updated:')
-})
+const backFromPreview = () => {
+  if (isMobile.value) {
+    modalState.value = 'chooser'
+  } else {
+    closeModal()
+  }
+}
 
 function onModalHidden() {
-  console.log('Modal fully hidden — cleaning up')
   modalState.value = 'closed'
   selectedFile.value = null
   preview.value = null
@@ -96,8 +89,6 @@ function onModalHidden() {
   isLoading.value = false
   if (fileInput.value) fileInput.value.value = ''
 }
-
-
 </script>
 
 <template>
@@ -113,7 +104,7 @@ function onModalHidden() {
   </div>
 
   <BModal
-    v-model="showModal"
+    :show="showModal"
     centered
     button-size="sm"
     :focus="false"
@@ -127,50 +118,67 @@ function onModalHidden() {
     @hidden="onModalHidden"
   >
     <!-- Preview Modal -->
-    <div v-if="modalState === 'preview'" class="preview-container w-100">
-      <div class="mb-3">
-        <div class="ratio ratio-4x3 position-relative">
-          <img v-if="preview" :src="preview" alt="Preview" width="200" class="preview-image" />
-          <div v-if="isLoading" class="spinner-overlay">
-            <LoadingComponent />
+    <div v-show="modalState === 'preview'" class="preview-container w-100">
+      <ErrorComponent :error="error" v-if="error" />
+      <div v-if="preview && !error" class="mb-3">
+        <BOverlay spinner-type="grow" :show="isLoading">
+          <div class="ratio ratio-4x3 position-relative">
+            <div class="preview-wrapper overflow-hidden" v-show="modalState === 'preview'">
+              <img :src="preview" alt="Preview" class="preview-image" />
+            </div>
           </div>
-        </div>
+        </BOverlay>
       </div>
 
-      <ErrorComponent :error="error" />
       <div class="mb-3 justify-content-center d-flex flex-column gap-2 align-items-center">
         <BButton
           variant="primary"
+          size="lg"
           @click.prevent="handleUpload"
           :label="t('profiles.image_upload.looks_good')"
-          :disabled="isLoading"
+          :disabled="isLoading || !!error"
         >
           {{ t('profiles.image_upload.looks_good') }}
         </BButton>
-        <BButton variant="link-secondary" @click.prevent="closeModal" class="link-secondary">
+        <BButton
+          variant="link-secondary"
+          @click.prevent="backFromPreview"
+          class="link-secondary mt-3"
+          size="sm"
+        >
           {{ t('profiles.image_upload.nevermind') }}
         </BButton>
       </div>
     </div>
 
     <!-- Mobile: Capture Chooser -->
-    <div
-      v-if="modalState === 'chooser'"
-      class="d-flex flex-column align-items-center h-100 justify-content-center"
-    >
-      <div class="w-50 mx-auto d-flex flex-column align-items-center">
-        <div class="mb-4">
-          <UploadButton @file:change="handleFileChange" :key="'capture-none'" />
-          <div class="mt-2 text-muted">{{ t('profiles.image_upload.add_from_phone') }}</div>
-        </div>
-        <div class="mb-3">
-          <UploadButton @file:change="handleFileChange" capture="user" :key="'capture-user'" />
-          <div class="mt-2 text-muted">{{ t('profiles.image_upload.take_photo') }}</div>
-        </div>
-        <div>
-          <BButton variant="link-secondary" @click.prevent="closeModal" class="link-secondary">
-            {{ t('profiles.image_upload.nevermind') }}
-          </BButton>
+    <div v-show="modalState === 'chooser'">
+      <div class="d-flex flex-column align-items-center h-100 justify-content-center">
+        <div class="mx-auto d-flex flex-column align-items-center">
+          <div class="mb-5 d-flex flex-column align-items-center">
+            <div class="col-6">
+              <UploadButton @file:change="handleFileChange" :key="'capture-none'" />
+            </div>
+            <div class="mt-0 form-text text-mute text-centerd">
+              {{ t('profiles.image_upload.add_from_phone') }}
+            </div>
+          </div>
+          <div class="mb-4 d-flex flex-column align-items-center">
+            <div class="col-6">
+              <UploadButton @file:change="handleFileChange" capture="user" :key="'capture-user'" />
+            </div>
+            <div class="form-text text-muted text-center">{{ t('profiles.image_upload.take_photo') }}</div>
+          </div>
+          <div>
+            <BButton
+              variant="link-secondary"
+              @click.prevent="closeModal"
+              class="link-secondary"
+              size="sm"
+            >
+              {{ t('profiles.image_upload.nevermind') }}
+            </BButton>
+          </div>
         </div>
       </div>
     </div>

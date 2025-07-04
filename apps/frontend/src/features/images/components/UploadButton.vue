@@ -33,7 +33,7 @@ const captureAttr = computed(() => props.capture || undefined)
     >
       <template #label>
         <div class="ratio ratio-1x1">
-          <div class="btn btn-secondary rounded rounded-lg-5 w-100 file-upload-label">
+          <div class="btn btn-outline-primary   w-100 file-upload-label">
             <IconCamera2  class="svg-icon" v-if="captureAttr" />
             <AvatarUploadIcon class="svg-icon" v-else-if="genericIcon" />
             <IconPhoto class="svg-icon" v-else />
@@ -51,6 +51,7 @@ const captureAttr = computed(() => props.capture || undefined)
   }
   .file-upload-label {
     width: 100%;
+    margin-bottom: 0;
   }
   svg {
     width: 100%;
