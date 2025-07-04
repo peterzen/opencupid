@@ -12,6 +12,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   backend:
+    image: ghcr.io/opencupid/opencupid-backend
     build:
       context: .
       dockerfile: apps/backend/Dockerfile
@@ -25,6 +26,7 @@ services:
       - '${PWD}/secrets:/secrets'
 
   frontend:
+    image: ghcr.io/opencupid/opencupid-frontend
     build:
       context: .
       dockerfile: apps/frontend/Dockerfile
@@ -35,6 +37,7 @@ services:
       - backend
 
   ingress:
+    image: ghcr.io/opencupid/opencupid-ingress
     build:
       context: apps/ingress
     restart: unless-stopped
@@ -67,3 +70,4 @@ volumes:
   certbot-etc:
     external: true
   certbot-webroot:
+
