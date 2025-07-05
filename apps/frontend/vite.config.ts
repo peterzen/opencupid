@@ -23,6 +23,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     ...define(mode),
     ...server(mode),
     build: {
+      sourcemap: true,
       rollupOptions: {
         external: (id) => id.includes('__tests__'),
         output: {
@@ -39,6 +40,9 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
           }
         }
       }
+    },
+    esbuild: {
+      sourcemap: true,
     },
     optimizeDeps: {
       include: ['qrcode']
@@ -61,19 +65,19 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       }),
       ...(mode === 'development'
         ? [visualizer({
-            open: true,
-            gzipSize: true,
-            emitFile: true,
-            filename: "stats.html",
-            template: 'sunburst'
-          }) as PluginOption]
+          open: true,
+          gzipSize: true,
+          emitFile: true,
+          filename: "stats.html",
+          template: 'sunburst'
+        }) as PluginOption]
         : [visualizer({
-            open: false,
-            gzipSize: true,
-            emitFile: true,
-            filename: "stats.html",
-            template: 'sunburst'
-          }) as PluginOption]),
+          open: false,
+          gzipSize: true,
+          emitFile: true,
+          filename: "stats.html",
+          template: 'sunburst'
+        }) as PluginOption]),
       vueJsx(),
       vueDevTools(),
       svgLoader(),
