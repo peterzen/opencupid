@@ -15,7 +15,7 @@ import LogoutButton from '../components/LogoutButton.vue'
 describe('LogoutButton', () => {
   it('logs out and redirects on click', async () => {
     const wrapper = mount(LogoutButton)
-    await wrapper.find('a').trigger('click')
+    await wrapper.find('button').trigger('click')
     expect(logout).toHaveBeenCalled()
     expect(push).toHaveBeenCalledWith({ name: 'Login' })
   })

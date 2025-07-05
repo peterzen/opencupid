@@ -33,10 +33,10 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <div>
-    <h5>{{ t('settings.push_notifications') }}</h5>
-    <BButton class="btn btn-primary" @click="enablePushNotifications"
+  <fieldset>
+    <legend>{{ t('settings.push_notifications') }}</legend>
+    <BButton variant="primary" size="sm" @click="enablePushNotifications"
       >{{ t('settings.enable_push') }}</BButton
     >
-  </div>
+  </fieldset>
 </template>

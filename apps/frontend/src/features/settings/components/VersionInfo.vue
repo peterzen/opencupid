@@ -38,7 +38,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="position-fixed bottom-0 end-0 p-2 text-center w-100" style="font-size: 0.5rem">
+  <div class="text-center w-100" style="font-size: 0.5rem">
     <div v-if="isLoading" class="text-muted">Loading version information...</div>
 
     <div v-else-if="error" class="text-danger">
@@ -46,7 +46,7 @@ onMounted(async () => {
     </div>
 
     <code v-else-if="version" class="text-muted" >
-      <strong>Version:</strong> {{ version.version }} <strong>Commit:</strong>
+      <strong>Commit:</strong>
       {{ formatCommit(version.commit) }} <strong>Built:</strong>
       {{ formatTimestamp(version.timestamp) }}
     </code>

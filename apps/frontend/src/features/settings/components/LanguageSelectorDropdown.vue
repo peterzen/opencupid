@@ -7,8 +7,8 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <div class="language-selector">
-    <label for="language-selector" class="form-label">{{ t('settings.language_label') }}</label>
+  <fieldset>
+    <legend for="language-selector" class="form-label">{{ t('settings.language_label') }}</legend>
     <BFormSelect v-model="i18nStore.currentLanguage" size="sm" class="mt-3" id="language-selector">
       <BFormSelectOption
         v-for="locale in i18nStore.getAvailableLocalesWithLabels()"
@@ -18,5 +18,5 @@ const { t } = useI18n()
         {{ locale.label }}
       </BFormSelectOption>
     </BFormSelect>
-  </div>
+  </fieldset>
 </template>

@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div class="w-100 d-flex align-items-center">
+  <nav class="w-100 d-flex align-items-center">
     <div class="col-2">
       <slot name="items-left"></slot>
     </div>
@@ -11,5 +11,11 @@
     <div class="col-2 d-flex justify-content-end">
       <slot name="items-right"></slot>
     </div>
-  </div>
+  </nav>
 </template>
+
+<style scoped>
+:deep(button) {
+  margin-top: 0 !important;
+}
+</style>

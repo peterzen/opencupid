@@ -15,9 +15,9 @@ function handleClick() {
 </script>
 
 <template>
-  <a @click="handleClick" href="#" class="btn btn-secondary btn-sm">
+  <BButton variant="primary" size="sm" @click="handleClick">
     <IconLogout class="svg-icon" />
-    {{ t('authentication.logout') }}</a
+    {{ t('authentication.logout') }}</BButton
   >
 </template>
 
