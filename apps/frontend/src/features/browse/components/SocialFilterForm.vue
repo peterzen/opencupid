@@ -58,7 +58,7 @@ const toggleDisabled = () => {
       <CountrySelector v-model="model.location" v-if="model.location" />
 
       <div class="mt-3">
-        <CitySelector v-model="model.location" v-if="model.location" :cityInputAutoFocus="false" />
+        <CitySelector v-model="model.location" v-if="model.location" :allowEmpty="true" :cityInputAutoFocus="false" />
       </div>
     </fieldset>
 

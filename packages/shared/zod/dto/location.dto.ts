@@ -19,18 +19,13 @@ export type LocationDTO = z.infer<typeof LocationSchema>
 
 export function mapLocation(
   raw: { country: string | null; cityId: string | null },
-): LocationDTO | null {
+): LocationPayload {
   const country = raw.country && raw.country !== '' ? raw.country : null
   const cityId = raw.cityId && raw.cityId !== '' ? raw.cityId : null
-
-  if (!country) {
-    return null
-  }
 
   return {
     country,
     cityId,
-    cityName: '',
   }
 }
 

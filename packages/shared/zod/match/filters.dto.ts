@@ -32,7 +32,7 @@ export const SocialMatchFilterWithTagsSchema = SocialMatchFilterSchema.extend({
 export type SocialMatchFilterWithTags = z.infer<typeof SocialMatchFilterWithTagsSchema>
 
 export const SocialMatchFilterDTOSchema = z.object({
-  location: LocationSchema.nullable(),
+  location: LocationPayloadSchema,
   radius: z.number().optional(),
   tags: z.array(PublicTagSchema).default([]),
 })
