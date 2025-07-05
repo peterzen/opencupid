@@ -24,26 +24,32 @@ vi.mock('@/assets/icons/interface/home.svg', () => ({ default: { template: '<div
 vi.mock('@/features/shared/ui/NotificationDot.vue', () => ({ default: { template: '<div><slot /></div>' } }))
 vi.mock('@/features/images/components/ProfileImage.vue', () => ({ default: { template: '<div class="profile-thumbnail" />' } }))
 
+const mockIsLoggedIn: { value: boolean } = { value: true }
+
 vi.mock('@/features/auth/stores/authStore', () => ({
   useAuthStore: () => ({
-    isLoggedIn: true,
-    logout: vi.fn()
+    get isLoggedIn() {
+      return mockIsLoggedIn.value
+    }
   })
 }))
+
+
 vi.mock('@/features/messaging/stores/messageStore', () => ({
   useMessageStore: () => ({
     hasUnreadMessages: false
   })
 }))
 
-const mockProfileRef: { value: { isDatingActive: boolean; profileImages: { url: string }[] } } = { value: { isDatingActive: true, profileImages: [] } }
+const mockProfileRef: { value: { isDatingActive: boolean; isOnboarded: boolean; profileImages: { url: string }[] } } =
+  { value: { isDatingActive: true, isOnboarded: true, profileImages: [] } }
 
 vi.mock('@/features/myprofile/stores/ownerProfileStore', () => ({
   useOwnerProfileStore: () => ({
     get profile() {
       return mockProfileRef.value
     },
-    isLoading: false
+    isLoading: false,
   })
 }))
 
@@ -55,12 +61,47 @@ vi.mock('@/features/interaction/stores/useInteractionStore', () => ({
   })
 }))
 
+
 import Navbar from '../Navbar.vue'
 const stub = { template: '<div><slot /></div>' }
 
 describe('Navbar', () => {
+  it('does not render when no logged in', () => {
+    mockIsLoggedIn.value = false
+    const wrapper = mount(Navbar, {
+      global: {
+        stubs: {
+          BNavbar: stub,
+          BNavItem: stub,
+          BNavbarNav: stub,
+          FontAwesomeIcon: stub
+        },
+        mocks: { $t: (msg: string) => msg },
+      }
+    })
+    expect(wrapper.html()).not.toContain('nav')
+  })
+
+  it('does not render when logged in but not onBoarded', () => {
+    mockIsLoggedIn.value = true
+    mockProfileRef.value = { isDatingActive: true, isOnboarded: false, profileImages: [{ url: "/path", }] }
+    const wrapper = mount(Navbar, {
+      global: {
+        stubs: {
+          BNavbar: stub,
+          BNavItem: stub,
+          BNavbarNav: stub,
+          FontAwesomeIcon: stub
+        },
+        mocks: { $t: (msg: string) => msg },
+      }
+    })
+    expect(wrapper.html()).not.toContain('nav')
+  })
+
   it('renders when logged in and profile image is loaded', () => {
-    mockProfileRef.value = { isDatingActive: true, profileImages: [{ url: "/path", }] }
+    mockIsLoggedIn.value = true
+    mockProfileRef.value = { isDatingActive: true, isOnboarded: true, profileImages: [{ url: "/path", }] }
     const wrapper = mount(Navbar, {
       global: {
         stubs: {
@@ -81,7 +122,8 @@ describe('Navbar', () => {
   })
 
   it('renders when logged in and no profile image is loaded', () => {
-    mockProfileRef.value = { isDatingActive: true, profileImages: [] }
+    mockIsLoggedIn.value = true
+    mockProfileRef.value = { isDatingActive: true, isOnboarded: true, profileImages: [] }
     const wrapper = mount(Navbar, {
       global: {
         stubs: {
@@ -103,7 +145,8 @@ describe('Navbar', () => {
 
 
   it('renders when logged in and no matches menu', () => {
-    mockProfileRef.value = { isDatingActive: false, profileImages: [] }
+    mockIsLoggedIn.value = true
+    mockProfileRef.value = { isDatingActive: false, isOnboarded: true, profileImages: [] }
     const wrapper = mount(Navbar, {
       global: {
         stubs: {

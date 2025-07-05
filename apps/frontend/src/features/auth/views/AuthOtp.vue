@@ -9,7 +9,9 @@ import { useI18nStore } from '@/store/i18nStore'
 import { useAuthStore } from '../stores/authStore'
 import OtpLoginComponent from '../components/OtpLoginComponent.vue'
 import LoginConfirmComponent from '../components/LoginConfirmComponent.vue'
-
+import IconMessage from '@/assets/icons/interface/message.svg'
+import IconMail from '@/assets/icons/interface/mail.svg'
+import ViewTitle from '@/features/shared/ui/ViewTitle.vue'
 import ChevronLeftIcon from '@/assets/icons/arrows/arrow-single-left.svg'
 
 // Reactive variables
@@ -125,7 +127,11 @@ function handleBackButton() {
             <ChevronLeftIcon class="svg-icon" />
           </a>
         </div>
+
         <div v-if="!showConfirmScreen">
+          <ViewTitle v-if="user.phonenumber" :icon="IconMessage" title="" class="text-primary" />
+          <ViewTitle v-else :icon="IconMail" title="" class="text-primary" />
+
           <OtpLoginComponent
             :isLoading="isLoading"
             :user="user"

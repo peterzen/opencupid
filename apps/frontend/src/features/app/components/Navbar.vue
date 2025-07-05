@@ -28,14 +28,10 @@ const hasMatchNotifications = computed(
   () => interactionStore.newMatchesCount > 0 || interactionStore.receivedLikesCount > 0
 )
 
-function handleLogoutClick() {
-  authStore.logout() // Clear the authentication state
-  useRouter().push({ name: 'Login' }) // Redirect to the login page
-}
 </script>
 
 <template>
-  <BNavbar variant="secondary" fixed="top" class="" data-testid="navbar">
+  <BNavbar v-if="authStore.isLoggedIn && profileStore.profile?.isOnboarded" variant="secondary" fixed="top" class="" data-testid="navbar">
     <BNavbarNav class="d-flex justify-content-between w-100">
       <BNavItem to="/" active-class="active">
         <IconHome class="svg-icon-lg" />

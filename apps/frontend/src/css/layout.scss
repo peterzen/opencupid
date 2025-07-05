@@ -8,8 +8,11 @@ body {
 }
 
 main {
-  padding-top: $navbar-height;
-    height: calc(100vh - $navbar-height);
-
+  height: 100vh;
   flex-grow: 1;
+}
+
+nav.navbar+main {
+  padding-top: $navbar-height;
+  height: calc(100vh - $navbar-height);
 }

@@ -49,12 +49,12 @@ watch(inputState, state => {
   <div class="otp-form">
     <div class="fs-4 mb-3">
       <span class="text-muted opacity-50">
-        <span v-if="user.phonenumber">
+        <!-- <span v-if="user.phonenumber">
           <IconMessage class="svg-icon" />
         </span>
         <span v-else>
           <IconMail class="svg-icon" />
-        </span>
+        </span> -->
       </span>
       {{ t('auth.otp_check_messages') }}
     </div>
