@@ -34,12 +34,6 @@ const props = withDefaults(
   }
 )
 
-// State
-const selectOptions = ref<PublicCity[]>([])
-const isLoading = ref(false)
-const showHint = ref(false)
-const multiselectRef = ref<MultiselectComponent>()
-
 // Computed selected city
 const selectedCity = computed<PublicCity>({
   get() {
@@ -50,14 +44,19 @@ const selectedCity = computed<PublicCity>({
     }
   },
   set(val: PublicCity) {
-    if (!val) return
     model.value = {
-      cityId: val.id,
-      cityName: val.name,
+      cityId: val?.id,
+      cityName: val?.name,
       country: model.value.country,
     }
   },
 })
+
+// State
+const selectOptions = ref<PublicCity[]>([selectedCity.value ?? {}])
+const isLoading = ref(false)
+const showHint = ref(false)
+const multiselectRef = ref<MultiselectComponent>()
 
 // Watch for country change and reset city
 watch(
@@ -72,7 +71,7 @@ watch(
       }
       if (props.cityInputAutoFocus) {
         await nextTick()
-        if(multiselectRef.value?.activate) multiselectRef.value?.activate()
+        if (multiselectRef.value?.activate) multiselectRef.value?.activate()
         showHint.value = true
       }
     }
@@ -97,7 +96,7 @@ onMounted(async () => {
 // Search cities
 async function asyncFind(query: string) {
   if (!query) {
-    selectOptions.value = []
+    selectOptions.value = [selectedCity.value ?? {}]
     return
   }
 
@@ -144,7 +143,7 @@ async function addCity(name: string) {
       :options="selectOptions"
       :searchable="true"
       :close-on-select="true"
-      :clear-on-select="false"
+      :clear-on-select="true"
       :internal-search="false"
       :taggable="true"
       :show-labels="true"
