@@ -4,7 +4,7 @@ import z from "zod";
 export const LocationSchema = z.object({
   country: z.string(),
   cityId: z.string().nullable(),
-  cityName: z.string(),
+  cityName: z.string().optional(),
 })
 
 export const LocationPayloadSchema = z.object({
@@ -29,9 +29,9 @@ export function mapLocation(
   }
 }
 
-export function unmapLocation(
+export function mapLocationDTOToPayload(
   location: LocationDTO | null,
-): { country: string | null; cityId: string | null } {
+): LocationPayload {
   if (!location) {
     return { country: null, cityId: null }
   }

@@ -22,7 +22,7 @@ import {
 } from '@/store/helpers'
 import { bus } from '@/lib/bus'
 import { DatingPreferencesDTOSchema, SocialMatchFilterDTOSchema, UpdateSocialMatchFilterPayloadSchema, type DatingPreferencesDTO, type SocialMatchFilterDTO, type UpdateSocialMatchFilterPayload } from '@zod/match/filters.dto'
-import { unmapLocation } from '@zod/dto/location.dto'
+import { mapLocationDTOToPayload } from '@zod/dto/location.dto'
 import { initialize } from '../../shared/composables/useCountries'
 
 type FindProfileStoreState = {
@@ -35,12 +35,10 @@ type FindProfileStoreState = {
 
 type StoreProfileListResponse = StoreSuccess<{ result: PublicProfile[] }> | StoreError
 
-export function mapSocialMatchFilterDTOToPayload(
-  dto: SocialMatchFilterDTO,
-): UpdateSocialMatchFilterPayload {
+export function mapSocialMatchFilterDTOToPayload(dto: SocialMatchFilterDTO): UpdateSocialMatchFilterPayload {
   const payload = {
     ...dto,
-    location: dto.location ? unmapLocation(dto.location) : undefined,
+    location: dto.location ? mapLocationDTOToPayload(dto.location) : undefined,
     tags: dto.tags.map(tag => tag.id),
   }
 

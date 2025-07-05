@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { useCountries } from '@/features/shared/composables/useCountries'
-import { type LocationDTO } from '@zod/dto/location.dto'
+import { LocationPayload, type LocationDTO } from '@zod/dto/location.dto'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Multiselect from 'vue-multiselect'
 
 const { t } = useI18n()
 
-const model = defineModel<LocationDTO>({
+const model = defineModel<LocationPayload>({
   default: () => ({
     cityId: '',
     cityName: '',

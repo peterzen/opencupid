@@ -1,138 +1,161 @@
+
+
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import Multiselect from 'vue-multiselect'
 import { useCitiesStore } from '@/store/cityStore'
 import { useI18n } from 'vue-i18n'
-
-import type { PublicCity } from '@zod/dto/city.dto'
-import type { LocationDTO } from '@zod/dto/location.dto'
 import { toInitialCaps } from '@/lib/utils'
 import { type MultiselectComponent } from '@/types/multiselect'
 
+import type { PublicCity } from '@zod/dto/city.dto'
+import { LocationPayload } from '@zod/dto/location.dto'
+
+const cityStore = useCitiesStore()
 const { t } = useI18n()
 
-// Store
-const cityStore = useCitiesStore()
 
-// Model
-const model = defineModel<LocationDTO>({
+/*
+Actual schemas defined elewhere, but for clarity in this file:
+
+export const LocationPayloadSchema = z.object({
+  country: z.string().nullable(),
+  cityId: z.string().nullable(),
+})
+
+export type LocationPayload = z.infer<typeof LocationPayloadSchema>
+
+
+const publicCityFields = {
+  id: true,
+  name: true,
+  country: true,
+} as const;
+
+export const PublicCitySchema = CitySchema.pick(publicCityFields);
+export type PublicCity = z.infer<typeof PublicCitySchema>;
+
+*/
+
+
+const model = defineModel<LocationPayload>({
   default: () => ({
-    cityId: '',
-    cityName: '',
-    country: '',
+    cityId: null,
+    country: null,
   }),
 })
 
 const props = withDefaults(
   defineProps<{
     allowEmpty?: boolean
-    cityInputAutoFocus?: boolean // focus city input on country change
+    canAddCity?: boolean
+    cityInputAutoFocus?: boolean
   }>(),
   {
     allowEmpty: false,
+    canAddCity: true,
     cityInputAutoFocus: true,
   }
 )
 
-// Computed selected city
-const selectedCity = computed<PublicCity>({
-  get() {
-    return {
-      id: model.value.cityId || '',
-      name: model.value.cityName,
-      country: model.value.country,
-    }
-  },
-  set(val: PublicCity) {
-    model.value = {
-      cityId: val?.id,
-      cityName: val?.name,
-      country: model.value.country,
-    }
-  },
-})
-
-// State
-const selectOptions = ref<PublicCity[]>([selectedCity.value ?? {}])
+const selectOptions = ref<PublicCity[]>([])
 const isLoading = ref(false)
 const showHint = ref(false)
 const multiselectRef = ref<MultiselectComponent>()
 
-// Watch for country change and reset city
+const selectedCity = computed<PublicCity>({
+  get() {
+    return {
+      id: model.value.cityId ?? '',
+      name: (selectOptions.value.find(c => c.id === model.value.cityId)?.name) ?? '',
+      country: model.value.country ?? '',
+    }
+  },
+  set(val: PublicCity) {
+    model.value = {
+      cityId: val?.id || null,
+      country: model.value.country ?? null,
+    }
+  },
+})
+
+// Watch cityId → fetch city name
+watch(
+  () => model.value.cityId,
+  async (newId) => {
+    if (newId) {
+      try {
+        const city = await cityStore.getCity(newId)
+        if (city) {
+          if (!selectOptions.value.find(c => c.id === city.id)) {
+            selectOptions.value.push(city)
+          }
+        }
+      } catch (e) {
+        console.warn('City fetch failed:', e)
+      }
+    }
+  },
+  { immediate: true }
+)
+
+// Watch country change → reset city
 watch(
   () => model.value.country,
   async (newVal, oldVal) => {
     if (newVal && newVal !== oldVal) {
+      model.value.cityId = null
       selectOptions.value = []
-      selectedCity.value = {
-        id: '',
-        name: '',
-        country: newVal,
-      }
+
       if (props.cityInputAutoFocus) {
         await nextTick()
-        if (multiselectRef.value?.activate) multiselectRef.value?.activate()
+        multiselectRef.value?.activate?.()
         showHint.value = true
       }
     }
   }
 )
 
-// Preload existing city if present
-onMounted(async () => {
-  if (model.value.cityId) {
-    try {
-      const current = await cityStore.getCity(model.value.cityId)
-      if (current) {
-        selectedCity.value = current
-        selectOptions.value = [current]
-      }
-    } catch (error) {
-      console.error('Failed to fetch cities:', error)
-    }
-  }
-})
-
-// Search cities
 async function asyncFind(query: string) {
   if (!query) {
-    selectOptions.value = [selectedCity.value ?? {}]
+    selectOptions.value = selectedCity.value?.id ? [selectedCity.value] : []
     return
   }
 
   isLoading.value = true
   try {
-    selectOptions.value = await cityStore.search(model.value.country, query)
+    if (model.value.country) {
+      selectOptions.value = await cityStore.search(model.value.country, query)
+    }
   } catch (error) {
-    console.error('Failed to search cities:', error)
+    console.error('City search failed:', error)
   } finally {
     isLoading.value = false
   }
 }
 
-// Add new city
 async function addCity(name: string) {
+  if (!model.value.country) return
+
   const create = {
     name: toInitialCaps(name.trim()),
     country: model.value.country,
   }
+
   isLoading.value = true
   try {
     const newCity = await cityStore.create(create)
     selectOptions.value.push(newCity)
     selectedCity.value = newCity
-    model.value = {
-      cityId: newCity.id,
-      cityName: newCity.name,
-      country: model.value.country,
-    }
   } catch (error) {
-    console.error('Failed to add city:', error)
+    console.error('City create failed:', error)
   } finally {
     isLoading.value = false
   }
 }
 </script>
+
+
 
 <template>
   <div class="interests-multiselect">
@@ -145,7 +168,7 @@ async function addCity(name: string) {
       :close-on-select="true"
       :clear-on-select="true"
       :internal-search="false"
-      :taggable="true"
+      v-bind:taggable="props.canAddCity"
       :show-labels="true"
       :show-no-results="false"
       :show-no-options="false"

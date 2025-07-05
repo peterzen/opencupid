@@ -17,7 +17,8 @@ const model = defineModel<SocialMatchFilterDTO>({
 const props = defineProps<{
   viewerProfile: OwnerProfile | null
 }>()
-const locationDisabled = ref(!model.value.location?.country)
+
+const locationDisabled = ref(!model.value.location.country)
 
 const setLocationFromProfile = () => {
   if (props.viewerProfile?.location && model.value.location) {
@@ -25,14 +26,13 @@ const setLocationFromProfile = () => {
   }
 }
 
-
 const toggleDisabled = () => {
   if (!model.value.location) return
   if (locationDisabled.value) {
-    Object.assign(model.value.location, {country:'',cityId:''} as LocationDTO)
+    Object.assign(model.value.location, { country: '', cityId: '' } as LocationDTO)
   } else {
-    console.log('Setting location from model:', model.value.location)
-    Object.assign(model.value.location, model.value.location ?? ({} as LocationDTO))
+    // console.log('Setting location from model:', props.viewerProfile?.location)
+    model.value.location.country = props.viewerProfile?.location?.country || ''
   }
 }
 </script>
@@ -58,7 +58,13 @@ const toggleDisabled = () => {
       <CountrySelector v-model="model.location" v-if="model.location" />
 
       <div class="mt-3">
-        <CitySelector v-model="model.location" v-if="model.location" :allowEmpty="true" :cityInputAutoFocus="false" />
+        <CitySelector
+          v-model="model.location"
+          v-if="model.location"
+          :allowEmpty="true"
+          :canAddCity="false"
+          :cityInputAutoFocus="false"
+        />
       </div>
     </fieldset>
 
