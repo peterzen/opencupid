@@ -25,7 +25,6 @@ services:
     ports:
       - '6379:6379'
 
-# https://github.com/mpolden/echoip
 
 volumes:
   postgres_data:

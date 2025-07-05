@@ -11,8 +11,7 @@ import Components from 'unplugin-vue-components/vite'
 import { BootstrapVueNextResolver } from 'bootstrap-vue-next'
 import svgLoader from 'vite-svg-loader'
 import serveStatic from 'serve-static'
-
-
+import VitePluginBrowserSync from 'vite-plugin-browser-sync'
 import { server, define } from './vite.common'
 
 process.env.DEBUG = 'vite:*' // Add this to force verbose output
@@ -94,7 +93,22 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
           )
         },
       },
-
+      VitePluginBrowserSync({
+        dev: {
+          bs: {
+            https: {
+              key: '../../certs/key.pem',
+              cert: '../../certs/cert.pem',
+            },
+            open: false,
+            port: 5174,
+            ui: {
+              port: 8081
+            },
+            notify: false
+          }
+        }
+      })
 
       // VitePWA({
       //   registerType: 'autoUpdate',
