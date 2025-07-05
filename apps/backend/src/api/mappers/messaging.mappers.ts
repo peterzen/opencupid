@@ -8,6 +8,7 @@ import type {
 import { mapProfileSummary } from './profile.mappers';
 import { DbProfileWithContext } from '@zod/profile/profile.db';
 import { ConversationContext } from '@zod/messaging/conversationContext.dto';
+import { canSendMessageInConversation } from '../../services/messaging.service';
 
 function mapConversationMeta(c: { id: string; updatedAt: Date; createdAt: Date }) {
   return {
@@ -20,7 +21,7 @@ function mapConversationMeta(c: { id: string; updatedAt: Date; createdAt: Date }
 export function mapConversationContext(dbProfile: DbProfileWithContext): ConversationContext {
   const participant = dbProfile.conversationParticipants?.[0]
   const conversation = participant?.conversation
-  const canMessage= !conversation || conversation.status === 'ACCEPTED'
+  const canMessage = !conversation || conversation.status === 'ACCEPTED'
   const initiated =
     !!conversation &&
     conversation.status === 'INITIATED' &&
@@ -51,6 +52,7 @@ export function mapConversationParticipantToSummary(
 
   const lastMessage = p.conversation.messages[0] ?? null
 
+  const canReply = canSendMessageInConversation(p.conversation, currentProfileId)
   return {
     id: p.id,
     profileId: p.profileId,
@@ -58,6 +60,7 @@ export function mapConversationParticipantToSummary(
     lastReadAt: p.lastReadAt,
     isMuted: p.isMuted,
     isArchived: p.isArchived,
+    canReply,
     lastMessage: lastMessage ? {
       content: lastMessage.content,
       createdAt: lastMessage.createdAt,
@@ -86,7 +89,7 @@ export function mapMessageDTO(
 export function mapMessageForMessageList(
   m: MessageInConversation, profileId: string
 ): MessageDTO {
-console.error('Mapping message for list:', m.senderId , profileId)
+  console.error('Mapping message for list:', m.senderId, profileId)
   return {
     ...m,
     isMine: m.senderId === profileId,

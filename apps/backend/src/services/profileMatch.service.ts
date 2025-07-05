@@ -6,6 +6,7 @@ import type { SocialMatchFilterWithTags, UpdateSocialMatchFilterPayload } from '
 
 import { blocklistWhereClause } from '@/db/includes/blocklistWhereClause';
 import { profileImageInclude, tagsInclude } from '@/db/includes/profileIncludes';
+import type { LocationDTO } from '@zod/dto/location.dto';
 
 const tagInclude = {
   tags: {
@@ -16,6 +17,7 @@ const tagInclude = {
     }
   },
 }
+
 
 export type OrderBy = Prisma.Enumerable<Prisma.ProfileOrderByWithRelationInput> | Prisma.ProfileOrderByWithRelationInput
 
@@ -64,8 +66,8 @@ export class ProfileMatchService {
 
     const create = {
       profileId,
-      country: data.location?.country || null,
-      cityId: data.location?.cityId || null,
+      country: data.location?.country ?? '',
+      cityId: data.location?.cityId ?? '',
       radius: data.radius ?? 0,
       tags: {
         connect: tagIds, // ✅ required for create
@@ -82,6 +84,19 @@ export class ProfileMatchService {
       }
     })
   }
+
+  async createSocialMatchFilter(tx: Prisma.TransactionClient, profileId: string, location: LocationDTO): Promise<SocialMatchFilterWithTags | null> {
+    return await tx.socialMatchFilter.create({
+      data: {
+        profileId,
+        country: location.country ?? '',
+      },
+      include: {
+        ...tagInclude,
+      }
+    })
+  }
+
 
   async findSocialProfilesFor(profileId: string, orderBy: OrderBy = defaultOrderBy, take: number = 20): Promise<DbProfileWithImages[]> {
 

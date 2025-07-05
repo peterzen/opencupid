@@ -78,18 +78,10 @@ export class MessageService {
     return await prisma.conversationParticipant.findMany({
       where: {
         profileId,
-        OR: [
+        NOT: [
           {
             conversation: {
-              status: 'ACCEPTED',
-            },
-          },
-          {
-            conversation: {
-              status: 'INITIATED',
-              NOT: {
-                initiatorProfileId: profileId, // only show if someone else initiated
-              },
+              status: 'BLOCKED', // Exclude blocked conversations
             },
           },
         ],
@@ -108,9 +100,18 @@ export class MessageService {
       },
 
       include: conversationSummaryInclude,
-      orderBy: {
-        conversation: { updatedAt: 'desc' },
-      },
+      orderBy: [
+        {
+          conversation: {
+            status: 'desc',
+          },
+        },
+        {
+          conversation: {
+            updatedAt: 'desc',
+          },
+        },
+      ],
     })
   }
 
@@ -165,7 +166,7 @@ export class MessageService {
    */
   async acceptConversationOnMatch(profileAId: string, profileBId: string): Promise<Conversation | null> {
     const [sortedProfileAId, sortedProfileBId] = this.sortProfilePair(profileAId, profileBId)
-    
+
     const existingConversation = await prisma.conversation.findUnique({
       where: {
         profileAId_profileBId: { profileAId: sortedProfileAId, profileBId: sortedProfileBId },
@@ -282,7 +283,7 @@ export class MessageService {
         }
 
         // Check if the sender is allowed to reply to this conversation.
-        if (!this.canSendMessageInConversation(conversation, senderProfileId)) {
+        if (!canSendMessageInConversation(conversation, senderProfileId)) {
           throw new Error('Conversation is not accepted or sender cannot reply to initiated thread')
         }
 
@@ -314,35 +315,28 @@ export class MessageService {
   }
 
   async sendOrStartConversation(
+    tx: Prisma.TransactionClient,
     senderProfileId: string,
     recipientProfileId: string,
     content: string
-  ): Promise<SendMessageSuccessResponse> {
+  ): Promise<{ convoId: string; message: Message }> {
+
     const [profileAId, profileBId] = this.sortProfilePair(senderProfileId, recipientProfileId)
 
-    const { conversationId, message } = await prisma.$transaction(async (tx) => {
-      const convo = await this.findOrCreateConversation(tx, profileAId, profileBId, senderProfileId)
+    const convo = await this.findOrCreateConversation(tx, profileAId, profileBId, senderProfileId)
 
-      const message = await tx.message.create({
-        data: {
-          conversationId: convo.id,
-          senderId: senderProfileId,
-          content,
-        },
-        include: sendInclude,
-      })
-
-      return { conversationId: convo.id, message }
+    const message = await tx.message.create({
+      data: {
+        conversationId: convo.id,
+        senderId: senderProfileId,
+        content,
+      },
+      include: sendInclude,
     })
 
-    const conversation = await this.getConversationSummary(conversationId, senderProfileId)
-    if (!conversation) throw {
-      error: 'Conversation not found after creation',
-      code: 'INTERNAL_ERROR',
-    }
-
-    return { conversation, message }
+    return { convoId: convo.id, message }
   }
+
 
   private async findOrCreateConversation(
     tx: Prisma.TransactionClient,
@@ -350,6 +344,7 @@ export class MessageService {
     profileBId: string,
     senderId: string
   ): Promise<Conversation> {
+
     const existing = await tx.conversation.findUnique({
       where: {
         profileAId_profileBId: { profileAId, profileBId },
@@ -357,7 +352,7 @@ export class MessageService {
     })
 
     if (existing) {
-      if (!this.canSendMessageInConversation(existing, senderId)) {
+      if (!canSendMessageInConversation(existing, senderId)) {
         throw {
           error: 'Conversation is not accepted or sender cannot reply to initiated thread',
           code: 'CONVERSATION_BLOCKED',
@@ -397,69 +392,6 @@ export class MessageService {
 
 
 
-  // async _sendOrStartConversation(
-  //   senderProfileId: string,
-  //   recipientProfileId: string,
-  //   content: string
-  // ): Promise<SendMessageSuccessResponse> {
-  //   const [profileAId, profileBId] = this.sortProfilePair(senderProfileId, recipientProfileId)
-
-  //   const { conversationId, message } = await prisma.$transaction(
-  //     async (tx: Prisma.TransactionClient) => {
-  //       let convo = await tx.conversation.findUnique({
-  //         where: {
-  //           profileAId_profileBId: { profileAId, profileBId },
-  //         },
-  //       })
-
-  //       if (convo) {
-
-  //         // Check if the sender is allowed to reply to a conversation.
-  //         if (!this.canSendMessageInConversation(convo, senderProfileId)) {
-  //           throw {
-  //             error: 'Conversation is not accepted or sender cannot reply to initiated thread',
-  //           }
-  //         }
-
-  //         // existing conversation, update lastMessageAt
-  //         await tx.conversation.update({
-  //           where: {
-  //             profileAId_profileBId: { profileAId, profileBId },
-  //           },
-  //           data: {
-  //             updatedAt: new Date(),
-  //             status: 'ACCEPTED' // ensure status is set to ACCEPTED
-  //           },
-  //         })
-
-  //       } else {
-  //         convo = await tx.conversation.create({
-  //           data: {
-  //             status: 'INITIATED', // start as initiated
-  //             initiatorProfileId: senderProfileId, // set the initiator
-  //             profileAId,
-  //             profileBId,
-  //             participants: {
-  //               create: [{ profileId: profileAId }, { profileId: profileBId }],
-  //             },
-  //           },
-  //         })
-  //       }
-
-  //       const message = await tx.message.create({
-  //         data: {
-  //           conversationId: convo.id,
-  //           senderId: senderProfileId,
-  //           content,
-  //         },
-  //       })
-  //       return { conversationId: convo.id, message }
-  //     }
-  //   )
-  //   const convo = await this.getConversationSummary(conversationId, senderProfileId)
-  //   return { conversation: convo, message }
-  // }
-
   /**
    * Sorts a pair of profile IDs in a consistent order.
    * @param a
@@ -470,26 +402,7 @@ export class MessageService {
     return a < b ? [a, b] : [b, a]
   }
 
-  // Checks if the sender is allowed to reply to a conversation.
-  /*
-  | Condition                                | Allow?                   |
-  | ---------------------------------------- | ------------------------ |
-  | status = `ACCEPTED`                      | ✅ Yes                    |
-  | status = `INITIATED`, sender ≠ initiator | ✅ Yes                    |
-  | status = `INITIATED`, sender = initiator | ❌ No (already initiated) |
-  | status = `BLOCKED` or anything else      | ❌ No                     |
-  */
-  canSendMessageInConversation(
-    conversation: Conversation | null,
-    senderProfileId: string
-  ): boolean {
-    if (!conversation) return true // no conversation yet → allowed to start one
 
-    return (
-      conversation.status === 'ACCEPTED' ||
-      (conversation.status === 'INITIATED' && conversation.profileAId !== senderProfileId)
-    )
-  }
 }
 
 export type SendMessageSuccessResponse = {
@@ -502,3 +415,20 @@ export type SendMessageErrorResponse = {
   error: string
 }
 
+/*
+Checks if the sender is allowed to reply to a conversation.
+| Condition                                | Allow?                   |
+| ---------------------------------------- | ------------------------ |
+| status = `ACCEPTED`                      | ✅ Yes                    |
+| status = `INITIATED`, sender ≠ initiator | ✅ Yes                    |
+| status = `INITIATED`, sender = initiator | ❌ No (already initiated) |
+| status = `BLOCKED` or anything else      | ❌ No                     |
+*/
+export function canSendMessageInConversation(conversation: Conversation | null, senderProfileId: string): boolean {
+  if (!conversation) return true // no conversation yet → allowed to start one
+
+  return (
+    conversation.status === 'ACCEPTED' ||
+    (conversation.status === 'INITIATED' && conversation.initiatorProfileId !== senderProfileId)
+  )
+}

@@ -10,6 +10,7 @@ import ReceivedLikesCount from '@/features/interaction/components/ReceivedLikesC
 
 import MiddleColumn from '@/features/shared/ui/MiddleColumn.vue'
 import ProfileCardGrid from '@/features/browse/components/ProfileCardGrid.vue'
+import LikesAndMatchesBanner from '@/features/interaction/components/LikesAndMatchesBanner.vue'
 
 const profileStore = useOwnerProfileStore()
 const viewerProfile = ref(profileStore.profile)
@@ -18,9 +19,9 @@ const router = useRouter()
 const newProfiles = ref([] as PublicProfile[])
 
 onMounted(async () => {
-  const findProfileStore = useFindProfileStore()
-
   await useBootstrap().bootstrap()
+
+  const findProfileStore = useFindProfileStore()
 
   const result = await findProfileStore.fetchNewSocial()
   console.log('New profiles fetched:', result)
@@ -42,14 +43,25 @@ provide('viewerProfile', viewerProfile.value)
 </script>
 
 <template>
-  <main class="container overflow-auto">
-    <h2 class="mt-3">Welcome to Gaians.</h2>
-    <ReceivedLikesCount class="my-3" />
-
-    <div v-if="newProfiles.length > 0" class="mb-4">
-      <h5>New people nearby</h5>
+  <main class="overflow-auto">
+    <div class="container">
       <MiddleColumn>
-        <ProfileCardGrid :profiles="newProfiles" @profile:select="handleCardClick" cols="2" gutter="2" gap="2"/>
+        <h2 class="mt-3">Welcome to Gaians.</h2>
+        <LikesAndMatchesBanner class="my-3" />
+
+        <div v-if="newProfiles.length > 0" class="mb-4">
+          <h5>Meet new people</h5>
+          <BRow>
+            <ProfileCardGrid
+              :profiles="newProfiles"
+              @profile:select="handleCardClick"
+              :showTags="false"
+              cols="2"
+              gutter="2"
+              gap="2"
+            />
+          </BRow>
+        </div>
       </MiddleColumn>
     </div>
   </main>
