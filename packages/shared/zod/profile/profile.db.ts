@@ -1,5 +1,6 @@
 import z from "zod";
 import {
+  CitySchema,
   ConversationParticipantSchema,
   ConversationSchema,
   HiddenProfileSchema,
@@ -14,6 +15,7 @@ import { datingFields, ownerFields, socialFields } from "./profile.fields";
 export const DbProfileSchema = ProfileSchema.extend({
   localized: z.array(LocalizedProfileFieldSchema).default([]),
   tags: z.array(TagWithTranslationsSchema).default([]),
+  city: CitySchema
 })
 export type DbProfile = z.infer<typeof DbProfileSchema>;
 

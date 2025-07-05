@@ -23,7 +23,6 @@ import {
 import { bus } from '@/lib/bus'
 import { DatingPreferencesDTOSchema, SocialMatchFilterDTOSchema, UpdateSocialMatchFilterPayloadSchema, type DatingPreferencesDTO, type SocialMatchFilterDTO, type UpdateSocialMatchFilterPayload } from '@zod/match/filters.dto'
 import { mapLocationDTOToPayload } from '@zod/dto/location.dto'
-import { initialize } from '../../shared/composables/useCountries'
 
 type FindProfileStoreState = {
   datingPrefs: DatingPreferencesDTO | null,

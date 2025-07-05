@@ -1,4 +1,4 @@
-import { mapLocation, type LocationDTO } from "@zod/dto/location.dto"
+import { mapLocationToPayload, type LocationDTO } from "@zod/dto/location.dto"
 import type { Profile, SocialMatchFilter } from "@zod/generated"
 import {
   DatingPreferencesDTOSchema,
@@ -26,7 +26,7 @@ export function mapSocialMatchFilterToDTO(
   filter: SocialMatchFilterWithTags,
   locale: string,
 ): SocialMatchFilterDTO {
-  const location = mapLocation({ country: filter.country, cityId: filter.cityId })
+  const location = mapLocationToPayload({ country: filter.country, cityId: filter.cityId })
   const tags = (filter.tags ?? []).map(tag => DbTagToPublicTagTransform(tag, locale))
   return {
     location,

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useCountries } from '@/features/shared/composables/useCountries'
-import { LocationPayload, type LocationDTO } from '@zod/dto/location.dto'
+import { type LocationPayload, type LocationDTO } from '@zod/dto/location.dto'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Multiselect from 'vue-multiselect'

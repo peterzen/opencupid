@@ -9,7 +9,7 @@ import { toInitialCaps } from '@/lib/utils'
 import { type MultiselectComponent } from '@/types/multiselect'
 
 import type { PublicCity } from '@zod/dto/city.dto'
-import { LocationPayload } from '@zod/dto/location.dto'
+import { type LocationPayload } from '@zod/dto/location.dto'
 
 const cityStore = useCitiesStore()
 const { t } = useI18n()

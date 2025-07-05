@@ -63,7 +63,11 @@ export function mapProfileToPublic(dbProfile: DbProfileWithImages, includeDating
     ...scalars,
     profileImages: publicImages,
     tags: publicTags,
-    location: LocationSchema.parse(dbProfile),
+    location: {
+      country: dbProfile.country || '',
+      cityId: dbProfile.cityId || '',
+      cityName: dbProfile.city.name || '',
+    },
     introSocial: get('introSocial') || '',
     introDating: get('introDating') || '',
   } as PublicProfileWithContext

@@ -17,7 +17,7 @@ export type LocationPayload = z.infer<typeof LocationPayloadSchema>
 export type LocationDTO = z.infer<typeof LocationSchema>
 
 
-export function mapLocation(
+export function mapLocationToPayload(
   raw: { country: string | null; cityId: string | null },
 ): LocationPayload {
   const country = raw.country && raw.country !== '' ? raw.country : null
@@ -29,8 +29,9 @@ export function mapLocation(
   }
 }
 
+
 export function mapLocationDTOToPayload(
-  location: LocationDTO | null,
+  location: LocationPayload | null,
 ): LocationPayload {
   if (!location) {
     return { country: null, cityId: null }
@@ -41,3 +42,5 @@ export function mapLocationDTOToPayload(
 
   return { country, cityId }
 }
+
+
