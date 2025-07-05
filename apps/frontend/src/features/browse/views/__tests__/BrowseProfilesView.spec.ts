@@ -3,7 +3,6 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { ref, computed } from 'vue'
 
 // stub child components
-vi.mock('../../components/SecondaryNav.vue', () => ({ default: { template: '<div class="secondary-nav" />' } }))
 vi.mock('../../components/ProfileCardGrid.vue', () => ({ default: { template: '<div class="profile-grid" />', props: ['profiles'] } }))
 vi.mock('../../components/PlaceholdersGrid.vue', () => ({ default: { template: '<div class="placeholders-grid" />', props: ['howMany','loading'] } }))
 vi.mock('../../components/NoAccessCTA.vue', () => ({ default: { template: '<div class="no-access" />', props: ['modelValue'] } }))
@@ -12,6 +11,7 @@ vi.mock('../../components/DatingPreferencesForm.vue', () => ({ default: { templa
 vi.mock('../../components/MiddleColumn.vue', () => ({ default: { template: '<div class="middle"><slot /></div>' } }))
 vi.mock('@/features/publicprofile/components/PublicProfile.vue', () => ({ default: { template: '<div class="public-profile" />', props: ['id'] } }))
 vi.mock('@/features/interaction/components/ReceivedLikesCount.vue', () => ({ default: { template: '<div class="received-likes" />' } }))
+vi.mock('@/features/shared/ui/SecondaryNav.vue', () => ({ default: { template: '<div class="secondary-nav" />' } }))
 vi.mock('@/features/shared/ui/StoreErrorOverlay.vue', () => ({ default: { template: '<div class="store-error"><slot /></div>', props: ['error'] } }))
 vi.mock('vue-router', () => ({ useRouter: () => ({ push: vi.fn(), back: vi.fn(), replace: vi.fn() }) }))
 

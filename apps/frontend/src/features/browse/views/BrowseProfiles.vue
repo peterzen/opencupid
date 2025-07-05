@@ -11,7 +11,7 @@ import ReceivedLikesCount from '@/features/interaction/components/ReceivedLikesC
 import { useFindMatchViewModel } from '../composables/useFindMatchViewModel'
 import DatingPreferencesForm from '../components/DatingPreferencesForm.vue'
 import SocialFilterForm from '../components/SocialFilterForm.vue'
-import SecondaryNav from '../components/SecondaryNav.vue'
+import SecondaryNav from '../../shared/ui/SecondaryNav.vue'
 import ProfileCardGrid from '../components/ProfileCardGrid.vue'
 import NoAccessCTA from '../components/NoAccessCTA.vue'
 import NoResultsCTA from '../components/NoResultsCTA.vue'
@@ -19,6 +19,7 @@ import PlaceholdersGrid from '../components/PlaceholdersGrid.vue'
 import LocationLabel from '@/features/shared/profiledisplay/LocationLabel.vue'
 import SocialFilterDisplay from '../components/SocialFilterDisplay.vue'
 import DatingPrefsDisplay from '../components/DatingPrefsDisplay.vue'
+import ScopeViewToggler from '@/features/shared/ui/ScopeViewToggler.vue'
 const router = useRouter()
 
 // state management
@@ -113,7 +114,11 @@ const isDetailView = computed(() => !!selectedProfileId.value)
     >
       <MiddleColumn class="my-2">
         <div class="container d-flex flex-column">
-          <SecondaryNav v-model="scopeModel" />
+          <SecondaryNav>
+            <template #items-center>
+              <ScopeViewToggler v-model="scopeModel" />
+            </template>
+          </SecondaryNav>
           <div v-if="currentScope == 'social'" class="filter-controls my-2">
             <SocialFilterDisplay
               v-if="socialFilter && haveAccess"
