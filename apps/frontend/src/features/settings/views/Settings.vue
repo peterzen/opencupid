@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 
 import { useColorMode } from 'bootstrap-vue-next'
 import { type LoginUser } from '@zod/user/user.dto'
 
 import { useMessageStore } from '@/features/messaging/stores/messageStore'
 import { useAuthStore } from '@/features/auth/stores/authStore'
+import { useLocalStore } from '@/store/localStore'
 
 import IconSetting2 from '@/assets/icons/interface/setting-2.svg'
 import IconLogout from '@/assets/icons/interface/logout.svg'
@@ -21,6 +22,7 @@ import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const localStore = useLocalStore()
 
 const user = reactive({} as LoginUser)
 const isLoading = ref(true)
@@ -35,12 +37,17 @@ const mode = useColorMode({
   },
 })
 
+watch(mode, newMode => {
+  localStore.setTheme(newMode)
+})
+
 const changeColor = () => {
   mode.value = mode.value === 'dark' ? 'light' : 'dark'
 }
 
 onMounted(async () => {
   isLoading.value = true
+  mode.value = localStore.getTheme as any
   const res = await authStore.fetchUser()
 
   if (res.success) {
@@ -55,7 +62,7 @@ onMounted(async () => {
 
 function handleClick() {
   authStore.logout()
-  console.log('User logged out sending to /auth' )
+  console.log('User logged out sending to /auth')
   router.push({ name: 'Login' })
 }
 </script>
