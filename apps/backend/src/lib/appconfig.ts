@@ -53,6 +53,10 @@ export const configSchema = z.object({
   OG_TYPE: z.string(),
 
   FACEAPI_ENABLED: z.string().transform(val => val === 'true').default('false'),
+
+  DOMAIN: z.string().default('example.org'),
+  
+  SITE_NAME: z.string().default('OpenCupid'),
 })
 
 if (process.env.NODE_ENV !== 'production') {

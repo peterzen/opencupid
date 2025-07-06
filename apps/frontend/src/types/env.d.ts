@@ -28,4 +28,5 @@ declare const __APP_CONFIG__: {
   readonly OG_IMAGE: string
   readonly OG_URL: string
   readonly OG_TYPE: string
+  readonly SITE_NAME: string
 }
