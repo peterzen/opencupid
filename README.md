@@ -22,11 +22,7 @@ pnpm dev
 pnpm install 
 pnpm --filter backend generate  # generate prisma client
 
-# backend test suite
-pnpm --filter backend test
-
-# frontend test suite
-pnpm --filter frontend test:unit
+pnpm test  # this runs all of the tests in backend/frontend
 
 # lint
 pnpm lint

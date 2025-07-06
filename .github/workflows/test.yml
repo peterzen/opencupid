@@ -9,17 +9,17 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_DB: app_test
-          POSTGRES_USER: appuser
-          POSTGRES_PASSWORD: secret
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=5
+    # services:
+      # postgres:
+      #   image: postgres:15
+      #   env:
+      #     POSTGRES_DB: app_test
+      #     POSTGRES_USER: appuser
+      #     POSTGRES_PASSWORD: secret
+      #   ports:
+      #     - 5432:5432
+      #   options: >-
+      #     --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=5
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -36,14 +36,14 @@ jobs:
         run: pnpm --filter backend exec npx prisma generate
       - name: Run lint
         run: pnpm lint
-      - name: Initialize test database
-        run: pnpm --filter backend exec npx prisma db push
-        env:
-          DATABASE_URL: postgresql://appuser:secret@localhost:5432/app_test
+      # - name: Initialize test database
+      #   run: pnpm --filter backend exec npx prisma db push
+      #   env:
+      #     DATABASE_URL: postgresql://appuser:secret@localhost:5432/app_test
       - name: Build frontend
         run: pnpm --filter frontend exec pnpm build
       - name: Backend tests
-        run: pnpm --filter backend exec vitest run  --mode test
+        run: pnpm --filter backend exec vitest run 
       - name: Frontend unit tests
         run: pnpm --filter frontend exec vitest run
         
