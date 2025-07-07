@@ -31,9 +31,6 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
             if (id.includes('features/auth')) {
               return 'auth'
             }
-            if (id.includes('vue-circle-flag')) {
-              return 'flags'
-            }
             if (id.includes('assets/icons')) {
               return 'icons'
             }

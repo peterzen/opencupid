@@ -1,4 +1,4 @@
-import { createI18n } from 'vue-i18n'
+import { createI18n, type Composer } from 'vue-i18n'
 
 declare global {
   interface Window {
@@ -31,7 +31,7 @@ import { bus } from './bus'
 export function getLocale(): string {
   const localStore = useLocalStore()
   // Ensure the store is initialized so values are loaded from localStorage
-  if (!localStore.language) localStore.initialize()
+  // if (!localStore.language) localStore.initialize()
   return localStore.getLanguage
 }
 
@@ -46,21 +46,27 @@ export function appCreateI18n() {
   })
 }
 
+async function loadMessages(language: string) {
+  // Lazy-load messages only if not already loaded
+  const messages = await messagesLoaders[language]?.()
+  if (messages) {
+    (window.__APP_I18N__?.global as Composer).setLocaleMessage(language, messages.default || messages)
+    console.log(`Messages for locale ${language} loaded successfully.`)
+  } else {
+    console.warn(`No message loader found for locale: ${language}`)
+  }
+
+  // Apply new locale
+  (window.__APP_I18N__?.global as Composer).locale.value = language
+}
+
 export function appUseI18n(app: any) {
   const i18n = window.__APP_I18N__ || appCreateI18n()
   window.__APP_I18N__ = i18n as any
   app.use(i18n)
+  loadMessages(getLocale())
 
   bus.on('language:changed', async ({ language }) => {
-    // Lazy-load messages only if not already loaded
-    const messages = await messagesLoaders[language]?.()
-    if (messages) {
-      (i18n.global as import('vue-i18n').Composer).setLocaleMessage(language, messages.default || messages)
-    } else {
-      console.warn(`No message loader found for locale: ${language}`)
-    }
-
-    // Apply new locale
-    (i18n.global as import('vue-i18n').Composer).locale.value = language
+    loadMessages(language)
   })
 }

@@ -3,6 +3,8 @@ import { computed } from 'vue'
 
 import { type SearchLocationDTO, type LocationDTO } from '@zod/dto/location.dto'
 import { useCountries } from '@/features/shared/composables/useCountries'
+import FlagIcon, { type CountryCode } from 'vue3-flag-icons'
+import 'vue3-flag-icons/styles'
 
 const props = withDefaults(
   defineProps<{
@@ -37,8 +39,9 @@ const shouldRenderCountry = computed(() => {
   return !!props.location.country && (!isSameCountry.value || props.showCountryLabel)
 })
 
-
-
+const countryCode = computed(() => {
+  return props.location.country?.toLowerCase() as CountryCode
+})
 </script>
 
 <template>
@@ -52,12 +55,12 @@ const shouldRenderCountry = computed(() => {
       <span v-if="showCountryIcon" class="flag-icon" @click="$event.stopPropagation()">
         <BTooltip :delay="100" placement="top" :title="countryName">
           <template #target>
-            <CircleFlags
-              :newFlagName="countryName"
-              :showFlagName="true"
-              size="small"
-              :country="location.country"
-              title=""
+            <FlagIcon
+              :code="countryCode"
+              size="36"
+              circle
+              v-if="countryCode"
+              :title="countryName"
             />
           </template>
           {{ countryName }}

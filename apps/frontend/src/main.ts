@@ -39,22 +39,15 @@ app.use(createBootstrap()) // bootstrap-vue-next
 import { useIcons } from './lib/icons'
 useIcons(app)
 
-import { appUseI18n } from './lib/i18n'
-appUseI18n(app)
-
 // toasts
 import registerToast from './lib/toast'
 
 registerToast(app)
 
-//@ts-expect-error no ts decl
-import CircleFlags from "vue-circle-flags";
-import "vue-circle-flags/dist/vue-circle-flags.css";
-app.use(CircleFlags)
-
-// import '@/lib/websocket' // Initialize WebSocket connection
-
 import { useBootstrap } from './lib/bootstrap'
 useBootstrap().bootstrap()
+
+import { appUseI18n } from './lib/i18n'
+appUseI18n(app)
 
 app.mount('#app')
