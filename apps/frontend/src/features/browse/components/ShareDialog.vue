@@ -1,7 +1,12 @@
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n'
+
 import { UseClipboard } from '@vueuse/components'
 import { useQRCode } from '@vueuse/integrations/useQRCode'
 import IconCopy from '@/assets/icons/interface/copy.svg'
+
+const { t } = useI18n()
+
 
 const showModal = defineModel<boolean>({
   default: false,
@@ -27,7 +32,7 @@ const handleSelect = (event: Event) => {
     :no-footer="true"
     :no-header="false"
     fullscreen="sm"
-    :title="$t('uicomponents.share_dialog.title')"
+    :title="t('uicomponents.share_dialog.title')"
     :backdrop-first="false"
     no-animation
   >
@@ -51,14 +56,14 @@ const handleSelect = (event: Event) => {
           class="flex-grow-1 flex-shrink-0 ms-3"
         >
           <IconCopy class="svg-icon" />
-          {{ copied ? $t('uicomponents.share_dialog.button_copied') : $t('uicomponents.share_dialog.button_copy') }}
+          {{ copied ? t('uicomponents.share_dialog.button_copied') : t('uicomponents.share_dialog.button_copy') }}
         </BButton>
       </UseClipboard>
     </BFormGroup>
     <div class="col-12 text-center">
       <img :src="qrcode" alt="QR Code" class="img-fluid w-100" />
       <div class="text-muted">
-        {{ $t('uicomponents.share_dialog.qr_hint') }}
+        {{ t('uicomponents.share_dialog.qr_hint') }}
       </div>
     </div>
   </BModal>

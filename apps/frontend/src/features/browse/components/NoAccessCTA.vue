@@ -1,9 +1,14 @@
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n'
+
 import { type ProfileScope } from '@zod/profile/profile.dto'
 
 const currentScope = defineModel<ProfileScope | null>()
 
 defineEmits(['edit:profile'])
+
+const { t } = useI18n()
+
 </script>
 
 <template>
@@ -12,18 +17,18 @@ defineEmits(['edit:profile'])
   >
     <div v-if="currentScope === 'dating'">
       <!-- Your own dating profile is currently private -->
-      <h5>{{ $t('profiles.browse.no_access_dating_title') }}</h5>
+      <h5>{{ t('profiles.browse.no_access_dating_title') }}</h5>
       <p class="text-muted">
         <!-- When others can't see you... -->
-        {{ $t('profiles.browse.no_access_dating_description') }}
+        {{ t('profiles.browse.no_access_dating_description') }}
       </p>
     </div>
     <div v-else-if="currentScope === 'social'">
       <!-- Your own social profile is currently private -->
-      <h5>{{ $t('profiles.browse.no_access_social_title') }}</h5>
+      <h5>{{ t('profiles.browse.no_access_social_title') }}</h5>
       <p class="text-muted">
         <!-- When others can't see you... -->
-        {{ $t('profiles.browse.no_access_social_description') }}
+        {{ t('profiles.browse.no_access_social_description') }}
       </p>
     </div>
     <BButton
@@ -34,7 +39,7 @@ defineEmits(['edit:profile'])
       class="d-flex align-items-center justify-content-center"
     >
       <!-- Go to my profile -->
-      {{ $t('profiles.browse.cta_button_label') }}
+      {{ t('profiles.browse.cta_button_label') }}
     </BButton>
   </div>
 </template>

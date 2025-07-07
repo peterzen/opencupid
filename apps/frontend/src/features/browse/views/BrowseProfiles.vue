@@ -204,7 +204,7 @@ const isDetailView = computed(() => !!selectedProfileId.value)
             <MiddleColumn class="h-100">
               <div class="my-3">
                 <!-- There's nobody in your area that matches your preferences, yet. -->
-                {{ $t('profiles.browse.social_no_results') }}
+                {{ t('profiles.browse.social_no_results') }}
               </div>
               <NoResultsCTA />
             </MiddleColumn>
