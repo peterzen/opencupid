@@ -107,7 +107,6 @@
     "forms": {
       "my_preferences": "My preferences",
       "age_range": "Age range",
-      "publicname_hint": "First name only please.",
       "kids_label": "Kids?",
       "relationship_label": "I am...",
       "pronouns_label": "They refer to me as...",
@@ -122,9 +121,7 @@
       "dictate_listening": "Listening…",
       "dictate": "Dictate",
       "intro_placeholder": "Tell a bit about yourself",
-      "intro_who_placeholder": "Who would you like to meet?",
-      "save_changes_hint": "Done editing",
-      "edit_button_hint": "Edit your info"
+      "intro_who_placeholder": "Who would you like to meet?"
     },
     "blocklist": {
       "title": "Blocked users",
