@@ -255,7 +255,7 @@
     "send_message_button": "Küldje el a",
     "message_input_placeholder": "Írja be ide az üzenetét...",
     "new_message_notification": "{sender} küldött egy üzenetet",
-    "send_message_to_user": "Üzenet küldése a következő címre: {név}",
+    "send_message_to_user": "Üzenet küldése a következő címre: {name}",
     "unknown_sender": "Valaki",
     "message_input_hint": "Nyomja meg az Entert a küldéshez",
     "send_failed": "Hoppá, ez nem működött. Kérjük, próbálja meg újra.",
