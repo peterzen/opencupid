@@ -33,7 +33,7 @@ const hasMatchNotifications = computed(
 <template>
   <BNavbar v-if="authStore.isLoggedIn && profileStore.profile?.isOnboarded" variant="secondary" fixed="top" class="" data-testid="navbar">
     <BNavbarNav class="d-flex justify-content-between w-100">
-      <BNavItem to="/" active-class="active">
+      <BNavItem to="/home" active-class="active">
         <IconHome class="svg-icon-lg" />
         <span class="d-none d-md-inline label">{{ $t('nav.home') }}</span>
       </BNavItem>
