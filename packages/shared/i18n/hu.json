@@ -266,7 +266,7 @@
     "block_user_ok": "Blokk {név}",
     "nevermind": "Nevermind",
     "send_message_heading": "Üzenet küldése",
-    "welcome_message": "Üdvözöljük a Gaians!",
+    "welcome_message": "Üdvözöljük a {siteName} oldalon!\nMookie vagyok, a házigazda.\nEz egy olyan hely, ahol kapcsolatba léphetünk, új embereket ismerhetünk meg, és hasonlóan gondolkodó lelkeket találhatunk. Remélem, jól érzed magad itt.\nBoldog kapcsolódást!\n- Mookie",
     "no_messages_cta": "Találjon embereket, akikkel beszélgethet",
     "no_messages_title": "Még nincsenek üzenetek",
     "no_messages_placeholder": "A beszélgetések itt fognak zajlani."

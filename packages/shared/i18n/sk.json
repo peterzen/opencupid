@@ -219,7 +219,7 @@
     "block_user_ok": "Blok {name}",
     "nevermind": "Nevermind",
     "send_message_heading": "Odoslať správu",
-    "welcome_message": "Vitajte v Gaians!",
+    "welcome_message": "Vitajte na {siteName}!\nSom Mookie, váš hostiteľ.\nToto je miesto, kde sa môžeme spojiť, spoznať nových ľudí a nájsť podobne zmýšľajúce duše. Dúfam, že sa vám tu bude páčiť.\nŠťastné spojenie!\n- Mookie",
     "no_messages_cta": "Nájdite ľudí, s ktorými sa môžete porozprávať",
     "no_messages_title": "Zatiaľ žiadne správy",
     "no_messages_placeholder": "Vaše rozhovory budú prebiehať tu."

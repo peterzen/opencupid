@@ -219,7 +219,7 @@
     "block_user_ok": "Bloque {name}",
     "nevermind": "No importa",
     "send_message_heading": "Enviar mensaje",
-    "welcome_message": "¡Bienvenido a Gaians!",
+    "welcome_message": "¡Bienvenido a {siteName}!\nSoy Mookie, tu anfitrión.\nEste es un lugar para conectar, conocer gente nueva y encontrar almas afines. Espero que disfrutes de tu estancia aquí.\n¡Feliz conexión!\n- Mookie",
     "no_messages_cta": "Encuentra personas con las que hablar",
     "no_messages_title": "Aún no hay mensajes",
     "no_messages_placeholder": "Tus conversaciones tendrán lugar aquí."
