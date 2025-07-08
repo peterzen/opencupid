@@ -34,6 +34,9 @@
     "translate": "npx json-autotranslate    -i packages/shared/i18n/ --directory-structure ngx-translate -d --type key-based -m i18next -s amazon-translate"
   },
   "dependencies": {
+    "@types/node": "^24.0.11",
+    "rollup": "^4.44.2",
+    "vite": "^7.0.3",
     "zod": "^3.24.4"
   },
   "packageManager": "pnpm@10.12.4"
