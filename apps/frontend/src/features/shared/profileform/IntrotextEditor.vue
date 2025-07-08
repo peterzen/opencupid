@@ -181,7 +181,7 @@ watch(
         class="mb-3"
       />
     </BFormFloatingLabel> -->
-
+<!-- 
     <div v-if="recognition">
       <p><strong>isListening:</strong> {{ isListening }}</p>
       <p><strong>lastTranscript:</strong> {{ lastTranscript }}</p>
@@ -190,7 +190,7 @@ watch(
       <p><strong>lang:</strong> {{ recognition?.lang }}</p>
       <p><strong>interimResults:</strong> {{ recognition?.interimResults }}</p>
       <p><strong>continuous:</strong> {{ recognition?.continuous }}</p>
-    </div>
+    </div> -->
   </div>
 </template>
 
