@@ -8,7 +8,6 @@ import IconSocialize from '@/assets/icons/app/socialize.svg'
 import IconGlobe from '@/assets/icons/interface/globe.svg'
 import Logo from '@/assets/icons/app/logo.svg'
 
-// @ts-ignore sdf
 import { faGithub } from '@fortawesome/free-brands-svg-icons'
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
