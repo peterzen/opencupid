@@ -285,7 +285,7 @@
     "block_user_ok": "Block {name}",
     "nevermind": "Nevermind",
     "send_message_heading": "Send Message",
-    "welcome_message": "Welcome to Gaians!",
+    "welcome_message": "Welcome to {siteName}!\nI am Mookie, your host.\nThis is a place for us to connect, meet new people, and find like-minded souls. I hope you enjoy your stay here.\nHappy connecting!\n- Mookie",
     "no_messages_cta": "Find people to talk to",
     "no_messages_title": "No messages yet",
     "no_messages_placeholder": "Your conversations will take place here."

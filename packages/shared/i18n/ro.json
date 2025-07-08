@@ -102,7 +102,7 @@
       "looks_good": "Arată bine!",
       "add_from_phone": "Adăugați o fotografie de pe telefon",
       "take_photo": "Sau faceți o fotografie cu aparatul dvs. foto",
-      "Lasă": "Lasă"
+      "nevermind": "Lasă"
     },
     "forms": {
       "my_preferences": "Preferințele mele",
@@ -217,12 +217,12 @@
     "their_turn": "Rândul lor",
     "block_report_unmatch": "Blocare/raportare/nepotrivire",
     "block_user_ok": "Bloc {name}",
-    "Lasă": "Lasă",
     "send_message_heading": "Trimite mesaj",
     "welcome_message": "Bine ați venit la Gaians!",
     "no_messages_cta": "Găsiți oameni cu care să vorbiți",
     "no_messages_title": "Încă nu există mesaje",
-    "no_messages_placeholder": "Conversațiile tale vor avea loc aici."
+    "no_messages_placeholder": "Conversațiile tale vor avea loc aici.",
+    "nevermind": "Nevermind"
   },
   "onboarding": {
     "country_placeholder": "Țara",

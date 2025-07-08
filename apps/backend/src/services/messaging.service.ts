@@ -7,6 +7,7 @@ import type {
 import { Conversation, Message } from '@zod/generated'
 import { blocklistWhereClause } from '@/db/includes/blocklistWhereClause'
 import i18next from 'i18next'
+import { JSDOM } from 'jsdom'
 import { appConfig } from '../lib/appconfig'
 
 const conversationSummaryInclude = {
@@ -202,6 +203,16 @@ export class MessageService {
     content: string
   ): Promise<{ convoId: string; message: Message }> {
 
+    // Clean and sanitize user input
+    const cleanContent = cleanUserInput(content).trim()
+
+    if (!cleanContent) {
+      throw {
+        error: 'Message content cannot be empty',
+        code: 'EMPTY_MESSAGE',
+      }
+    }
+
     const [profileAId, profileBId] = this.sortProfilePair(senderProfileId, recipientProfileId)
 
     const convo = await this.findOrCreateConversation(tx, profileAId, profileBId, senderProfileId)
@@ -210,7 +221,7 @@ export class MessageService {
       data: {
         conversationId: convo.id,
         senderId: senderProfileId,
-        content,
+        content: cleanContent,
       },
       include: sendInclude,
     })
@@ -277,7 +288,8 @@ export class MessageService {
     console.error('Welcome message sender ID:', senderId)
     if (senderId) {
       const t = i18next.getFixedT(locale)
-      const content = t('messaging.welcome_message')
+      const mdContent = t('messaging.welcome_message')
+      const content = simpleMarkdownToHtml(mdContent)
       console.error('Sending welcome message:', content)
       return await prisma.$transaction(async tx => {
         await this.sendOrStartConversation(tx, senderId, recipientProfileId, content)
@@ -324,4 +336,20 @@ export function canSendMessageInConversation(conversation: Conversation | null, 
     conversation.status === 'ACCEPTED' ||
     (conversation.status === 'INITIATED' && conversation.initiatorProfileId !== senderProfileId)
   )
+}
+
+
+export function simpleMarkdownToHtml(input: string): string {
+  return input
+    .replace(/&/g, '&amp;')    // escape HTML entities
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\n/g, '<br>')
+}
+
+function cleanUserInput(input: string): string {
+  const dom = new JSDOM('')
+  const div = dom.window.document.createElement('div')
+  div.innerHTML = input
+  return div.textContent || ''
 }

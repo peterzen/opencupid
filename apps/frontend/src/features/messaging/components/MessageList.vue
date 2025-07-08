@@ -26,16 +26,22 @@ watch(
     <div
       v-for="msg in messages"
       :key="msg.id"
-      class="message mb-2 me-2 message badge px-3 text-wrap rounded-pill fs-6 animate__animated animate__zoomIn user-select-none"
+      class="message mb-2 me-2 message text-wrap animate__animated animate__zoomIn user-select-none"
       :class="{
         'bg-info align-self-start': !msg.isMine,
         'bg-secondary align-self-end': msg.isMine,
       }"
-    >
-      {{ msg.content }}
-    </div>
+      v-html="msg.content"
+    />
   </div>
 </template>
 
 <style scoped>
+.message {
+  max-width: 50%;
+  border-radius: 15px;
+  word-break: break-word;
+  padding: 0.25rem 0.5rem;
+  font-size: 1rem;
+}
 </style>
