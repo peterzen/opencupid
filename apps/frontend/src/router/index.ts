@@ -10,20 +10,22 @@ import MyProfile from '@/features/myprofile/views/MyProfile.vue'
 import BrowseProfiles from '@/features/browse/views/BrowseProfiles.vue'
 import OnboardingView from '@/features/onboarding/views/Onboarding.vue'
 import MatchesView from '@/features/interaction/views/Matches.vue'
-import { useOwnerProfileStore } from '../features/myprofile/stores/ownerProfileStore'
-import { useBootstrap } from '../lib/bootstrap'
+import AuthUserId  from '@/features/auth/views/AuthUserId.vue'
+import AuthOtp from '@/features/auth/views/AuthOtp.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/auth',
     name: 'Login',
-    component: () => import('@/features/auth/views/AuthUserId.vue'),
+    // component: () => import('@/features/auth/views/AuthUserId.vue'),
+    component: AuthUserId,
     meta: { requiresAuth: false },
   },
   {
     path: '/auth/otp',
     name: 'LoginOTP',
-    component: () => import('@/features/auth/views/AuthOtp.vue'),
+    // component: () => import('@/features/auth/views/AuthOtp.vue'),
+    component: AuthOtp,
     meta: { requiresAuth: false },
   },
   {
@@ -60,7 +62,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true },
   },
   {
-    path: '/',
+    path: '/home',
     name: 'UserHome',
     component: UserHome,
     meta: { requiresAuth: true },
@@ -90,11 +92,6 @@ const routes: Array<RouteRecordRaw> = [
     component: MatchesView,
     props: true,
     meta: { requiresAuth: true },
-  },
-  // Redirect root to login page
-  {
-    path: '/',
-    redirect: '/login',
   },
 ]
 

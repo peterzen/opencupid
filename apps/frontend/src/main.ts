@@ -1,53 +1,23 @@
-import '@/css'
-
-// @ ts-expect-error: virtual:pwa-register is a Vite virtual module
-// import { registerSW } from 'virtual:pwa-register'
-
-// const updateSW = registerSW({
-//   immediate: true,
-//   onNeedRefresh() {
-//     // Show "new version available" prompt
-//   },
-//   onOfflineReady() {
-//     // Show "app is ready offline" message
-//   },
-// })
-
-
-import { Settings } from 'luxon'
-Settings.defaultZone = 'Europe/Berlin'
-
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import { createBootstrap } from 'bootstrap-vue-next'
-
-import App from './App.vue'
-import router from './router'
-
-const app = createApp(App)
-app.config.warnHandler = (msg, vm, trace) => {
-  console.error('Vue warning:', msg, trace)
-  if (msg.includes('computed value is readonly')) {
-    // debugger
-  }
-}
-app.use(createPinia())
-app.use(router)
-app.use(createBootstrap()) // bootstrap-vue-next
-
-// Load/initialize icon set
-import { useIcons } from './lib/icons'
-useIcons(app)
-
-// toasts
-import registerToast from './lib/toast'
-
-registerToast(app)
-
-import { useBootstrap } from './lib/bootstrap'
-useBootstrap().bootstrap()
-
 import { appUseI18n } from './lib/i18n'
-appUseI18n(app)
 
-app.mount('#app')
+import '@/css/fonts.scss'
+import '@/css/bootstrap.scss'
+
+
+if (window.location.pathname === '/') {
+  import('@/features/landingpage/views/LandingPage.vue').then(({ default: Landing }) => {
+    const app = createApp(Landing)
+    app.use(createPinia())
+    appUseI18n(app)
+
+    app.mount('#app')
+    // Preload full app silently in background
+    import('./app')
+  })
+} else {
+  import('./app').then(({ bootstrapApp }) => bootstrapApp())
+}
+
+

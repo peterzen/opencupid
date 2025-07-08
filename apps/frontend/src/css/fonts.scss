@@ -7,4 +7,11 @@
 // @import "~@fontsource/rubik/index.css";
 // @import "~@fontsource/quicksand/index.css";
 // @import "~@fontsource/mukta/index.css";
-@import '@fontsource/caveat'; // Defaults to weight 400
+// import "@fontsource/poppins/index.css";
+
+// TODO tighten this up, only import the weights we need
+@import '@fontsource/nunito/index.css';
+@import '@fontsource/rubik/index.css';
+
+// scribble
+// @import '@fontsource/caveat'; // Defaults to weight 400

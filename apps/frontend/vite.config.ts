@@ -23,23 +23,40 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     ...define(mode),
     ...server(mode),
     build: {
-      sourcemap: true,
+      sourcemap: false,
       rollupOptions: {
         external: (id) => id.includes('__tests__'),
         output: {
           manualChunks(id) {
-            if (id.includes('features/auth')) {
-              return 'auth'
+            if (id.includes('shared/ui/LocaleSelector')) {
+              return 'landing'
+            }
+            if (id.includes('features/landingpage')) {
+              return 'landing'
             }
             if (id.includes('assets/icons')) {
               return 'icons'
             }
+            if (id.includes('vue3-flag-icons')) {
+              return 'flags'
+            }
+            // output: {
+            //   manualChunks(id) {
+            //     if (id.includes('features/auth')) {
+            //       return 'auth'
+            //     }
+            //     if (id.includes('assets/icons')) {
+            //       return 'icons'
+            //     }
+            //   }
+            // }
+
           }
         }
       }
     },
     esbuild: {
-      sourcemap: true,
+      sourcemap: false,
     },
     optimizeDeps: {
       include: ['qrcode']
