@@ -54,7 +54,6 @@ export async function bootstrapApp() {
 
   await appUseI18n(app)
 
-  await router.push('/home')
   await router.isReady()
 
   app.mount('#app')

@@ -12,6 +12,7 @@ import OnboardingView from '@/features/onboarding/views/Onboarding.vue'
 import MatchesView from '@/features/interaction/views/Matches.vue'
 import AuthUserId from '@/features/auth/views/AuthUserId.vue'
 import AuthOtp from '@/features/auth/views/AuthOtp.vue'
+import Logout from '@/features/auth/views/Logout.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -27,6 +28,12 @@ const routes: Array<RouteRecordRaw> = [
     // component: () => import('@/features/auth/views/AuthOtp.vue'),
     component: AuthOtp,
     meta: { requiresAuth: false },
+  },
+  {
+    path: '/auth/logout',
+    name: 'Logout',
+    component: Logout,
+    meta: { requiresAuth: true },
   },
   {
     path: '/browse',
