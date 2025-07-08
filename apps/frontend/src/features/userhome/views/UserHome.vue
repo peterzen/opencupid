@@ -1,19 +1,17 @@
 <script setup lang="ts">
 import { useOwnerProfileStore } from '@/features/myprofile/stores/ownerProfileStore'
-import { onMounted, provide, ref } from 'vue'
+import { computed, onMounted, provide, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useBootstrap } from '@/lib/bootstrap'
 import { useFindProfileStore } from '@/features/browse/stores/findProfileStore'
 import { type PublicProfile } from '@zod/profile/profile.dto'
-
-import ReceivedLikesCount from '@/features/interaction/components/ReceivedLikesCount.vue'
 
 import MiddleColumn from '@/features/shared/ui/MiddleColumn.vue'
 import ProfileCardGrid from '@/features/browse/components/ProfileCardGrid.vue'
 import LikesAndMatchesBanner from '@/features/interaction/components/LikesAndMatchesBanner.vue'
 
 const profileStore = useOwnerProfileStore()
-const viewerProfile = ref(profileStore.profile)
+const viewerProfile = computed(() => profileStore.profile)
 const router = useRouter()
 const newProfiles = ref([] as PublicProfile[])
 
