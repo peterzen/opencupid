@@ -1,4 +1,4 @@
-import { createApp } from 'vue'
+import { createApp, nextTick } from 'vue'
 import { createPinia } from 'pinia'
 import { appUseI18n } from './lib/i18n'
 
@@ -20,7 +20,10 @@ if (window.location.pathname === '/') {
 
       app.mount('#app')
       // Preload full app silently in background
-      import('./app')
+
+      nextTick(() => {
+        import('./app')
+      })
     })
   })
 } else {

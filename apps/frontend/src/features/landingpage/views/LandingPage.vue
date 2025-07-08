@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { getCurrentInstance, ref } from 'vue'
 import { useI18nStore } from '@/store/i18nStore'
 
 import IconDate from '@/assets/icons/app/cupid.svg'
@@ -19,9 +19,16 @@ const i18nStore = useI18nStore()
 
 const loading = ref(false)
 
+const vm = getCurrentInstance()
+
 async function enterApp() {
   loading.value = true
+
+  // Unmount the current LandingPage app
+  console.log('Unmounting LandingPage app...', vm)
+  vm?.appContext.app.unmount()
   const { bootstrapApp } = await import('../../../app')
+
   await bootstrapApp()
 }
 
@@ -37,8 +44,16 @@ const siteName = __APP_CONFIG__.SITE_NAME || 'OpenCupid'
     <header class="my-3 my-md-5">
       <BContainer fluid="md" class="d-flex flex-column justify-content-between">
         <BRow>
-          <BCol cols="12" sm="6" md="3" class="d-flex justify-content-center align-items-center ms-auto">
-            <div class="flex-shrink-1 flex-grow-0 ms-2 opacity-50" :title="t('landingpage.select_language')">
+          <BCol
+            cols="12"
+            sm="6"
+            md="3"
+            class="d-flex justify-content-center align-items-center ms-auto"
+          >
+            <div
+              class="flex-shrink-1 flex-grow-0 ms-2 opacity-50"
+              :title="t('landingpage.select_language')"
+            >
               <IconGlobe class="svg-icon svg-icon-lg me-2" />
             </div>
             <div class="flex-grow-1">

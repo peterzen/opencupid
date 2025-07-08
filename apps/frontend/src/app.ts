@@ -52,8 +52,11 @@ export async function bootstrapApp() {
 
   useBootstrap().bootstrap()
 
-  appUseI18n(app)
+  await appUseI18n(app)
+
+  await router.push('/home')
+  await router.isReady()
 
   app.mount('#app')
-  await router.isReady()
+
 }

@@ -6,6 +6,13 @@ declare global {
   }
 }
 
+
+
+import { Settings } from 'luxon'
+Settings.defaultZone = 'Europe/Berlin'
+
+
+
 // https://lokalise.com/blog/vue-i18n/
 
 // Import JSON locale files
@@ -28,11 +35,8 @@ export const messagesLoaders: Record<string, () => Promise<any>> = {
 import { useLocalStore } from '@/store/localStore'
 import { bus } from './bus'
 
-export function getLocale(): string {
+export function getLocale(): string | null {
   const localStore = useLocalStore()
-  // Ensure the store is initialized so values are loaded from localStorage
-  // neccessary for the landing page where bootstrap isn't called
-  // if (!localStore.language) localStore.initialize()
   return localStore.getLanguage
 }
 
@@ -48,16 +52,11 @@ export function sortLanguagesWithEnFirst(codes: string[]): string[] {
 export function appCreateI18n() {
   return createI18n({
     legacy: false,
-    locale: getLocale(),
+    locale: 'en',
     fallbackLocale: 'en',
     messages: { en },
     missingWarn: true,
     fallbackWarn: false,
-    interpolation: {
-      escapeParameter: false,
-      // optional but explicit:
-      delimiters: ['{{', '}}'],
-    },
   })
 }
 
@@ -84,9 +83,14 @@ export async function appUseI18n(app: any) {
   const i18n = window.__APP_I18N__ || appCreateI18n()
   window.__APP_I18N__ = i18n as any
   app.use(i18n)
-  await loadMessages(getLocale())
+
+  const defaultLocale = getLocale() || 'en'
+  if (defaultLocale && defaultLocale !== 'en') {
+    await loadMessages(defaultLocale)
+  }
 
   bus.on('language:changed', async ({ language }) => {
     await loadMessages(language)
+    Settings.defaultLocale = language
   })
 }

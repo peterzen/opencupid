@@ -4,9 +4,6 @@ import { ref, watch } from "vue";
 import { bus } from "@/lib/bus";
 import { useLocalStore } from "@/store/localStore";
 
-import { Settings } from 'luxon'
-Settings.defaultZone = 'Europe/Berlin'
-
 const labels: Record<string, string> = {
   en: 'English',
   hu: 'Magyar',
@@ -25,24 +22,24 @@ const labels: Record<string, string> = {
 export const useI18nStore = defineStore('i18n', () => {
 
   const localStore = useLocalStore()
-  localStore.initialize()
-  const { locale, availableLocales } = useI18n()
-  const currentLanguage = ref(localStore.getLanguage)
-  if (!currentLanguage.value)
-    currentLanguage.value = getBrowserLanguage(availableLocales)
-  locale.value = currentLanguage.value
 
-  // Sync changes to localStore + vue-i18n
+  const { locale } = useI18n()
+
+  const preferredLanguage = (localStore.getLanguage ?? getBrowserLanguage(Object.keys(labels))) ?? 'en'
+  const currentLanguage = ref(preferredLanguage)
+
+  // Sync changes vue-i18n
   watch(currentLanguage, (newLang) => {
-    locale.value = newLang
-    // Set the locale for Luxon
-    Settings.defaultLocale = locale.value
-    localStore.setLanguage(newLang)
-    bus.emit('language:changed', { language: newLang })
+    setLanguage(newLang)
+  }, { immediate: true })
+
+  // sync changes from vue-i18n to localStore
+  watch(locale, (newLocale) => {
+    localStore.setLanguage(newLocale)
   })
 
   function getLanguage() {
-    return currentLanguage.value
+    return locale.value
   }
 
   function setLanguage(lang: string) {
@@ -51,6 +48,7 @@ export const useI18nStore = defineStore('i18n', () => {
       console.error(`Unsupported language: ${lang}`)
       return
     }
+    bus.emit('language:changed', { language: lang })
     currentLanguage.value = lang
   }
 

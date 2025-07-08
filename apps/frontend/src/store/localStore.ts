@@ -5,7 +5,7 @@ import type { ProfileScope } from '@zod/profile/profile.dto'
 
 export interface LocalState {
   messageDrafts: Record<string, string>
-  language: string
+  language: string |null
   theme: string
   currentScope: ProfileScope | null
 }
@@ -13,7 +13,7 @@ export interface LocalState {
 export const useLocalStore = defineStore('local', {
   state: (): LocalState => ({
     messageDrafts: {},
-    language: 'en',
+    language: null,
     theme: 'light',
     currentScope: null,
   }),
@@ -49,7 +49,7 @@ export const useLocalStore = defineStore('local', {
     },
     async cleanUp() {
       this.messageDrafts = {}
-      this.language = 'en'
+      this.language = null
       this.theme = 'light'
       this.currentScope = null
       localStorage.clear()
