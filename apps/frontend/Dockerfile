@@ -7,7 +7,7 @@ RUN apt-get update && apt-get -y install build-essential python3 && \
 # Copy root monorepo files
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/frontend/package.json ./apps/frontend/package.json
-COPY .env ./apps/frontend/.env
+COPY .env ./
 RUN corepack enable && pnpm install --frozen-lockfile --filter ./apps/frontend...
 
 # Copy frontend source
