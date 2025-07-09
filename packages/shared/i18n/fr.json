@@ -219,7 +219,7 @@
     "block_user_ok": "Bloc {name}",
     "nevermind": "Nevermind",
     "send_message_heading": "Envoyer un message",
-    "welcome_message": "Bienvenue sur {siteName} !\nJe suis Mookie, ton hôte.\nC'est un endroit qui nous permet de nous connecter, de rencontrer de nouvelles personnes et de trouver des âmes partageant les mêmes idées. J'espère que tu apprécieras ton séjour ici.\nBonne connexion !\n- Mookie",
+    "welcome_message": "Bienvenue sur {{siteName}} !\nJe suis Mookie, ton hôte.\nC'est un endroit qui nous permet de nous connecter, de rencontrer de nouvelles personnes et de trouver des âmes partageant les mêmes idées. J'espère que tu apprécieras ton séjour ici.\nBonne connexion !\n- Mookie",
     "no_messages_cta": "Trouve des gens à qui parler",
     "no_messages_title": "Aucun message pour l'instant",
     "no_messages_placeholder": "Tes conversations se dérouleront ici."

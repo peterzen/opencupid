@@ -11,11 +11,28 @@ const translationsPath = path.join(
   '{{lng}}.json'
 )
 
+// TODO consolidate this with frontend i18n store
+// move it out to packages/shared/i18n.ts
+const labels: Record<string, string> = {
+  en: 'English',
+  hu: 'Magyar',
+  de: 'Deutsch',
+  fr: 'Français',
+  es: 'Español',
+  it: 'Italiano',
+  pt: 'Português',
+  sk: 'Slovenčina',
+  pl: 'Polski',
+  ro: 'Română',
+  nl: 'Nederlands',
+}
+
+
 i18next
   .use(FsBackend)
   .init({
     fallbackLng: 'en',
-    preload: ['en', 'de', 'fr', 'hu'],
+    preload: Object.keys(labels),
     initImmediate: false,
     backend: {
       loadPath: translationsPath,
