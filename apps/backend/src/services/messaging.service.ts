@@ -285,10 +285,11 @@ export class MessageService {
 
   async sendWelcomeMessage(recipientProfileId: string, locale: string) {
     const senderId = appConfig.WELCOME_MESSAGE_SENDER_PROFILE_ID
+    const siteName = appConfig.SITE_NAME || 'OpenCupid'
     console.error('Welcome message sender ID:', senderId)
     if (senderId) {
       const t = i18next.getFixedT(locale)
-      const mdContent = t('messaging.welcome_message')
+      const mdContent = t('messaging.welcome_message', { siteName })
       const content = simpleMarkdownToHtml(mdContent)
       console.error('Sending welcome message:', content)
       return await prisma.$transaction(async tx => {
@@ -344,7 +345,7 @@ export function simpleMarkdownToHtml(input: string): string {
     .replace(/&/g, '&amp;')    // escape HTML entities
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/\n/g, '<br>')
+    .replace(/\n/g, '<br><br>')
 }
 
 function cleanUserInput(input: string): string {
