@@ -32,6 +32,27 @@ const statusFlags = {
 }
 
 export class ProfileMatchService {
+
+  async findNewProfilesAnywhere(profileId: string, orderBy: OrderBy = defaultOrderBy, take: number = 20): Promise<DbProfileWithImages[]> {
+
+    return await prisma.profile.findMany({
+      where: {
+        ...statusFlags,
+        isSocialActive: true,
+        id: {
+          not: profileId,
+        },
+        ...blocklistWhereClause(profileId),
+      },
+      include: {
+        ...tagsInclude(),
+        ...profileImageInclude(),
+      },
+      take: take,
+      orderBy: orderBy,
+    })
+  }
+
   private static instance: ProfileMatchService;
 
   private constructor() {

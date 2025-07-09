@@ -34,7 +34,7 @@ const findProfileRoutes: FastifyPluginAsync = async fastify => {
     const locale = req.session.lang
 
     try {
-      const profiles = await profileMatchService.findLocalProfiles(myProfileId, [{ createdAt: 'desc' }], 10)
+      const profiles = await profileMatchService.findNewProfilesAnywhere(myProfileId, [{ createdAt: 'desc' }], 10)
       const mappedProfiles = profiles.map(p =>
         mapProfileToPublic(p, false /* includeDatingContext */, locale)
       )
