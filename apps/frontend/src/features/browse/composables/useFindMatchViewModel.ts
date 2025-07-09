@@ -49,7 +49,7 @@ export function useFindMatchViewModel() {
   const isInitialized = ref(false)
 
   const localStore = useLocalStore()
-  const savedScope = ref(localStore.getCurrentScope)
+  const savedScope = computed(() => localStore.getCurrentScope)
 
   const initialize = async (defaultScope?: ProfileScope) => {
 
@@ -72,6 +72,13 @@ export function useFindMatchViewModel() {
       await findProfileStore.fetchDatingPrefs(datingPrefsDefaults(ownerProfile))
     }
 
+    resolveScope(defaultScope)
+    if (currentScope.value) await fetchResults()
+
+    isInitialized.value = true
+  }
+
+  function resolveScope(defaultScope?: ProfileScope) {
     if (!currentScope.value && !selectedProfileId.value) {
       const resolvedScope =
         defaultScope ??
@@ -79,10 +86,6 @@ export function useFindMatchViewModel() {
         (ownerStore.scopes.length > 0 ? ownerStore.scopes[0] : null)
       if (resolvedScope) navigateToScope(resolvedScope)
     }
-
-    if (currentScope.value) await fetchResults()
-
-    isInitialized.value = true
   }
 
   const fetchResults = async () => {
@@ -105,6 +108,12 @@ export function useFindMatchViewModel() {
   watch(currentScope, (newScope) => {
     if (!newScope) return // No scope selected
     fetchResults()
+  })
+
+  // this forces re-rendering the view when the route changes
+  // e.g. details view -> /browse
+  watch(() => route.fullPath, () => {
+    resolveScope()
   })
 
   watch(
