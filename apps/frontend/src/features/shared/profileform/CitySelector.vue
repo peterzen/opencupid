@@ -181,6 +181,7 @@ async function addCity(name: string) {
       @tag="addCity"
       @open="showHint = true"
       @close="showHint = false"
+      :deselect-label="t('profiles.forms.city_deselect_label')"
       :placeholder="t('profiles.forms.city_search_placeholder')"
       :tag-placeholder="t('profiles.forms.city_add_placeholder')"
     >

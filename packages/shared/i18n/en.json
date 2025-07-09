@@ -129,6 +129,7 @@
       "more_options": "More options...",
       "city_search_placeholder": "Search cities",
       "city_add_placeholder": "Add this as new city",
+      "city_deselect_label": "Remove",
       "city_start_typing": "Start typing to search for your city",
       "tag_search_placeholder": "Search interests...",
       "tag_add_placeholder": "Add this as new tag",
@@ -164,6 +165,7 @@
       "no_results_cta_description": "You can help by inviting your friends to join. The more, the merrier.",
       "invite_button": "Invite friends",
       "filters": {
+        "filter_display_label": "Looking in:",
         "dialog_ok_button": "Find people",
         "dialog_cancel_button": "Nevermind",
         "social_title": "I 'm looking for connections...",
