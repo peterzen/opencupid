@@ -58,10 +58,10 @@
     "login": "Inloggen",
     "auth_id_input_empty": "Voer je e-mailadres of telefoonnummer in.",
     "auth_id_input_label": "E-mail of telefoonnummer",
-    "auth_id_input_placeholder": "+12 34567121 of je e-mail.com",
+    "auth_id_input_placeholder": "",
     "captcha_input_label": "Ik ben een mens",
     "login_confirm_welcome": "Welkom!",
-    "otp_check_messages": "Controleer je berichten",
+    "otp_check_messages": "Controleer je berichtjes",
     "otp_sent_phone": "We hebben je een kleine code naar je telefoonnummer gestuurd, voer deze hieronder in.",
     "otp_sent_email": "We hebben je een inloglink gestuurd, controleer je inbox. Als je deze niet ziet, controleer dan je spamfolder.",
     "otp_input_label": "Code invoeren",
@@ -79,8 +79,8 @@
     "home": "Home",
     "profile": "Profiel",
     "browse": "Blader door",
-    "matches": "Lucifers",
-    "inbox": "Postvak IN",
+    "matches": "Matches",
+    "inbox": "Berichtjes",
     "settings": "Instellingen"
   },
   "authentication": {
@@ -102,7 +102,7 @@
       "looks_good": "Ziet er goed uit!",
       "add_from_phone": "Een foto van je telefoon toevoegen",
       "take_photo": "Of maak een foto met je camera",
-      "nevermind": "Nevermind"
+      "nevermind": "Laat maar"
     },
     "forms": {
       "my_preferences": "Mijn voorkeuren",
@@ -115,6 +115,7 @@
       "more_options": "Meer opties...",
       "city_search_placeholder": "Steden zoeken",
       "city_add_placeholder": "Voeg dit toe als nieuwe stad",
+      "city_deselect_label": "Verwijderen",
       "city_start_typing": "Begin te typen om je stad te zoeken",
       "tag_search_placeholder": "Zoek interesses...",
       "tag_add_placeholder": "Voeg dit toe als nieuwe tag",
@@ -136,7 +137,7 @@
       "dialog_title": "{name} blokkeren?",
       "dialog_message_1": "Als deze persoon je lastig valt, kun je hem blokkeren. Hierdoor kunnen ze je geen berichten sturen of interactie hebben met je profiel. Ze zullen ook nergens op deze site te zien zijn, alsof ze nooit hebben bestaan.",
       "dialog_message_2": "Ze zullen geen melding ontvangen dat je ze hebt geblokkeerd.",
-      "confirmation_no": "Nevermind",
+      "confirmation_no": "Laat maar",
       "confirmation_yes": "Ja, blokkeer ze",
       "block_confirm_message": "Je zult ze niet meer zien."
     },
@@ -152,7 +153,7 @@
       "invite_button": "Vrienden uitnodigen",
       "filters": {
         "dialog_ok_button": "Mensen vinden",
-        "dialog_cancel_button": "Nevermind",
+        "dialog_cancel_button": "Laat maar",
         "social_title": "Ik ben op zoek naar connecties...",
         "tags_label": "Geïnteresseerd in...",
         "anywhere": "Overal",
@@ -165,7 +166,7 @@
     "pronouns_edit_label": "voornaamwoorden"
   },
   "matches": {
-    "matches_list_title": "Mijn wedstrijden",
+    "matches_list_title": "Mijn matches",
     "you_received_like": "Je hebt een like ontvangen!",
     "you_matched_with": "Je bent gekoppeld aan {name}!",
     "received_likes": "Je hebt geen likes.|Je hebt 1 like.|Je hebt {count} likes!",
@@ -204,7 +205,7 @@
     "like_error": "Oeps, dit werkte niet. Probeer het opnieuw."
   },
   "messaging": {
-    "page_title": "Berichten",
+    "page_title": "Berichtjes",
     "send_message_button": "Stuur",
     "message_input_placeholder": "Type hier je bericht...",
     "new_message_notification": "{sender} heeft een bericht verzonden",
@@ -217,7 +218,7 @@
     "their_turn": "Hun beurt",
     "block_report_unmatch": "Blokkeren/rapporten/ongelijkmatigheid",
     "block_user_ok": "Blok {name}",
-    "nevermind": "Nevermind",
+    "nevermind": "Laat maar",
     "send_message_heading": "Verstuur bericht",
     "welcome_message": "Welkom op {siteName}!\nIk ben Mookie, jullie gastheer.\nDit is een plek voor ons om met elkaar in contact te komen, nieuwe mensen te ontmoeten en gelijkgestemde zielen te vinden. Ik hoop dat je geniet van je verblijf hier.\nVeel plezier met verbinden!\n- Mookie",
     "no_messages_cta": "Mensen vinden om mee te praten",
@@ -235,7 +236,7 @@
       "appear_message": "Je verschijnt nu bij mensen die op zoek zijn naar dezelfde dingen als jij. Je kunt deze informatie later altijd nog wijzigen.",
       "next": "Volgende",
       "finish": "Afwerking",
-      "cancel": "Nevermind"
+      "cancel": "Laat maar"
     },
     "welcome_title": "Welkom op {siteName}!",
     "welcome_subtitle": "Laten we je op weg helpen zodat je mensen kunt ontmoeten.",
@@ -315,7 +316,7 @@
       "button_copied": "Gekopieerd",
       "qr_hint": "Flash dit naar hun telefoon"
     },
-    "dialog_cancel_button": "Nevermind"
+    "dialog_cancel_button": "Laat maar"
   },
   "emails": {
     "loginLink": {
