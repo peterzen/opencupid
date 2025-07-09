@@ -59,7 +59,7 @@ const siteName = __APP_CONFIG__.SITE_NAME || 'OpenCupid'
 
 <template>
   <div class="w-100 h-100 d-flex flex-column justify-content-center align-items-center">
-    <div class="w-100 d-flex justify-content-between align-items-center">
+    <div class="w-100 d-flex justify-content-between align-items-center position-absolute top-0 left-0">
       <BackButton :show="!isFirst && !isLast" @click="goToPrevious" />
     </div>
 

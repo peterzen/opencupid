@@ -104,7 +104,7 @@ onMounted(async () => {
           <ErrorComponent v-if="error" :error="error" />
           <div v-else>
             <!-- onboarding wizard finish title -->
-            <ViewTitle :icon="IconOkHand" class="text-primary mb-5">
+            <ViewTitle :icon="IconOkHand" class="text-primary mb-1">
               {{ t('onboarding.confirmation.title') }}
             </ViewTitle>
 
