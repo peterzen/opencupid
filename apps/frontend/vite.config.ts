@@ -4,8 +4,8 @@ import { type ConfigEnv, defineConfig, loadEnv, type PluginOption, type UserConf
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
-import { visualizer } from 'rollup-plugin-visualizer'
-import { VitePWA } from 'vite-plugin-pwa'
+// import visualizer from 'vite-bundle-visualizer'
+// import { VitePWA } from 'vite-plugin-pwa'
 
 import Components from 'unplugin-vue-components/vite'
 import { BootstrapVueNextResolver } from 'bootstrap-vue-next'
@@ -77,21 +77,21 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
           },
         },
       }),
-      ...(mode === 'development'
-        ? [visualizer({
-          open: true,
-          gzipSize: true,
-          emitFile: true,
-          filename: "stats.html",
-          template: 'sunburst'
-        }) as PluginOption]
-        : [visualizer({
-          open: false,
-          gzipSize: true,
-          emitFile: true,
-          filename: "stats.html",
-          template: 'sunburst'
-        }) as PluginOption]),
+      // ...(mode === 'development'
+      //   ? [visualizer({
+      //     open: true,
+      //     gzipSize: true,
+      //     emitFile: true,
+      //     filename: "stats.html",
+      //     template: 'sunburst'
+      //   }) as PluginOption]
+      //   : [visualizer({
+      //     open: false,
+      //     gzipSize: true,
+      //     emitFile: true,
+      //     filename: "stats.html",
+      //     template: 'sunburst'
+      //   })]),
       vueJsx(),
       vueDevTools(),
       svgLoader(),
