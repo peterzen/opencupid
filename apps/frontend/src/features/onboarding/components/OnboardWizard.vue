@@ -164,9 +164,7 @@ const siteName = __APP_CONFIG__.SITE_NAME || 'OpenCupid'
             <!-- Upload a profile picture and any other images you want to share. -->
             {{ t('onboarding.photos_subtitle') }}
           </p>
-          <div class="m-4">
             <ImageEditor />
-          </div>
         </fieldset>
 
         <DatingSteps v-model="formData" :isCurrent></DatingSteps>
@@ -175,7 +173,7 @@ const siteName = __APP_CONFIG__.SITE_NAME || 'OpenCupid'
           <slot> </slot>
         </fieldset>
 
-        <div class="w-100 text-center mt-4">
+        <div class="w-100 text-center mt-2">
           <BButton
             @click="handleNext"
             :disabled="!current.state"

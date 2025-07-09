@@ -18,6 +18,7 @@ import { useI18nStore } from '@/store/i18nStore'
 import { useBootstrap } from '@/lib/bootstrap'
 import { useOwnerProfileStore } from '@/features/myprofile/stores/ownerProfileStore'
 import { useMessageStore } from '../../messaging/stores/messageStore'
+import MiddleColumn from '@/features/shared/ui/MiddleColumn.vue'
 
 const { t } = useI18n()
 const profileStore = useOwnerProfileStore()
@@ -94,44 +95,44 @@ onMounted(async () => {
 
 <template>
   <main class="container">
-    <OnboardWizard v-model="formData" @finished="handleWizardFinish">
-      <div v-if="profileStore.isLoading" class="text-center">
-        <SpinnerComponent />
-      </div>
-      <div v-else>
-        <ErrorComponent v-if="error" :error="error" />
+    <MiddleColumn class="d-flex flex-column align-items-center justify-content-center h-100">
+      <OnboardWizard v-model="formData" @finished="handleWizardFinish">
+        <div v-if="profileStore.isLoading" class="text-center">
+          <SpinnerComponent />
+        </div>
         <div v-else>
-          <!-- onboarding wizard finish title -->
-          <ViewTitle :icon="IconOkHand"   class="text-primary mb-5" >
-            {{ t('onboarding.confirmation.title') }}
-          </ViewTitle>
+          <ErrorComponent v-if="error" :error="error" />
+          <div v-else>
+            <!-- onboarding wizard finish title -->
+            <ViewTitle :icon="IconOkHand" class="text-primary mb-5">
+              {{ t('onboarding.confirmation.title') }}
+            </ViewTitle>
 
-          <div v-if="!profileStore.isLoading" class="d-flex flex-column gap-3">
-            <div class="mb-4 d-flex flex-column align-items-center">
-              <p class="wizard-step-subtitle">
-                <!-- See who else is on here -->
-                {{ t('onboarding.confirmation.browse_hint') }}
-              </p>
-              <BButton @click="handleGoToBrowse" variant="success" size="lg" pill>
-                <!-- Meet people -->
-                {{ t('onboarding.confirmation.browse_button') }}
-              </BButton>
-            </div>
-            <div class="d-flex flex-column align-items-center">
-              <p class="wizard-step-subtitle">
-                <!-- See what other people see about me. -->
-                {{ t('onboarding.confirmation.profile_hint') }}
-              </p>
-              <BButton @click="handleGoToProfile" variant="primary" size="lg" pill
-                >
-                <!-- My profile -->
-                 {{ t('onboarding.confirmation.profile_button') }}
-                </BButton
-              >
+            <div v-if="!profileStore.isLoading" class="d-flex flex-column gap-3">
+              <div class="mb-4 d-flex flex-column align-items-center">
+                <p class="wizard-step-subtitle">
+                  <!-- See who else is on here -->
+                  {{ t('onboarding.confirmation.browse_hint') }}
+                </p>
+                <BButton @click="handleGoToBrowse" variant="success" size="lg" pill>
+                  <!-- Meet people -->
+                  {{ t('onboarding.confirmation.browse_button') }}
+                </BButton>
+              </div>
+              <div class="d-flex flex-column align-items-center">
+                <p class="wizard-step-subtitle">
+                  <!-- See what other people see about me. -->
+                  {{ t('onboarding.confirmation.profile_hint') }}
+                </p>
+                <BButton @click="handleGoToProfile" variant="primary" size="lg" pill>
+                  <!-- My profile -->
+                  {{ t('onboarding.confirmation.profile_button') }}
+                </BButton>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </OnboardWizard>
+      </OnboardWizard>
+    </MiddleColumn>
   </main>
 </template>
