@@ -19,6 +19,7 @@ Settings.defaultZone = 'Europe/Berlin'
 import en from '@shared/i18n/en.json'
 
 export const messagesLoaders: Record<string, () => Promise<any>> = {
+  en: () => import('@shared/i18n/en.json'),
   hu: () => import('@shared/i18n/hu.json'),
   de: () => import('@shared/i18n/de.json'),
   fr: () => import('@shared/i18n/fr.json'),

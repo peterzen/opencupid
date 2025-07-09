@@ -7,15 +7,15 @@
   },
   "gender": {
     "male": "Férfi",
-    "female": "Női",
+    "female": "Nő",
     "agender": "Agender",
     "androgynous": "Androgün",
     "bigender": "Bigender",
-    "cis_man": "Cisgender férfi",
-    "cis_woman": "Cis nemű nő",
+    "cis_man": "Cis férfi",
+    "cis_woman": "Cis nő",
     "genderfluid": "Genderfluid",
     "genderqueer": "Genderqueer",
-    "gender_nonconforming": "Nemi szempontból nem konform",
+    "gender_nonconforming": "Nem konform",
     "hijra": "Hidzsra",
     "intersex": "Interszex",
     "pangender": "Pangender",
@@ -27,7 +27,7 @@
     "two_spirit": "Két szellem",
     "non_binary": "Nem bináris",
     "other": "Egyéb",
-    "unspecified": "Inkább nem mondanám, hogy"
+    "unspecified": "Inkább nem mondom meg"
   },
   "pronouns": {
     "he_him": "Ő/Ő",
@@ -36,76 +36,76 @@
     "unspecified": "azt kívánják"
   },
   "relationship": {
-    "single": "Egyetlen",
-    "in_relationship": "Egy kapcsolatban",
+    "single": "Szingli",
+    "in_relationship": "Kapcsolatban",
     "married": "Házas",
     "divorced": "Elvált",
-    "widowed": "Megözvegyült",
-    "other": "Egyéb (ez bonyolult)",
-    "unspecified": "Inkább nem mondanám, hogy"
+    "widowed": "Özvegy",
+    "other": "Egyéb (bonyolult)",
+    "unspecified": "Inkább nem mondom meg"
   },
   "haskids": {
     "yes": "Igen",
     "no": "Nem",
-    "unspecified": "Inkább nem mondanám, hogy"
+    "unspecified": "Inkább nem mondom meg"
   },
   "haskids_label": {
-    "yes": "Gyerekei vannak",
-    "no": "Nincsenek gyerekek",
-    "unspecified": "Inkább nem mondanám, hogy"
+    "yes": "Van gyereke",
+    "no": "Nincs gyereke",
+    "unspecified": "Inkább nem mondom meg"
   },
   "auth": {
-    "login": "Bejelentkezés",
-    "auth_id_input_empty": "Kérjük, adja meg e-mail címét vagy telefonszámát.",
+    "login": "Belépés",
+    "auth_id_input_empty": "Add meg e-mail címedet vagy telefonszámodat.",
     "auth_id_input_label": "E-mail vagy telefonszám",
-    "auth_id_input_placeholder": "+12 34567121 vagy az Ön email.com",
-    "captcha_input_label": "Emberi lény vagyok",
+    "auth_id_input_placeholder": "",
+    "captcha_input_label": "Emberi lény vagyok!",
     "captcha_verify": "Nézzük meg",
-    "captcha_verifying": "Várj egy pillanatot...",
-    "captcha_success": "Hát persze!  Elnézést a kérdésért.",
-    "captcha_refresh": "Próbálja újra",
-    "captcha_error": "Valami baj van, próbáld újra?",
-    "login_confirm_welcome": "Üdvözöljük!",
-    "otp_check_messages": "Ellenőrizze üzeneteit",
-    "otp_sent_phone": "Küldtünk Önnek egy kis kódot a telefonszámára, kérjük, adja meg az alábbiakban.",
-    "otp_sent_email": "Küldtünk egy bejelentkezési linket, ellenőrizze a postaládáját. Ha nem látja, kérjük, ellenőrizze a spam mappáját.",
-    "otp_input_label": "Adja meg a kódot",
-    "otp_invalid_feedback": "A kódnak 6 számjegyűnek kell lennie",
+    "captcha_verifying": "Egy pillanat...",
+    "captcha_success": "Hát persze. Elnézést a kérdésért.",
+    "captcha_refresh": "Próbáld újra",
+    "captcha_error": "Valami zökkenő van, próbáld újra?",
+    "login_confirm_welcome": "Légy üdvözölve!",
+    "otp_check_messages": "Nézd rá az üzeneteidre",
+    "otp_sent_phone": "A telefonodra küldtünk egy üzenetet, az abban levő kódot írd be ide.",
+    "otp_sent_email": "Emailen küldtünk egy linket, arra kattints rá (vagy írd be a kódot).  Ha nem látod az emailt, nézz rá a spam mappára is.",
+    "otp_input_label": "Írd ide a kódot",
+    "otp_invalid_feedback": "A kód 6 számjegyű",
     "email": "E-mail",
     "phone_number": "Telefonszám",
     "password": "Jelszó"
   },
   "nav": {
-    "home": "Home",
-    "profile": "Profil",
-    "browse": "Böngésszen a  oldalon.",
-    "matches": "Gyufa",
-    "inbox": "Beérkezett üzenetek",
+    "home": "Főoldal",
+    "profile": "Profilom",
+    "browse": "Böngész",
+    "matches": "Egyezések",
+    "inbox": "Üzenetek",
     "settings": "Beállítások"
   },
   "authentication": {
-    "login": "Bejelentkezés",
-    "logout": "Kijelentkezés"
+    "login": "Belépés",
+    "logout": "Kilépés"
   },
   "home": {
-    "welcome_title": "Üdvözöljük a {siteName} oldalon!",
-    "meet_new_people": "Új emberekkel találkozni"
+    "welcome_title": "Légy üdvözölve nálunk.",
+    "meet_new_people": "Nemrég csatlakoztak"
   },
   "profiles": {
     "send_message_button": "Üzenet",
-    "profile_photos": "{név} fotói",
-    "no_profile_title": "Kérjük, töltse ki profilját",
+    "profile_photos": "{name} fotói",
+    "no_profile_title": "Kérjük, töltsd ki a profilodat",
     "no_profile_create": "Profil létrehozása",
-    "image_editor_help": "Az Ön fotója itt",
+    "image_editor_help": "Itt tölts fel képet",
     "image_upload": {
-      "title": "Fénykép hozzáadása",
-      "looks_good": "Jól néz ki!",
-      "add_from_phone": "Fénykép hozzáadása a telefonról",
-      "take_photo": "Vagy készítsen egy fényképet a fényképezőgépével",
-      "nevermind": "Nevermind"
+      "title": "Kép hozzáadása",
+      "looks_good": "Jól lesz, mehet",
+      "add_from_phone": "Kép egy albumból",
+      "take_photo": "Lövök egy fotót",
+      "nevermind": "Mégse"
     },
     "forms": {
-      "my_preferences": "Az én preferenciáim",
+      "my_preferences": "Preferenciáim",
       "age_range": "Korosztály",
       "kids_label": "Gyerekek?",
       "relationship_label": "Én...",
