@@ -6,16 +6,12 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@aws-sdk/client-translate": "^3.840.0",
     "@modelcontextprotocol/server-filesystem": "^2025.3.28",
-    "@vue/shared": "^3.5.17",
     "acorn": "^8.15.0",
     "dotenv-expand": "^12.0.2",
     "find-up": "^7.0.0",
-    "jsdom": "^26.1.0",
     "prettier": "3.6.2",
-    "turbo": "^2.5.4",
-    "vue": "^3.5.17"
+    "turbo": "^2.5.4"
   },
   "scripts": {
     "dev": "turbo run dev",
@@ -36,7 +32,6 @@
   "dependencies": {
     "@types/node": "^24.0.11",
     "rollup": "^4.44.2",
-    "vite": "^7.0.3",
     "zod": "^3.24.4"
   },
   "packageManager": "pnpm@10.12.4"
