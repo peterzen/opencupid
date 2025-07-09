@@ -18,23 +18,6 @@ function mapConversationMeta(c: { id: string; updatedAt: Date; createdAt: Date }
   }
 }
 
-export function mapConversationContext(dbProfile: DbProfileWithContext): ConversationContext {
-  const participant = dbProfile.conversationParticipants?.[0]
-  const conversation = participant?.conversation
-  const canMessage = !conversation || conversation.status === 'ACCEPTED'
-  const initiated =
-    !!conversation &&
-    conversation.status === 'INITIATED' &&
-    conversation.initiatorProfileId !== dbProfile.id
-
-  return {
-    haveConversation: !!conversation && conversation.status === 'ACCEPTED',
-    canMessage: canMessage,
-    conversationId: canMessage ? (conversation?.id ?? null) : null,
-    initiated,
-  }
-}
-
 export function extractSenderProfile(
   p: ConversationParticipantWithConversationSummary,
   senderProfileId: string

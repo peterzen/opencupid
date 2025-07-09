@@ -31,15 +31,18 @@ export function mapInteractionContext(profile: DbProfileWithContext, includeDati
 
   const participant = profile.conversationParticipants?.[0]
   const conversation = participant?.conversation
-  const canMessage = !conversation || conversation.status === 'ACCEPTED'
   const initiated =
     !!conversation &&
     conversation.status === 'INITIATED' &&
     conversation.initiatorProfileId !== profile.id
 
+  const canMessage = !conversation ||   // no conversation exists
+    (initiated && conversation.status === 'ACCEPTED') ||  // i initiated and they accepted
+    (!initiated && conversation.status !== 'BLOCKED') // they initiated and i didn't block them
+
   return {
 
-    haveConversation: !!conversation && conversation.status === 'ACCEPTED',
+    haveConversation: !!conversation && !initiated,
     canMessage,
     conversationId: canMessage ? (conversation?.id ?? null) : null,
     initiated,

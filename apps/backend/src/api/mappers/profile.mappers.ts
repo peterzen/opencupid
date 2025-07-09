@@ -66,7 +66,7 @@ export function mapProfileToPublic(dbProfile: DbProfileWithImages, includeDating
     location: {
       country: dbProfile.country || '',
       cityId: dbProfile.cityId || '',
-      cityName: dbProfile.city.name || '',
+      cityName: dbProfile.city?.name || '',
     },
     introSocial: get('introSocial') || '',
     introDating: get('introDating') || '',
@@ -79,11 +79,11 @@ export function mapProfileWithContext(dbProfile: DbProfileWithContext, includeDa
 
   const mapped = mapProfileToPublic(dbProfile, includeDatingContext, locale)
   const conversation = dbProfile.conversationParticipants?.[0]?.conversation ?? null
-
+  const interactionContext = mapInteractionContext(dbProfile, includeDatingContext)
   return {
     ...mapped,
     conversation: conversation || null,
-    interactionContext: mapInteractionContext(dbProfile, includeDatingContext)
+    interactionContext,
   } as PublicProfileWithContext
 }
 
