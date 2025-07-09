@@ -92,7 +92,7 @@ const remainingSlots = computed(() => {
 <!--            <HelpScribble :text="t('profiles.image_editor_help')" direction="w" /> -->
           </div>
           <VueDraggableNext
-            class="row row-cols-2 row-cols-sm-3 row-cols-md-3 g-4 sortable-grid p-4"
+            class="row row-cols-2 row-cols-sm-3 row-cols-md-3 g-4  mx-4 sortable-grid"
             v-model="model"
             ghost-class="ghost"
             :sort="true"
