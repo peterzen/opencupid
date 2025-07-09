@@ -18,7 +18,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main class="container mt-3 pt-5 dating overflow-auto">
+  <main class="container pt-5 dating overflow-auto">
     <ViewTitle :icon="IconDate" title="" class="text-dating" />
     <MiddleColumn>
       <div class="d-flex flex-column align-items-center justify-content-center text-center">

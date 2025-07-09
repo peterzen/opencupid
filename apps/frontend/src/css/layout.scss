@@ -1,18 +1,41 @@
 @import '@/css/app-vars.scss';
 
+html,
+body {
+  padding: 0;
+  margin: 0;
+  height: 100dvh; // dvh for mobile viewport correctness
+  width: 100%;
+}
+
 body {
   overflow: hidden;
-
-  // TODO investigate if this is really needed for iOS
-  height: 105vh;
 }
+
+#app {
+  height: 100dvh;
+}
+
+nav.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: $navbar-height;
+}
+
 
 main {
-  height: 100vh;
-  flex-grow: 1;
+  height: 100dvh;
+  min-height: 0; // prevents flex item overflow clipping (iOS)
+  position: relative;
 }
 
+
 nav.navbar+main {
+  // navbar is fixed at the top, so we need to offset the main content
   padding-top: $navbar-height;
-  height: calc(100vh - $navbar-height);
+  // height: 100%;
+  // height: calc(100% - $navbar-height);
 }

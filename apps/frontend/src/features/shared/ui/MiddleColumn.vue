@@ -1,6 +1,6 @@
 
 <template>
-  <div class="col-12 col-sm-8 col-md-8  mx-auto " >
+  <div class="col-12 col-sm-10 col-md-8 col-lg-6 mx-auto " >
     <slot></slot>
   </div>
 </template>

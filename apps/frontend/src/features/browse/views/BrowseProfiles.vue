@@ -2,7 +2,6 @@
 import { useRouter } from 'vue-router'
 import { computed, onMounted, onUnmounted, provide, ref } from 'vue'
 
-
 import PublicProfile from '@/features/publicprofile/components/PublicProfile.vue'
 import MiddleColumn from '@/features/shared/ui/MiddleColumn.vue'
 
@@ -91,19 +90,22 @@ const isDetailView = computed(() => !!selectedProfileId.value)
 </script>
 
 <template>
-  <main class="w-100">
+  <main class="w-100 position-relative overflow-hidden">
     <!-- this is the container for the detail view -->
     <div
       v-if="isDetailView"
-      class="detail-view position-absolute w-100"
+      class="detail-view position-absolute w-100 h-100" 
       :class="{ active: isDetailView }"
     >
-      <div class="overflow-auto h-100">
-        <MiddleColumn class="pt-md-3 position-relative pb-5">
+      <div class="overflow-auto hide-scrollbar h-100 d-flex flex-column">
+        <MiddleColumn
+          class="pt-sm-3 position-relative flex-grow-1"
+          style="min-height: 100%"
+        >
           <PublicProfile
             v-if="selectedProfileId"
             :id="selectedProfileId"
-            class="shadow-lg"
+            class="shadow-lg mb-3 pb-5"
             @intent:back="handleCloseProfileView"
             @intent:message="handleOpenConversation"
             @hidden="(id: string) => handleHidden(id)"
@@ -210,7 +212,7 @@ const isDetailView = computed(() => !!selectedProfileId.value)
 
         <!-- Main profile results -->
         <template v-else-if="isInitialized">
-          <div class="overflow-auto">
+          <div class="overflow-auto hide-scrollbar pb-5">
             <MiddleColumn>
               <ProfileCardGrid
                 :profiles="profileList"
@@ -261,11 +263,10 @@ const isDetailView = computed(() => !!selectedProfileId.value)
 @import '@/css/app-vars.scss';
 
 .detail-view {
-  top: 0;
-  left: 0;
   // nav.fixed is on 1030 - on screens < md we put this above the navbar
   z-index: 1050;
   height: 100vh;
+  inset:0;
 
   @include media-breakpoint-up(sm) {
     // on screens > sm navbar stays visible

@@ -40,27 +40,27 @@ const siteName = __APP_CONFIG__.SITE_NAME || 'OpenCupid'
 </script>
 
 <template>
-  <div style="min-height: 100vh" class="bg-light">
-    <header class="my-3 my-md-5">
+  <div style="min-height: 100%;" class="bg-light posiion-relative">
+    <header class="position-absolute top-0 start-0 w-100 pt-2" style="z-index: 1000; background-color: inherit;">
       <BContainer fluid="md" class="d-flex flex-column justify-content-between">
         <BRow>
           <BCol
             cols="12"
             sm="6"
-            md="3"
+            md="4"
             class="d-flex justify-content-center align-items-center ms-auto"
           >
-            <div
-              class="flex-shrink-1 flex-grow-0 ms-2 opacity-50"
-              :title="t('landingpage.select_language')"
-            >
-              <IconGlobe class="svg-icon svg-icon-lg me-2" />
-            </div>
             <div class="flex-grow-1">
               <LanguageSelectorDropdown
                 size="sm"
                 @language:select="(lang: string) => handleSetLanguage(lang)"
               />
+            </div>
+            <div
+              class="flex-shrink-1 flex-grow-0 ms-2 opacity-50"
+              :title="t('landingpage.select_language')"
+            >
+              <IconGlobe class="svg-icon svg-icon-lg me-2" />
             </div>
           </BCol>
         </BRow>
@@ -68,15 +68,15 @@ const siteName = __APP_CONFIG__.SITE_NAME || 'OpenCupid'
     </header>
 
     <main
-      class="fs-3 overflow-auto hide-scrollbar pb-5 position-relative"
-      style="padding-bottom: 10rem"
+      class="fs-3 overflow-auto hide-scrollbar position-relative"
+      style="padding-bottom: 5rem; padding-top: 4rem;"
     >
       <BContainer>
         <div class="text-success w-100 d-flex align-items-center flex-column mb-3 mb-lg-4">
           <Logo class="svg-icon-100 logo text-success" style="width: 6rem" />
         </div>
-        <BRow>
-          <BCol md="12">
+        <BRow class="d-flex flex-column align-items-center">
+          <BCol md="12" lg="8">
             <h1 class="text-center mb-3 mb-lg-4">
               <span class="d-none d-md-inline-block">
                 {{ t('landingpage.title_lg', { siteName: siteName }) }}

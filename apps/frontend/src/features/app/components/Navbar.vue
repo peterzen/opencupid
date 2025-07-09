@@ -31,7 +31,7 @@ const hasMatchNotifications = computed(
 </script>
 
 <template>
-  <BNavbar v-if="authStore.isLoggedIn && profileStore.profile?.isOnboarded" variant="secondary" fixed="top" class="" data-testid="navbar">
+  <BNavbar v-if="authStore.isLoggedIn && profileStore.profile?.isOnboarded" variant="secondary" data-testid="navbar">
     <BNavbarNav class="d-flex justify-content-between w-100">
       <BNavItem to="/home" active-class="active">
         <IconHome class="svg-icon-lg" />
@@ -98,7 +98,5 @@ const hasMatchNotifications = computed(
   margin: 0 !important;
   padding: 0 !important;
 }
-.navbar {
-  height: $navbar-height;
-}
+
 </style>
