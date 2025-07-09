@@ -50,38 +50,34 @@ const { current, isFirst, isLast, goToNext, goToPrevious, isCurrent } =
     </fieldset>
   </div>
 
-  <div class="mt-3 d-flex justify-content-end align-items-center">
-    <BButton
-      v-if="!isLast"
-      @click="$emit('cancel')"
-      variant="link"
-      class="link-secondary"
-    >
-      {{ t('onboarding.wizard.cancel') }}
-    </BButton>
-
-    <BButton
-      v-if="!isLast"
-      @click="goToNext"
-      :disabled="!current.state"
-      variant="primary"
-      size="lg"
-      class="px-5"
-      pill
-    >
-      {{ t('onboarding.wizard.next') }}
-      <IconArrowRight class="svg-icon" />
-    </BButton>
-    <BButton
-      v-else
-      @click="$emit('finished')"
-      :disabled="!current.state"
-      variant="primary"
-      size="lg"
-      class="px-5"
-      pill
-    >
-      {{ t('onboarding.wizard.finish') }}
-    </BButton>
+  <div class="mt-3 d-flex flex-column justify-content-end align-items-center">
+    <div class="mb-2">
+      <BButton
+        v-if="!isLast"
+        @click="goToNext"
+        :disabled="!current.state"
+        variant="primary"
+        class="px-5"
+        pill
+      >
+        {{ t('onboarding.wizard.next') }}
+        <IconArrowRight class="svg-icon" />
+      </BButton>
+      <BButton
+        v-else
+        @click="$emit('finished')"
+        :disabled="!current.state"
+        variant="primary"
+        class="px-5"
+        pill
+      >
+        {{ t('onboarding.wizard.finish') }}
+      </BButton>
+    </div>
+    <div>
+      <BButton v-if="!isLast" @click="$emit('cancel')" variant="link" class="link-secondary">
+        {{ t('onboarding.wizard.cancel') }}
+      </BButton>
+    </div>
   </div>
 </template>
