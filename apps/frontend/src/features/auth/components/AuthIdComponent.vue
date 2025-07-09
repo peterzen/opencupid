@@ -88,7 +88,7 @@ function handleCaptchaUpdatePayload(payload: string) {
             type="text"
             :label="t('auth.auth_id_input_label')"
             :placeholder="t('auth.auth_id_input_placeholder')"
-            maxlength="25"
+            maxlength="80"
             aria-autocomplete="none"
             autofocus
             autocomplete="off"
