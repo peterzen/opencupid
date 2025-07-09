@@ -100,6 +100,10 @@ const routes: Array<RouteRecordRaw> = [
     props: true,
     meta: { requiresAuth: true },
   },
+  {
+    path: '/',
+    redirect: { name: 'UserHome' },
+  },
 ]
 
 const router = createRouter({
