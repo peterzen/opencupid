@@ -21,11 +21,15 @@ defineEmits<{
 
 <template>
   <div
-    class="d-flex align-items-center justify-content-between w-100 clickable bg-secondary rounded-2 px-2 py-1 text-white"
+    class="d-flex align-items-center justify-content-between w-100 clickable px-2 py-1 bg-light rounded"
     @click="$emit('prefs:toggle')"
   >
+    <span>
+      <!-- Looking:  -->
+      {{ $t('profiles.browse.filters.filter_display_label') }}
+    </span>
     <div class="flex-grow-1">
-      <span class="me-2 ps-1">
+      <strong class="me-2 ps-1">
         <LocationLabel
           v-if="socialFilter?.location && viewerLocation"
           :location="socialFilter.location"
@@ -38,16 +42,25 @@ defineEmits<{
           <!-- Anywhere -->
           {{ $t('profiles.browse.filters.anywhere') }}
         </span>
-      </span>
+      </strong>
 
       <TagList v-if="socialFilter?.tags.length" :tags="socialFilter.tags" />
     </div>
 
-    <div class="flex-shrink-1">
-      <BButton variant="link" pill class="text-white py-0 ms-2"
+    <BButton
+      variant="primary"
+      pill
+      :title="$t('profiles.browse.filters.search_button_title_social')"
+    >
+      <!-- <IconSearch class="svg-icon" /> -->
+      <IconSetting class="svg-icon" />
+    </BButton>
+
+    <!-- <div class="flex-shrink-1">
+      <BButton variant="primary" pill class="ms-2"
       :title="$t('profiles.browse.filters.search_button_title_social')">
-        <IconSearch class="svg-icon" />
+         <IconSetting class="svg-icon" />
       </BButton>
-    </div>
+    </div> -->
   </div>
 </template>
