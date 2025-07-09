@@ -108,6 +108,9 @@ importers:
       cuid:
         specifier: ^3.0.0
         version: 3.0.0
+      deepl-node:
+        specifier: ^1.19.0
+        version: 1.19.0
       dotenv:
         specifier: ^16.5.0
         version: 16.6.1
@@ -2898,6 +2901,10 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
+  adm-zip@0.5.16:
+    resolution: {integrity: sha512-TGw5yVi4saajsSEgz25grObGHEUaDrniwvA2qwSC060KfqGPdglhvPMA2lPIoxs3PQIItj2iag35fONcQqgUaQ==}
+    engines: {node: '>=12.0'}
+
   agent-base@6.0.2:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
     engines: {node: '>= 6.0.0'}
@@ -3584,6 +3591,10 @@ packages:
   deep-is@0.1.4:
     resolution: {integrity: sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==}
 
+  deepl-node@1.19.0:
+    resolution: {integrity: sha512-icg7dw/IXxsEZ4rf441XBWUpMKYyqa3JfLFbiFEj07f+2SNRseHwoDCJeA6CxYgQdIuX1jy2ShPvY2DAlzXSQw==}
+    engines: {node: '>=12.0'}
+
   deepmerge@4.3.1:
     resolution: {integrity: sha512-3sUqbMEc77XqpdNO7FRyRog+eW3ph+GYCbj+rK+uYyRMuwsVy0rMiVtPn+QJlKFvWP/1PYpapqYn0Me2knFn+A==}
     engines: {node: '>=0.10.0'}
@@ -4159,6 +4170,10 @@ packages:
   form-data@2.5.3:
     resolution: {integrity: sha512-XHIrMD0NpDrNM/Ckf7XJiBbLl57KEhT3+i3yY+eWm+cqYZJQTZrKo8Y8AWKnuV5GT4scfuUGt9LzNoIx3dU1nQ==}
     engines: {node: '>= 0.12'}
+
+  form-data@3.0.3:
+    resolution: {integrity: sha512-q5YBMeWy6E2Un0nMGWMgI65MAKtaylxfNJGJxpGh45YDciZB4epbWpaAfImil6CPAPTYB4sh0URQNDRIZG5F2w==}
+    engines: {node: '>= 6'}
 
   form-data@4.0.3:
     resolution: {integrity: sha512-qsITQPfmvMOSAdeyZ+12I1c+CKSstAFAwu+97zrnWAbIr5u8wfsExUzCesVLC8NgHuRUqNN4Zy6UPWUTRGslcA==}
@@ -5034,6 +5049,10 @@ packages:
 
   lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+
+  loglevel@1.9.2:
+    resolution: {integrity: sha512-HgMmCqIJSAKqo68l0rS2AanEWfkxaZ5wNiEFb5ggm08lDs9Xl2KxBlX3PTcaD2chBM1gXAYf491/M2Rv8Jwayg==}
+    engines: {node: '>= 0.6.0'}
 
   long@4.0.0:
     resolution: {integrity: sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==}
@@ -9941,7 +9960,7 @@ snapshots:
   '@types/browser-sync@2.29.0':
     dependencies:
       '@types/micromatch': 2.3.35
-      '@types/node': 22.16.1
+      '@types/node': 24.0.11
       '@types/serve-static': 1.15.8
       chokidar: 3.6.0
 
@@ -9953,11 +9972,11 @@ snapshots:
 
   '@types/cors@2.8.19':
     dependencies:
-      '@types/node': 22.16.1
+      '@types/node': 24.0.11
 
   '@types/cross-spawn@6.0.2':
     dependencies:
-      '@types/node': 22.16.1
+      '@types/node': 24.0.11
 
   '@types/debug@4.1.8':
     dependencies:
@@ -9997,7 +10016,7 @@ snapshots:
 
   '@types/node-fetch@2.6.12':
     dependencies:
-      '@types/node': 22.16.1
+      '@types/node': 24.0.11
       form-data: 4.0.3
 
   '@types/node@18.19.116':
@@ -10033,7 +10052,7 @@ snapshots:
   '@types/request@2.48.12':
     dependencies:
       '@types/caseless': 0.12.5
-      '@types/node': 22.16.1
+      '@types/node': 24.0.11
       '@types/tough-cookie': 4.0.5
       form-data: 2.5.3
 
@@ -10046,7 +10065,7 @@ snapshots:
   '@types/send@0.17.5':
     dependencies:
       '@types/mime': 1.3.5
-      '@types/node': 22.16.1
+      '@types/node': 24.0.11
 
   '@types/serve-static@1.15.8':
     dependencies:
@@ -10522,6 +10541,8 @@ snapshots:
       acorn: 8.15.0
 
   acorn@8.15.0: {}
+
+  adm-zip@0.5.16: {}
 
   agent-base@6.0.2:
     dependencies:
@@ -11266,6 +11287,17 @@ snapshots:
 
   deep-is@0.1.4: {}
 
+  deepl-node@1.19.0:
+    dependencies:
+      '@types/node': 24.0.11
+      adm-zip: 0.5.16
+      axios: 1.10.0
+      form-data: 3.0.3
+      loglevel: 1.9.2
+      uuid: 8.3.2
+    transitivePeerDependencies:
+      - debug
+
   deepmerge@4.3.1: {}
 
   default-browser-id@5.0.0: {}
@@ -11470,7 +11502,7 @@ snapshots:
   engine.io@6.6.4:
     dependencies:
       '@types/cors': 2.8.19
-      '@types/node': 22.16.1
+      '@types/node': 24.0.11
       accepts: 1.3.8
       base64id: 2.0.0
       cookie: 0.7.2
@@ -12026,6 +12058,13 @@ snapshots:
       es-set-tostringtag: 2.1.0
       mime-types: 2.1.35
       safe-buffer: 5.2.1
+
+  form-data@3.0.3:
+    dependencies:
+      asynckit: 0.4.0
+      combined-stream: 1.0.8
+      es-set-tostringtag: 2.1.0
+      mime-types: 2.1.35
 
   form-data@4.0.3:
     dependencies:
@@ -12924,6 +12963,8 @@ snapshots:
 
   lodash@4.17.21: {}
 
+  loglevel@1.9.2: {}
+
   long@4.0.0: {}
 
   long@5.3.2: {}
@@ -13632,7 +13673,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
-      '@types/node': 22.16.1
+      '@types/node': 24.0.11
       long: 5.3.2
 
   protocol-buffers-schema@3.6.0: {}
