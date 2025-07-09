@@ -51,7 +51,7 @@ const siteName = __APP_CONFIG__.SITE_NAME
       <MiddleColumn>
         <h2 class="mt-3">
           <!-- Welcome to site_name -->
-          {{ $t('home.welcome_title', { siteName: siteName }) }}
+          <!-- {{ $t('home.welcome_title', { siteName: siteName }) }} -->
         </h2>
         <LikesAndMatchesBanner class="my-3" />
 
