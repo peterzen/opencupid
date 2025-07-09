@@ -17,7 +17,7 @@ const checkboxOptions = relationshipStatusOptions().filter(
 
 <template>
   <div>
-    <label>{{ t('profiles.forms.relationship_label') }}</label>
+    <!-- <label>{{ t('profiles.forms.relationship_label') }}</label> -->
     <BListGroup>
       <BListGroupItem
         v-for="s in checkboxOptions"
