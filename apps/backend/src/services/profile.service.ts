@@ -14,6 +14,8 @@ import {
 } from '@zod/profile/profile.db'
 import { mapToLocalizedUpserts } from '@/api/mappers/profile.mappers'
 import { blockedContextInclude, conversationContextInclude, interactionContextInclude, profileImageInclude, tagsInclude } from '@/db/includes/profileIncludes'
+import { ProfileMatchService } from './profileMatch.service'
+
 
 
 export class ProfileService {
@@ -107,7 +109,6 @@ export class ProfileService {
 
     // 2) Validate that the user has a profile
     const current = await tx.profile.findUnique({
-      select: { id: true },
       where: { userId },
     })
 
@@ -144,11 +145,22 @@ export class ProfileService {
       await this.upsertLocalizedProfileText(tx, profileId, locale, updates)
     }
 
+    // XXX miserable hack
+    const profileMatchService = ProfileMatchService.getInstance()
+
+    // TODO factor this out of here
+    // determine if the user has dating prefs already or we need to create defaults
+    // awful hack. datingPrefs really needs to move out of the Profile table.
+    const datingPrefsFragment =
+     (data.birthday && !current.prefAgeMax && !current.prefAgeMin) ?
+      profileMatchService.createDatingPrefsDefaults(data) : {}
+
     // 5) Update all scalar fields
     const updated = await tx.profile.update({
       where: { userId },
       data: {
         ...rest,
+        ...datingPrefsFragment,
         isActive: true, // TODO change this to isVisible when we have that field
       },
       include: {

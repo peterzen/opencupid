@@ -1,5 +1,4 @@
 import { prisma } from '../lib/prisma'
-import type { Prisma } from '@prisma/client';
 
 import { type DbProfileWithImages } from '@zod/profile/profile.db';
 import type { SocialMatchFilterWithTags, UpdateSocialMatchFilterPayload } from '@zod/match/filters.dto';
@@ -7,6 +6,7 @@ import type { SocialMatchFilterWithTags, UpdateSocialMatchFilterPayload } from '
 import { blocklistWhereClause } from '@/db/includes/blocklistWhereClause';
 import { profileImageInclude, tagsInclude } from '@/db/includes/profileIncludes';
 import type { LocationDTO } from '@zod/dto/location.dto';
+import { Gender, HasKids, type Prisma } from '@prisma/client';
 
 const tagInclude = {
   city: true,
@@ -118,16 +118,17 @@ export class ProfileMatchService {
       }
     })
   }
-  createDatingPrefsDefaults(profile: { birthday?: Date | null }) {
+  createDatingPrefsDefaults(profile: { birthday?: Date | null, gender?: Gender | null }) {
 
     if (!profile.birthday) return {}
     const currentYear = new Date().getFullYear()
     const age = currentYear - new Date(profile.birthday).getFullYear()
+    const prefGender = profile.gender === Gender.male ? Gender.female : Gender.male
     const prefs = {
       prefAgeMin: age ? age - 5 : 18,
       prefAgeMax: age ? age + 5 : 100,
-      prefGender: [],
-      prefKids: [],
+      prefGender: [prefGender],
+      prefKids: [HasKids.no, HasKids.yes],
     }
     // for now we'll just return the created preferences object.
     return prefs
