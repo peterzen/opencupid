@@ -229,6 +229,8 @@ export class ProfileMatchService {
     const prefAgeMax = profile.prefAgeMax ? profile.prefAgeMax + 1 : 99
     const prefAgeMin = profile.prefAgeMin ? profile.prefAgeMin - 1 : 18
 
+    const hasKids = profile.prefKids.length > 0 ? { hasKids: { in: profile.prefKids } } : {}
+
     const where = {
       ...statusFlags,
       isDatingActive: true,
@@ -241,7 +243,7 @@ export class ProfileMatchService {
         lte: subtractYears(new Date(), prefAgeMin), // youngest acceptable
       },
       gender: { in: profile.prefGender },
-      hasKids: { in: profile.prefKids },
+      ...hasKids,
       prefAgeMin: { lte: myAge },
       prefAgeMax: { gte: myAge },
       prefGender: { hasSome: [profile.gender] },
