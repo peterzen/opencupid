@@ -4,6 +4,7 @@ import { type ConfigEnv, defineConfig, loadEnv, type PluginOption, type UserConf
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
+import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 // import visualizer from 'vite-bundle-visualizer'
 // import { VitePWA } from 'vite-plugin-pwa'
 
@@ -94,6 +95,9 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       //   })]),
       vueJsx(),
       vueDevTools(),
+      VueI18nPlugin({
+        include: [path.resolve(__dirname, '../../packages/shared/i18n/**')]
+      }),
       svgLoader(),
       Components({
         resolvers: [BootstrapVueNextResolver()],
