@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
-import { onMounted, ref, provide, computed } from 'vue'
+import { onMounted, ref, provide, computed, toRef } from 'vue'
 import { useBootstrap } from '@/lib/bootstrap'
 
 import IconDate from '@/assets/icons/app/cupid.svg'
@@ -81,7 +81,7 @@ onMounted(async () => {
 })
 
 provide('isOwner', true)
-provide('viewerProfile', formData)
+provide('viewerProfile', toRef(formData))
 
 const route = useRoute()
 const hint = computed(() => history?.state?.hint || null)
