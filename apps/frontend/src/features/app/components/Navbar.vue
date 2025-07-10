@@ -27,15 +27,18 @@ const hasUnreadMessages = computed(() => useMessageStore().hasUnreadMessages)
 const hasMatchNotifications = computed(
   () => interactionStore.newMatchesCount > 0 || interactionStore.receivedLikesCount > 0
 )
-
 </script>
 
 <template>
-  <BNavbar v-if="authStore.isLoggedIn && profileStore.profile?.isOnboarded" variant="secondary" data-testid="navbar">
+  <BNavbar
+    v-if="authStore.isLoggedIn && profileStore.profile?.isOnboarded"
+    variant="secondary"
+    data-testid="navbar"
+  >
     <BNavbarNav class="d-flex justify-content-between w-100">
       <BNavItem to="/home" active-class="active">
         <IconHome class="svg-icon-lg" />
-        <span class="d-none d-md-inline label">{{ $t('nav.home') }}</span>
+        <span class="d-none d-md-block label">{{ $t('nav.home') }}</span>
       </BNavItem>
 
       <BNavItem to="/browse" active-class="active">
@@ -58,10 +61,7 @@ const hasMatchNotifications = computed(
       </BNavItem>
 
       <BNavItem to="/me" active-class="active">
-        <span
-          v-if="profileStore.profile?.profileImages?.length"
-          class="profile-thumbnail d-flex"
-        >
+        <span v-if="profileStore.profile?.profileImages?.length" class="profile-thumbnail d-flex">
           <ProfileImage
             :profile="profileStore.profile"
             class="img-fluid rounded"
@@ -70,17 +70,31 @@ const hasMatchNotifications = computed(
         </span>
         <IconUser v-else class="svg-icon-lg" />
       </BNavItem>
-
     </BNavbarNav>
   </BNavbar>
 </template>
 
 <style scoped lang="scss">
 @import '@/css/app-vars.scss';
+:deep(.nav-link) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  &.active {
+    color: var(--bs-primary);
+    background-color: var(--bs-secondary-light);
+  }
 
-:deep(.nav-link .label) {
-  vertical-align: sub;
-  margin-left: 0.25rem;
+  &:hover {
+    color: var(--bs-primary);
+    background-color: var(--bs-secondary-light);
+  }
+}
+.nav-link .label{
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  color: var(--bs-secondary-text);
 }
 .nav-item {
   display: flex;
@@ -98,5 +112,4 @@ const hasMatchNotifications = computed(
   margin: 0 !important;
   padding: 0 !important;
 }
-
 </style>
