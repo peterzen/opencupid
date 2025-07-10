@@ -124,7 +124,8 @@
       "intro_who_placeholder": "Qui aimerais-tu rencontrer ?",
       "publicname_hint": "Prénom seulement s'il te plaît.",
       "save_changes_hint": "Edition terminée",
-      "edit_button_hint": "Modifie tes informations"
+      "edit_button_hint": "Modifie tes informations",
+      "city_deselect_label": "Enlever"
     },
     "blocklist": {
       "title": "Utilisateurs bloqués",
@@ -146,7 +147,7 @@
       "no_access_social_title": "Ton propre profil social est actuellement privé.",
       "no_access_social_description": "Quand les autres ne peuvent pas te voir, tu ne peux pas les voir non plus - c'est juste.  Pour voir et rencontrer d'autres personnes, tu dois rendre ton profil public.",
       "cta_button_label": "Accéder à mon profil",
-      "social_no_results": "Il n'y a personne dans ta région qui corresponde à tes préférences, pour l'instant.",
+      "social_no_results": "Nous n'avons encore trouvé personne sur {country}.",
       "no_results_cta_title": "Cette communauté ne cesse de s'agrandir.",
       "no_results_cta_description": "Tu peux nous aider en invitant tes amis à se joindre à nous. Plus on est nombreux, plus on rit.",
       "invite_button": "Invite des amis",
@@ -159,8 +160,11 @@
         "locate_button_title": "Fixe-toi à mon pays",
         "search_button_title_social": "Trouve des gens",
         "search_button_title_dating": "Trouve des gens",
-        "age_range": "Tranche d'âge :"
-      }
+        "age_range": "Tranche d'âge :",
+        "filter_display_label": "Regarde à l'intérieur :"
+      },
+      "social_no_results_city": "Je n'ai encore trouvé personne sur {cityName}.",
+      "social_no_results_tags": "Je n'ai trouvé personne qui s'intéresse à ces questions."
     },
     "pronouns_edit_label": "pronoms"
   },
@@ -219,7 +223,6 @@
     "block_user_ok": "Bloc {name}",
     "nevermind": "Nevermind",
     "send_message_heading": "Envoyer un message",
-    "welcome_message": "Bienvenue sur {{siteName}} !\nJe suis Mookie, ton hôte.\nC'est un endroit qui nous permet de nous connecter, de rencontrer de nouvelles personnes et de trouver des âmes partageant les mêmes idées. J'espère que tu apprécieras ton séjour ici.\nBonne connexion !\n- Mookie",
     "no_messages_cta": "Trouve des gens à qui parler",
     "no_messages_title": "Aucun message pour l'instant",
     "no_messages_placeholder": "Tes conversations se dérouleront ici."
@@ -316,16 +319,6 @@
       "qr_hint": "Montre ça à leur téléphone"
     },
     "dialog_cancel_button": "Nevermind"
-  },
-  "emails": {
-    "loginLink": {
-      "subject": "Ton lien de connexion",
-      "html": "<p>Salut, bienvenue à bord !</p><h1>{{otp}}</h1><p>Clique sur ce lien pour te lancer dans l'aventure : <a href=\"{{link}}\">Confirm Email</a></p>"
-    },
-    "welcome": {
-      "subject": "Bienvenue chez les Gaïens !",
-      "html": "<p>Salut, bienvenue à bord !</p><a href=\"{{link}}\">Go connect with people</a></p>"
-    }
   },
   "landingpage": {
     "title_lg": "Bienvenue sur {siteName}",

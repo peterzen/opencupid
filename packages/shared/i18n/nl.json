@@ -58,7 +58,7 @@
     "login": "Inloggen",
     "auth_id_input_empty": "Voer je e-mailadres of telefoonnummer in.",
     "auth_id_input_label": "E-mail of telefoonnummer",
-    "auth_id_input_placeholder": "",
+    "auth_id_input_placeholder": "+12 34567121 of je e-mail.com",
     "captcha_input_label": "Ik ben een mens",
     "login_confirm_welcome": "Welkom!",
     "otp_check_messages": "Controleer je berichtjes",
@@ -115,7 +115,7 @@
       "more_options": "Meer opties...",
       "city_search_placeholder": "Steden zoeken",
       "city_add_placeholder": "Voeg dit toe als nieuwe stad",
-      "city_deselect_label": "Verwijderen",
+      "city_deselect_label": "Verwijder",
       "city_start_typing": "Begin te typen om je stad te zoeken",
       "tag_search_placeholder": "Zoek interesses...",
       "tag_add_placeholder": "Voeg dit toe als nieuwe tag",
@@ -147,7 +147,7 @@
       "no_access_social_title": "Je eigen sociale profiel is momenteel privé.",
       "no_access_social_description": "Als anderen jou niet kunnen zien, kun jij hen ook niet zien - dat is alleen maar eerlijk.  Maak je profiel openbaar om anderen te zien en te ontmoeten.",
       "cta_button_label": "Ga naar mijn profiel",
-      "social_no_results": "Er is nog niemand in je omgeving die aan je voorkeuren voldoet.",
+      "social_no_results": "We hebben nog niemand gevonden op {country}.",
       "no_results_cta_title": "Deze gemeenschap groeit nog steeds.",
       "no_results_cta_description": "Je kunt helpen door je vrienden uit te nodigen om mee te doen. Hoe meer, hoe beter.",
       "invite_button": "Vrienden uitnodigen",
@@ -160,8 +160,11 @@
         "locate_button_title": "Ingesteld op mijn land",
         "search_button_title_social": "Mensen vinden",
         "search_button_title_dating": "Mensen vinden",
-        "age_range": "Leeftijdscategorie:"
-      }
+        "age_range": "Leeftijdscategorie:",
+        "filter_display_label": "Binnenkijken:"
+      },
+      "social_no_results_city": "Ik heb nog niemand gevonden op {cityName}.",
+      "social_no_results_tags": "Ik heb nog niemand gevonden met deze interesses."
     },
     "pronouns_edit_label": "voornaamwoorden"
   },
@@ -220,7 +223,6 @@
     "block_user_ok": "Blok {name}",
     "nevermind": "Laat maar",
     "send_message_heading": "Verstuur bericht",
-    "welcome_message": "Welkom op {{siteName}}!\nIk ben Mookie, jullie gastheer.\nDit is een plek voor ons om met elkaar in contact te komen, nieuwe mensen te ontmoeten en gelijkgestemde zielen te vinden. Ik hoop dat je geniet van je verblijf hier.\nVeel plezier met verbinden!\n- Mookie",
     "no_messages_cta": "Mensen vinden om mee te praten",
     "no_messages_title": "Nog geen berichten",
     "no_messages_placeholder": "Je gesprekken vinden hier plaats."
@@ -317,16 +319,6 @@
       "qr_hint": "Flash dit naar hun telefoon"
     },
     "dialog_cancel_button": "Laat maar"
-  },
-  "emails": {
-    "loginLink": {
-      "subject": "Je inloglink",
-      "html": "<p>Hallo, welkom aan boord!</p><h1>{{otp}}</h1><p>Klik op deze link om er meteen in te springen: <a href=\"{{link}}\">Confirm Email</a></p>"
-    },
-    "welcome": {
-      "subject": "Welkom bij Gaians!",
-      "html": "<p>Hallo, welkom aan boord!</p><a href=\"{{link}}\">Go connect with people</a></p>"
-    }
   },
   "landingpage": {
     "title_lg": "Welkom op {siteName}",

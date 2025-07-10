@@ -1,0 +1,15 @@
+{
+  "emails": {
+    "loginLink": {
+      "subject": "{{siteName}} belépő link",
+      "html": "<p>Szia,</p><p>ezzel a kóddal tudsz belépni:</p><h1>{{otp}}</h1><p>Vagy <a href=\"{{link}}\">kattints ide</a> </p>"
+    },
+    "welcome": {
+      "subject": "{{siteName}} Üdv az oldalon!",
+      "html": "<p>Üdv a fedélzeten!</p><a href=\"{{link}}\">Kapcsolódj</a></p>"
+    }
+  },
+  "messages": {
+    "welcome_message": "Üdv a {{siteName}} oldalon !\nMookie vagyok, a házigazda.\nEz egy olyan hely, ahol kapcsolatba léphetünk, új emberekkel találkozhatunk, és megtalálhatjuk a hasonlóan gondolkodó lelkeket. Remélem, jól fogod érezni magad itt.\nSzép kapcsolódásokat!\n\n- Mookie"
+  }
+}
