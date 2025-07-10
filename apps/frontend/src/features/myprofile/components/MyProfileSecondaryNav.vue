@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, inject, type Ref, ref } from 'vue'
 import { useI18nStore } from '@/store/i18nStore'
 
 import { type ViewState } from '../composables/types'
 import ScopeViewToggler from '@/features/shared/ui/ScopeViewToggler.vue'
 import LanguageIcon from '@/features/shared/profiledisplay/LanguageIcon.vue'
 import IconSetting2 from '@/assets/icons/interface/setting-2.svg'
+import { type OwnerProfile } from '@zod/profile/profile.dto'
 
 const model = defineModel<ViewState>({
   default: {
@@ -15,10 +16,16 @@ const model = defineModel<ViewState>({
   required: true,
 })
 
-const languagePreviewOptions = useI18nStore().getAvailableLocalesWithLabels()
+const viewerProfile = inject<Ref<OwnerProfile>>('viewerProfile')
+
+const i18nStore = useI18nStore()
+
+const languagePreviewOptions = computed(() => {
+  return i18nStore.getLanguageLabels(viewerProfile?.value.languages || [])
+})
 
 const currentLanguage = computed(() => {
-  return languagePreviewOptions.find(lang => lang.value === model.value.previewLanguage)
+  return languagePreviewOptions.value.find(lang => lang.value === model.value.previewLanguage)
 })
 </script>
 

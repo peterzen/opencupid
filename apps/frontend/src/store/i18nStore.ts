@@ -63,9 +63,17 @@ export const useI18nStore = defineStore('i18n', () => {
     }))
   }
 
+  function getLanguageLabels(languages: string[]) {
+    return languages.map((lang) => ({
+      value: lang,
+      label: labels[lang] || lang, // Fallback to code if no label found
+    }))
+  }
+
   return {
     currentLanguage,
     getAvailableLocales,
+    getLanguageLabels,
     getAvailableLocalesWithLabels,
     setLanguage,
     getLanguage,
