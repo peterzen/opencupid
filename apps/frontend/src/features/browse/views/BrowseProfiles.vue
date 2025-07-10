@@ -84,7 +84,7 @@ const handleHidden = (id: string) => {
 }
 
 // Provide the viewerProfile object (current user's profile) to child components
-provide('viewerProfile', viewerProfile.value)
+provide('viewerProfile', viewerProfile)
 
 const isDetailView = computed(() => !!selectedProfileId.value)
 </script>

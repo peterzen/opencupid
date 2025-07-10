@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject } from 'vue'
+import { inject, ref, Ref } from 'vue'
 import type { OwnerProfile, PublicProfile } from '@zod/profile/profile.dto'
 import ProfileImage from '@/features/images/components/ProfileImage.vue'
 import TagList from '@/features/shared/profiledisplay/TagList.vue'
@@ -12,8 +12,8 @@ defineProps<{
   showLocation?: boolean
 }>()
 
-const viewerProfile = inject('viewerProfile') as OwnerProfile
-const viewerLocation = viewerProfile?.location
+const viewerProfile = inject<Ref<OwnerProfile>>('viewerProfile') 
+const viewerLocation = ref(viewerProfile?.value.location)
 </script>
 
 <template>

@@ -40,7 +40,7 @@ const handleCardClick = async (profileId: string) => {
   })
 }
 
-provide('viewerProfile', viewerProfile.value)
+provide('viewerProfile', viewerProfile)
 
 const siteName = __APP_CONFIG__.SITE_NAME
 </script>

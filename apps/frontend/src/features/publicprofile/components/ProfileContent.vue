@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { inject } from 'vue'
+import { inject, ref, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { type OwnerProfile, type PublicProfileWithContext } from '@zod/profile/profile.dto'
@@ -28,8 +28,8 @@ const props = defineProps<{
   wrapperClass?: string
 }>()
 
-const viewerProfile = inject('viewerProfile') as OwnerProfile
-const viewerLocation = viewerProfile?.location
+const viewerProfile = inject<Ref<OwnerProfile>>('viewerProfile') 
+const viewerLocation = ref(viewerProfile?.value.location)
 </script>
 
 <template>
