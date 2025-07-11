@@ -19,6 +19,8 @@ import type {
 import { broadcastToProfile } from '@/utils/wsUtils'
 import { SendMessagePayloadSchema } from '@zod/messaging/messaging.dto'
 import { InteractionService } from '../../services/interaction.service'
+import { notifierService } from '@/services/notifier.service'
+import { appConfig } from '@/lib/appconfig'
 
 // Route params for ID lookups
 const IdLookupParamsSchema = z.object({
@@ -156,13 +158,19 @@ const messageRoutes: FastifyPluginAsync = async fastify => {
       reply.code(200).send(response)
 
       // Broadcast the new message to the recipient's WebSocket connections
-      const ok = broadcastToProfile(fastify, profileId, {
+      const isWsBroadcasted = broadcastToProfile(fastify, profileId, {
         type: 'ws:new_message',
         payload: messageDTO,
       })
 
-      webPushService.send(messageDTO)
-
+      if (!isWsBroadcasted) {
+        await notifierService.notifyProfile(profileId, 'new_message', {
+          sender: messageDTO.sender.publicName,
+          message: messageDTO.content,
+          link: `${appConfig.FRONTEND_URL}/inbox`,
+        })
+      // webPushService.send(messageDTO)
+      }
     } catch (error: any) {
       return sendError(reply, 403, error)
     }
