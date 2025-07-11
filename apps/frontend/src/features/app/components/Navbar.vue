@@ -18,6 +18,7 @@ import { useMessageStore } from '@/features/messaging/stores/messageStore'
 import { useOwnerProfileStore } from '@/features/myprofile/stores/ownerProfileStore'
 
 import ProfileImage from '@/features/images/components/ProfileImage.vue'
+import MiddleColumn from '@/features/shared/ui/MiddleColumn.vue'
 
 const authStore = useAuthStore()
 const profileStore = useOwnerProfileStore()
@@ -35,42 +36,44 @@ const hasMatchNotifications = computed(
     variant="secondary"
     data-testid="navbar"
   >
-    <BNavbarNav class="d-flex justify-content-between w-100">
-      <BNavItem to="/home" active-class="active">
-        <IconHome class="svg-icon-lg" />
-        <span class="d-none d-md-block label">{{ $t('nav.home') }}</span>
-      </BNavItem>
+    <MiddleColumn>
+      <BNavbarNav class="d-flex justify-content-between w-100">
+        <BNavItem to="/home" active-class="active">
+          <IconHome class="svg-icon-lg" />
+          <span class="d-none d-md-block label">{{ $t('nav.home') }}</span>
+        </BNavItem>
 
-      <BNavItem to="/browse" active-class="active">
-        <IconSearch class="svg-icon-lg" />
-        <span class="d-none d-md-inline label">{{ $t('nav.browse') }}</span>
-      </BNavItem>
+        <BNavItem to="/browse" active-class="active">
+          <IconSearch class="svg-icon-lg" />
+          <span class="d-none d-md-inline label">{{ $t('nav.browse') }}</span>
+        </BNavItem>
 
-      <BNavItem to="/matches" active-class="active" v-if="profileStore.profile?.isDatingActive">
-        <NotificationDot :show="hasMatchNotifications">
-          <IconHeart class="svg-icon-lg" />
-        </NotificationDot>
-        <span class="d-none d-md-inline label">{{ $t('nav.matches') }}</span>
-      </BNavItem>
+        <BNavItem to="/matches" active-class="active" v-if="profileStore.profile?.isDatingActive">
+          <NotificationDot :show="hasMatchNotifications">
+            <IconHeart class="svg-icon-lg" />
+          </NotificationDot>
+          <span class="d-none d-md-inline label">{{ $t('nav.matches') }}</span>
+        </BNavItem>
 
-      <BNavItem to="/inbox" active-class="active">
-        <NotificationDot :show="hasUnreadMessages">
-          <IconMessage class="svg-icon-lg" />
-        </NotificationDot>
-        <span class="d-none d-md-inline label">{{ $t('nav.inbox') }}</span>
-      </BNavItem>
+        <BNavItem to="/inbox" active-class="active">
+          <NotificationDot :show="hasUnreadMessages">
+            <IconMessage class="svg-icon-lg" />
+          </NotificationDot>
+          <span class="d-none d-md-inline label">{{ $t('nav.inbox') }}</span>
+        </BNavItem>
 
-      <BNavItem to="/me" active-class="active">
-        <span v-if="profileStore.profile?.profileImages?.length" class="profile-thumbnail d-flex">
-          <ProfileImage
-            :profile="profileStore.profile"
-            class="img-fluid rounded"
-            style="width: 2.5rem; height: 2.5rem"
-          />
-        </span>
-        <IconUser v-else class="svg-icon-lg" />
-      </BNavItem>
-    </BNavbarNav>
+        <BNavItem to="/me" active-class="active">
+          <span v-if="profileStore.profile?.profileImages?.length" class="profile-thumbnail d-flex">
+            <ProfileImage
+              :profile="profileStore.profile"
+              class="img-fluid rounded"
+              style="width: 2.5rem; height: 2.5rem"
+            />
+          </span>
+          <IconUser v-else class="svg-icon-lg" />
+        </BNavItem>
+      </BNavbarNav>
+    </MiddleColumn>
   </BNavbar>
 </template>
 
@@ -91,7 +94,7 @@ const hasMatchNotifications = computed(
     background-color: var(--bs-secondary-light);
   }
 }
-.nav-link .label{
+.nav-link .label {
   font-size: 0.85rem;
   margin-top: 0.25rem;
   color: var(--bs-secondary-text);
