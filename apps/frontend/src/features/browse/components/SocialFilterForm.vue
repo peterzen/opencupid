@@ -64,7 +64,7 @@ const toggleDisabled = () => {
         </div>
       </div>
     </div>
-    <fieldset class="mb-4" :disabled="locationDisabled">
+    <fieldset class="mb-2 mb-md-4" :disabled="locationDisabled">
       <LocationSelector v-model="model.location as LocationDTO" v-if="model.location" :allowEmpty="true" />
     </fieldset>
 

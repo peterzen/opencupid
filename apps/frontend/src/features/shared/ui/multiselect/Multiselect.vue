@@ -93,13 +93,14 @@
         </slot>
       </span>
     </div>
-    <transition name="multiselect">
+    <div name="multiselect">
       <div
         class="multiselect__content-wrapper"
-        v-show="isOpen"
+        v-show="true"
         @focus="activate"
         tabindex="-1"
         @mousedown.prevent
+        :class="{'visibility-hidden': !isOpen}"
         :style="{ height: optimizedHeight + 'px' }"
         ref="list"
       >
@@ -157,7 +158,7 @@
           <slot name="afterList"></slot>
         </ul>
       </div>
-    </transition>
+    </div>
   </div>
 </template>
 
