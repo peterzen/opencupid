@@ -28,9 +28,7 @@ const handleCloseClick = () => (showModal.value = false)
         class="w-100 h-100 bg-black"
       >
         <template #img>
-          <div
-            class="image-fit-wrapper h-100 w-100 d-flex justify-content-center align-items-center overflow-hidden"
-          >
+          <div class="ratio ratio-4x3">
             <ImageTag :image="img" className="fitted-image" />
           </div>
         </template>
