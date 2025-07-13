@@ -23,7 +23,7 @@ const handleCloseClick = () => (showModal.value = false)
     <BCarousel controls v-model="slide" v-if="!showModal" class="h-100">
       <BCarouselSlide
         v-for="img in props.profile.profileImages"
-        :key="img.url!"
+        :key="img.position"
         @click="handleImageClick"
         class="w-100 h-100"
       >
@@ -51,12 +51,14 @@ const handleCloseClick = () => (showModal.value = false)
       <BCarousel controls indicators v-model="slide" class="w-100 h-100" v-if="showModal">
         <BCarouselSlide
           v-for="img in props.profile.profileImages"
-          :key="img.url!"
+          :key="img.position"
           @click="handleCloseClick"
-          class="w-100 h-100 wrapper"
+          class="h-100"
         >
           <template #img>
-            <ImageTag :image="img" className="" />
+            <div class="image-fit-wrapper">
+              <ImageTag :image="img" className="fitted-image" />
+            </div>
           </template>
         </BCarouselSlide>
       </BCarousel>
@@ -65,7 +67,26 @@ const handleCloseClick = () => (showModal.value = false)
 </template>
 
 <style lang="scss">
+.image-fit-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+.fitted-image img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
 .modal.carousel-modal {
+  .carousel-inner {
+    height: 100%;
+  }
   .modal-content {
     background-color: transparent;
     border: none;

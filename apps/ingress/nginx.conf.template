@@ -1,8 +1,11 @@
 worker_processes 1;
+env AUTH_IMG_HMAC_SECRET;
 
 events {
   worker_connections 1024;
 }
+
+error_log /dev/stderr error;
 
 http {
   include mime.types;
@@ -101,6 +104,7 @@ http {
     }
 
     location /images/ {
+      access_by_lua_file image_auth.lua;
       alias /var/www/;
       autoindex off;
       try_files $uri =404;

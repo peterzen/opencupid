@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { type PropType } from 'vue'
+import { computed } from 'vue'
+import type { PropType } from 'vue'
+
+type Variant = { size: string; url: string }
 
 const props = defineProps({
   image: {
-    type: Object as PropType<{ url: string | null }>,
+    type: Object as PropType<{ variants: Variant[] }>,
     required: true,
   },
   className: {
@@ -11,27 +14,35 @@ const props = defineProps({
     default: '',
   },
 })
+
+const sizesMap: Record<string, string> = {
+  thumb: '150w',
+  card: '480w',
+  medium: '960w',
+  full: '1280w',
+  hd: '1920w',
+}
+
+const webpSrcset = computed(() =>
+  props.image.variants
+    .filter(v => sizesMap[v.size])
+    .map(v => `${v.url} ${sizesMap[v.size]}`)
+    .join(', ')
+)
+
+const fallbackUrl = computed(() =>
+  props.image.variants.find(v => v.size === 'original')?.url || ''
+)
 </script>
 
 <template>
-  <picture class="profile-image w-100 h-100" v-if="props.image">
-    <!-- WebP responsive -->
+  <picture class="profile-image">
     <source
-      :srcset="`
-        ${props.image.url}-thumb.webp 150w,
-        ${props.image.url}-card.webp 480w,
-        ${props.image.url}-full.webp 1280w
-      `"
-      sizes="(max-width: 600px) 100vw, (max-width: 1024px) 50vw, 33vw"
+      :srcset="webpSrcset"
+      sizes="(max-width: 600px) 360px, (max-width: 1024px) 480px, 600px"
       type="image/webp"
     />
-
-    <!-- JPEG fallback -->
-    <img
-      :src="`${props.image.url}-original.jpg`"
-      class="w-100 h-100"
-      :class="className"
-    />
+    <img :src="fallbackUrl" class="w-100 h-100" :class="className" />
   </picture>
 </template>
 
