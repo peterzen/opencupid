@@ -54,8 +54,6 @@ export const configSchema = z.object({
   OG_URL: z.string(),
   OG_TYPE: z.string(),
 
-  FACEAPI_ENABLED: z.string().transform(val => val === 'true').default('false'),
-
   DOMAIN: z.string().default('example.org'),
 
   SITE_NAME: z.string().default('OpenCupid'),
