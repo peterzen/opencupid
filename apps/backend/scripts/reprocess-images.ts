@@ -4,6 +4,7 @@ import fs from 'fs'
 import { PrismaClient } from '@prisma/client'
 import { ImageService } from '../src/services/image.service'
 import { getImageRoot } from '../src/lib/media'
+import { ImageProcessor } from '../src/services/imageprocessor'
 
 const prisma = new PrismaClient()
 const imageService = ImageService.getInstance()
@@ -11,7 +12,7 @@ const imageService = ImageService.getInstance()
 
 async function main() {
 
-  await imageService.initialize()
+  await ImageProcessor.initialize()
 
   const images = await prisma.profileImage.findMany({
     where: {
