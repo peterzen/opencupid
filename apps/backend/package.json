@@ -2,7 +2,7 @@
   "name": "backend",
   "main": "dist/main.js",
   "scripts": {
-    "dev": "tsup --watch --onSuccess \"node --inspect dist/main.js\"",
+    "dev": "tsup --watch --onSuccess \"node --inspect dist/src/main.js\"",
     "build": "tsup && node scripts/generate-version.js",
     "start": "node dist/main.js",
     "generate": "prisma generate --no-hints",
@@ -32,6 +32,7 @@
     "@google-cloud/translate": "^9.1.0",
     "@maxmind/geoip2-node": "^6.1.0",
     "@prisma/client": "^6.8.2",
+    "@sentry/node": "^9.39.0",
     "@tensorflow-models/blazeface": "^0.1.0",
     "@tensorflow/tfjs": "^4.22.0",
     "@tensorflow/tfjs-backend-cpu": "^4.22.0",

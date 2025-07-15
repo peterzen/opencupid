@@ -1,3 +1,6 @@
+
+import Sentry from '@/lib/sentry' // keep this at the top
+
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import { appConfig } from '@/lib/appconfig'
@@ -77,5 +80,6 @@ async function main() {
 
 main().catch(err => {
   console.error(err)
+  Sentry.captureException(err)
   process.exit(1)
 })
