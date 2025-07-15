@@ -1,7 +1,10 @@
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
-  entry: ['src/main.ts'],
+  entry: [
+    'src/main.ts',
+    'scripts/**/*.ts',
+  ],
   outDir: 'dist',
   format: ['cjs'],
   splitting: false,
