@@ -1,15 +1,13 @@
+
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
-  entry: [
-    'src/main.ts',
-  ],
-  outDir: 'dist',
+  entry: ['scripts/**/*.ts'],
+  outDir: 'dist/scripts',
   format: ['cjs'],
   splitting: false,
-  clean: true,
+  clean: false,
   sourcemap: true,
   dts: false,
   target: 'es2020',
-  shims: false,
 })
