@@ -32,6 +32,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Create .env from secret
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          envkey_PRODUCTION_ENV_FILE: ${{ secrets.PRODUCTION_ENV_FILE }}
+          file_name: .env
+          
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
