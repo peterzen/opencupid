@@ -18,13 +18,12 @@ const newProfiles = ref([] as PublicProfile[])
 onMounted(async () => {
   await useBootstrap().bootstrap()
 
-  if (!viewerProfile.value?.isOnboarded) {
+  if (viewerProfile.value && !viewerProfile.value?.isOnboarded) {
     router.push({ name: 'Onboarding' })
     return
   }
 
   const findProfileStore = useFindProfileStore()
-
   const result = await findProfileStore.fetchNewSocial()
   if (result.success && result.data) {
     newProfiles.value = result.data.result as PublicProfile[]
