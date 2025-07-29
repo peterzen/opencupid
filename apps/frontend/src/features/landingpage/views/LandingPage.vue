@@ -40,8 +40,11 @@ const siteName = __APP_CONFIG__.SITE_NAME || 'OpenCupid'
 </script>
 
 <template>
-  <div style="min-height: 100%;" class="bg-light posiion-relative">
-    <header class="position-absolute top-0 start-0 w-100 pt-2" style="z-index: 1000; background-color: inherit;">
+  <div style="min-height: 100%" class="bg-light posiion-relative">
+    <header
+      class="position-absolute top-0 start-0 w-100 pt-2"
+      style="z-index: 1000; background-color: inherit"
+    >
       <BContainer fluid="md" class="d-flex flex-column justify-content-between">
         <BRow>
           <BCol
@@ -67,10 +70,7 @@ const siteName = __APP_CONFIG__.SITE_NAME || 'OpenCupid'
       </BContainer>
     </header>
 
-    <main
-      class="fs-3 overflow-auto hide-scrollbar position-relative"
-      style="padding-bottom: 5rem; padding-top: 4rem;"
-    >
+    <main class="overflow-auto hide-scrollbar position-relative" style="padding-top: 4rem">
       <BContainer>
         <div class="text-success w-100 d-flex align-items-center flex-column mb-3 mb-lg-4">
           <Logo class="svg-icon-100 logo text-success" style="width: 6rem" />
@@ -85,35 +85,39 @@ const siteName = __APP_CONFIG__.SITE_NAME || 'OpenCupid'
                 {{ t('landingpage.title', { siteName: siteName }) }}
               </span>
             </h1>
-            <div class="my-md-3">
+            <div class="my-md-3 fs-5">
               <!-- This is a meeting point in the online realm for us to find each other and connect. -->
               {{ t('landingpage.subtitle_1') }}
             </div>
           </BCol>
         </BRow>
-        <BRow class="fs-4">
-          <BCol md="6">
-            <div class="d-flex flex-column align-items-center py-3 text-center">
-              <div class="icon-wrapper text-social mb-lg-3">
-                <IconSocialize class="svg-icon-100" />
-              </div>
-              <div>
-                <!-- Exchange ideas, connect on our travels, find like-minded souls nearby to hang out
+        <BRow class="d-flex flex-column align-items-center fs-4">
+          <BCol md="12" lg="8">
+            <BRow>
+              <BCol md="6">
+                <div class="d-flex flex-column align-items-center py-3 text-center">
+                  <div class="icon-wrapper text-social mb-lg-3">
+                    <IconSocialize class="svg-icon-100" />
+                  </div>
+                  <div>
+                    <!-- Exchange ideas, connect on our travels, find like-minded souls nearby to hang out
                 with -->
-                {{ t('landingpage.socialize_1') }}
-              </div>
-            </div>
-          </BCol>
-          <BCol md="6">
-            <div class="d-flex flex-column align-items-center py-3 text-center">
-              <div class="icon-wrapper text-dating mb-lg-3">
-                <IconDate class="svg-icon-100" />
-              </div>
-              <div>
-                <!-- Find a soulmate or playmate -->
-                {{ t('landingpage.date_1') }}
-              </div>
-            </div>
+                    {{ t('landingpage.socialize_1') }}
+                  </div>
+                </div>
+              </BCol>
+              <BCol md="6">
+                <div class="d-flex flex-column align-items-center py-3 text-center">
+                  <div class="icon-wrapper text-dating mb-lg-3">
+                    <IconDate class="svg-icon-100" />
+                  </div>
+                  <div>
+                    <!-- Find a soulmate or playmate -->
+                    {{ t('landingpage.date_1') }}
+                  </div>
+                </div>
+              </BCol>
+            </BRow>
           </BCol>
         </BRow>
 
@@ -143,7 +147,7 @@ const siteName = __APP_CONFIG__.SITE_NAME || 'OpenCupid'
         @click="enterApp"
         :disabled="loading"
         size="lg"
-        class="px-5 mb-3 mb-md-5"
+        class="px-5 mb-3"
         pill
       >
         {{ loading ? t('landingpage.enter_button_loading') : t('landingpage.enter_button') }}
@@ -170,5 +174,20 @@ button {
 }
 footer {
   line-height: 1;
+}
+
+main::after {
+  content: '';
+  position: sticky;
+  bottom: 0;
+  display: block;
+  height: 5rem;
+  width: 100%;
+  background: linear-gradient(
+    to top,
+    transparentize(map-get($theme-colors, 'light'), 0),
+    transparentize(map-get($theme-colors, 'light'), 1)
+  );
+  pointer-events: none; /* let clicks pass through */
 }
 </style>
