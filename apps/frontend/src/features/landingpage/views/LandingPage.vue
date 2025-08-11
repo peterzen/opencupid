@@ -137,6 +137,9 @@ const siteName = __APP_CONFIG__.SITE_NAME || 'OpenCupid'
               <FontAwesomeIcon :icon="faGithub" class="text-decoration-none text-muted fs-4" />
             </a>
           </div>
+          <div>
+            <a href="mailto:hello@gaians.net">hello@gaians.net</a>
+          </div>
         </div>
       </BContainer>
     </main>
