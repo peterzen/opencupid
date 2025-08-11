@@ -85,7 +85,7 @@ const siteName = __APP_CONFIG__.SITE_NAME || 'OpenCupid'
                 {{ t('landingpage.title', { siteName: siteName }) }}
               </span>
             </h1>
-            <div class="my-md-3 fs-5">
+            <div class="my-md-3 fs-5 pre-line" >
               <!-- This is a meeting point in the online realm for us to find each other and connect. -->
               {{ t('landingpage.subtitle_1') }}
             </div>
