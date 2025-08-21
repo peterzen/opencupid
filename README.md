@@ -51,4 +51,7 @@ If you like the aims and goals of this project and would like to improve it in s
 * Test the platform and file issues for bugs/problems you find (don't need to be a developer to do this)
 * Work on open Github issues
 
-🙏
+## Acknowledgements 🙏
+
+* The awesome hand drawn Doodle Icons by Khushmeen https://khushmeen.com/icons.html
+* Many open source libraries this project relies on
