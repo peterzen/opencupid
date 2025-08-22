@@ -1,3 +1,5 @@
+[![Test](https://github.com/opencupid/opencupid/actions/workflows/test.yml/badge.svg)](https://github.com/opencupid/opencupid/actions/workflows/test.yml)
+
 # OpenCupid
 
 Free, open matchmaking application built to serve existing communities.
