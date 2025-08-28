@@ -79,7 +79,6 @@ export class ProfileMatchService {
     const update = {
       profileId,
       country: data.location?.country || null,
-      // cityId: data.location?.cityId || null,
       cityName: data.location?.cityName || null,
       lat: data.location?.lat ?? null,
       lon: data.location?.lon ?? null,
@@ -95,8 +94,6 @@ export class ProfileMatchService {
       cityName: data.location?.cityName || null,
       lat: data.location?.lat ?? null,
       lon: data.location?.lon ?? null,
-
-      // cityId: data.location?.cityId ?? '',
       radius: data.radius ?? 0,
       tags: {
         connect: tagIds, // ✅ required for create
@@ -162,7 +159,6 @@ export class ProfileMatchService {
 
     const filters = {
       ...(userPrefs.country ? { country: userPrefs.country } : {}),
-      ...(userPrefs.cityId ? { cityId: userPrefs.cityId } : {}),
       ...(userPrefs.tags?.length ? {
         tags: {
           some: {

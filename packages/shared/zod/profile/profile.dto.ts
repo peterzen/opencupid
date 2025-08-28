@@ -98,7 +98,6 @@ export const editableFields = {
 // Client -> API DTO profile editing payload
 export const UpdateProfilePayloadSchema = ProfileSchema.pick({
   ...editableFields,
-  cityId: true,
   country: true,
   cityName: true,
   lat: true,

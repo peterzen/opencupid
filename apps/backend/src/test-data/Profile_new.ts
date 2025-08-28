@@ -109,7 +109,6 @@ async function main() {
       publicName: f.person.firstName(gender as any),
       country: city.country,
       cityName: city.name,
-      // cityId: city.id,
       // city: { connect: { id: city.id } },
       languages: langs,
       // tags: randomTags,
