@@ -34,9 +34,9 @@ const mockProfiles = [
   { id: 'profile-2', isActive: true, isSocialActive: true },
   { id: 'profile-3', isActive: true, isSocialActive: true },
   { id: 'profile-4', isActive: true, isSocialActive: true, country: 'US' },
-  { id: 'profile-5', isActive: true, isSocialActive: true, country: 'US', cityId: 'city-1' },
+  { id: 'profile-5', isActive: true, isSocialActive: true, country: 'US' },
   { id: 'profile-6', isActive: true, isSocialActive: true, tags: [{ id: 'tag-1' }] },
-  { id: 'profile-7', isActive: true, isSocialActive: true, country: 'US', cityId: 'city-1', tags: [{ id: 'tag-2' }] },
+  { id: 'profile-7', isActive: true, isSocialActive: true, country: 'US', tags: [{ id: 'tag-2' }] },
 ]
 
 describe('ProfileMatchService.findSocialProfilesFor', () => {
@@ -63,20 +63,6 @@ describe('ProfileMatchService.findSocialProfilesFor', () => {
       profileId: mockProfileId,
       country: 'US',
     }
-    mockPrisma.socialMatchFilter.findUnique.mockResolvedValue(mockUserPrefs)
-    mockPrisma.profile.findMany.mockResolvedValue(mockProfiles)
-    const result = await service.findSocialProfilesFor(mockProfileId)
-    expect(result).toBe(mockProfiles)
-  })
-
-  it('country and city filters', async () => {
-
-    const mockUserPrefs = {
-      profileId: mockProfileId,
-      country: 'US',
-      cityId: 'city-1',
-    }
-
     mockPrisma.socialMatchFilter.findUnique.mockResolvedValue(mockUserPrefs)
     mockPrisma.profile.findMany.mockResolvedValue(mockProfiles)
     const result = await service.findSocialProfilesFor(mockProfileId)
