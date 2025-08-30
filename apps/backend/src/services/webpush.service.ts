@@ -4,17 +4,23 @@ import { MessageDTO } from '@zod/messaging/messaging.dto'
 // pushService.ts
 import webpush from 'web-push'
 
-// Replace with your actual VAPID keys
-webpush.setVapidDetails(
-  'mailto:admin@example.com',
-  process.env.VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-)
+if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+  webpush.setVapidDetails(
+    'mailto:admin@example.com',
+    process.env.VAPID_PUBLIC_KEY,
+    process.env.VAPID_PRIVATE_KEY
+  )
+}
 
 export class WebPushService {
   private static instance: WebPushService
 
+
   private constructor() { }
+
+  public static isWebPushConfigured(): boolean {
+    return !!(process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY)
+  }
 
   public static getInstance(): WebPushService {
     if (!WebPushService.instance) {
@@ -24,6 +30,9 @@ export class WebPushService {
   }
 
   async send(message: MessageDTO) {
+    if (!WebPushService.isWebPushConfigured()) {
+      throw new Error('Web push is not configured: VAPID keys are missing.')
+    }
 
     const payload = {
       body: 'You got message',
@@ -52,6 +61,9 @@ export class WebPushService {
   }
 
   async sendPushNotification(subscription: webpush.PushSubscription, payload: any) {
+    if (!WebPushService.isWebPushConfigured()) {
+      throw new Error('Web push is not configured: VAPID keys are missing.')
+    }
     return await webpush.sendNotification(subscription, JSON.stringify(payload))
   }
 
