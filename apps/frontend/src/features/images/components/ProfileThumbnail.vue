@@ -11,7 +11,7 @@ defineProps<{
 
 <template>
   <span class="profile-thumbnail d-inline-flex">
-    <ProfileImage :profile="profile" />
+    <ProfileImage :profile="profile" context="thumb"/>
   </span>
 </template>
 

@@ -25,9 +25,8 @@ type Variant = {
 const variants: Variant[] = [
   { name: 'thumb', width: 150, height: 150, fit: sharp.fit.cover }, // square crop
   { name: 'card', width: 600, height: 600, fit: sharp.fit.cover }, // optional black bars or pad
-  { name: 'profile', width: 1280, height: 720, fit: sharp.fit.contain }, // 4:3 aspect ratio
-  { name: 'medium', width: 800 },
-  { name: 'full', width: 1280 },
+  { name: 'profile', width: 1200, height: 900, fit: sharp.fit.contain }, // 4:3 aspect ratio
+  { name: 'full', width: 1280, fit: sharp.fit.contain },
 ]
 export class ImageService {
   private static instance: ImageService

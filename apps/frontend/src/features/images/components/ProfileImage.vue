@@ -2,16 +2,17 @@
 import { ref, watchEffect } from 'vue'
 
 import ImageTag from './ImageTag.vue'
+import { ImageVariant } from '@zod/profile/profileimage.dto';
 
 // Props & Emits
 const props = defineProps<{
-  context?: 'thumb' | 'card' | 'profile' | 'full',
+  context?: 'thumb' | 'card' | 'profile' | 'full'
   profile: {
-    profileImages: { variants: { size: string; url: string }[] }[]
+    profileImages: { variants: ImageVariant[] }[]
   }
 }>()
 
-const image = ref<{ variants: { size: string; url: string }[] }>()
+const image = ref<{ variants: ImageVariant[] }>()
 
 watchEffect(() => {
   if (props.profile && props.profile.profileImages && props.profile.profileImages.length > 0) {
@@ -21,5 +22,5 @@ watchEffect(() => {
 </script>
 
 <template>
-  <ImageTag :image="image" v-if="image" className="img-fluid rounded" :context="props.context"/>
+  <ImageTag :image="image" v-if="image" className="img-fluid rounded" :variant="props.context" />
 </template>

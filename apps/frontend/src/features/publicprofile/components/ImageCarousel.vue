@@ -29,7 +29,7 @@ const handleCloseClick = () => (showModal.value = false)
       >
         <template #img>
           <div class="ratio ratio-4x3">
-            <ImageTag :image="img" className="fitted-image" context="profile"/>
+            <ImageTag :image="img" className="fitted-image" variant="profile" />
           </div>
         </template>
       </BCarouselSlide>
@@ -58,7 +58,9 @@ const handleCloseClick = () => (showModal.value = false)
           class="bg-black d-flex justify-content-center align-items-center flex-column h-100"
         >
           <template #img>
-            <div class="w-100 d-flex justify-content-center align-items-center overflow-hidden">
+            <div
+              class="w-100 h-100 d-flex justify-content-center align-items-center overflow-hidden"
+            >
               <ImageTag :image="img" className="fitted-image" context="full" />
             </div>
           </template>
@@ -74,10 +76,11 @@ const handleCloseClick = () => (showModal.value = false)
   height: 100%;
 }
 .modal.carousel-modal {
-  .fitted-image img {
+  .fitted-image {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+    object-position: center;
   }
 
   .carousel-inner {

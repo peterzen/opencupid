@@ -1,15 +1,4 @@
-import path from 'path'
-import fs from 'fs'
-import { createHmac } from 'crypto'
-
-import { prisma } from '../lib/prisma'
-import { getImageRoot, makeImageLocation } from '@/lib/media'
-import { appConfig } from '@/lib/appconfig'
-
-import { generateContentHash } from '@/utils/hash'
-import { ProfileImagePosition } from '@zod/profile/profileimage.dto'
 import sharp from 'sharp'
-import type { ProfileImage } from '@zod/generated'
 
 import * as tf from '@tensorflow/tfjs'
 import '@tensorflow/tfjs-backend-cpu'
@@ -221,24 +210,6 @@ export class ImageProcessor {
       .webp({ quality: 85 })
       .toFile(outputPath)
   }
-
-  // async extractAndResize(
-  //   crop: Crop,
-  //   width: number,
-  //   height: number,
-  //   outputPath: string
-  // ) {
-  //   await sharp(this.buffer)
-  //     .extract({ left: crop.x, top: crop.y, width: crop.width, height: crop.height })
-  //     .resize(width, height)
-  //     .webp({ quality: 85 })
-  //     .toFile(outputPath)
-  // }
-
-  // async rotate(): Promise<void> {
-  //   this.sharpInstance = this.sharpInstance.rotate()
-  //   this.metadata = await this.sharpInstance.metadata()
-  // }
 
   async resizeOriginal(width: number, height: number | undefined, fit: keyof sharp.FitEnum, outputPath: string) {
     await this.sharpInstance
