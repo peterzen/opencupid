@@ -24,8 +24,8 @@ type Variant = {
 
 const variants: Variant[] = [
   { name: 'thumb', width: 150, height: 150, fit: sharp.fit.cover }, // square crop
-  { name: 'card', width: 400, height: 400, fit: sharp.fit.contain }, // optional black bars or pad
-  { name: 'profile', width: 720, height: 540, fit: sharp.fit.cover }, // 4:3 aspect ratio
+  { name: 'card', width: 600, height: 600, fit: sharp.fit.cover }, // optional black bars or pad
+  { name: 'profile', width: 1280, height: 720, fit: sharp.fit.contain }, // 4:3 aspect ratio
   { name: 'medium', width: 800 },
   { name: 'full', width: 1280 },
 ]
@@ -142,17 +142,18 @@ export class ImageService {
     await fs.promises.mkdir(outputDir, { recursive: true })
 
     const buffer = await fs.promises.readFile(filePath)
-    const processor = new ImageProcessor(buffer)
-    processor.rotate()
-    await processor.analyze()
 
     const originalPath = path.join(outputDir, `${baseName}-original.jpg`)
 
-    await sharp(buffer)
+    const orientFix = await sharp(buffer)
       .rotate()                // auto-orient pixels
-      .keepIccProfile()
+
+    await orientFix.keepIccProfile()
       .jpeg({ quality: 100 })
       .toFile(originalPath)
+
+    const processor = new ImageProcessor(await orientFix.toBuffer())
+    await processor.analyze()
 
     const outputPaths = await this.generateAllVariants(processor, outputDir, baseName)
     outputPaths.original = originalPath
@@ -188,7 +189,12 @@ export class ImageService {
       const height = v.height ?? v.width
       const fit = v.fit ?? sharp.fit.inside
 
-      if (['thumb', 'card', 'profile'].includes(v.name)) {
+      if (['card', 'thumb'].includes(v.name)) {
+        // Face-aware crop with +25% padding, target aspect maintained
+        const rect = await processor.getFaceAwareCrop(width, height, { paddingRatio: 0.75 })
+        const crop = { x: rect.left, y: rect.top, width: rect.width, height: rect.height }
+        await processor.extractAndResize(crop, width, height, outputPath)
+      } else if (['profile'].includes(v.name)) {
         const crop = await processor.getCropRegion(width, height)
         await processor.extractAndResize(crop, width, height, outputPath)
       } else {

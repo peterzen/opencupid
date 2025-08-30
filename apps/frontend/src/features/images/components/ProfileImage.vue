@@ -5,6 +5,7 @@ import ImageTag from './ImageTag.vue'
 
 // Props & Emits
 const props = defineProps<{
+  context?: 'thumb' | 'card' | 'profile' | 'full',
   profile: {
     profileImages: { variants: { size: string; url: string }[] }[]
   }
@@ -20,5 +21,5 @@ watchEffect(() => {
 </script>
 
 <template>
-  <ImageTag :image="image" v-if="image" className="img-fluid rounded" />
+  <ImageTag :image="image" v-if="image" className="img-fluid rounded" :context="props.context"/>
 </template>

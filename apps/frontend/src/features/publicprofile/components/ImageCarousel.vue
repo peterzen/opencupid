@@ -29,7 +29,7 @@ const handleCloseClick = () => (showModal.value = false)
       >
         <template #img>
           <div class="ratio ratio-4x3">
-            <ImageTag :image="img" className="fitted-image" />
+            <ImageTag :image="img" className="fitted-image" context="profile"/>
           </div>
         </template>
       </BCarouselSlide>
@@ -59,7 +59,7 @@ const handleCloseClick = () => (showModal.value = false)
         >
           <template #img>
             <div class="w-100 d-flex justify-content-center align-items-center overflow-hidden">
-              <ImageTag :image="img" className="fitted-image" />
+              <ImageTag :image="img" className="fitted-image" context="full" />
             </div>
           </template>
         </BCarouselSlide>
