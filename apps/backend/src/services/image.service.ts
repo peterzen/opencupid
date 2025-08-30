@@ -147,7 +147,12 @@ export class ImageService {
     await processor.analyze()
 
     const originalPath = path.join(outputDir, `${baseName}-original.jpg`)
-    await sharp(buffer).jpeg({ quality: 100 }).toFile(originalPath)
+
+    await sharp(buffer)
+      .rotate()                // auto-orient pixels
+      .keepIccProfile()
+      .jpeg({ quality: 100 })
+      .toFile(originalPath)
 
     const outputPaths = await this.generateAllVariants(processor, outputDir, baseName)
     outputPaths.original = originalPath
