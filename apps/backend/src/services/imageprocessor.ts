@@ -90,6 +90,11 @@ export class ImageProcessor {
       .toFile(outputPath)
   }
 
+  async rotate(): Promise<void> {
+    this.sharpInstance = this.sharpInstance.rotate()
+    this.metadata = await this.sharpInstance.metadata()
+  }
+
   async resizeOriginal(width: number, height: number | undefined, fit: keyof sharp.FitEnum, outputPath: string) {
     await this.sharpInstance
       .clone()

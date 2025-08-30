@@ -143,6 +143,7 @@ export class ImageService {
 
     const buffer = await fs.promises.readFile(filePath)
     const processor = new ImageProcessor(buffer)
+    processor.rotate()
     await processor.analyze()
 
     const originalPath = path.join(outputDir, `${baseName}-original.jpg`)
