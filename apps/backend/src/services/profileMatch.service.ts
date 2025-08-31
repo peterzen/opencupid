@@ -33,9 +33,9 @@ const statusFlags = {
 
 export class ProfileMatchService {
 
-  async findNewProfilesAnywhere(profileId: string, orderBy: OrderBy = defaultOrderBy, take: number = 20): Promise<DbProfileWithImages[]> {
+  async findNewProfilesAnywhere(profileId: string, orderBy: OrderBy = defaultOrderBy, take: number = 10, skip: number = 0): Promise<DbProfileWithImages[]> {
 
-    return await prisma.profile.findMany({
+    const profiles = await prisma.profile.findMany({
       where: {
         ...statusFlags,
         isSocialActive: true,
@@ -49,8 +49,11 @@ export class ProfileMatchService {
         ...profileImageInclude(),
       },
       take: take,
+      skip: skip,
       orderBy: orderBy,
     })
+
+    return profiles
   }
 
   private static instance: ProfileMatchService;
@@ -147,7 +150,7 @@ export class ProfileMatchService {
 
 
 
-  async findSocialProfilesFor(profileId: string, orderBy: OrderBy = defaultOrderBy, take: number = 20): Promise<DbProfileWithImages[]> {
+  async findSocialProfilesFor(profileId: string, orderBy: OrderBy = defaultOrderBy, take: number = 10, skip: number = 0): Promise<DbProfileWithImages[]> {
 
     const userPrefs = await this.getSocialMatchFilter(profileId)
 
@@ -168,7 +171,7 @@ export class ProfileMatchService {
       } : {}),
     }
 
-    return await prisma.profile.findMany({
+    const profiles = await prisma.profile.findMany({
       where: {
         ...statusFlags,
         isSocialActive: true,
@@ -183,12 +186,15 @@ export class ProfileMatchService {
         ...profileImageInclude(),
       },
       take: take,
+      skip: skip,
       orderBy: orderBy,
     })
+
+    return profiles
   }
 
 
-  async findLocalProfiles(profileId: string, orderBy: OrderBy = defaultOrderBy, take: number = 20): Promise<DbProfileWithImages[]> {
+  async findLocalProfiles(profileId: string, orderBy: OrderBy = defaultOrderBy, take: number = 10, skip: number = 0): Promise<DbProfileWithImages[]> {
 
     const userPrefs = await this.getSocialMatchFilter(profileId)
 
@@ -200,7 +206,7 @@ export class ProfileMatchService {
       ...(userPrefs.country ? { country: userPrefs.country } : {}),
     }
 
-    return await prisma.profile.findMany({
+    const profiles = await prisma.profile.findMany({
       where: {
         ...statusFlags,
         isSocialActive: true,
@@ -215,12 +221,15 @@ export class ProfileMatchService {
         ...profileImageInclude(),
       },
       take: take,
+      skip: skip,
       orderBy: orderBy,
     })
+
+    return profiles
   }
 
 
-  async findMutualMatchesFor(profileId: string, orderBy: OrderBy = defaultOrderBy, take: number = 20): Promise<DbProfileWithImages[]> {
+  async findMutualMatchesFor(profileId: string, orderBy: OrderBy = defaultOrderBy, take: number = 10, skip: number = 0): Promise<DbProfileWithImages[]> {
     const profile = await prisma.profile.findUnique({
       where: { id: profileId },
     })
@@ -253,15 +262,18 @@ export class ProfileMatchService {
       prefKids: profile.hasKids ? { hasSome: [profile.hasKids] } : undefined,
     }
 
-    return prisma.profile.findMany({
+    const profiles = await prisma.profile.findMany({
       where: where,
       include: {
         ...tagsInclude(),
         ...profileImageInclude(),
       },
       take: take,
+      skip: skip,
       orderBy: orderBy,
     })
+
+    return profiles
   }
 
   async areProfilesMutuallyCompatible(aId: string, bId: string): Promise<boolean> {

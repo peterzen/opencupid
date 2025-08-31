@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { computed, onMounted, onUnmounted, provide, ref } from 'vue'
+import { useInfiniteScroll } from '@vueuse/core'
 
 import PublicProfile from '@/features/publicprofile/components/PublicProfile.vue'
 import MiddleColumn from '@/features/shared/ui/MiddleColumn.vue'
@@ -30,6 +31,8 @@ const {
   haveAccess,
   haveResults,
   isLoading,
+  isLoadingMore,
+  hasMoreProfiles,
   currentScope,
   scopeModel,
   profileList,
@@ -43,6 +46,7 @@ const {
   initialize,
   reset,
   isInitialized,
+  loadMoreProfiles,
 } = useFindMatchViewModel()
 
 onMounted(async () => {
@@ -95,6 +99,31 @@ const countryName = computed(() => {
 provide('viewerProfile', viewerProfile)
 
 const isDetailView = computed(() => !!selectedProfileId.value)
+
+// Infinite scroll setup
+const scrollContainer = ref<HTMLElement>()
+
+useInfiniteScroll(
+  scrollContainer,
+  async () => {
+    console.log('🔄 BrowseProfiles - infinite scroll triggered', {
+      isLoadingMore: isLoadingMore.value,
+      hasMoreProfiles: hasMoreProfiles.value,
+      isInitialized: isInitialized.value,
+      currentScope: currentScope.value
+    })
+    
+    if (isLoadingMore.value || !hasMoreProfiles.value || !isInitialized.value) {
+      return
+    }
+
+    await loadMoreProfiles()
+  },
+  {
+    distance: 300, // Trigger when 300px from bottom
+    canLoadMore: () => hasMoreProfiles.value && !isLoadingMore.value && isInitialized.value,
+  }
+)
 </script>
 
 <template>
@@ -198,7 +227,10 @@ const isDetailView = computed(() => !!selectedProfileId.value)
 
         <!-- Main profile results -->
         <template v-else-if="isInitialized">
-          <div class="overflow-auto hide-scrollbar pb-5">
+          <div 
+            ref="scrollContainer"
+            class="overflow-auto hide-scrollbar pb-5"
+          >
             <MiddleColumn>
               <ProfileCardGrid
                 :profiles="profileList"
@@ -206,6 +238,16 @@ const isDetailView = computed(() => !!selectedProfileId.value)
                 :showLocation="true"
                 @profile:select="handleCardClick"
               />
+              
+              <!-- Infinite scroll loading indicator -->
+              <div v-if="isLoadingMore" class="text-center py-3">
+                <BSpinner variant="primary" small />
+                <span class="ms-2 text-muted">{{  $t('profiles.browse.loading_more_profiles') }}</span>
+              </div>
+              
+              <!-- No more profiles indicator -->
+              <!-- <div v-else-if="!hasMoreProfiles && profileList.length > 0" class="text-center py-3 text-muted">
+              </div> -->
             </MiddleColumn>
           </div>
         </template>

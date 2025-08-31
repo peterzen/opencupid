@@ -34,6 +34,11 @@ type FindProfileStoreState = {
   profileList: PublicProfile[]; // List of public profiles
   socialSearch: SocialMatchFilterDTO | null; // Current social search query
   isLoading: boolean; // Loading state
+  // Infinite scroll state
+  isLoadingMore: boolean; // Loading more profiles
+  hasMoreProfiles: boolean; // Whether there are more profiles to load
+  currentPage: number; // Current page for pagination
+  pageSize: number; // Number of profiles per page
 }
 
 type StoreProfileListResponse = StoreSuccess<{ result: PublicProfile[] }> | StoreError
@@ -74,6 +79,11 @@ export const useFindProfileStore = defineStore('findProfile', {
     profileList: [] as PublicProfile[],
     socialSearch: null as SocialMatchFilterDTO | null, // Current social search query
     isLoading: false,
+    // Infinite scroll state
+    isLoadingMore: false,
+    hasMoreProfiles: true,
+    currentPage: 0,
+    pageSize: 10,
   }),
 
   actions: {
@@ -81,9 +91,14 @@ export const useFindProfileStore = defineStore('findProfile', {
     async findSocial(): Promise<StoreResponse<StoreVoidSuccess | StoreError>> {
       try {
         this.isLoading = true
+        this.currentPage = 0
+        this.hasMoreProfiles = true
+        
         const res = await safeApiCall(() => api.get<GetProfilesResponse>('/find/social'))
         const fetched = PublicProfileArraySchema.parse(res.data.profiles)
         this.profileList = fetched
+        this.hasMoreProfiles = fetched.length === this.pageSize
+        
         return storeSuccess()
       } catch (error: any) {
         this.profileList = []
@@ -96,9 +111,14 @@ export const useFindProfileStore = defineStore('findProfile', {
     async findDating(): Promise<StoreResponse<StoreVoidSuccess | StoreError>> {
       try {
         this.isLoading = true
+        this.currentPage = 0
+        this.hasMoreProfiles = true
+        
         const res = await safeApiCall(() => api.get<GetProfilesResponse>('/find/dating'))
         const fetched = PublicProfileArraySchema.parse(res.data.profiles)
         this.profileList = fetched
+        this.hasMoreProfiles = fetched.length === this.pageSize
+        
         return storeSuccess()
       } catch (error: any) {
         this.profileList = []
@@ -116,6 +136,72 @@ export const useFindProfileStore = defineStore('findProfile', {
         return storeSuccess({ result: fetched })
       } catch (error: any) {
         return storeError(error, 'Failed to fetch profiles')
+      }
+    },
+
+    async loadMoreSocial(): Promise<StoreResponse<StoreVoidSuccess | StoreError>> {
+      if (this.isLoadingMore || !this.hasMoreProfiles) {
+        return storeSuccess()
+      }
+
+      try {
+        this.isLoadingMore = true
+        const nextPage = this.currentPage + 1
+        const skip = nextPage * this.pageSize
+        
+        const res = await safeApiCall(() => 
+          api.get<GetProfilesResponse>('/find/social', { 
+            params: { skip, take: this.pageSize } 
+          })
+        )
+        const fetched = PublicProfileArraySchema.parse(res.data.profiles)
+        
+        if (fetched.length > 0) {
+          this.profileList.push(...fetched)
+          this.currentPage = nextPage
+          this.hasMoreProfiles = fetched.length === this.pageSize
+        } else {
+          this.hasMoreProfiles = false
+        }
+        
+        return storeSuccess()
+      } catch (error: any) {
+        return storeError(error, 'Failed to load more profiles')
+      } finally {
+        this.isLoadingMore = false
+      }
+    },
+
+    async loadMoreDating(): Promise<StoreResponse<StoreVoidSuccess | StoreError>> {
+      if (this.isLoadingMore || !this.hasMoreProfiles) {
+        return storeSuccess()
+      }
+
+      try {
+        this.isLoadingMore = true
+        const nextPage = this.currentPage + 1
+        const skip = nextPage * this.pageSize
+        
+        const res = await safeApiCall(() => 
+          api.get<GetProfilesResponse>('/find/dating', { 
+            params: { skip, take: this.pageSize } 
+          })
+        )
+        const fetched = PublicProfileArraySchema.parse(res.data.profiles)
+        
+        if (fetched.length > 0) {
+          this.profileList.push(...fetched)
+          this.currentPage = nextPage
+          this.hasMoreProfiles = fetched.length === this.pageSize
+        } else {
+          this.hasMoreProfiles = false
+        }
+        
+        return storeSuccess()
+      } catch (error: any) {
+        return storeError(error, 'Failed to load more profiles')
+      } finally {
+        this.isLoadingMore = false
       }
     },
 
@@ -191,6 +277,9 @@ export const useFindProfileStore = defineStore('findProfile', {
       this.socialSearch = null
       this.datingPrefs = null
       this.isLoading = false
+      this.isLoadingMore = false
+      this.hasMoreProfiles = true
+      this.currentPage = 0
     }
   },
 })

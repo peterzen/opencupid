@@ -1,4 +1,5 @@
 import { FastifyPluginAsync, type FastifyReply, type FastifyRequest } from 'fastify'
+import { z } from 'zod'
 
 import { sendError, sendForbiddenError } from '../helpers'
 
@@ -10,6 +11,18 @@ import { validateBody } from '../../utils/zodValidate'
 import { mapProfileToPublic } from '../mappers/profile.mappers'
 import { mapProfileToDatingPreferencesDTO, mapSocialMatchFilterToDTO } from '../mappers/profileMatch.mappers'
 
+// Pagination query schema for infinite scrolling
+const PaginationQuerySchema = z.object({
+  skip: z.preprocess(
+    val => typeof val === 'string' ? parseInt(val, 10) : val,
+    z.number().int().min(0).default(0)
+  ),
+  take: z.preprocess(
+    val => typeof val === 'string' ? parseInt(val, 10) : val,
+    z.number().int().min(1).max(50).default(10)
+  ),
+})
+
 const findProfileRoutes: FastifyPluginAsync = async fastify => {
 
   // instantiate services
@@ -17,15 +30,19 @@ const findProfileRoutes: FastifyPluginAsync = async fastify => {
   const profileService = ProfileService.getInstance()
 
 
-  fastify.get('/social', { onRequest: [fastify.authenticate] }, (req, reply) =>
-    getSocialProfiles(req, reply, [{ updatedAt: 'desc' }])
-  )
+  fastify.get('/social', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    const { skip, take } = PaginationQuerySchema.parse(req.query)
+    return getSocialProfiles(req, reply, [{ updatedAt: 'desc' }], take, skip)
+  })
 
-  fastify.get('/dating', { onRequest: [fastify.authenticate] }, (req, reply) =>
-    getDatingProfiles(req, reply, [{ updatedAt: 'desc' }])
-  )
+  fastify.get('/dating', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    const { skip, take } = PaginationQuerySchema.parse(req.query)
+    return getDatingProfiles(req, reply, [{ updatedAt: 'desc' }], take, skip)
+  })
 
   fastify.get('/social/new', { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    const { skip, take } = PaginationQuerySchema.parse(req.query)
+    
     if (!req.session.profile.isSocialActive) {
       return sendForbiddenError(reply)
     }
@@ -34,7 +51,7 @@ const findProfileRoutes: FastifyPluginAsync = async fastify => {
     const locale = req.session.lang
 
     try {
-      const profiles = await profileMatchService.findNewProfilesAnywhere(myProfileId, [{ createdAt: 'desc' }], 10)
+      const profiles = await profileMatchService.findNewProfilesAnywhere(myProfileId, [{ createdAt: 'desc' }], take, skip)
       const mappedProfiles = profiles.map(p =>
         mapProfileToPublic(p, false /* includeDatingContext */, locale)
       )
@@ -124,7 +141,8 @@ const findProfileRoutes: FastifyPluginAsync = async fastify => {
     req: FastifyRequest,
     reply: FastifyReply,
     orderBy: OrderBy,
-    take: number = 10
+    take: number = 10,
+    skip: number = 0
   ) => {
     if (!req.session.profile.isDatingActive) {
       return sendForbiddenError(reply)
@@ -134,7 +152,7 @@ const findProfileRoutes: FastifyPluginAsync = async fastify => {
     const locale = req.session.lang
 
     try {
-      const profiles = await profileMatchService.findMutualMatchesFor(myProfileId, orderBy, take)
+      const profiles = await profileMatchService.findMutualMatchesFor(myProfileId, orderBy, take, skip)
       const mappedProfiles = profiles.map(p =>
         mapProfileToPublic(p, true /* includeDatingContext */, locale)
       )
@@ -151,7 +169,8 @@ const findProfileRoutes: FastifyPluginAsync = async fastify => {
     req: FastifyRequest,
     reply: FastifyReply,
     orderBy: OrderBy,
-    take: number = 20
+    take: number = 10,
+    skip: number = 0
   ) => {
     if (!req.session.profile.isSocialActive) {
       return sendForbiddenError(reply)
@@ -161,7 +180,7 @@ const findProfileRoutes: FastifyPluginAsync = async fastify => {
     const locale = req.session.lang
 
     try {
-      const profiles = await profileMatchService.findSocialProfilesFor(myProfileId, orderBy, take)
+      const profiles = await profileMatchService.findSocialProfilesFor(myProfileId, orderBy, take, skip)
       const mappedProfiles = profiles.map(p =>
         mapProfileToPublic(p, false /* includeDatingContext */, locale)
       )
