@@ -127,10 +127,6 @@ describe('BrowseProfiles view', () => {
     const wrapper = mountComponent()
     expect(wrapper.find('.profile-grid').exists()).toBe(true)
   })
-  it('renders profile grid when results available', () => {
-    const wrapper = mountComponent()
-    expect(wrapper.find('.profile-grid').exists()).toBe(true)
-  })
 
   it('shows no-access overlay when not initialized yet but access would be false', () => {
     vmState.haveAccess.value = false
