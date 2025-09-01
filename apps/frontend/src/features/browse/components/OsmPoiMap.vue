@@ -1,4 +1,5 @@
 <script setup lang="ts">
+
 import ProfileCardComponent from './ProfileCardComponent.vue'
 import { type PublicProfile } from '@zod/profile/profile.dto'
 
@@ -75,7 +76,10 @@ function ensureMap() {
   })
 
   // OSM tiles + required attribution
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  const tilesUrl = __APP_CONFIG__.API_BASE_URL + '/tiles/{z}/{x}/{y}.png'
+
+  L.tileLayer(tilesUrl, {
+    // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   }).addTo(map)
@@ -235,5 +239,9 @@ watch(
 :deep(.leaflet-div-icon) {
   background: transparent;
   border: none;
+}
+
+:deep(.leaflet-popup) {
+  width: 15rem !important;
 }
 </style>
