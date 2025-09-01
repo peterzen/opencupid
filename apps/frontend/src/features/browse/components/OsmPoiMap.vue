@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import ProfileCardComponent from './ProfileCardComponent.vue'
 import { type PublicProfile } from '@zod/profile/profile.dto'
 
@@ -195,7 +194,13 @@ watch(
     <div class="osm-poi-map" ref="mapEl" />
 
     <Teleport v-if="popupTarget" :to="popupTarget">
-      <ProfileCardComponent v-if="popupProfile" :profile="popupProfile" />
+      <ProfileCardComponent
+        v-if="popupProfile"
+        :profile="popupProfile"
+        :showTags="true"
+        :showLocation="true"
+        @click="$emit('profile:select', popupProfile.id)"
+      />
     </Teleport>
   </div>
   <!-- 
@@ -243,5 +248,13 @@ watch(
 
 :deep(.leaflet-popup) {
   width: 15rem !important;
+}
+
+:deep(.leaflet-popup-content) {
+  margin: 0;
+  line-height: 1.3;
+  font-size: 13px;
+  font-size: 1.08333em;
+  min-height: 1px;
 }
 </style>
